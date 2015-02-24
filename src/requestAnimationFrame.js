@@ -13,6 +13,7 @@ var vendors = ['ms', 'moz', 'webkit', 'o'];
 var rAF;
 
 if (typeof window === 'object') {
+    rAF = window.requestAnimationFrame;
     for(var x = 0; x < vendors.length && !rAF; ++x) {
         rAF = window[vendors[x]+'RequestAnimationFrame'];
     }
