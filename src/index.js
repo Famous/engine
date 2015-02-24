@@ -2,6 +2,5 @@
 
 module.exports = {
     ElementAllocator: require('./ElementAllocator'),
-    VirtualElement: require('./VirtualElement'),
-    Renderer: require('./Renderer')
+    VirtualElement: require('./VirtualElement')
 };
