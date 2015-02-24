@@ -15,5 +15,10 @@
   "homepage": "https://github.com/Famous/webgl-shaders",
   "dependencies": {
     "glslify": "latest"
+  },
+  "browserify" : {
+    "transform" : [
+      "glslify"
+    ]
   }
 }
