@@ -2,7 +2,10 @@
 
 function Engine () {
     this.updates = [];
-    this.looper = this.loop.bind(this);
+    var _this = this;
+    this.looper = function(time) {
+        _this.loop(time);
+    };
     this.looper();
 }
 
