@@ -20,11 +20,14 @@ var ADD_CLASS = 'ADD_CLASS';
 var CHANGE_ATTRIBUTE = 'CHANGE_ATTRIBUTE';
 var CHANGE_CONTENT = 'CHANGE_CONTENT';
 var ADD_EVENT_LISTENER = 'ADD_EVENT_LISTENER';
+var EVENT_METHODS = 'EVENT_METHODS';
+var EVENT_PROPERTIES = 'EVENT_PROPERTIES';
+var EVENT_END = 'EVENT_END';
 
 /**
  * The Element class is responsible for providing the API for how
  *   a RenderNode will interact with the DOM API's.  The element is
- *   responsible for adding a set of commands to the renderer. 
+ *   responsible for adding a set of commands to the renderer.
  *
  * @class Element
  * @constructor
@@ -96,13 +99,13 @@ HTMLElement.prototype.getSize = function getSize() {
     return this._size;
 };
 
-HTMLElement.prototype.on = function on (event, cb) {
-    this.eventListener(event);
+HTMLElement.prototype.on = function on (ev, methods, properties) {
+    this.eventListener(ev, methods, properties);
     return this;
 };
 
 /**
- * Set the value of a CSS property 
+ * Set the value of a CSS property
  *
  * @method property
  * @chainable
@@ -243,10 +246,23 @@ HTMLElement.prototype.get = function get (key) {
  *
  * @return {Component} this
  */
-HTMLElement.prototype.eventListener = function eventListener (event) {
+HTMLElement.prototype.eventListener = function eventListener (ev, methods, properties) {
     this.dispatch.dirtyRenderable(this._id);
     this.queue.push(ADD_EVENT_LISTENER);
-    this.queue.push(event);
+    this.queue.push(ev);
+    this.queue.push(EVENT_METHODS);
+    if (methods != null) {
+        for(var i = 0, len = methods.length; i < len; i++) {
+            this.queue.push(methods[i]);
+        }
+    }
+    this.queue.push(EVENT_PROPERTIES);
+    if (properties != null) {
+        for(var i = 0, len = properties.length; i < len; i++) {
+            this.queue.push(properties[i]);
+        }
+    }
+    this.queue.push(EVENT_END);
     return this;
 };
 
