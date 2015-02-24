@@ -1,5 +1,8 @@
 'use strict';
 
+var polyfills = require('famous-polyfills');
+var rAF = polyfills.requestAnimationFrame;
+
 function Engine () {
     this.updates = [];
     var _this = this;
@@ -17,7 +20,7 @@ Engine.prototype.step = function step (time) {
 
 Engine.prototype.loop = function loop (time) {
     this.step(time);
-    requestAnimationFrame(this.looper);
+    rAF(this.looper);
 };
 
 Engine.prototype.update = function update (item) {
