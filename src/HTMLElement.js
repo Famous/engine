@@ -9,7 +9,6 @@ var HEIGHT = 'height';
 var OPACITY = 'opacity';
 var PX = 'px';
 var TRANSFORM = 'transform';
-var TRANSFORM_ORIGIN = 'transform-origin';
 
 var WITH = 'WITH';
 var CHANGE_TRANSFORM_ORIGIN = 'CHANGE_TRANSFORM_ORIGIN';
@@ -62,10 +61,11 @@ HTMLElement.prototype.init = function init() {
 HTMLElement.prototype.clean = function clean() {
     var len = this.queue.length;
     if (len) {
-	var path = this.dispatch.getRenderPath();
-	this.dispatch.sendDrawCommand(WITH).sendDrawCommand(path);
-	for (var i = 0 ; i < len ; i++)
-	    this.dispatch.sendDrawCommand(this.queue.shift());
+    	var path = this.dispatch.getRenderPath();
+    	this.dispatch.sendDrawCommand(WITH).sendDrawCommand(path);
+    	for (var i = 0 ; i < len ; i++) {
+    	    this.dispatch.sendDrawCommand(this.queue.shift());
+        }
     }
     return !this.queue.length;
 };
@@ -76,11 +76,11 @@ HTMLElement.prototype._receiveTransformChange = function _receiveTransformChange
 
 HTMLElement.prototype._receiveSizeChange = function _receiveSizeChange(size) {
     if (!this.trueSized) {
-	var size = size.getTopDownSize();
-	this.property(WIDTH, Math.round(size[0]) + PX)
-	    .property(HEIGHT, Math.round(size[1]) + PX);
-	this._size[0] = size[0];
-	this._size[1] = size[1];
+    	var size = size.getTopDownSize();
+    	this.property(WIDTH, Math.round(size[0]) + PX)
+    	    .property(HEIGHT, Math.round(size[1]) + PX);
+    	this._size[0] = size[0];
+    	this._size[1] = size[1];
     }
 };
 
@@ -242,7 +242,7 @@ HTMLElement.prototype.get = function get (key) {
  * @method eventListener
  * @chainable
  *
- * @param {String} the name of the DOM event to be targeted
+ * @param {String} ev the name of the DOM event to be targeted
  *
  * @return {Component} this
  */
