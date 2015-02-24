@@ -1,0 +1,26 @@
+{
+  "name": "famous-transitions",
+  "version": "0.0.1",
+  "description": "Famous Transitions",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "node test/*.js | tap-spec",
+    "lint": "jshint --reporter node_modules/jshint-stylish/stylish.js src/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Famous/transitions.git"
+  },
+  "author": "",
+  "license": "All rights reserved",
+  "bugs": {
+    "url": "https://github.com/Famous/transitions/issues"
+  },
+  "homepage": "https://github.com/Famous/transitions",
+  "devDependencies": {
+    "jshint": "^2.5.11",
+    "jshint-stylish": "^1.0.0",
+    "tap-spec": "^2.2.0",
+    "tape": "^3.0.3"
+  }
+}
