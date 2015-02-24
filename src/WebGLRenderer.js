@@ -21,7 +21,7 @@ var Buffer = require('./Buffer');
 var checkerBoard = require('./Checkerboard');
 var BufferRegistry = require('./BufferRegistry');
 
-var uniformNames = ['perspective', 'transform', 'opacity', 'origin', 'size'];
+var uniformNames = ['perspective', 'transform', 'opacity', 'origin', 'size', 'baseColor'];
 var resolutionName = ['resolution'];
 var uniformValues = [];
 var resolutionValues = [];
@@ -101,12 +101,12 @@ WebGLRenderer.prototype.receive = function receive(path, commands) {
                 opacity: 1,
                 transform: identity,
                 size: [0, 0, 0],
-                origin: [0, 0, 0]
+                origin: [0, 0, 0],
+                baseColor: [.5, .1, .5]
             },
             buffers: {},
             geometry: null,
-            drawType: null,
-            dynamic: null
+            drawType: null
         };
     }
     var bufferName;
@@ -120,13 +120,13 @@ WebGLRenderer.prototype.receive = function receive(path, commands) {
         var command = commands.shift();
 
         switch (command) {
-                case 'MATERIAL_INPUT':
-            var name = commands.shift();
-            var mat = commands.shift();
-            inputValues[0][0] = -mat._id;
-            this.program.registerMaterial(name, mat);
-            this.updateSize();
-            break;
+            case 'MATERIAL_INPUT':
+                var name = commands.shift();
+                var mat = commands.shift();
+                mesh.uniforms.baseColor[0] = - mat._id;
+                this.program.registerMaterial(name, mat);
+                this.updateSize();
+                break;
             case GL_SET_GEOMETRY:
 
                 mesh.geometry = commands.shift();
@@ -174,9 +174,10 @@ WebGLRenderer.prototype.draw = function draw() {
         uniformValues[2] = mesh.uniforms.opacity;
         uniformValues[3] = mesh.uniforms.origin;
         uniformValues[4] = mesh.uniforms.size;
+        uniformValues[5] = mesh.uniforms.baseColor;
 
         this.program.setUniforms(uniformNames, uniformValues);
-        this.program.setUniforms(inputNames, inputValues);
+
         this.drawBuffers(buffers, mesh.drawType, mesh.geometry);
     }
 };
