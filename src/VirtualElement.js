@@ -39,26 +39,26 @@ var VENDOR_TRANSFORM = vendorPrefix(TRANSFORM);
 var VENDOR_TRANSFORM_ORIGIN = vendorPrefix(TRANSFORM_ORIGIN);
 
 function VirtualElement (target, path, renderer, parent) {
-    this.path = path;
-    this.target = target;
-    this.renderer = renderer;
-    this.parent = parent;
+    this._path = path;
+    this._target = target;
+    this._renderer = renderer;
+    this._parent = parent;
     this._matrix = new Float32Array(16);
     this._invertedParent = [];
     target.classList.add(FA_SURFACE);
-    this.allocator = new ElementAllocator(target);
-    this.properties = {};
-    this.eventListeners = {};
-    this.content = '';
-    this.children = {};
-    this.size = [0, 0, 0];
+    this._allocator = new ElementAllocator(target);
+    this._properties = {};
+    this._eventListeners = {};
+    this._content = '';
+    this._children = {};
+    this._size = [0, 0, 0];
 }
 
 VirtualElement.prototype.getOrSetElement = function getOrSetElement (path, index) {
-    if (this.children[index]) return this.children[index];
-    var div = this.allocator.allocate(DIV);
-    var child = new VirtualElement(div, path, this.renderer, this);
-    this.children[index] = child;
+    if (this._children[index]) return this._children[index];
+    var div = this._allocator.allocate(DIV);
+    var child = new VirtualElement(div, path, this._renderer, this);
+    this._children[index] = child;
     return child;
 };
 
@@ -145,18 +145,18 @@ function _stripEvent (ev, methods, properties) {
 }
 
 VirtualElement.prototype.dispatchEvent = function (ev, methods, properties, payload) {
-    this.renderer.sendEvent(this.path, ev, _stripEvent(payload, methods, properties));
+    this._renderer.sendEvent(this._path, ev, _stripEvent(payload, methods, properties));
 };
 
 VirtualElement.prototype._getSize = function _getSize () {
-    this.size[0] = this.target.offsetWidth;
-    this.size[1] = this.target.offsetHeight;
-    return this.size;
+    this._size[0] = this._target.offsetWidth;
+    this._size[1] = this._target.offsetHeight;
+    return this._size;
 };
 
 VirtualElement.prototype.setMatrix = function setMatrix (m0, m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11, m12, m13, m14, m15) {
-    if (this.parent) {
-        invert(this._invertedParent, this.parent._matrix);
+    if (this._parent) {
+        invert(this._invertedParent, this._parent._matrix);
         multiply(this._matrix, this._invertedParent, m0, m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11, m12, m13, m14, m15);
     } else {
         this._matrix[0] = m0;
@@ -176,34 +176,34 @@ VirtualElement.prototype.setMatrix = function setMatrix (m0, m1, m2, m3, m4, m5,
         this._matrix[14] = m14;
         this._matrix[15] = m15;
     }
-    this.target.style[VENDOR_TRANSFORM] = stringifyMatrix(this._matrix);
+    this._target.style[VENDOR_TRANSFORM] = stringifyMatrix(this._matrix);
 };
 
 VirtualElement.prototype.setProperty = function setProperty (key, value) {
-    if (this.properties[key] !== value) {
-        this.properties[key] = value;
+    if (this._properties[key] !== value) {
+        this._properties[key] = value;
         switch (key) {
             case TRANSFORM:
                 var m = value;
                 this.setMatrix(m[0], m[1], m[2], m[3], m[4], m[5], m[6], m[7], m[8], m[9], m[10], m[11], m[12], m[13], m[14], m[15]);
             break;
         default:
-            this.target.style[key] = value;
+            this._target.style[key] = value;
             break;
         }
     }
 };
 
 VirtualElement.prototype.setContent = function setContent (content) {
-    if (this.content !== content) {
-        this.content = content;
-        this.target.innerHTML = content;
+    if (this._content !== content) {
+        this._content = content;
+        this._target.innerHTML = content;
     }
 };
 
 VirtualElement.prototype.addEventListener = function addEventListener (name, cb) {
-    if (!this.eventListeners[name]) {
-        this.target.addEventListener(name, cb);
+    if (!this._eventListeners[name]) {
+        this._target.addEventListener(name, cb);
     }
 };
 

@@ -12,9 +12,9 @@
  */
 function ElementAllocator(container) {
     if (!container) container = document.createDocumentFragment();
-    this.container     = container;
-    this.detachedNodes = {};
-    this.nodeCount     = 0;
+    this._container = container;
+    this._detachedNodes = {};
+    this._nodeCount = 0;
 }
 
 /**
@@ -28,16 +28,16 @@ function ElementAllocator(container) {
  */
 ElementAllocator.prototype.allocate = function allocate(type) {
     type = type.toLowerCase();
-    if (!(type in this.detachedNodes)) this.detachedNodes[type] = [];
-    var nodeStore = this.detachedNodes[type];
+    if (!(type in this._detachedNodes)) this._detachedNodes[type] = [];
+    var nodeStore = this._detachedNodes[type];
     var result;
     if (nodeStore.length > 0) {
         result = nodeStore.pop();
     } else {
         result = document.createElement(type);
-        this.container.appendChild(result);
+        this._container.appendChild(result);
     }
-    this.nodeCount++;
+    this._nodeCount++;
     result.style.display = '';
     return result;
 };
@@ -51,9 +51,9 @@ ElementAllocator.prototype.allocate = function allocate(type) {
  */
 ElementAllocator.prototype.deallocate = function deallocate(element) {
     var nodeType = element.nodeName.toLowerCase();
-    var nodeStore = this.detachedNodes[nodeType];
+    var nodeStore = this._detachedNodes[nodeType];
     nodeStore.push(element);
-    this.nodeCount--;
+    this._nodeCount--;
 };
 
 /**
@@ -64,7 +64,7 @@ ElementAllocator.prototype.deallocate = function deallocate(element) {
  * @return {Number} total node count
  */
 ElementAllocator.prototype.getNodeCount = function getNodeCount() {
-    return this.nodeCount;
+    return this._nodeCount;
 };
 
 module.exports = ElementAllocator;
