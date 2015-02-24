@@ -2,6 +2,7 @@
 
 var ElementAllocator = require('./ElementAllocator');
 
+var CHANGE_TRANSFORM = 'CHANGE_TRANSFORM';
 var CHANGE_TRANSFORM_ORIGIN = 'CHANGE_TRANSFORM_ORIGIN';
 var CHANGE_PROPERTY = 'CHANGE_PROPERTY';
 var CHANGE_CONTENT = 'CHANGE_CONTENT';
@@ -42,7 +43,7 @@ function VirtualElement (target, path, renderer, parent) {
     this.target = target;
     this.renderer = renderer;
     this.parent = parent;
-    this._matrix = [];
+    this._matrix = new Float32Array(16);
     this._invertedParent = [];
     target.classList.add(FA_SURFACE);
     this.allocator = new ElementAllocator(target);
@@ -65,6 +66,26 @@ VirtualElement.prototype.receive = function receive (commands) {
     while (commands.length) {
         var command = commands.shift();
         switch (command) {
+        case CHANGE_TRANSFORM:
+            this.setMatrix(
+                commands.shift(),
+                commands.shift(),
+                commands.shift(),
+                commands.shift(),
+                commands.shift(),
+                commands.shift(),
+                commands.shift(),
+                commands.shift(),
+                commands.shift(),
+                commands.shift(),
+                commands.shift(),
+                commands.shift(),
+                commands.shift(),
+                commands.shift(),
+                commands.shift(),
+                commands.shift()
+            );
+            break;
         case CHANGE_TRANSFORM_ORIGIN:
             this.setProperty(VENDOR_TRANSFORM_ORIGIN, stringifyTransformOrigin(commands));
             break;
@@ -133,12 +154,27 @@ VirtualElement.prototype._getSize = function _getSize () {
     return this.size;
 };
 
-VirtualElement.prototype.setMatrix = function setMatrix (matrix) {
+VirtualElement.prototype.setMatrix = function setMatrix (m0, m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11, m12, m13, m14, m15) {
     if (this.parent) {
         invert(this._invertedParent, this.parent._matrix);
-        multiply(this._matrix, this._invertedParent, matrix);
+        multiply(this._matrix, this._invertedParent, m0, m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11, m12, m13, m14, m15);
     } else {
-        this._matrix = matrix;
+        this._matrix[0] = m0;
+        this._matrix[1] = m1;
+        this._matrix[2] = m2;
+        this._matrix[3] = m3;
+        this._matrix[4] = m4;
+        this._matrix[5] = m5;
+        this._matrix[6] = m6;
+        this._matrix[7] = m7;
+        this._matrix[8] = m8;
+        this._matrix[9] = m9;
+        this._matrix[10] = m10;
+        this._matrix[11] = m11;
+        this._matrix[12] = m12;
+        this._matrix[13] = m13;
+        this._matrix[14] = m14;
+        this._matrix[15] = m15;
     }
     this.target.style[VENDOR_TRANSFORM] = stringifyMatrix(this._matrix);
 };
@@ -148,7 +184,8 @@ VirtualElement.prototype.setProperty = function setProperty (key, value) {
         this.properties[key] = value;
         switch (key) {
             case TRANSFORM:
-                this.setMatrix(value);
+                var m = value;
+                this.setMatrix(m[0], m[1], m[2], m[3], m[4], m[5], m[6], m[7], m[8], m[9], m[10], m[11], m[12], m[13], m[14], m[15]);
             break;
         default:
             this.target.style[key] = value;
@@ -251,32 +288,32 @@ function invert (out, a) {
     return out;
 }
 
-function multiply (out, a, b) {
+function multiply (out, a, b0, b1, b2, b3, b4, b5, b6, b7, b8, b9, b10, b11, b12, b13, b14, b15) {
     var a00 = a[0], a01 = a[1], a02 = a[2], a03 = a[3],
         a10 = a[4], a11 = a[5], a12 = a[6], a13 = a[7],
         a20 = a[8], a21 = a[9], a22 = a[10], a23 = a[11],
         a30 = a[12], a31 = a[13], a32 = a[14], a33 = a[15];
 
     // Cache only the current line of the second matrix
-    var b0  = b[0], b1 = b[1], b2 = b[2], b3 = b[3];
+    var b0  = b0, b1 = b1, b2 = b2, b3 = b3;
     out[0] = b0*a00 + b1*a10 + b2*a20 + b3*a30;
     out[1] = b0*a01 + b1*a11 + b2*a21 + b3*a31;
     out[2] = b0*a02 + b1*a12 + b2*a22 + b3*a32;
     out[3] = b0*a03 + b1*a13 + b2*a23 + b3*a33;
 
-    b0 = b[4]; b1 = b[5]; b2 = b[6]; b3 = b[7];
+    b0 = b4; b1 = b5; b2 = b6; b3 = b7;
     out[4] = b0*a00 + b1*a10 + b2*a20 + b3*a30;
     out[5] = b0*a01 + b1*a11 + b2*a21 + b3*a31;
     out[6] = b0*a02 + b1*a12 + b2*a22 + b3*a32;
     out[7] = b0*a03 + b1*a13 + b2*a23 + b3*a33;
 
-    b0 = b[8]; b1 = b[9]; b2 = b[10]; b3 = b[11];
+    b0 = b8; b1 = b9; b2 = b10; b3 = b11;
     out[8] = b0*a00 + b1*a10 + b2*a20 + b3*a30;
     out[9] = b0*a01 + b1*a11 + b2*a21 + b3*a31;
     out[10] = b0*a02 + b1*a12 + b2*a22 + b3*a32;
     out[11] = b0*a03 + b1*a13 + b2*a23 + b3*a33;
 
-    b0 = b[12]; b1 = b[13]; b2 = b[14]; b3 = b[15];
+    b0 = b12; b1 = b13; b2 = b14; b3 = b15;
     out[12] = b0*a00 + b1*a10 + b2*a20 + b3*a30;
     out[13] = b0*a01 + b1*a11 + b2*a21 + b3*a31;
     out[14] = b0*a02 + b1*a12 + b2*a22 + b3*a32;
