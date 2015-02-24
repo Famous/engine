@@ -2,7 +2,6 @@
 
 var ElementAllocator = require('./ElementAllocator');
 
-var CHANGE_TRANSFORM = 'CHANGE_TRANSFORM';
 var CHANGE_TRANSFORM_ORIGIN = 'CHANGE_TRANSFORM_ORIGIN';
 var CHANGE_PROPERTY = 'CHANGE_PROPERTY';
 var CHANGE_CONTENT = 'CHANGE_CONTENT';
@@ -19,8 +18,6 @@ var ZERO_COMMA = '0,';
 var MATRIX3D = 'matrix3d(';
 var COMMA = ',';
 var CLOSE_PAREN = ')';
-
-var devicePixelRatio = 1;
 
 var PERCENT = '%';
 var PERCENT_SPACE = '% ';
@@ -72,9 +69,6 @@ VirtualElement.prototype.receive = function receive (commands) {
     while (commands.length) {
         var command = commands.shift();
         switch (command) {
-        case CHANGE_TRANSFORM:
-            this.setProperty(VENDOR_TRANSFORM, stringifyMatrix(commands));
-            break;
         case CHANGE_TRANSFORM_ORIGIN:
             this.setProperty(VENDOR_TRANSFORM_ORIGIN, stringifyTransformOrigin(commands));
             break;
@@ -103,10 +97,11 @@ VirtualElement.prototype.receive = function receive (commands) {
 
 function _stripEvent (ev, methods, properties) {
     var result = {};
-    for (var i = 0, len = methods.length; i < len; i++) {
+    var i, len;
+    for (i = 0, len = methods.length; i < len; i++) {
         ev[methods[i]]();
     }
-    for (var i = 0, len = properties.length; i < len; i++) {
+    for (i = 0, len = properties.length; i < len; i++) {
         var prop = properties[i];
         result[prop] = ev[prop];
     }
