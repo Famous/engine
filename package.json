@@ -1,0 +1,29 @@
+{
+  "name": "famous-math",
+  "version": "0.0.1",
+  "description": "Famous Math",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "tape test/*.js | tap-spec",
+    "lint": "jshint --reporter node_modules/jshint-stylish/stylish.js src/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Famous/math.git"
+  },
+  "author": "",
+  "license": "All rights reserved",
+  "bugs": {
+    "url": "https://github.com/Famous/math/issues"
+  },
+  "homepage": "https://github.com/Famous/math",
+  "devDependencies": {
+    "jshint": "^2.5.11",
+    "jshint-stylish": "^1.0.0",
+    "tap-spec": "^2.2.0",
+    "tape": "^3.0.3"
+  },
+  "dependencies": {
+    "famous-utilities": "git+ssh://git@github.famo.us/platform/utilities#master"
+  }
+}
