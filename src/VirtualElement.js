@@ -37,10 +37,6 @@ function vendorPrefix(property) {
 var VENDOR_TRANSFORM = vendorPrefix(TRANSFORM);
 var VENDOR_TRANSFORM_ORIGIN = vendorPrefix(TRANSFORM_ORIGIN);
 
-var MATRIX3D = 'matrix3d(';
-var COMMA = ',';
-var CLOSE_PAREN = ')';
-
 function VirtualElement (target, path, renderer, parent) {
     this.path = path;
     this.target = target;
