@@ -8,9 +8,8 @@ var WIDTH = 'width';
 var HEIGHT = 'height';
 var OPACITY = 'opacity';
 var PX = 'px';
-var TRANSFORM = 'transform';
-
 var WITH = 'WITH';
+var CHANGE_TRANSFORM = 'CHANGE_TRANSFORM';
 var CHANGE_TRANSFORM_ORIGIN = 'CHANGE_TRANSFORM_ORIGIN';
 var CHANGE_PROPERTY = 'CHANGE_PROPERTY';
 var CHANGE_TAG = 'CHANGE_TAG';
@@ -71,7 +70,24 @@ HTMLElement.prototype.clean = function clean() {
 };
 
 HTMLElement.prototype._receiveTransformChange = function _receiveTransformChange(transform) {
-    this.property(TRANSFORM, transform._matrix);
+    this.dispatch.dirtyRenderable(this._id);
+    this.queue.push(CHANGE_TRANSFORM);
+    this.queue.push(transform._matrix[0]);
+    this.queue.push(transform._matrix[1]);
+    this.queue.push(transform._matrix[2]);
+    this.queue.push(transform._matrix[3]);
+    this.queue.push(transform._matrix[4]);
+    this.queue.push(transform._matrix[5]);
+    this.queue.push(transform._matrix[6]);
+    this.queue.push(transform._matrix[7]);
+    this.queue.push(transform._matrix[8]);
+    this.queue.push(transform._matrix[9]);
+    this.queue.push(transform._matrix[10]);
+    this.queue.push(transform._matrix[11]);
+    this.queue.push(transform._matrix[12]);
+    this.queue.push(transform._matrix[13]);
+    this.queue.push(transform._matrix[14]);
+    this.queue.push(transform._matrix[15]);
 };
 
 HTMLElement.prototype._receiveSizeChange = function _receiveSizeChange(size) {
