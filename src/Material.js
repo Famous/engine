@@ -23,8 +23,8 @@ var chunks = {
     multiply: {glsl: '%1 * %2;', inputs: [4, 4], output: 4, content: '+' }, 
 
     normal: {glsl:'vNormal;', inputs: [], output: 4 },
-    uv: {glsl:'vec3(vTextureCoordinate, 1, 1.);', inputs: [], output: 4 },
-    world_position: {glsl:'vec3(vPosition, 1.);', inputs: [], output: 4 },
+    uv: {glsl:'vec3(vTextureCoordinate, 1);', inputs: [], output: 4 },
+    meshPosition: {glsl:'(vPosition + 1.0) * 0.5;', inputs: [], output: 4 },
 
     image: {glsl:'texture2D(image, vTextureCoordinate).rgb;', inputs: [], output: 4 },
 
@@ -106,8 +106,10 @@ Material.prototype._compile = function _compile() {
         glsl += 'vec3 ' + makeLabel(node._id) + '=' + processGLSL(node.chunk.glsl, node.inputs) + '\n ';
         if (node.uniforms) extend(uniforms, node.uniforms);
     });
-    
-    return {glsl: glsl + 'return ' + makeLabel(this._id) + ';', uniforms: uniforms};
+
+    return {
+        _id: this._id,
+        glsl: glsl + 'return ' + makeLabel(this._id) + ';', uniforms: uniforms};
 };
 
 function extend (a, b) { for (var k in b) a[k] = b[k]; }
@@ -126,6 +128,5 @@ function loadImage (url) {
     img.src = url;
     return img;
 }
-
 
 module.exports = expressions;
