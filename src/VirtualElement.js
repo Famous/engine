@@ -7,6 +7,8 @@ var CHANGE_TRANSFORM_ORIGIN = 'CHANGE_TRANSFORM_ORIGIN';
 var CHANGE_PROPERTY = 'CHANGE_PROPERTY';
 var CHANGE_CONTENT = 'CHANGE_CONTENT';
 var ADD_EVENT_LISTENER = 'ADD_EVENT_LISTENER';
+var EVENT_PROPERTIES = 'EVENT_PROPERTIES';
+var EVENT_END = 'EVENT_END';
 var WITH = 'WITH';
 
 var DIV = 'div';
@@ -84,7 +86,13 @@ VirtualElement.prototype.receive = function receive (commands) {
             break;
         case ADD_EVENT_LISTENER:
             var ev = commands.shift();
-            this.addEventListener(ev, this.dispatchEvent.bind(this, ev));
+            var methods = [];
+            var properties = [];
+            commands.shift();
+            var c;
+            while((c = commands.shift()) !== EVENT_PROPERTIES) methods.push(c);
+            while ((c = commands.shift()) !== EVENT_END) properties.push(c);
+            this.addEventListener(ev, this.dispatchEvent.bind(this, ev, methods, properties));
             break;
         case WITH:
             commands.unshift(command);
@@ -93,28 +101,39 @@ VirtualElement.prototype.receive = function receive (commands) {
     }
 };
 
-function _stripEvent (ev) {
+function _stripEvent (ev, methods, properties) {
     var result = {};
+    for (var i = 0, len = methods.length; i < len; i++) {
+        ev[methods[i]]();
+    }
+    for (var i = 0, len = properties.length; i < len; i++) {
+        var prop = properties[i];
+        result[prop] = ev[prop];
+    }
     switch (ev.type) {
-    case 'mousedown':
-    case 'mouseup':
-    case 'click':
-        result.x = ev.x;
-        result.y = ev.y;
-        result.timeStamp = ev.timeStamp;
-        break;
-    case 'mousemove':
-        result.x = ev.x;
-        result.y = ev.y;
-        result.movementX = ev.movementX;
-        result.movementY = ev.movementY;
-        break;
+        case 'mousedown':
+        case 'mouseup':
+        case 'click':
+            result.x = ev.x;
+            result.y = ev.y;
+            result.timeStamp = ev.timeStamp;
+            break;
+        case 'mousemove':
+            result.x = ev.x;
+            result.y = ev.y;
+            result.movementX = ev.movementX;
+            result.movementY = ev.movementY;
+            break;
+        case 'wheel':
+            result.deltaX = ev.deltaX;
+            result.deltaY = ev.deltaY;
+            break;
     }
     return result;
 }
 
-VirtualElement.prototype.dispatchEvent = function (ev, payload) {
-    this.renderer.sendEvent(this.path, ev, _stripEvent(payload));
+VirtualElement.prototype.dispatchEvent = function (ev, methods, properties, payload) {
+    this.renderer.sendEvent(this.path, ev, _stripEvent(payload, methods, properties));
 };
 
 VirtualElement.prototype._getSize = function _getSize () {
@@ -163,7 +182,7 @@ VirtualElement.prototype.addEventListener = function addEventListener (name, cb)
 /**
  * A helper function for serializing a transform its corresponding
  * css string representation.
- * 
+ *
  * @method stringifyMatrix
  * @private
  *
@@ -172,9 +191,6 @@ VirtualElement.prototype.addEventListener = function addEventListener (name, cb)
  * @return {String} a string of format "matrix3d(m0, m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11, m12, m13, m14, m15)"
  */
 function stringifyMatrix(m) {
-    m[12] = Math.round(m[12] * devicePixelRatio) / devicePixelRatio;
-    m[13] = Math.round(m[13] * devicePixelRatio) / devicePixelRatio;
-
     var r = MATRIX3D;
 
     r += (m[0] < 0.000001 && m[0] > -0.000001) ? ZERO_COMMA : m[0] + COMMA;
@@ -249,26 +265,26 @@ function multiply (out, a, b) {
         a10 = a[4], a11 = a[5], a12 = a[6], a13 = a[7],
         a20 = a[8], a21 = a[9], a22 = a[10], a23 = a[11],
         a30 = a[12], a31 = a[13], a32 = a[14], a33 = a[15];
-    
+
     // Cache only the current line of the second matrix
-    var b0  = b[0], b1 = b[1], b2 = b[2], b3 = b[3];  
+    var b0  = b[0], b1 = b[1], b2 = b[2], b3 = b[3];
     out[0] = b0*a00 + b1*a10 + b2*a20 + b3*a30;
     out[1] = b0*a01 + b1*a11 + b2*a21 + b3*a31;
     out[2] = b0*a02 + b1*a12 + b2*a22 + b3*a32;
     out[3] = b0*a03 + b1*a13 + b2*a23 + b3*a33;
-    
+
     b0 = b[4]; b1 = b[5]; b2 = b[6]; b3 = b[7];
     out[4] = b0*a00 + b1*a10 + b2*a20 + b3*a30;
     out[5] = b0*a01 + b1*a11 + b2*a21 + b3*a31;
     out[6] = b0*a02 + b1*a12 + b2*a22 + b3*a32;
     out[7] = b0*a03 + b1*a13 + b2*a23 + b3*a33;
-    
+
     b0 = b[8]; b1 = b[9]; b2 = b[10]; b3 = b[11];
     out[8] = b0*a00 + b1*a10 + b2*a20 + b3*a30;
     out[9] = b0*a01 + b1*a11 + b2*a21 + b3*a31;
     out[10] = b0*a02 + b1*a12 + b2*a22 + b3*a32;
     out[11] = b0*a03 + b1*a13 + b2*a23 + b3*a33;
-    
+
     b0 = b[12]; b1 = b[13]; b2 = b[14]; b3 = b[15];
     out[12] = b0*a00 + b1*a10 + b2*a20 + b3*a30;
     out[13] = b0*a01 + b1*a11 + b2*a21 + b3*a31;
