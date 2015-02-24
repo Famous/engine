@@ -48,6 +48,8 @@ function PhysicsEngine(options) {
 
     this.prestep = [];
     this.poststep = [];
+
+    this.frameDependent = options.frameDependent || false;
 }
 
 /**
@@ -233,6 +235,7 @@ PhysicsEngine.prototype.update = function update(time) {
     var forces = this.forces;
     var constraints = this.constraints;
 
+    var frameDependent = this.frameDependent;
     var step = this.step;
     var dt = step * 0.001;
     var speed = this.speed;
@@ -240,6 +243,7 @@ PhysicsEngine.prototype.update = function update(time) {
     var delta = this.delta;
     delta += (time - this.time) * speed;
     this.time = time;
+
     while(delta > step) {
         for (var i = 0, len = this.prestep.length; i < len; i++) {
             this.prestep[i](time, dt);
@@ -286,8 +290,10 @@ PhysicsEngine.prototype.update = function update(time) {
             this.poststep[i](time, dt);
         }
 
-        delta -= step;
+        if (frameDependent) delta = 0;
+        else delta -= step;
     }
+
     this.delta = delta;
 };
 
