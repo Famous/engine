@@ -96,8 +96,9 @@ function Program(gl) {
 Program.prototype.registerMaterial = function registerMaterial(name, material) {
     if (this.registeredMaterials[material._id]) return;
     this.registeredMaterials[material._id] = true;
-    var compiled = material._compile();
-    
+
+    var compiled = material;
+
     if (compiled.uniforms.image) {
         var t = new Texture(this.gl);
         loadImage(compiled.uniforms.image, function (img) {

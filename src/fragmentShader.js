@@ -28,6 +28,7 @@ module.exports = {
         '}',
 
         'vec3 applyLight(vec3 baseColor, vec3 normal, float metalness, float glossiness) {',
+        '  return baseColor;',
         '  vec3 light = vec3(.5, .1, .5);',
         '  vec3 color = baseColor * dot(normal, light);',
 
@@ -40,7 +41,7 @@ module.exports = {
         '  float brdf_spec = fresnel(metalness, halfVec, light) * geometry(normal, halfVec, view, light, glossiness) * distribution(normal, halfVec, glossiness) / (4.0 * NdotL_clamped * NdotV_clamped);',
         '  vec3 color_spec = NdotL_clamped * brdf_spec * color;',
         '  vec3 color_diff = NdotL_clamped * diffuseEnergyRatio(metalness, normal, light) * color;',
-        '  return color_diff * .3;',
+
         '}',
 
         '//float_definitions',
@@ -51,8 +52,9 @@ module.exports = {
 
         '//vec_definitions',
         'vec3 applyMaterial(vec3 ID) {',
+        
         '  //vec_applications',
-        '  return vec3(1);',
+        '  return vec3(1, 0, 1);',
         '}',
 
         'void main() {',
@@ -62,7 +64,6 @@ module.exports = {
         '    metalness >= 0. ? metalness: applyMaterial(metalness),',
         '    glossiness >= 0. ? glossiness: applyMaterial(glossiness));',
         '    gl_FragColor.a = opacity;',
-        '    gl_FragColor = vec4((vPosition + 1.0) * 0.5, 1.0);',
         '}'
     ].join('\n')
 };
