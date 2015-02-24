@@ -22,7 +22,7 @@ GlobalDispatch.prototype.receiveCommands = function receiveCommands (commands) {
                 break;
             case FRAME:
                 this.targetedCallbacks.engine.trigger(FRAME, commands.shift());
-                break
+                break;
         }
     }
 };
@@ -35,7 +35,7 @@ GlobalDispatch.prototype.handleMessage = function handleMessage (commands) {
             if (this.targetedCallbacks[path]) this.targetedCallbacks[path].trigger(commands.shift(), commands.shift());
             break;
     }
-}
+};
 
 GlobalDispatch.prototype.targetedOn = function targetedOn (path, key, cb) {
     if (!this.targetedCallbacks[path]) this.targetedCallbacks[path] = new CallbackStore();

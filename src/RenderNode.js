@@ -39,7 +39,7 @@ RenderNode.prototype.reflow = function reflow () {
         for (var i = 0, len = this._childNodes.length ; i < len ; i++)
             this._childNodes[i].reflow();
     }
-}
+};
 
 RenderNode.prototype.layout = function layout (i, fn, ctx) {
     this._layoutNodes[i].halt();
@@ -63,7 +63,7 @@ RenderNode.prototype.removeChildAtIndex = function removeChildAtIndex (index) {
     result[0].killDispatch();
     result[1].killDispatch();
     return this;
-}
+};
 
 RenderNode.prototype.removeAllChildren = function removeAllChildren () {
     for (var i = 0, len = this._childNodes.length ; i < len ; i++) {
