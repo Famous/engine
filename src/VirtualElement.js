@@ -54,6 +54,10 @@ function VirtualElement (target, path, renderer, parent) {
     this._size = [0, 0, 0];
 }
 
+VirtualElement.prototype.getTarget = function getTarget () {
+    return this._target;
+};
+
 VirtualElement.prototype.getOrSetElement = function getOrSetElement (path, index) {
     if (this._children[index]) return this._children[index];
     var div = this._allocator.allocate(DIV);
