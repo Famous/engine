@@ -20,11 +20,6 @@ Compositor.CommandsToOutput = {
     GL_SET_GEOMETRY: 'GL'
 };
 
-function _getElement(selector) {
-    if (!this._domElement[selector]) this._domElement[selector] = document.querySelector(selector);
-    return this._domElement[selector];
-}
-
 Compositor.prototype.sendEvent = function sendEvent(path, ev, payload) {
     this._outCommands.push('WITH', path, 'TRIGGER', ev, payload);
 };
