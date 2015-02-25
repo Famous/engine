@@ -99,6 +99,7 @@ Size.prototype.toIdentity = function toIdentity () {
     this._absolute[0] = this._absolute[1] = this._absolute[2] = 0;
     this._differential[0] = this._differential[1] = this._differential[2] = 0;
     this._proportions[0] = this._proportions[1] = this._proportions[2] = 1;
+    this._invalidated = 7;
     return this;
 };
 
