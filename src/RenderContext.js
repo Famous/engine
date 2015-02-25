@@ -1,6 +1,6 @@
 'use strict';
 
-var Transform = require('famous-math').Transform;
+var Transform = require('./Transform');
 var Origin = require('./Origin');
 var MountPoint = require('./MountPoint');
 var Align = require('./Align');

@@ -24,7 +24,6 @@
     "tape": "^3.0.3"
   },
   "dependencies": {
-    "famous-math": "git+ssh://git@github.famo.us/platform/math#master",
     "famous-components": "git+ssh://git@github.famo.us/platform/components#master",
     "famous-handlers":  "git+ssh://git@github.famo.us/platform/handlers#master"
   }
