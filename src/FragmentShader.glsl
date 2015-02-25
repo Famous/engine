@@ -52,5 +52,4 @@ void main() {
     metalness >= 0. ? metalness: applyMaterial(metalness),
     glossiness >= 0. ? glossiness: applyMaterial(glossiness));
     gl_FragColor.a = opacity;
-    gl_FragColor = vec4((vPosition + 1.0) * 0.5, 1.0);
 }
