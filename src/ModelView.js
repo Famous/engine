@@ -19,12 +19,13 @@ ModelView.prototype.kill = function kill () {
 };
 
 ModelView.prototype.acceptModel = function acceptModel (model) {
+    this._model = model;
+    
     var renderer = new model.constructor.renderWith(this._dispatch, this._model);
     var Handler;
     var i;
     var len;
 
-    this._model = model;
     this._rendererControllers.push(new RenderHandler(renderer, this._dispatch));
     this._renderer = renderer;
 
