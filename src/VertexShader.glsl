@@ -25,7 +25,12 @@ vec4 applyTransform(vec4 pos) {
    projection[1][1] = 1.0/resolution.y;
    projection[2][2] = (resolution.y > resolution.x) ? 1.0/resolution.y : 1.0/resolution.x;
 
-   pos = projection * MVMatrix * pos;
+   pos = MVMatrix * pos;
+
+   vPosition = pos.xyz;
+   vPosition += translation.xyz;
+
+   pos = projection * pos;
    pos += translation;
 
    return pos;
@@ -35,6 +40,5 @@ vec4 applyTransform(vec4 pos) {
 // and normal attributes as varyings and passes the position
 // attribute through position pipeline
 void main() {
-    vPosition = pos.xyz;
     gl_Position = applyTransform(vec4(pos, 1.0));
 }
