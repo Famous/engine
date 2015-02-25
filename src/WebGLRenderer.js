@@ -46,11 +46,11 @@ function WebGLRenderer(container) {
     this.container = container;
     this.canvas = document.createElement('canvas');
 
-    if (this.container.target === document.body) {
+    if (this.container._target === document.body) {
         window.addEventListener('resize', this.updateSize.bind(this));
     }
 
-    this.container.target.appendChild(this.canvas);
+    this.container._target.appendChild(this.canvas);
     this.canvas.className = 'famous-webgl GL';
 
     var context = this.canvas.getContext('webgl') || this.canvas.getContext('experimental-webgl');
@@ -102,7 +102,7 @@ WebGLRenderer.prototype.receive = function receive(path, commands) {
                 transform: identity,
                 size: [0, 0, 0],
                 origin: [0, 0, 0],
-                baseColor: [.5, .1, .5]
+                baseColor: [.5, .5, .5]
             },
             buffers: {},
             geometry: null,
