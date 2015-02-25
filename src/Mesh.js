@@ -18,12 +18,12 @@ var MATERIAL_INPUT = 'MATERIAL_INPUT';
 var METALLIC = 'metallic';
 var BASE_COLOR = 'baseColor';
 var GLOSSINESS = 'glossiness';
-var NORMAL = 'normal';  
+var NORMAL = 'normal';
 
 /**
  * The Mesh class is responsible for providing the API for how
  * a RenderNode will interact with the WebGL API by adding
- * a set of commands to the renderer. 
+ * a set of commands to the renderer.
  *
  * @class Mesh
  * @constructor
@@ -125,16 +125,6 @@ Mesh.prototype.setGeometry = function (geometry) {
         this._geometry = geometry;
     }
 
-    i = geometry.spec.invalidations.length;
-    while (i--) {
-        bufferIndex = geometry.spec.invalidations.pop();
-        this.queue.push(GL_BUFFER_DATA);
-        this.queue.push(geometry.id);
-        this.queue.push(geometry.spec.bufferNames[i]);
-        this.queue.push(geometry.spec.bufferValues[i]);
-        this.queue.push(geometry.spec.bufferSpacings[i]);
-    }
-
     return this
 };
 
@@ -153,6 +143,17 @@ Mesh.prototype.clean = function clean() {
         .sendDrawCommand('WITH')
         .sendDrawCommand(path);
 
+    var bufferIndex;
+    i = this._geometry.spec.invalidations.length;
+    while (i--) {
+        bufferIndex = this._geometry.spec.invalidations.pop();
+        this.dispatch.sendDrawCommand(GL_BUFFER_DATA);
+        this.dispatch.sendDrawCommand(this._geometry.id);
+        this.dispatch.sendDrawCommand(this._geometry.spec.bufferNames[i]);
+        this.dispatch.sendDrawCommand(this._geometry.spec.bufferValues[i]);
+        this.dispatch.sendDrawCommand(this._geometry.spec.bufferSpacings[i]);
+    }
+
     var i = this.queue.length;
     while (i--) this.dispatch.sendDrawCommand(this.queue.shift());
 
@@ -160,7 +161,7 @@ Mesh.prototype.clean = function clean() {
 };
 
 /**
- * Defines a 3-element map that provides the overall color of the mesh. 
+ * Defines a 3-element map that provides the overall color of the mesh.
  *
  * @method baseColor
  * @chainable
