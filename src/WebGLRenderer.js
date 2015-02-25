@@ -46,11 +46,11 @@ function WebGLRenderer(container) {
     this.container = container;
     this.canvas = document.createElement('canvas');
 
-    if (this.container._target === document.body) {
+    if (this.container.target === document.body) {
         window.addEventListener('resize', this.updateSize.bind(this));
     }
 
-    this.container._target.appendChild(this.canvas);
+    this.container.target.appendChild(this.canvas);
     this.canvas.className = 'famous-webgl GL';
 
     var context = this.canvas.getContext('webgl') || this.canvas.getContext('experimental-webgl');
