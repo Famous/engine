@@ -21,14 +21,14 @@ var Buffer = require('./Buffer');
 var checkerBoard = require('./Checkerboard');
 var BufferRegistry = require('./BufferRegistry');
 
-var uniformNames = ['perspective', 'transform', 'opacity', 'origin', 'size'];
+var uniformNames = ['perspective', 'transform', 'opacity', 'origin', 'size', 'baseColor'];
 var resolutionName = ['resolution'];
 var uniformValues = [];
 var resolutionValues = [];
 
 var inputIdx = { baseColor: 0, normal: 1, metalness: 2, glossiness: 3 };
 var inputNames = ['baseColor', 'normal', 'metalness', 'glossiness'];
-var inputValues = [[1, 1, 1], [0,0,0], .2, .8];
+var inputValues = [[.5, .5, .5], [0,0,0], .2, .8];
 var identity = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
 
 /**
@@ -46,11 +46,11 @@ function WebGLRenderer(container) {
     this.container = container;
     this.canvas = document.createElement('canvas');
 
-    if (this.container.target === document.body) {
+    if (this.container._target === document.body) {
         window.addEventListener('resize', this.updateSize.bind(this));
     }
 
-    this.container.target.appendChild(this.canvas);
+    this.container._target.appendChild(this.canvas);
     this.canvas.className = 'famous-webgl GL';
 
     var context = this.canvas.getContext('webgl') || this.canvas.getContext('experimental-webgl');
@@ -101,12 +101,12 @@ WebGLRenderer.prototype.receive = function receive(path, commands) {
                 opacity: 1,
                 transform: identity,
                 size: [0, 0, 0],
-                origin: [0, 0, 0]
+                origin: [0, 0, 0],
+                baseColor: [.5, .5, .5]
             },
             buffers: {},
             geometry: null,
-            drawType: null,
-            dynamic: null
+            drawType: null
         };
     }
     var bufferName;
@@ -120,6 +120,13 @@ WebGLRenderer.prototype.receive = function receive(path, commands) {
         var command = commands.shift();
 
         switch (command) {
+            case 'MATERIAL_INPUT':
+                var name = commands.shift();
+                var mat = commands.shift();
+                mesh.uniforms.baseColor[0] = - mat._id;
+                this.program.registerMaterial(name, mat);
+                this.updateSize();
+                break;
             case GL_SET_GEOMETRY:
 
                 mesh.geometry = commands.shift();
@@ -167,27 +174,12 @@ WebGLRenderer.prototype.draw = function draw() {
         uniformValues[2] = mesh.uniforms.opacity;
         uniformValues[3] = mesh.uniforms.origin;
         uniformValues[4] = mesh.uniforms.size;
+        uniformValues[5] = mesh.uniforms.baseColor;
 
         this.program.setUniforms(uniformNames, uniformValues);
 
         this.drawBuffers(buffers, mesh.drawType, mesh.geometry);
     }
-
-    // var i = geometry.spec.invalidations.length;
-    // while (i--) this.bufferRegistry.allocate(geometry.spec, geometry.spec.invalidations.shift());
-
-    // for (i = 0; i < queue.length; i++) {
-    //     while (queue.length) {
-    //         var command = queue.shift();
-    //         switch (command) {
-    //             case BUFFER_DATA: break;
-    //             case MATERIAL_INPUT: var name = queue.shift(), mat = queue.shift();
-    //                                  inputValues[inputIdx[name]][0] = -mat._id;
-    //                                  this.program.registerMaterial(name, mat); break;
-    //             case UNIFORM_INPUT: inputValues[inputIdx[queue.shift()]] = queue.shift(); break; 
-    //         }
-    //     }
-    // }
 };
 
 
