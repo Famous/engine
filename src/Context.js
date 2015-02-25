@@ -4,6 +4,7 @@ var RenderProxy = require('./RenderProxy');
 var RenderNode = require('./RenderNode');
 
 var NEED_SIZE_FOR = 'NEED_SIZE_FOR';
+var RESIZE = 'resize';
 
 function Context (model, selector, globalDispatch) {
     this._selector = selector;
@@ -18,7 +19,7 @@ function Context (model, selector, globalDispatch) {
 Context.prototype.init = function init (model) {
     this._contentNode.getDispatch().acceptModel(model);
     this._globalDispatch.message(NEED_SIZE_FOR).message(this._selector);
-    this._globalDispatch.targetedOn(this._selector, 'resize', this._receiveContextSize.bind(this));
+    this._globalDispatch.targetedOn(this._selector, RESIZE, this._receiveContextSize.bind(this));
     return this;
 };  
 
@@ -32,7 +33,6 @@ Context.prototype.receive = function receive (command) {
 };
 
 Context.prototype.send = function send () {
-    var len = this._drawCommands.length;
     for (var i = 0, len = this._drawCommands.length ; i < len ; i++)
         this._globalDispatch.message(this._drawCommands.shift());
     return this;
