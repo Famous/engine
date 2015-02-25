@@ -1,14 +1,20 @@
 'use strict';
 
-var time = 0;
-Date.now = function() {
-    return time;
-};
-
 var test = require('tape');
 var TweenTransition = require('../src/TweenTransition');
 
+var time = 0;
+var _now = Date.now;
+
 test('TweenTransition', function(t) {
+    t.test('set up', function(t) {
+        time = 0;
+        Date.now = function() {
+            return time;
+        };
+        t.end();
+    });
+
     t.test('constructor', function(t) {
         t.equal(typeof TweenTransition, 'function', 'TweenTransition should be a function');
 
@@ -161,5 +167,10 @@ test('TweenTransition', function(t) {
         tweenTransition.halt();
         time = 1000;
         t.equal(tweenTransition.get(), 0.5);
+    });
+
+    t.test('tear down', function(t) {
+        Date.now = _now;
+        t.end();
     });
 });
