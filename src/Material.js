@@ -109,7 +109,9 @@ Material.prototype._compile = function _compile() {
 
     return {
         _id: this._id,
-        glsl: glsl + 'return ' + makeLabel(this._id) + ';', uniforms: uniforms};
+        glsl: glsl + 'return ' + makeLabel(this._id) + ';',
+        uniforms: uniforms
+    };
 };
 
 function extend (a, b) { for (var k in b) a[k] = b[k]; }
