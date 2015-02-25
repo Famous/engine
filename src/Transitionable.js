@@ -157,13 +157,21 @@ Transitionable.prototype.reset = function reset(startState, startVelocity) {
  * @return {Transitionable} this
  */
 Transitionable.prototype.delay = function delay(duration, callback) {
-    this.set(this.get(), {duration: duration,
+    var endValue;
+    if (this.actionQueue.length) {
+        endValue = this.actionQueue[this.actionQueue.length - 1][0];
+    } else if (this.currentAction) {
+        endValue = this.currentAction[0];
+    } else {
+        endValue = this.get();
+    }
+
+    return this.set(endValue, {
+        duration: duration,
         curve: function() {
             return 0;
-        }},
-        callback
-    );
-    return this;
+        }
+    }, callback);
 };
 
 /**
