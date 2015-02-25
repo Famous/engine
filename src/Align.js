@@ -1,6 +1,6 @@
 'use strict';
 
-var Transform = require('famous-math').Transform;
+var Transform = require('./Transform');
 
 function Align () {
     this.x = 0;
