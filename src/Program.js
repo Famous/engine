@@ -27,8 +27,8 @@ var TYPES = {
 var VERTEX_SHADER = 35633;
 var FRAGMENT_SHADER = 35632;
 
-var vertexWrapper = require('./vertexShader.js', 'utf8').glsl;
-var fragmentWrapper = require('./fragmentShader.js', 'utf8').glsl;
+var vertexWrapper = require('famous-webgl-shaders').vertex;
+var fragmentWrapper = require('famous-webgl-shaders').fragment;
 
 var inputs = ['baseColor', 'normals', 'metalness', 'glossiness'];
 var inputTypes = {baseColor: 'vec3', normal: 'vec3', glossiness: 'float', metalness: 'float' };
