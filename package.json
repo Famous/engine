@@ -26,6 +26,6 @@
   "dependencies": {
     "famous-components": "git+ssh://git@github.famo.us/platform/components#master",
     "famous-handlers":  "git+ssh://git@github.famo.us/platform/handlers#master",
-    "famous-utilities":  "git+ssh://git@github.famo.us/platform/utilities#master",
+    "famous-utilities":  "git+ssh://git@github.famo.us/platform/utilities#master"
   }
 }
