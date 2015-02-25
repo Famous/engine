@@ -11,6 +11,7 @@ function Compositor() {
 
 Compositor.CommandsToOutput = {
     CHANGE_TRANSFORM_ORIGIN: 'DOM',
+    CHANGE_TRANSFORM: 'DOM',
     CHANGE_PROPERTY: 'DOM',
     CHANGE_CONTENT: 'DOM',
     ADD_EVENT_LISTENER: 'DOM',
@@ -69,7 +70,7 @@ Compositor.prototype.getOrSetContext = function getOrSetContext(selector) {
     var result = {
         DOM: new VirtualElement(document.querySelector(selector), selector, this)
     };
-    result.DOM.setMatrix([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
+    result.DOM.setMatrix(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
     this._contexts[selector] = result;
     return result;
 };
