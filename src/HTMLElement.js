@@ -18,7 +18,6 @@ var ADD_CLASS = 'ADD_CLASS';
 var CHANGE_ATTRIBUTE = 'CHANGE_ATTRIBUTE';
 var CHANGE_CONTENT = 'CHANGE_CONTENT';
 var ADD_EVENT_LISTENER = 'ADD_EVENT_LISTENER';
-var EVENT_METHODS = 'EVENT_METHODS';
 var EVENT_PROPERTIES = 'EVENT_PROPERTIES';
 var EVENT_END = 'EVENT_END';
 
@@ -266,18 +265,9 @@ HTMLElement.prototype.eventListener = function eventListener (ev, methods, prope
     this.dispatch.dirtyRenderable(this._id);
     this.queue.push(ADD_EVENT_LISTENER);
     this.queue.push(ev);
-    this.queue.push(EVENT_METHODS);
-    if (methods != null) {
-        for(var i = 0, len = methods.length; i < len; i++) {
-            this.queue.push(methods[i]);
-        }
-    }
+    if (methods != null) this.queue.push(methods);
     this.queue.push(EVENT_PROPERTIES);
-    if (properties != null) {
-        for(var i = 0, len = properties.length; i < len; i++) {
-            this.queue.push(properties[i]);
-        }
-    }
+    if (properties != null) this.queue.push(properties);
     this.queue.push(EVENT_END);
     return this;
 };
