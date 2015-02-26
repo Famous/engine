@@ -53,7 +53,7 @@ Context.prototype._update = function _update (node, parent) {
     dispatch.updateModelView()
         .cleanComponents()
         .cleanRenderContext(parent)
-        .cleanRenderables(this._renderProxy);
+        .cleanRenderables();
     this._needsReflow = this._needsReflow || dispatch.requestingReflow();
     var children = node.getChildren();
     var i = 0;

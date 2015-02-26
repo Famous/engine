@@ -133,7 +133,7 @@ function _findPublication (model) {
     if (!publicationKey) return;
     else if (publicationKey.constructor === String)
 
-        if (model[publicationKey].constructor === Array) {
+        if (model[publicationKey] && model[publicationKey].constructor === Array) {
             i = 0;
             len = model[publicationKey].length;
             node = this._dispatch.getNode();
@@ -161,14 +161,17 @@ function _findPublication (model) {
             this._childManager = new ObjectObserver(model);
             this._childManager.subscribe(publicationKey, this.swapChild.bind(this));
 
-            node.removeAllChildren();
-            node
-                .addChild(0)
-                .getDispatch()
-                .acceptModel(model[publicationKey]);
+            if (model[publicationKey]) {
+                node.removeAllChildren();
+                node
+                    .addChild(0)
+                    .getDispatch()
+                    .acceptModel(model[publicationKey]);
 
-            if (this._renderer.layout)
-                node.reflowWith(this._renderer.layout, this._renderer);
+                if (this._renderer.layout)
+                    node.reflowWith(this._renderer.layout, this._renderer);
+            }
+
         }
     else if (publicationKey.constructor === Array) {
         i = 0;
