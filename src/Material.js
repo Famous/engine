@@ -65,7 +65,6 @@ function Material(name, chunk, inputs, uniforms) {
     this.inputs = inputs ? (Array.isArray(inputs) ? inputs : [inputs]): [];
     this.uniforms = uniforms;
     this._id = Material.id++;
-    for (var k in uniforms) if (STRING === typeof uniforms[k]) uniforms[k] = loadImage(uniforms[k]);
 }
 
 Material.id = 1;
@@ -123,12 +122,6 @@ function processGLSL(str, inputs) {
 }
 function makeLabel (n) {
     return 'fa_' + (n);
-}
-
-function loadImage (url) {
-    var img = new Image();
-    img.src = url;
-    return img;
 }
 
 module.exports = expressions;
