@@ -72,7 +72,8 @@ function WebGLRenderer(container) {
     this.state = {
         boundArrayBuffer: null,
         boundElementBuffer: null,
-        lastDrawn: null
+        lastDrawn: null,
+        enabledAttributes: {}
     };
 
     this.cachedSize = [];
@@ -196,7 +197,6 @@ WebGLRenderer.prototype.draw = function draw() {
  * @param {Number} Enumerator defining what primitive to draw
  * 
  */
-
 WebGLRenderer.prototype.drawBuffers = function drawBuffers(vertexBuffers, mode, id) {
     var gl = this.gl;
     var length = 0;
@@ -205,9 +205,11 @@ WebGLRenderer.prototype.drawBuffers = function drawBuffers(vertexBuffers, mode, 
     var spacing;
     var offset;
     var buffer;
+    var iter;
     var j;
 
-    for (var i = 0; i < vertexBuffers.keys.length; i++) {
+    iter = vertexBuffers.keys.length;
+    for (var i = 0; i < iter; i++) {
         attribute = vertexBuffers.keys[i];
 
         // Do not set vertexAttribPointer if index buffer.
@@ -224,7 +226,12 @@ WebGLRenderer.prototype.drawBuffers = function drawBuffers(vertexBuffers, mode, 
         if (location === undefined) {
             location = gl.getAttribLocation(this.program.program, attribute);
             this.program.attributeLocations[attribute] = location;
-            if (location !== -1) gl.enableVertexAttribArray(location);
+            if (location === -1) continue;
+        }
+
+        if (!this.state.enabledAttributes[attribute]) {
+            gl.enableVertexAttribArray(location);
+            this.state.enabledAttributes[attribute] = true;
         }
 
         // Retreive buffer information used to set attribute pointer.
@@ -243,6 +250,15 @@ WebGLRenderer.prototype.drawBuffers = function drawBuffers(vertexBuffers, mode, 
 
         if (this.state.lastDrawn !== id) {
             gl.vertexAttribPointer(location, spacing, gl.FLOAT, gl.FALSE, 0, 4 * offset);
+        }
+    }
+
+    // Disable any attributes that not currently being used.
+
+    for(var attribute in this.state.enabledAttributes) {
+        if (this.state.enabledAttributes[attribute] && vertexBuffers.keys.indexOf(attribute) === -1) {
+            gl.disableVertexAttribArray(this.program.attributeLocations[attribute]);
+            this.state.enabledAttributes[i] = false;
         }
     }
 
