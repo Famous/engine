@@ -55,7 +55,7 @@ BufferRegistry.prototype.allocate = function allocate(geometryId, name, value, s
 
     if (j === -1) {
         j = vertexBuffers.keys.length;
-        length = isIndex ? value.length : value.length / spacing;
+        length = isIndex ? value.length : Math.floor(value.length / spacing);
 
         if (dynamic) {
 
