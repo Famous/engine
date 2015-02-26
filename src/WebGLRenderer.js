@@ -258,7 +258,7 @@ WebGLRenderer.prototype.drawBuffers = function drawBuffers(vertexBuffers, mode, 
     for(var attribute in this.state.enabledAttributes) {
         if (this.state.enabledAttributes[attribute] && vertexBuffers.keys.indexOf(attribute) === -1) {
             gl.disableVertexAttribArray(this.program.attributeLocations[attribute]);
-            this.state.enabledAttributes[i] = false;
+            this.state.enabledAttributes[attribute] = false;
         }
     }
 
