@@ -40,5 +40,8 @@ vec4 applyTransform(vec4 pos) {
 // and normal attributes as varyings and passes the position
 // attribute through position pipeline
 void main() {
+    gl_PointSize = 10.;
+    vNormal = normal;
+    vTextureCoordinate = texCoord;
     gl_Position = applyTransform(vec4(pos, 1.0));
 }
