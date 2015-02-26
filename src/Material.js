@@ -117,11 +117,18 @@ function extend (a, b) { for (var k in b) a[k] = b[k]; }
 
 function processGLSL(str, inputs) {
     return str.replace(/%\d/g, function (s) {
-        return makeLabel(inputs[s[1]-1]._id);
+        return makeLabel(inputs[s[1]-1]);
     });
 }
 function makeLabel (n) {
-    return 'fa_' + (n);
+    if (typeof n == 'object') return 'fa_' + (n._id);
+    if (Array.isArray(n)) return arrayToVec(n);
+    else return JSON.stringify(n);
+}
+
+function arrayToVec(array) {
+    var len = array.length;
+    return 'vec' + len + '(' + array.join(',')  + ')';
 }
 
 module.exports = expressions;
