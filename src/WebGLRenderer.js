@@ -127,6 +127,11 @@ WebGLRenderer.prototype.receive = function receive(path, commands) {
                 this.program.registerMaterial(name, mat);
                 this.updateSize();
                 break;
+            case 'UNIFORM_INPUT':
+                var name = commands.shift();
+                var mat = commands.shift();
+                mesh.uniforms.baseColor = mat;
+                break;
             case GL_SET_GEOMETRY:
 
                 mesh.geometry = commands.shift();
@@ -415,3 +420,4 @@ WebGLRenderer.prototype.updateSize = function updateSize() {
 };
 
 module.exports = WebGLRenderer;
+
