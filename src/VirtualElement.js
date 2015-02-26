@@ -130,8 +130,10 @@ function _mirror(item, target, reference) {
         keys = Object.keys(item);
         for (i = 0, len = keys.length; i < len; i++) {
             key = keys[i];
-            target[key] = {};
-            _mirror(item[key], target[key], reference[key])
+            if (reference[key]) {
+                target[key] = {};
+                _mirror(item[key], target[key], reference[key])
+            }
         }
     }
 }
