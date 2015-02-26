@@ -33,17 +33,19 @@ vec3 applyLight(vec3 baseColor, vec3 normal, float metalness, float glossiness) 
   float brdf_spec = fresnel(metalness, halfVec, light) * geometry(normal, halfVec, view, light, glossiness) * distribution(normal, halfVec, glossiness) / (4.0 * NdotL_clamped * NdotV_clamped);
   vec3 color_spec = NdotL_clamped * brdf_spec * color;
   vec3 color_diff = NdotL_clamped * diffuseEnergyRatio(metalness, normal, light) * color;
-  return color_diff * .3;
+  return baseColor;
 }
-//float_definitions
+
+#float_definitions
 float applyMaterial(float ID) {
-  //float_applications
+  #float_applications
   return 1.;
 }
-//vec_definitions
+
+#vec_definitions
 vec3 applyMaterial(vec3 ID) {
-  //vec_applications
-  return vec3(1);
+  #vec_applications
+  return vec3(.5);         
 }
 void main() {
     gl_FragColor.rgb = applyLight(

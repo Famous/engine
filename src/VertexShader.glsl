@@ -41,7 +41,7 @@ vec4 applyTransform(vec4 pos) {
 // attribute through position pipeline
 void main() {
     gl_PointSize = 10.;
-    vNormal = normal;
+    vNormal = normals;
     vTextureCoordinate = texCoord;
     gl_Position = applyTransform(vec4(pos, 1.0));
 }
