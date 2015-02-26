@@ -2,11 +2,10 @@
 
 var Layer = require('./Layer');
 
-function ComponentStore (dispatch) {
+function ComponentStore () {
     this._components = new Layer();
     this._renderables = new Layer();
     this._currentRenderableSize = [0, 0, 0];
-    this._localDispatch = dispatch;
 }
 
 ComponentStore.prototype.clearComponents = function clearComponents () {
