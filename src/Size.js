@@ -78,18 +78,15 @@ Size.prototype.getTopDownSize = function getTopDownSize () {
 
 Size.prototype._update = function _update(parentReport, parentSize) {
     this._invalidated |= parentReport;
-    if (this._invalidated & 1) {
+    if (this._invalidated & 1)
         if (this._absoluteSized[0]) this._size[0] = this._absolute[0];
         else this._size[0] = parentSize[0] * this._proportions[0] + this._differential[0];
-    }
-    if (this._invalidated & 2) {
+    if (this._invalidated & 2)
         if (this._absoluteSized[1]) this._size[1] = this._absolute[1];
         else this._size[1] = parentSize[1] * this._proportions[1] + this._differential[1];
-    }
-    if (this._invalidated & 4) {
+    if (this._invalidated & 4)
         if (this._absoluteSized[2]) this._size[2] = this._absolute[2];
         else this._size[2] = parentSize[2] * this._proportions[2] + this._differential[2];
-    }
     this._previouslyInvalidated = this._invalidated;
     this._invalidated = 0;
     return this._previouslyInvalidated;

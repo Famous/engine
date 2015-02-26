@@ -137,14 +137,13 @@ RenderContext.prototype.update = function update (parentContext) {
         parentContext._size.getTopDownSize()
     );
 
-    if (!this._origin.isActive) {
+    if (!this._origin.isActive)
         this._origin._setWithoutActivating(parentContext._origin.x, parentContext._origin.y, parentContext._origin.z);
-    }
     var mySize = this._size.get();
     var parentSize = parentContext._size.get();
     this._align.update(parentSize);
     this._mountPoint.update(mySize);
-    
+
     this._align.transform._update(
         parentContext._transform._previouslyInvalidated,
         parentContext._transform._matrix
@@ -160,30 +159,29 @@ RenderContext.prototype.update = function update (parentContext) {
         this._mountPoint.transform._matrix
     );
 
-    if (this._transform._previouslyInvalidated) {
+    if (this._transform._previouslyInvalidated)
        this._events.trigger(TRANSFORM, this._transform);
-    }
 
     if (this._origin.dirty) {
         this._events.trigger(ORIGIN, this._origin);
         this._origin.clean();
     }
 
-    if (this._size._previouslyInvalidated) this._events.trigger(SIZE, this._size);
+    if (this._size._previouslyInvalidated)
+        this._events.trigger(SIZE, this._size);
 
     if (this._opacity.dirty) {
         this._events.trigger(OPACITY, this._opacity);
         this._opacity.clean();
     }
-    
-    if (this._needsReflow) {
+
+    if (this._needsReflow)
         if (!this._dispatch._modelView.renderer) {
             var layoutFn = this._dispatch._modelView.renderer.layout;
             if (layoutFn)
                 this._dispatch.reflowWith(layoutFn, this._dispatch._modelView.renderer);
             this._needsReflow = false;
         }
-    }
     return this;
 };
 

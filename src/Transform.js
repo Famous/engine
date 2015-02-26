@@ -57,11 +57,11 @@ var VALIDATORS = [
 
 // Map of invalidation numbers
 var DEPENDENTS = {
-    global : [4369,8738,17476,34952,4369,8738,17476,34952,4369,8738,17476,34952,4096,8192,16384,32768],
-    local  : {
-        translation : [61440,61440,61440],
-        rotation    : [4095,4095,255],
-        scale       : [4095,4095,4095],
+    global: [4369, 8738, 17476, 34952, 4369, 8738, 17476, 34952, 4369, 8738, 17476, 34952, 4096, 8192, 16384, 32768],
+    local: {
+        translation: [61440, 61440, 61440],
+        rotation: [4095, 4095, 255],
+        scale: [4095, 4095, 4095]
     }
 };
 
@@ -75,12 +75,12 @@ var DEPENDENTS = {
  * @constructor
  */
 function Transform() {
-    this._matrix   = new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
-    this._memory   = new Float32Array([1, 0, 1, 0, 1, 0]);
-    this._vectors  = {
-        translation : new Float32Array([0, 0, 0]),
-        rotation    : new Float32Array([0, 0, 0]),
-        scale       : new Float32Array([1, 1, 1])
+    this._matrix = new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
+    this._memory = new Float32Array([1, 0, 1, 0, 1, 0]);
+    this._vectors = {
+        translation: new Float32Array([0, 0, 0]),
+        rotation: new Float32Array([0, 0, 0]),
+        scale: new Float32Array([1, 1, 1])
     };
     this._invalidated = 0;
     this._previouslyInvalidated = 0;
@@ -127,7 +127,7 @@ Transform.prototype._invalidateFromParent = function _invalidateFromParent(paren
     }
 };
 
-Transform.prototype._isIdentity = function _isIdentity () {
+Transform.prototype._isIdentity = function _isIdentity() {
     var vectors = this._vectors;
     var trans = vectors.translation;
     var rot = vectors.rotation;
@@ -135,7 +135,7 @@ Transform.prototype._isIdentity = function _isIdentity () {
     return !(trans[0] || trans[1] || trans[2] || rot[0] || rot[1] || rot[2]) && scale[0] && scale[1] && scale[2];
 };
 
-Transform.prototype._copyParent = function _copyParent (parentReport, parentMatrix) {
+Transform.prototype._copyParent = function _copyParent(parentReport, parentMatrix) {
     var report = parentReport;
     if (parentReport) {
         this._previouslyInvalidated = parentReport;
@@ -147,7 +147,7 @@ Transform.prototype._copyParent = function _copyParent (parentReport, parentMatr
         }
     }
     return parentReport;
-}
+};
 
 /**
  * Update the global matrix based on local and parent invalidations.
@@ -162,10 +162,10 @@ Transform.prototype._copyParent = function _copyParent (parentReport, parentMatr
 Transform.prototype._update = function _update(parentReport, parentMatrix) {
     if (!(parentReport || this._invalidated)) return 0;
     if (this._isIdentity()) return this._copyParent(parentReport, parentMatrix);
-    if (parentReport)  this._invalidateFromParent(parentReport);
+    if (parentReport) this._invalidateFromParent(parentReport);
     if (!parentMatrix) parentMatrix = IDENTITY;
     var update;
-    var counter     = 0;
+    var counter = 0;
     var invalidated = this._invalidated;
 
     // Based on invalidations update only the needed indicies
@@ -199,22 +199,22 @@ Transform.prototype._update = function _update(parentReport, parentMatrix) {
  */
 Transform.prototype.translate = function translate(x, y, z) {
     var translation = this._vectors.translation;
-    var dirty       = false;
+    var dirty = false;
     var size;
 
     if (x) {
         translation[0] += x;
-        dirty           = true;
+        dirty = true;
     }
 
     if (y) {
         translation[1] += y;
-        dirty           = true;
+        dirty = true;
     }
 
     if (z) {
         translation[2] += z;
-        dirty           = true;
+        dirty = true;
     }
 
     if (dirty) this._invalidated |= 61440;
@@ -247,21 +247,21 @@ Transform.prototype.rotate = function rotate(x, y, z) {
  */
 Transform.prototype.scale = function scale(x, y, z) {
     var scaleVector = this._vectors.scale;
-    var dirty       = false;
+    var dirty = false;
 
     if (x) {
         scaleVector[0] += x;
-        dirty     = dirty || true;
+        dirty = dirty || true;
     }
 
     if (y) {
         scaleVector[1] += y;
-        dirty     = dirty || true;
+        dirty = dirty || true;
     }
 
     if (z) {
         scaleVector[2] += z;
-        dirty     = dirty || true;
+        dirty = dirty || true;
     }
 
     if (dirty) this._invalidated |= 4095;
@@ -279,22 +279,22 @@ Transform.prototype.scale = function scale(x, y, z) {
  */
 Transform.prototype.setTranslation = function setTranslation(x, y, z) {
     var translation = this._vectors.translation;
-    var dirty       = false;
+    var dirty = false;
     var size;
 
     if (x !== translation[0] && x != null) {
         translation[0] = x;
-        dirty          = dirty || true;
+        dirty = dirty || true;
     }
 
     if (y !== translation[1] && y != null) {
         translation[1] = y;
-        dirty          = dirty || true;
+        dirty = dirty || true;
     }
 
     if (z !== translation[2] && z != null) {
         translation[2] = z;
-        dirty          = dirty || true;
+        dirty = dirty || true;
     }
 
     if (dirty) this._invalidated |= 61440;
@@ -323,26 +323,26 @@ Transform.prototype.getTranslation = function getTranslation() {
  */
 Transform.prototype.setRotation = function setRotation(x, y, z) {
     var rotation = this._vectors.rotation;
-    var dirty    = false;
+    var dirty = false;
 
     if (x !== rotation[0] && x != null) {
-        rotation[0]     = x;
+        rotation[0] = x;
         this._memory[0] = Math.cos(x);
         this._memory[1] = Math.sin(x);
-        dirty           = dirty || true;
+        dirty = dirty || true;
     }
 
     if (y !== rotation[1] && y != null) {
-        rotation[1]     = y;
+        rotation[1] = y;
         this._memory[2] = Math.cos(y);
         this._memory[3] = Math.sin(y);
-        dirty           = dirty || true;
+        dirty = dirty || true;
     }
 
     if (z !== rotation[2] && z != null) {
-        rotation[2]        = z;
-        this._memory[4]    = Math.cos(z);
-        this._memory[5]    = Math.sin(z);
+        rotation[2] = z;
+        this._memory[4] = Math.cos(z);
+        this._memory[5] = Math.sin(z);
         this._invalidated |= 255;
     }
 
@@ -376,17 +376,17 @@ Transform.prototype.setScale = function setScale(x, y, z) {
 
     if (x !== scale[0]) {
         scale[0] = x;
-        dirty    = dirty || true;
+        dirty = dirty || true;
     }
 
     if (y !== scale[1]) {
         scale[1] = y;
-        dirty    = dirty || true;
+        dirty = dirty || true;
     }
 
     if (z !== scale[2]) {
         scale[2] = z;
-        dirty    = dirty || true;
+        dirty = dirty || true;
     }
 
     if (dirty) this._invalidated |= 4095;

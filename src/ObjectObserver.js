@@ -18,7 +18,7 @@ function ObjectObserver (obj, type) {
         case ObjectObserver.METHODS:
             this.callbacks = new MethodStore();
             break;
-        default: 
+        default:
             this.callbacks = new CallbackStore();
             break;
     }

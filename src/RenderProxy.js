@@ -20,6 +20,6 @@ RenderProxy.prototype.receive = function receive (command) {
 RenderProxy.prototype.send = function send () {
     this._parent.send();
     return this;
-};  
+};
 
 module.exports = RenderProxy;
