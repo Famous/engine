@@ -1,5 +1,6 @@
 'use strict';
 
 module.exports = {
-    Mesh: require('./Mesh')
+    Mesh: require('./Mesh'),
+    PointLight: require('./PointLight')
 };
