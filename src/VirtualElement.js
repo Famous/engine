@@ -101,12 +101,13 @@ VirtualElement.prototype.receive = function receive (commands) {
             break;
         case ADD_EVENT_LISTENER:
             var ev = commands.shift();
-            var methods = [];
-            var properties = [];
-            commands.shift();
+            var methods;
+            var properties;
             var c;
-            while((c = commands.shift()) !== EVENT_PROPERTIES) methods.push(c);
-            while ((c = commands.shift()) !== EVENT_END) properties.push(c);
+            while ((c = commands.shift()) !== EVENT_PROPERTIES) methods = c;
+            while ((c = commands.shift()) !== EVENT_END) properties = c;
+            methods = methods || [];
+            properties = properties || [];
             this.addEventListener(ev, this.dispatchEvent.bind(this, ev, methods, properties));
             break;
         case WITH:
@@ -116,6 +117,25 @@ VirtualElement.prototype.receive = function receive (commands) {
     }
 };
 
+function _mirror(item, target, reference) {
+    var i, len;
+    var key, keys;
+    if (typeof item === 'string' || typeof item === 'number') target[item] = reference[item];
+    else if (Array.isArray(item)) {
+        for (i = 0, len = item.length; i < len; i++) {
+            _mirror(item[i], target, reference);
+        }
+    }
+    else {
+        keys = Object.keys(item);
+        for (i = 0, len = keys.length; i < len; i++) {
+            key = keys[i];
+            target[key] = {};
+            _mirror(item[key], target[key], reference[key])
+        }
+    }
+}
+
 function _stripEvent (ev, methods, properties) {
     var result = {};
     var i, len;
@@ -124,7 +144,7 @@ function _stripEvent (ev, methods, properties) {
     }
     for (i = 0, len = properties.length; i < len; i++) {
         var prop = properties[i];
-        result[prop] = ev[prop];
+        _mirror(prop, result, ev);
     }
     switch (ev.type) {
         case 'mousedown':
