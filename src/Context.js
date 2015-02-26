@@ -21,7 +21,7 @@ Context.prototype.init = function init (model) {
     this._globalDispatch.message(NEED_SIZE_FOR).message(this._selector);
     this._globalDispatch.targetedOn(this._selector, RESIZE, this._receiveContextSize.bind(this));
     return this;
-};  
+};
 
 Context.prototype.getRenderPath = function () {
     return this._selector;
@@ -77,4 +77,3 @@ Context.prototype.reflow = function reflow () {
 };
 
 module.exports = Context;
-

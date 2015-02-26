@@ -17,7 +17,8 @@ RenderNode.prototype.addChild = function addChild (index) {
     if (index == null) {
         this._layoutNodes.push(layoutNode);
         this._childNodes.push(childNode);
-    } else {
+    }
+    else {
         this._layoutNodes.splice(index, 0, layoutNode);
         this._childNodes.splice(index, 0, childNode);
     }
@@ -33,9 +34,8 @@ RenderNode.prototype.reflowWith = function reflowWith (fn, ctx) {
 RenderNode.prototype.reflow = function reflow () {
     var renderer = this._localDispatch.getRenderer();
     if (renderer) {
-        if (renderer.layout) {
+        if (renderer.layout)
             this.reflowWith(renderer.layout, renderer);
-        }
         for (var i = 0, len = this._childNodes.length ; i < len ; i++)
             this._childNodes[i].reflow();
     }

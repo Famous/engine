@@ -124,7 +124,7 @@ LocalDispatch.prototype.setDifferential = function setDifferential (x, y, z) {
     return this;
 };
 
-LocalDispatch.prototype.setProportions = function setProportions (x,  y, z) {
+LocalDispatch.prototype.setProportions = function setProportions (x, y, z) {
     this._context.setProportions(x, y, z);
     return this;
 };

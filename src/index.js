@@ -18,5 +18,5 @@ module.exports = {
     RenderContext: require('./RenderContext'),
     RenderNode: require('./RenderNode'),
     RenderProxy: require('./RenderProxy'),
-    Size: require('./Size'),
+    Size: require('./Size')
 };

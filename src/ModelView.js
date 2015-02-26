@@ -20,7 +20,7 @@ ModelView.prototype.kill = function kill () {
 
 ModelView.prototype.acceptModel = function acceptModel (model) {
     this._model = model;
-    
+
     var renderer = new model.constructor.renderWith(this._dispatch, this._model);
     var Handler;
     var i;
@@ -41,6 +41,7 @@ ModelView.prototype.acceptModel = function acceptModel (model) {
             Handler = renderer.constructor.handlers[i];
             this._rendererControllers.push(new Handler(renderer, this._dispatch));
         }
+
     }
 
     var subscriptions = this._renderer.constructor.subscribe;
@@ -130,7 +131,7 @@ function _findPublication (model) {
     var len;
 
     if (!publicationKey) return;
-    else if (publicationKey.constructor === String) {
+    else if (publicationKey.constructor === String)
 
         if (model[publicationKey].constructor === Array) {
             i = 0;
@@ -166,13 +167,12 @@ function _findPublication (model) {
                 .getDispatch()
                 .acceptModel(model[publicationKey]);
 
-            if (this._renderer.layout) 
+            if (this._renderer.layout)
                 node.reflowWith(this._renderer.layout, this._renderer);
         }
-
-    } else if (publicationKey.constructor === Array) {
+    else if (publicationKey.constructor === Array) {
         i = 0;
-        len = publicationKey.length;
+        len = publicationKey.legnth;
         node = this._dispatch.getNode();
         this._childManager = new ObjectObserver(model);
 
