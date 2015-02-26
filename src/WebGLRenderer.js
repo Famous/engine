@@ -28,12 +28,12 @@ var identity = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
 /**
  * WebGLRenderer is a private class that reads commands from a Mesh
  * and converts them into webGL api calls.
- * 
+ *
  * @class WebGLRenderer
  * @constructor
- * 
+ *
  * @param {DOMElement} canvas The dom element that GL will paint itself onto.
- * 
+ *
  */
 
 function WebGLRenderer(container) {
@@ -59,6 +59,7 @@ function WebGLRenderer(container) {
     gl.depthFunc(gl.LEQUAL);
 
     this.meshRegistry = {};
+    this.lightRegistry = {};
     this.textureRegistry = {};
     this.texCache = {};
     this.bufferRegistry = new BufferRegistry(gl);
@@ -83,12 +84,13 @@ function WebGLRenderer(container) {
  * @method render
  *
  * @param {Context} object with local transform data and mesh
- * 
+ *
  * @chainable
  */
 
 WebGLRenderer.prototype.receive = function receive(path, commands) {
     var mesh = this.meshRegistry[path];
+    var light = this.lightRegistry[path];
 
     if (!mesh) {
         mesh = this.meshRegistry[path] = {
@@ -110,6 +112,28 @@ WebGLRenderer.prototype.receive = function receive(path, commands) {
         var command = commands.shift();
 
         switch (command) {
+
+            case 'GL_CREATE_LIGHT':
+                light = this.lightRegistry[path] = {
+                    color: [1.0, 1.0, 1.0],
+                    position: [0.0, 0.0, 100.0]
+                };
+                break;
+
+            case 'GL_LIGHT_POSITION':
+                var transform = commands.shift();
+                light.position[0] = transform[12];
+                light.position[1] = transform[13];
+                light.position[2] = transform[14];
+                break;
+
+            case 'GL_LIGHT_COLOR':
+                var color = commands.shift();
+                light.color[0] = color[0];
+                light.color[1] = color[1];
+                light.color[2] = color[2];
+                break;
+
             case 'MATERIAL_INPUT':
                 var name = commands.shift();
                 var mat = commands.shift();
@@ -130,22 +154,19 @@ WebGLRenderer.prototype.receive = function receive(path, commands) {
                 mesh.dynamic = commands.shift();
                 break;
 
-            case 'GL_UNIFORMS': 
+            case 'GL_UNIFORMS':
                 uniformName = commands.shift();
                 uniformValue = commands.shift();
-
                 var index = mesh.uniformKeys.indexOf(uniformName);
-
                 if (index === -1) {
                     mesh.uniformKeys.push(uniformName);
                     mesh.uniformValues.push(uniformValue);
                 } else {
                     mesh.uniformValues[index] = uniformValue;
                 }
-
                 break;
 
-            case 'GL_BUFFER_DATA': 
+            case 'GL_BUFFER_DATA':
                 geometryId = commands.shift();
                 bufferName = commands.shift();
                 bufferValue = commands.shift();
@@ -163,12 +184,19 @@ WebGLRenderer.prototype.draw = function draw() {
     var mesh;
     var buffers;
     var size;
+    var light;
+
+    for(var key in this.lightRegistry) {
+        light = this.lightRegistry[key];
+        this.program.setUniforms(['u_LightPosition'], [light.position]);
+        this.program.setUniforms(['u_LightColor'], [light.color]);
+    }
 
     this.program.setUniforms(['perspective'], [this.projectionTransform]);
 
     for (var key in this.meshRegistry) {
         mesh = this.meshRegistry[key];
-        
+
         buffers = this.bufferRegistry.registry[mesh.geometry];
         if (!buffers) return;
 
@@ -185,7 +213,7 @@ WebGLRenderer.prototype.draw = function draw() {
  *
  * @param {Object} Map of vertex buffers keyed by attribute identifier
  * @param {Number} Enumerator defining what primitive to draw
- * 
+ *
  */
 WebGLRenderer.prototype.drawBuffers = function drawBuffers(vertexBuffers, mode, id) {
     var gl = this.gl;
@@ -268,7 +296,7 @@ WebGLRenderer.prototype.drawBuffers = function drawBuffers(vertexBuffers, mode, 
                 gl.bindBuffer(buffer.target, buffer.buffer);
                 this.state.boundElementBuffer = buffer;
             }
-            
+
             gl.drawElements(mode, length, gl.UNSIGNED_SHORT, 2 * offset);
         }
         else {
@@ -288,7 +316,7 @@ WebGLRenderer.prototype.drawBuffers = function drawBuffers(vertexBuffers, mode, 
  * @param {spec} The object containing mesh data
  * @param {context} The object containing global render information
  * @param {Texture} The location where the render data is stored
- * 
+ *
  */
 
 function renderOffscreen(callback, spec, context, texture) {
@@ -309,7 +337,7 @@ function renderOffscreen(callback, spec, context, texture) {
 
     gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texture.id, 0);
     gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, renderbuffer);
-    
+
     if (this.debug) checkFrameBufferStatus(gl);
 
     callback.call(this, spec);
@@ -322,10 +350,10 @@ function renderOffscreen(callback, spec, context, texture) {
  * Uploads an image if it is a string
  *
  * @method loadImage
- * 
+ *
  * @param {Object, String} image object or string url
  * @param {Function} proc that gets called when the image is loaded
- * 
+ *
  */
 function loadImage (img, callback) {
     var obj = (typeof img === 'string' ? new Image() : img) || {};
@@ -341,15 +369,15 @@ function loadImage (img, callback) {
  * Diagonose the failed intialization of an FBO
  *
  * @method checkFrameBufferStatus
- * 
+ *
  * @param {Object} the glContext that owns this FBO
- * 
+ *
  */
 function checkFrameBufferStatus(gl) {
     var status = gl.checkFramebufferStatus(gl.FRAMEBUFFER);
 
     switch (status) {
-        case gl.FRAMEBUFFER_COMPLETE: 
+        case gl.FRAMEBUFFER_COMPLETE:
             break;
         case gl.FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
             throw("Incomplete framebuffer: FRAMEBUFFER_INCOMPLETE_ATTACHMENT"); break;
@@ -370,15 +398,15 @@ function checkFrameBufferStatus(gl) {
  * If no size is passed in this function will update using the cached size.
  *
  * @method updateSize
- * 
+ *
  * @param {Number} width Updated width of the drawing context.
  * @param {Number} height Updated height of the drawing context.
  * @param {Number} depth Updated depth of the drawing context.
- * 
+ *
  */
 WebGLRenderer.prototype.updateSize = function updateSize() {
     var newSize = this.container._getSize();
-    
+
     var width = newSize[0];
     var height = newSize[1];
 

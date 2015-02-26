@@ -40,15 +40,17 @@ var inputTypes = {baseColor: 'vec3', normal: 'vec3', glossiness: 'float', metaln
 var identityMatrix = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
 
 var uniformNames = [
-    'perspective', 'resolution', 
+    'perspective', 'resolution',
     'transform', 'origin', 'size', 'opacity',
-    'baseColor', 'normal', 'metalness', 'glossiness'
+    'baseColor', 'normal', 'metalness', 'glossiness',
+    'u_LightPosition', 'u_LightColor'
 ];
 
 var uniformValues = [
     identityMatrix, [0, 0, 0],
     identityMatrix, [0.5, 0.5], [1, 1, 1], 0,
-    [1, 1, 1], [1, 1, 1], 1, 1
+    [1, 1, 1], [1, 1, 1], 1, 1,
+    [1, 1, 1], [1, 1, 1]
 ];
 
 var attributeNames = ['pos', 'texCoord', 'normals'];
@@ -109,7 +111,7 @@ Program.prototype.registerMaterial = function registerMaterial(name, material) {
             t.setImage(img);
         });
         delete compiled.uniforms.image;
-    } 
+    }
 
     for (var k in compiled.uniforms) {
         uniformNames.push(k);
@@ -118,24 +120,24 @@ Program.prototype.registerMaterial = function registerMaterial(name, material) {
 
     if (inputTypes[name] == FLOAT) {
         this.definitionFloat.push('float fa_' + material._id + '() {\n '  + compiled.glsl + ' \n}');
-        this.applicationFloat.push('if (int(abs(ID)) == ' + material._id + ') return fa_' + material._id  + '();');        
+        this.applicationFloat.push('if (int(abs(ID)) == ' + material._id + ') return fa_' + material._id  + '();');
     } else {
         this.definitionVec.push('vec3 fa_' + material._id + '() {\n '  + compiled.glsl + ' \n}');
         this.applicationVec.push('if (int(abs(ID.x)) == ' + material._id + ') return fa_' + material._id + '();');
     }
-    
+
     this.resetProgram();
 };
 
 /**
- * Clears all cached uniforms and attribute locations.  Assembles 
- * new fragment and vertex shaders and based on material from 
- * currently registered materials.  Attaches said shaders to new 
+ * Clears all cached uniforms and attribute locations.  Assembles
+ * new fragment and vertex shaders and based on material from
+ * currently registered materials.  Attaches said shaders to new
  * shader program and upon success links program to the WebGL
  * context.
  *
  * @method resetProgram
- * 
+ *
  * @return {Program} this
  *
  */
@@ -148,7 +150,7 @@ Program.prototype.resetProgram = function resetProgram() {
 
     var vertexHeader = [header];
     var fragmentHeader = [header];
-    
+
     var fragmentSource;
     var vertexSource;
     var material;
@@ -169,7 +171,7 @@ Program.prototype.resetProgram = function resetProgram() {
 
     this.uniformNames = Utility.clone(uniformNames);
     this.uniformValues = Utility.clone(uniformValues);
-    
+
     this.flaggedUniforms = [];
     this.cachedUniforms = {};
 
@@ -177,15 +179,15 @@ Program.prototype.resetProgram = function resetProgram() {
 
     for(i = 0; i < this.uniformNames.length; i++) {
         name = this.uniformNames[i], value = this.uniformValues[i];
-        vertexHeader.push(UNIFORM + TYPES[value.length] + name + SEMINEWLINE); 
-        fragmentHeader.push(UNIFORM + TYPES[value.length] + name + SEMINEWLINE); 
+        vertexHeader.push(UNIFORM + TYPES[value.length] + name + SEMINEWLINE);
+        fragmentHeader.push(UNIFORM + TYPES[value.length] + name + SEMINEWLINE);
     }
 
     for(i = 0; i < this.attributeNames.length; i++) {
         name = this.attributeNames[i], value = this.attributeValues[i];
         vertexHeader.push(ATTRIBUTE + TYPES[value] + name + SEMINEWLINE);
     }
-    
+
     for(i = 0; i < this.varyingNames.length; i++) {
         name = this.varyingNames[i], value = this.varyingValues[i];
         vertexHeader.push(VARYING + TYPES[value]  + name + SEMINEWLINE);
@@ -211,7 +213,7 @@ Program.prototype.resetProgram = function resetProgram() {
         program,
         this.compileShader(this.gl.createShader(FRAGMENT_SHADER), fragmentSource)
     );
- 
+
     this.gl.linkProgram(program);
 
     if (! this.gl.getProgramParameter(program, this.gl.LINK_STATUS)) {
@@ -224,7 +226,7 @@ Program.prototype.resetProgram = function resetProgram() {
     }
 
     this.setUniforms(this.uniformNames, this.uniformValues);
- 
+
     return this;
 };
 
@@ -234,7 +236,7 @@ Program.prototype.resetProgram = function resetProgram() {
  * creates new entries in the cache when necessary.
  *
  * @method uniformIsCached
- * 
+ *
  * @param {String} targetName Key of uniform spec being evaluated
  * @param {Number | Array} value Value of uniform spec being evaluated
  * @return {Boolean} Value indicating whether the uniform being set
@@ -272,15 +274,15 @@ Program.prototype.uniformIsCached = function (targetName, value) {
 };
 
 /**
- * Handles all passing of uniforms to WebGL drawing context.  This 
+ * Handles all passing of uniforms to WebGL drawing context.  This
  * function will find the uniform location and then, based on
  * a type inferred from the javascript value of the uniform, it will call
- * the appropriate function to pass the uniform to WebGL.  Finally, 
+ * the appropriate function to pass the uniform to WebGL.  Finally,
  * setUniforms will iterate through the passed in shaderChunks (if any)
  * and set the appropriate uniforms to specify which chunks to use.
  *
  * @method setUniforms
- * 
+ *
  * @param {Object} entityUniforms Key-value pairs of all uniforms from incoming spec
  * @param {Array} shaderChunks Program chunks registered to incoming spec
  * @return {Program} this
@@ -302,7 +304,7 @@ Program.prototype.setUniforms = function (uniformNames, uniformValue) {
     for (i = 0; i < len; i++) {
         name = uniformNames[i];
 
-        // Retreive the cached location of the uniform, 
+        // Retreive the cached location of the uniform,
         // requesting a new location from the WebGL context
         // if it does not yet exist.
 
@@ -343,7 +345,7 @@ Program.prototype.setUniforms = function (uniformNames, uniformValue) {
 /**
  * Adds shader source to shader and compiles the input shader.  Checks
  * compile status and logs error if necessary.
- * 
+ *
  * @method compileShader
  *
  * @param {WebGL Program} shader Program to be compiled
