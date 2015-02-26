@@ -6,11 +6,6 @@ var BUFFER_DATA = 'BUFFER_DATA';
 var UNIFORM_INPUT = 'UNIFORM_INPUT';
 var MATERIAL_INPUT = 'MATERIAL_INPUT';
 var GL_SPEC = 'GL_SPEC';
-var WITH = 'WITH';
-
-var GL_UNIFORMS = 'GL_UNIFORMS';
-var GL_BUFFER_DATA = 'GL_BUFFER_DATA';
-var GL_SET_GEOMETRY = 'GL_SET_GEOMETRY';
 
 var FRAME_END = 'FRAME_END';
 
@@ -97,13 +92,8 @@ WebGLRenderer.prototype.receive = function receive(path, commands) {
 
     if (!mesh) {
         mesh = this.meshRegistry[path] = {
-            uniforms: {
-                opacity: 1,
-                transform: identity,
-                size: [0, 0, 0],
-                origin: [0, 0, 0],
-                baseColor: [.5, .5, .5]
-            },
+            uniformKeys: ['opacity', 'transform', 'size', 'origin', 'baseColor'],
+            uniformValues: [1, identity, [0, 0, 0], [0, 0, 0], [0.5, 0.5, 0.5]],
             buffers: {},
             geometry: null,
             drawType: null
@@ -123,42 +113,48 @@ WebGLRenderer.prototype.receive = function receive(path, commands) {
             case 'MATERIAL_INPUT':
                 var name = commands.shift();
                 var mat = commands.shift();
-                mesh.uniforms.baseColor[0] = - mat._id;
+                mesh.uniformValues[4][0] = -mat._id;
                 this.program.registerMaterial(name, mat);
                 this.updateSize();
                 break;
+
             case 'UNIFORM_INPUT':
                 var name = commands.shift();
                 var mat = commands.shift();
-                mesh.uniforms.baseColor = mat;
+                mesh.uniformValues[4] = mat;
                 break;
-            case GL_SET_GEOMETRY:
 
+            case 'GL_SET_GEOMETRY':
                 mesh.geometry = commands.shift();
                 mesh.drawType = commands.shift();
                 mesh.dynamic = commands.shift();
                 break;
 
-            case GL_UNIFORMS: 
-
+            case 'GL_UNIFORMS': 
                 uniformName = commands.shift();
                 uniformValue = commands.shift();
 
-                mesh.uniforms[uniformName] = uniformValue;
+                var index = mesh.uniformKeys.indexOf(uniformName);
+
+                if (index === -1) {
+                    mesh.uniformKeys.push(uniformName);
+                    mesh.uniformValues.push(uniformValue);
+                } else {
+                    mesh.uniformValues[index] = uniformValue;
+                }
+
                 break;
 
-            case GL_BUFFER_DATA: 
-
+            case 'GL_BUFFER_DATA': 
                 geometryId = commands.shift();
                 bufferName = commands.shift();
                 bufferValue = commands.shift();
                 bufferSpacing = commands.shift();
 
-
                 this.bufferRegistry.allocate(geometryId, bufferName, bufferValue, bufferSpacing, mesh.dynamic);
                 break;
 
-            case WITH: commands.unshift(command); return;
+            case 'WITH': commands.unshift(command); return;
         }
     }
 };
@@ -168,21 +164,15 @@ WebGLRenderer.prototype.draw = function draw() {
     var buffers;
     var size;
 
+    this.program.setUniforms(['perspective'], [this.projectionTransform]);
+
     for (var key in this.meshRegistry) {
         mesh = this.meshRegistry[key];
+        
         buffers = this.bufferRegistry.registry[mesh.geometry];
-
         if (!buffers) return;
 
-        uniformValues[0] = this.projectionTransform;
-        uniformValues[1] = mesh.uniforms.transform;
-        uniformValues[2] = mesh.uniforms.opacity;
-        uniformValues[3] = mesh.uniforms.origin;
-        uniformValues[4] = mesh.uniforms.size;
-        uniformValues[5] = mesh.uniforms.baseColor;
-
-        this.program.setUniforms(uniformNames, uniformValues);
-
+        this.program.setUniforms(mesh.uniformKeys, mesh.uniformValues);
         this.drawBuffers(buffers, mesh.drawType, mesh.geometry);
     }
 };

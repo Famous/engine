@@ -122,7 +122,8 @@ Program.prototype.registerMaterial = function registerMaterial(name, material) {
     } else {
         this.definitionVec.push('vec3 fa_' + material._id + '() {\n '  + compiled.glsl + ' \n}');
         this.applicationVec.push('if (int(abs(ID.x)) == ' + material._id + ') return fa_' + material._id + '();');
-    } 
+    }
+    
     this.resetProgram();
 };
 
