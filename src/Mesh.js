@@ -94,7 +94,7 @@ Mesh.prototype._receiveOpacityChange = function _receiveOpacityChange(opacity) {
     this.dispatch.dirtyRenderable(this._id);
 
     this.queue.push(GL_UNIFORMS);
-    this.queue.push('opacity')
+    this.queue.push('opacity');
     this.queue.push(opacity);
 };
 
@@ -125,7 +125,7 @@ Mesh.prototype.setGeometry = function (geometry) {
         this._geometry = geometry;
     }
 
-    return this
+    return this;
 };
 
 /**
@@ -171,6 +171,7 @@ Mesh.prototype.clean = function clean() {
  */
 
 Mesh.prototype.baseColor = function (materialExpression) {
+    if (materialExpression._compile) materialExpression = materialExpression._compile();
     this.queue.push(Array.isArray(materialExpression) ? UNIFORM_INPUT : MATERIAL_INPUT);
     this.queue.push(BASE_COLOR);
     this.queue.push(materialExpression);
@@ -189,6 +190,7 @@ Mesh.prototype.baseColor = function (materialExpression) {
  */
 
 Mesh.prototype.normal = function (materialExpression) {
+    if (materialExpression._compile) materialExpression = materialExpression._compile();
     this.queue.push(NUMBER == typeof materialExpression ? UNIFORM_INPUT : MATERIAL_INPUT);
     this.queue.push(NORMAL);
     this.queue.push(materialExpression);
@@ -206,6 +208,7 @@ Mesh.prototype.normal = function (materialExpression) {
  */
 
 Mesh.prototype.glossiness = function (materialExpression) {
+    if (materialExpression._compile) materialExpression = materialExpression._compile();
     this.queue.push(NUMBER == typeof materialExpression ? UNIFORM_INPUT : MATERIAL_INPUT);
     this.queue.push(GLOSSINESS);
     this.queue.push(materialExpression);
@@ -223,6 +226,7 @@ Mesh.prototype.glossiness = function (materialExpression) {
  */
 
 Mesh.prototype.metallic = function metallic(materialExpression) {
+    if (materialExpression._compile) materialExpression = materialExpression._compile();
     this.queue.push(NUMBER == typeof materialExpression ? UNIFORM_INPUT : MATERIAL_INPUT);
     this.queue.push(METALLIC);
     this.queue.push(materialExpression);
