@@ -6,6 +6,12 @@ function ThreadManager (thread, compositor) {
 	this.thread.onmessage = function (ev) {
         _this.compositor.receiveCommands(ev.data);
     };
+    this.thread.oncommands = function (commands) {
+        _this.compositor.receiveCommands(commands);
+    };
+    this.thread.onerror = function (error) {
+        console.error(error);
+    };
 }
 
 ThreadManager.prototype.update = function update (time) {
