@@ -25,17 +25,11 @@ var TweenTransition = require('./TweenTransition');
  *    beginning state
  */
 function Transitionable(start) {
-    this.currentAction = null;
-    this.actionQueue = [];
-    this.callbackQueue = [];
+    this._endStateQueue = [];
+    this._transitionQueue = [];
+    this._callbackQueue = [];
 
-    this.state = 0;
-    this.velocity = undefined;
-    this._callback = undefined;
-    this._engineInstance = null;
-    this._currentMethod = null;
-
-    this.set(start);
+    this.reset(start);
 }
 
 var transitionMethods = {};
@@ -57,23 +51,23 @@ Transitionable.unregisterMethod = function unregisterMethod(name) {
 };
 
 function _loadNext() {
+    /*jshint validthis: true */
     if (this._callback) {
         var callback = this._callback;
-        this._callback = undefined;
+        this._callback = null;
         callback();
     }
-    if (this.actionQueue.length <= 0) {
+    if (this._transitionQueue.length === 0) {
         this.set(this.get()); // no update required
         return;
     }
-    this.currentAction = this.actionQueue.shift();
-    this._callback = this.callbackQueue.shift();
+    this._currentEndState = this._endStateQueue.shift();
+    this._currentTransition = this._transitionQueue.shift();
+    this._callback = this._callbackQueue.shift();
 
     var method = null;
-    var endValue = this.currentAction[0];
-    var transition = this.currentAction[1];
-    if (transition instanceof Object && transition.method) {
-        method = transition.method;
+    if (this._currentTransition instanceof Object && this._currentTransition.method) {
+        method = this._currentTransition.method;
         if (typeof method === 'string') method = transitionMethods[method];
     }
     else {
@@ -81,7 +75,7 @@ function _loadNext() {
     }
 
     if (this._currentMethod !== method) {
-        if (!(endValue instanceof Object) || method.SUPPORTS_MULTIPLE === true || endValue.length <= method.SUPPORTS_MULTIPLE) {
+        if (!(this._currentEndState instanceof Object) || method.SUPPORTS_MULTIPLE === true || this._currentEndState.length <= method.SUPPORTS_MULTIPLE) {
             this._engineInstance = new method();
         }
         else {
@@ -91,8 +85,8 @@ function _loadNext() {
     }
 
     this._engineInstance.reset(this.state, this.velocity);
-    if (this.velocity !== undefined) transition.velocity = this.velocity;
-    this._engineInstance.set(endValue, transition, _loadNext.bind(this));
+    if (this.velocity !== undefined) this._currentTransition.velocity = this.velocity;
+    this._engineInstance.set(this._currentEndState, this._currentTransition, _loadNext.bind(this));
 }
 
 /**
@@ -117,10 +111,11 @@ Transitionable.prototype.set = function set(endState, transition, callback) {
         return this;
     }
 
-    var action = [endState, transition];
-    this.actionQueue.push(action);
-    this.callbackQueue.push(callback);
-    if (!this.currentAction) _loadNext.call(this);
+    this._endStateQueue.push(endState);
+    this._transitionQueue.push(transition);
+    this._callbackQueue.push(callback);
+
+    if (!this._currentTransition && !this._currentEndState) _loadNext.call(this);
     return this;
 };
 
@@ -136,12 +131,16 @@ Transitionable.prototype.set = function set(endState, transition, callback) {
 Transitionable.prototype.reset = function reset(startState, startVelocity) {
     this._currentMethod = null;
     this._engineInstance = null;
-    this._callback = undefined;
     this.state = startState;
     this.velocity = startVelocity;
-    this.currentAction = null;
-    this.actionQueue = [];
-    this.callbackQueue = [];
+
+    this._currentEndState = null;
+    this._currentTransition = null;
+    this._callback = null;
+
+    this._endStateQueue.length = 0;
+    this._transitionQueue.length = 0;
+    this._callbackQueue.length = 0;
     return this;
 };
 
@@ -202,7 +201,7 @@ Transitionable.prototype.get = function get(timestamp) {
  * @return {boolean}
  */
 Transitionable.prototype.isActive = function isActive() {
-    return !!this.currentAction;
+    return !!this._currentTransition;
 };
 
 /**
