@@ -46,11 +46,11 @@ function WebGLRenderer(container) {
     this.container = container;
     this.canvas = document.createElement('canvas');
 
-    if (this.container.target === document.body) {
+    if (this.container.getTarget() === document.body) {
         window.addEventListener('resize', this.updateSize.bind(this));
     }
 
-    this.container.target.appendChild(this.canvas);
+    this.container.getTarget().appendChild(this.canvas);
     this.canvas.className = 'famous-webgl GL';
 
     var context = this.canvas.getContext('webgl') || this.canvas.getContext('experimental-webgl');
@@ -400,13 +400,10 @@ WebGLRenderer.prototype.updateSize = function updateSize() {
     
     var width = newSize[0];
     var height = newSize[1];
-    var depth = 0;
 
-    if (width != null) {
-        this.cachedSize[0] = width;
-        this.cachedSize[1] = height;
-        this.cachedSize[2] = width;
-    }
+    this.cachedSize[0] = width;
+    this.cachedSize[1] = height;
+    this.cachedSize[2] = (width > height) ? width : height;
 
     this.canvas.width  = width;
     this.canvas.height = height;
