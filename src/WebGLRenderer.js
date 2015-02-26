@@ -18,7 +18,6 @@ var Texture = require('./Texture');
 var Program = require('./Program');
 var Buffer = require('./Buffer');
 
-var checkerBoard = require('./Checkerboard');
 var BufferRegistry = require('./BufferRegistry');
 
 var uniformNames = ['perspective', 'transform', 'opacity', 'origin', 'size', 'baseColor'];
@@ -272,35 +271,6 @@ WebGLRenderer.prototype.drawBuffers = function drawBuffers(vertexBuffers, mode, 
     }
 
     this.state.lastDrawn = id;
-};
-
-/**
- * Loads the image data into the material
- *
- * @method registerMaterial
- * 
- * @param {Material} the object that contains the image data
- * 
- */
-
-WebGLRenderer.prototype.registerMaterial = function registerMaterial(material) {
-    var image = material.options.image;
-    var tex;
-
-    if (image) {
-        tex = this.texCache[image];
-        if (!tex) {
-            tex = new Texture(this.gl);
-            tex.setImage(checkerBoard);
-            this.texCache[image] = tex;
-            loadImage(image, function (img) {
-                tex.bind();
-                tex.setImage(img);
-            });
-        }
-
-        this.textureRegistry[material.entity] = tex;
-    }
 };
 
 /**
