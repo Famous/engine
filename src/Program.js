@@ -15,6 +15,8 @@ var SEMINEWLINE = ';\n';
 var ATTRIBUTE = 'attribute ';
 var VARYING = 'varying ';
 
+var checkers = require('./Checkerboard');
+
 var TYPES = {
     undefined: 'float ',
     1: 'float ',
@@ -28,6 +30,7 @@ var VERTEX_SHADER = 35633;
 var FRAGMENT_SHADER = 35632;
 
 var vertexWrapper = require('famous-webgl-shaders').vertex;
+
 var fragmentWrapper = require('famous-webgl-shaders').fragment;
 
 var inputs = ['baseColor', 'normals', 'metalness', 'glossiness'];
@@ -101,6 +104,7 @@ Program.prototype.registerMaterial = function registerMaterial(name, material) {
 
     if (compiled.uniforms.image) {
         var t = new Texture(this.gl);
+        t.setImage(checkers);
         loadImage(compiled.uniforms.image, function (img) {
             t.setImage(img);
         });
@@ -190,10 +194,10 @@ Program.prototype.resetProgram = function resetProgram() {
     vertexSource = vertexHeader.join('') + vertexWrapper;
 
     fragmentSource = fragmentHeader.join('') + fragmentWrapper
-        .replace('//vec_definitions', this.definitionVec.join(NEWLINE))
-        .replace('//vec_applications', this.applicationVec.join(NEWLINE))
-        .replace('//float_definitions', this.definitionFloat.join(NEWLINE))
-        .replace('//float_applications', this.applicationFloat.join(NEWLINE));
+        .replace('#vec_definitions', this.definitionVec.join(NEWLINE))
+        .replace('#vec_applications', this.applicationVec.join(NEWLINE))
+        .replace('#float_definitions', this.definitionFloat.join(NEWLINE))
+        .replace('#float_applications', this.applicationFloat.join(NEWLINE));
 
     program = this.gl.createProgram();
 

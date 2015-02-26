@@ -18,7 +18,6 @@ var Texture = require('./Texture');
 var Program = require('./Program');
 var Buffer = require('./Buffer');
 
-var checkerBoard = require('./Checkerboard');
 var BufferRegistry = require('./BufferRegistry');
 
 var uniformNames = ['perspective', 'transform', 'opacity', 'origin', 'size', 'baseColor'];
@@ -126,6 +125,11 @@ WebGLRenderer.prototype.receive = function receive(path, commands) {
                 mesh.uniforms.baseColor[0] = - mat._id;
                 this.program.registerMaterial(name, mat);
                 this.updateSize();
+                break;
+            case 'UNIFORM_INPUT':
+                var name = commands.shift();
+                var mat = commands.shift();
+                mesh.uniforms.baseColor = mat;
                 break;
             case GL_SET_GEOMETRY:
 
@@ -270,35 +274,6 @@ WebGLRenderer.prototype.drawBuffers = function drawBuffers(vertexBuffers, mode, 
 };
 
 /**
- * Loads the image data into the material
- *
- * @method registerMaterial
- * 
- * @param {Material} the object that contains the image data
- * 
- */
-
-WebGLRenderer.prototype.registerMaterial = function registerMaterial(material) {
-    var image = material.options.image;
-    var tex;
-
-    if (image) {
-        tex = this.texCache[image];
-        if (!tex) {
-            tex = new Texture(this.gl);
-            tex.setImage(checkerBoard);
-            this.texCache[image] = tex;
-            loadImage(image, function (img) {
-                tex.bind();
-                tex.setImage(img);
-            });
-        }
-
-        this.textureRegistry[material.entity] = tex;
-    }
-};
-
-/**
  * Allocates an array buffer where vertex data is sent to via compile.
  *
  * @method renderOffscreen
@@ -415,3 +390,4 @@ WebGLRenderer.prototype.updateSize = function updateSize() {
 };
 
 module.exports = WebGLRenderer;
+
