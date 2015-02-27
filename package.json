@@ -32,7 +32,7 @@
     "tape": "^3.0.3",
     "testling": "^1.7.1"
   },
-  "devDependencies": {
+  "dependencies": {
     "famous-polyfills":  "git+ssh://git@github.famo.us/platform/polyfills#master"
   }
 }
