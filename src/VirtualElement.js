@@ -121,8 +121,6 @@ VirtualElement.prototype.receive = function receive (commands) {
         case RECALL:
             this.setProperty('display', 'none');
             this._parent._allocator.deallocate(this._target);
-            var index = this._parent._children.indexOf(this);
-            this._parent._children.splice(index, 1);
             break;
         case WITH:
             commands.unshift(command);
