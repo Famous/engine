@@ -22,6 +22,7 @@ var ADD_EVENT_LISTENER = 'ADD_EVENT_LISTENER';
 var EVENT_METHODS = 'EVENT_METHODS';
 var EVENT_PROPERTIES = 'EVENT_PROPERTIES';
 var EVENT_END = 'EVENT_END';
+var RECALL = 'RECALL';
 
 /**
  * The Element class is responsible for providing the API for how
@@ -121,6 +122,11 @@ HTMLElement.prototype.on = function on (ev, methods, properties) {
     return this;
 };
 
+HTMLElement.prototype.kill = function kill () {
+    this.dispatch.dirtyRenderable(this._id);
+    this.queue.push(RECALL);
+};
+
 /**
  * Set the value of a CSS property
  *
@@ -150,8 +156,8 @@ HTMLElement.prototype.property = function property(key, value) {
  */
 HTMLElement.prototype.trueSize = function trueSize() {
     if (!this.trueSized) {
-	this.trueSized = true;
-	this.dispatch.dirtyRenderable(this._id);
+        this.trueSized = true;
+        this.dispatch.dirtyRenderable(this._id);
     }
     return this;
 };
