@@ -73,7 +73,7 @@ function WebGLRenderer(container) {
     };
 
     this.cachedSize = [];
-    this.updateSize(containerSize[0], containerSize[1], containerSize[2], this.container);
+    this.updateSize();
 
     this.projectionTransform = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
 }
