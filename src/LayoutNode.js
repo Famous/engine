@@ -44,11 +44,12 @@ LayoutNode.prototype.removeChild = function removeChild (child) {
 LayoutNode.prototype.removeAllChildren = function removeAllChildren () {
     var i = 0;
     var len = this._children.length;
-    for (; i < len ; i++) this._children.shift();
+    for (; i < len ; i++) this._children.shift().kill();
 };
 
-LayoutNode.prototype.killDispatch = function killDispatch () {
+LayoutNode.prototype.kill = function kill () {
     this._localDispatch.kill();
+    this.removeAllChildren();
     return this;
 };
 

@@ -49,35 +49,31 @@ RenderNode.prototype.layout = function layout (i, fn, ctx) {
 RenderNode.prototype.removeChild = function removeChild (node) {
     var index = this._childNodes.indexOf(node);
     if (index > -1) {
-        var result = this._layoutNodes
-            .splice(index, 1)
-            .concat(this._childNodes.splice(index, 1));
-        result[0].killDispatch();
-        result[1].killDispatch();
+        var result = this._layoutNodes.splice(index, 1);
+        result[0].kill();
+        this._layoutNodes.splice(index, 1);
     }
     return this;
 };
 
 RenderNode.prototype.removeChildAtIndex = function removeChildAtIndex (index) {
-    var result = this._layoutNodes.splice(index, 1).concat(this._childNodes.splice(index, 1));
-    result[0].killDispatch();
-    result[1].killDispatch();
+    var result = this._layoutNodes.splice(index, 1);
+    result[0].kill();
+    this._childNodes.splice(index, 1);
     return this;
 };
 
 RenderNode.prototype.removeAllChildren = function removeAllChildren () {
     for (var i = 0, len = this._childNodes.length ; i < len ; i++) {
-        var result = this._layoutNode
-            .splice(i, 1)
-            .concat(this._childNodes.splice(i, 1));
-        result[0].killDispatch();
-        result[1].killDispatch();
+        this._layoutNodes.splice(i, 1)[0].kill();
+        this._childNodes.splice(i, 1);
     }
     return this;
 };
 
-RenderNode.prototype.killDispatch = function killDispatch () {
+RenderNode.prototype.kill = function kill () {
     this._localDispatch.kill();
+    this.removeAllChildren();
     return this;
 };
 
