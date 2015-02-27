@@ -114,4 +114,3 @@ LayoutNode.prototype.setProportions = function setProportions (x, y, z, options)
 };
 
 module.exports = LayoutNode;
-    

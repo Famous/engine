@@ -53,4 +53,3 @@ Layer.prototype.get = function get () {
 };
 
 module.exports = Layer;
-

@@ -23,17 +23,14 @@ function Clock () {
 }
 
 Clock.prototype.step = function step (time) {
-    for (var i = 0, len = this.roots.length ; i < len ; i++) {
+    for (var i = 0, len = this.roots.length ; i < len ; i++)
         this.roots[i].update(time);
-    }
 
     var events = this.dispatch.events;
     if (events.length) {
-        if (WORKER) {
-            self.postMessage(events);
-        } else {
-            this.oncommands(events);
-        }
+        if (WORKER) self.postMessage(events);
+        else this.oncommands(events);
+
         this.dispatch.flush();
     }
 };

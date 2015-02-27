@@ -16,8 +16,12 @@ function ArrayObserver (arr, type) {
     }.bind(this);
     this.target = arr;
     switch (type) {
-    case ArrayObserver.METHODS: this.callbacks = new MethodStore();
-    default: this.callbacks = new CallbackStore();
+        case ArrayObserver.METHODS:
+            this.callbacks = new MethodStore();
+            break;
+        default:
+            this.callbacks = new CallbackStore();
+            break;
     }
 }
 

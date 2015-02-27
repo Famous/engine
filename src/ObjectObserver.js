@@ -6,14 +6,21 @@ var CallbackStore = require('famous-utilities').CallbackStore;
 function ObjectObserver (obj, type) {
     this.changes = [];
     this.type = ObjectObserver.PUSH;
+
     this.observer = function (changes) {
         this.changes = this.changes.concat(changes);
         if (this.type === ObjectObserver.PUSH) this.dispatch();
     }.bind(this);
+
     this.target = obj;
+
     switch (type) {
-    case ObjectObserver.METHODS: this.callbacks = new MethodStore();
-    default: this.callbacks = new CallbackStore();
+        case ObjectObserver.METHODS:
+            this.callbacks = new MethodStore();
+            break;
+        default:
+            this.callbacks = new CallbackStore();
+            break;
     }
 }
 
