@@ -102,13 +102,13 @@ Material.prototype._compile = function _compile() {
  
    this.traverse(function (node, depth) {
         if (! node.chunk) return;
-        glsl += 'vec3 ' + makeLabel(node._id) + '=' + processGLSL(node.chunk.glsl, node.inputs) + '\n ';
+        glsl += 'vec3 ' + makeLabel(node) + '=' + processGLSL(node.chunk.glsl, node.inputs) + '\n ';
         if (node.uniforms) extend(uniforms, node.uniforms);
     });
 
     return {
         _id: this._id,
-        glsl: glsl + 'return ' + makeLabel(this._id) + ';',
+        glsl: glsl + 'return ' + makeLabel(this) + ';',
         uniforms: uniforms
     };
 };
