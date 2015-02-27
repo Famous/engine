@@ -11,6 +11,7 @@ var CHANGE_CONTENT = 'CHANGE_CONTENT';
 var ADD_EVENT_LISTENER = 'ADD_EVENT_LISTENER';
 var EVENT_PROPERTIES = 'EVENT_PROPERTIES';
 var EVENT_END = 'EVENT_END';
+var RECALL = 'RECALL';
 var WITH = 'WITH';
 
 var DIV = 'div';
@@ -116,6 +117,12 @@ VirtualElement.prototype.receive = function receive (commands) {
             while((c = commands.shift()) !== EVENT_PROPERTIES) methods.push(c);
             while ((c = commands.shift()) !== EVENT_END) properties.push(c);
             this.addEventListener(ev, this.dispatchEvent.bind(this, ev, methods, properties));
+            break;
+        case RECALL:
+            this.setProperty('display', 'none');
+            this._parent._allocator.deallocate(this._target);
+            var index = this._parent._children.indexOf(this);
+            this._parent._children.splice(index, 1);
             break;
         case WITH:
             commands.unshift(command);
