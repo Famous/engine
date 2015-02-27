@@ -8,20 +8,21 @@ vec4 applyTransform(vec4 pos) {
     mat4 projection = perspective;
     pos.y *= -1.0;
     pos.xyz *= size.xyz;
-    mat4 MVMatrix = invertYAxis(transform);
-    vec4 translation = convertToClipSpace(MVMatrix[3]);
+    mat4 MVMatrix = transform;
+    vec4 translation = MVMatrix[3];
     MVMatrix[3] = vec4(0.0, 0.0, 0.0, 1.0);
     projection[0][0] = 1.0/resolution.x;
     projection[1][1] = 1.0/resolution.y;
-    projection[2][2] = (resolution.y > resolution.x) ? 1.0/resolution.y : 1.0/resolution.x;
+    projection[2][2] = (resolution.y > resolution.x) ? -1.0/resolution.y : -1.0/resolution.x;
 
     pos = MVMatrix * pos;
 
-    vPosition = pos.xyz;
-    vPosition += translation.xyz;
+    vec3 alignment = vec3(size.x, -size.y, 0.0);
+
+    vPosition = pos.xyz + translation.xyz + alignment;
 
     pos = projection * pos;
-    pos += translation;
+    pos += convertToClipSpace(translation);
 
     return pos;
 }
