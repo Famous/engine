@@ -5,6 +5,8 @@ var ElementAllocator = require('./ElementAllocator');
 var CHANGE_TRANSFORM = 'CHANGE_TRANSFORM';
 var CHANGE_TRANSFORM_ORIGIN = 'CHANGE_TRANSFORM_ORIGIN';
 var CHANGE_PROPERTY = 'CHANGE_PROPERTY';
+var ADD_CLASS = 'ADD_CLASS';
+var REMOVE_CLASS = 'REMOVE_CLASS';
 var CHANGE_CONTENT = 'CHANGE_CONTENT';
 var ADD_EVENT_LISTENER = 'ADD_EVENT_LISTENER';
 var EVENT_PROPERTIES = 'EVENT_PROPERTIES';
@@ -99,6 +101,12 @@ VirtualElement.prototype.receive = function receive (commands) {
         case CHANGE_CONTENT:
             this.setContent(commands.shift());
             break;
+        case ADD_CLASS:
+            this.addClass(commands.shift());
+            break;
+        case REMOVE_CLASS:
+            this.removeClass(commands.shift());
+            break;
         case ADD_EVENT_LISTENER:
             var ev = commands.shift();
             var methods = [];
@@ -181,6 +189,14 @@ VirtualElement.prototype.setMatrix = function setMatrix (m0, m1, m2, m3, m4, m5,
         this._matrix[15] = m15;
     }
     this._target.style[VENDOR_TRANSFORM] = stringifyMatrix(this._matrix);
+};
+
+VirtualElement.prototype.addClass = function addClass (className) {
+    this._target.classList.add(className);
+};
+
+VirtualElement.prototype.removeClass = function removeClass (className) {
+    this._target.classList.remove(className);
 };
 
 VirtualElement.prototype.setProperty = function setProperty (key, value) {
