@@ -41,7 +41,6 @@ ModelView.prototype.acceptModel = function acceptModel (model) {
             Handler = renderer.constructor.handlers[i];
             this._rendererControllers.push(new Handler(renderer, this._dispatch));
         }
-
     }
 
     var subscriptions = this._renderer.constructor.subscribe;
