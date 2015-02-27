@@ -15,6 +15,7 @@ var CHANGE_PROPERTY = 'CHANGE_PROPERTY';
 var CHANGE_TAG = 'CHANGE_TAG';
 var CHANGE_ATTRIBUTE = 'CHANGE_ATTRIBUTE';
 var ADD_CLASS = 'ADD_CLASS';
+var REMOVE_CLASS = 'REMOVE_CLASS';
 var CHANGE_ATTRIBUTE = 'CHANGE_ATTRIBUTE';
 var CHANGE_CONTENT = 'CHANGE_CONTENT';
 var ADD_EVENT_LISTENER = 'ADD_EVENT_LISTENER';
@@ -190,17 +191,32 @@ HTMLElement.prototype.attribute = function attribute(key, value) {
 };
 
 /**
- * Define a CSS class to be on the DOM element
+ * Define a CSS class to be added to the DOM element
  *
- * @method cssClass
+ * @method addClass
  * @chainable
  *
  * @param {String} value name of the class
  * @return {HTMLElement} current HTMLElement
  */
-HTMLElement.prototype.cssClass = function cssClass(value) {
+HTMLElement.prototype.addClass = function addClass(value) {
     this.dispatch.dirtyRenderable(this._id);
     this.queue.push(ADD_CLASS);
+    this.queue.push(value);
+    return this;
+};
+/**
+ * Define a CSS class to be removed from the DOM element
+ *
+ * @method removeClass
+ * @chainable
+ *
+ * @param {String} value name of the class
+ * @return {HTMLElement} current HTMLElement
+ */
+HTMLElement.prototype.removeClass = function removeClass(value) {
+    this.dispatch.dirtyRenderable(this._id);
+    this.queue.push(REMOVE_CLASS);
     this.queue.push(value);
     return this;
 };
