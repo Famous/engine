@@ -22,6 +22,7 @@ Compositor.CommandsToOutput = {
     CHANGE_PROPERTY: DOM,
     CHANGE_CONTENT: DOM,
     ADD_EVENT_LISTENER: DOM,
+    RECALL: DOM,
     GL_UNIFORMS: GL,
     GL_BUFFER_DATA: GL,
     GL_SET_GEOMETRY: GL,
