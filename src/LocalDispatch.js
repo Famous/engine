@@ -13,6 +13,12 @@ function LocalDispatch (node, proxy) {
     this._node = node;
 }
 
+LocalDispatch.prototype.kill = function kill () {
+    this._modelView.kill();
+    this._componentStore.kill();
+    return this;
+};
+
 LocalDispatch.prototype.getNode = function getNode () {
     return this._node;
 };

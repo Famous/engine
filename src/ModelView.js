@@ -122,6 +122,11 @@ ModelView.prototype.swapChildAtIndex = function swapChildAtIndex (change) {
     // todo
 };
 
+ModelView.prototype.kill = function kill () {
+    if (this._subscriptionManager) this._subscriptionManager.stopObserving();
+    if (this._childManager) this._childManager.stopObserving();
+};
+
 function _findPublication (model) {
     /*jshint validthis: true */
     var publicationKey = model.constructor.publish;

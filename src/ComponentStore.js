@@ -23,6 +23,8 @@ ComponentStore.prototype.clear = function clear () {
     this.clearComponents().clearRenderables();
 };
 
+ComponentStore.prototype.kill = ComponentStore.prototype.clear;
+
 ComponentStore.prototype.cleanComponents = function cleanComponents () {
     this._components.clean();
     return this;
