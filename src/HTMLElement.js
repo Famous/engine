@@ -28,19 +28,24 @@ var RECALL = 'RECALL';
  *   a RenderNode will interact with the DOM API's.  The element is
  *   responsible for adding a set of commands to the renderer.
  *
- * @class Element
+ * @class HTMLElement
  * @constructor
  * @component
  * @param {RenderNode} RenderNode to which the instance of Element will be a component of
  */
 function HTMLElement(dispatch) {
-    this.dispatch = dispatch;
+    this._dispatch = dispatch;
     this._id = dispatch.addRenderable(this);
     this._trueSized = false;
     this._size = [0, 0, 0];
-    this.queue = [];
-    this.callbacks = new CallbackStore();
-    this.init();
+    this._queue = [];
+    this._callbacks = new CallbackStore();
+    this._dispatch.onTransformChange(this._receiveTransformChange.bind(this));
+    this._dispatch.onSizeChange(this._receiveSizeChange.bind(this));
+    this._dispatch.onOpacityChange(this._receiveOpacityChange.bind(this));
+    this._dispatch.onOriginChange(this._receiveOriginChange.bind(this));
+    this._receiveTransformChange(this._dispatch.getContext()._transform);
+    this._receiveOriginChange(this._dispatch.getContext()._origin);
 }
 
 // Return the name of the Element Class: 'element'
@@ -48,64 +53,54 @@ HTMLElement.toString = function toString() {
     return ELEMENT;
 };
 
-HTMLElement.prototype.init = function init() {
-    var dispatch = this.dispatch;
-    dispatch.onTransformChange(this._receiveTransformChange.bind(this));
-    dispatch.onSizeChange(this._receiveSizeChange.bind(this));
-    dispatch.onOpacityChange(this._receiveOpacityChange.bind(this));
-    dispatch.onOriginChange(this._receiveOriginChange.bind(this));
-    this._receiveTransformChange(dispatch.getContext()._transform);
-    this._receiveOriginChange(dispatch.getContext()._origin);
-    return this;
-}
 HTMLElement.prototype.clean = function clean() {
-    var len = this.queue.length;
+    var len = this._queue.length;
     if (len) {
-    	var path = this.dispatch.getRenderPath();
-    	this.dispatch.sendDrawCommand(WITH).sendDrawCommand(path);
-    	for (var i = 0 ; i < len ; i++) {
-    	    this.dispatch.sendDrawCommand(this.queue.shift());
-        }
+    	var path = this._dispatch.getRenderPath();
+    	this._dispatch.sendDrawCommand(WITH).sendDrawCommand(path);
+    	for (var i = 0 ; i < len ; i++)
+    	    this._dispatch.sendDrawCommand(this._queue.shift());
     }
-    return !this.queue.length;
+    return true;
 };
 
 HTMLElement.prototype._receiveTransformChange = function _receiveTransformChange(transform) {
-    this.dispatch.dirtyRenderable(this._id);
-    this.queue.push(CHANGE_TRANSFORM);
-    this.queue.push(transform._matrix[0]);
-    this.queue.push(transform._matrix[1]);
-    this.queue.push(transform._matrix[2]);
-    this.queue.push(transform._matrix[3]);
-    this.queue.push(transform._matrix[4]);
-    this.queue.push(transform._matrix[5]);
-    this.queue.push(transform._matrix[6]);
-    this.queue.push(transform._matrix[7]);
-    this.queue.push(transform._matrix[8]);
-    this.queue.push(transform._matrix[9]);
-    this.queue.push(transform._matrix[10]);
-    this.queue.push(transform._matrix[11]);
-    this.queue.push(transform._matrix[12]);
-    this.queue.push(transform._matrix[13]);
-    this.queue.push(transform._matrix[14]);
-    this.queue.push(transform._matrix[15]);
+    this._dispatch.dirtyRenderable(this._id);
+    var queue = this._queue;
+    queue.push(CHANGE_TRANSFORM);
+    queue.push(transform._matrix[0]);
+    queue.push(transform._matrix[1]);
+    queue.push(transform._matrix[2]);
+    queue.push(transform._matrix[3]);
+    queue.push(transform._matrix[4]);
+    queue.push(transform._matrix[5]);
+    queue.push(transform._matrix[6]);
+    queue.push(transform._matrix[7]);
+    queue.push(transform._matrix[8]);
+    queue.push(transform._matrix[9]);
+    queue.push(transform._matrix[10]);
+    queue.push(transform._matrix[11]);
+    queue.push(transform._matrix[12]);
+    queue.push(transform._matrix[13]);
+    queue.push(transform._matrix[14]);
+    queue.push(transform._matrix[15]);
 };
 
 HTMLElement.prototype._receiveSizeChange = function _receiveSizeChange(size) {
-    if (!this.trueSized) {
-    	var size = size.getTopDownSize();
-    	this.property(WIDTH, Math.round(size[0]) + PX)
-    	    .property(HEIGHT, Math.round(size[1]) + PX);
-    	this._size[0] = size[0];
-    	this._size[1] = size[1];
+    if (!this._trueSized) {
+    	var topDownSize = size.getTopDownSize();
+    	this.property(WIDTH, Math.round(topDownSize[0]) + PX)
+    	    .property(HEIGHT, Math.round(topDownSize[1]) + PX);
+    	this._size[0] = topDownSize[0];
+    	this._size[1] = topDownSize[1];
     }
 };
 
 HTMLElement.prototype._receiveOriginChange = function _receiveOriginChange(origin) {
-    this.dispatch.dirtyRenderable(this._id);
-    this.queue.push(CHANGE_TRANSFORM_ORIGIN);
-    this.queue.push(origin.x);
-    this.queue.push(origin.y);
+    this._dispatch.dirtyRenderable(this._id);
+    this._queue.push(CHANGE_TRANSFORM_ORIGIN);
+    this._queue.push(origin.x);
+    this._queue.push(origin.y);
 };
 
 HTMLElement.prototype._receiveOpacityChange = function _receiveOpacityChange(opacity) {
@@ -136,10 +131,10 @@ HTMLElement.prototype.kill = function kill () {
  * @return {HTMLElement} current HTMLElement
  */
 HTMLElement.prototype.property = function property(key, value) {
-    this.dispatch.dirtyRenderable(this._id);
-    this.queue.push(CHANGE_PROPERTY);
-    this.queue.push(key);
-    this.queue.push(value);
+    this._dispatch.dirtyRenderable(this._id);
+    this._queue.push(CHANGE_PROPERTY);
+    this._queue.push(key);
+    this._queue.push(value);
     return this;
 };
 
@@ -153,9 +148,9 @@ HTMLElement.prototype.property = function property(key, value) {
  * @return {HTMLElement} this
  */
 HTMLElement.prototype.trueSize = function trueSize() {
-    if (!this.trueSized) {
-        this.trueSized = true;
-        this.dispatch.dirtyRenderable(this._id);
+    if (!this._trueSized) {
+    	this._trueSized = true;
+    	this._dispatch.dirtyRenderable(this._id);
     }
     return this;
 };
@@ -170,9 +165,9 @@ HTMLElement.prototype.trueSize = function trueSize() {
  * @return {HTMLElement} current HTMLElement
  */
 HTMLElement.prototype.tagName = function tagName(value) {
-    this.dispatch.dirtyRenderable(this._id);
-    this.queue.push(CHANGE_TAG);
-    this.queue.push(value);
+    this._dispatch.dirtyRenderable(this._id);
+    this._queue.push(CHANGE_TAG);
+    this._queue.push(value);
     return this;
 };
 
@@ -187,10 +182,10 @@ HTMLElement.prototype.tagName = function tagName(value) {
  * @return {HTMLElement} current HTMLElement
  */
 HTMLElement.prototype.attribute = function attribute(key, value) {
-    this.dispatch.dirtyRenderable(this._id);
-    this.queue.push(CHANGE_ATTRIBUTE);
-    this.queue.push(key);
-    this.queue.push(value);
+    this._dispatch.dirtyRenderable(this._id);
+    this._queue.push(CHANGE_ATTRIBUTE);
+    this._queue.push(key);
+    this._queue.push(value);
     return this;
 };
 
@@ -204,9 +199,9 @@ HTMLElement.prototype.attribute = function attribute(key, value) {
  * @return {HTMLElement} current HTMLElement
  */
 HTMLElement.prototype.addClass = function addClass(value) {
-    this.dispatch.dirtyRenderable(this._id);
-    this.queue.push(ADD_CLASS);
-    this.queue.push(value);
+    this._dispatch.dirtyRenderable(this._id);
+    this._queue.push(ADD_CLASS);
+    this._queue.push(value);
     return this;
 };
 /**
@@ -219,9 +214,9 @@ HTMLElement.prototype.addClass = function addClass(value) {
  * @return {HTMLElement} current HTMLElement
  */
 HTMLElement.prototype.removeClass = function removeClass(value) {
-    this.dispatch.dirtyRenderable(this._id);
-    this.queue.push(REMOVE_CLASS);
-    this.queue.push(value);
+    this._dispatch.dirtyRenderable(this._id);
+    this._queue.push(REMOVE_CLASS);
+    this._queue.push(value);
     return this;
 };
 
@@ -235,10 +230,10 @@ HTMLElement.prototype.removeClass = function removeClass(value) {
  * @return {HTMLElement} current HTMLElement
  */
 HTMLElement.prototype.id = function id(value) {
-    this.dispatch.dirtyRenderable(this._id);
-    this.queue.push(CHANGE_ATTRIBUTE);
-    this.queue.push(ID);
-    this.queue.push(value);
+    this._dispatch.dirtyRenderable(this._id);
+    this._queue.push(CHANGE_ATTRIBUTE);
+    this._queue.push(ID);
+    this._queue.push(value);
     return this;
 };
 
@@ -252,9 +247,9 @@ HTMLElement.prototype.id = function id(value) {
  * @return {HTMLElement} current HTMLElement
  */
 HTMLElement.prototype.content = function content(value) {
-    this.dispatch.dirtyRenderable(this._id);
-    this.queue.push(CHANGE_CONTENT);
-    this.queue.push(value);
+    this._dispatch.dirtyRenderable(this._id);
+    this._queue.push(CHANGE_CONTENT);
+    this._queue.push(value);
     return this;
 };
 
@@ -301,7 +296,7 @@ HTMLElement.prototype.eventListener = function eventListener (ev, methods, prope
  * @return {Bool} whether or not this HTMLElement can be rendered
  */
 HTMLElement.prototype.isRenderable = function isRenderable () {
-    return !!this.queue.length;
+    return !!this._queue.length;
 };
 
 /**
@@ -313,15 +308,10 @@ HTMLElement.prototype.isRenderable = function isRenderable () {
  * @return {HTMLElement} this
  */
 HTMLElement.prototype.clear = function clear () {
-    var queueLength = this.queue.length;
-    var i = 0;
+    this._trueSized = false;
 
-    this.target = null;
-    this.trueSized = false;
-
-    for (; i < queueLength; i++) {
-	this.queue.pop();
-    }
+    for (var i = 0, l = this._queue.length; i < l; i++)
+        this._queue.pop();
 
     return this;
 };
