@@ -123,8 +123,7 @@ HTMLElement.prototype.on = function on (ev, methods, properties) {
 };
 
 HTMLElement.prototype.kill = function kill () {
-    this.dispatch.dirtyRenderable(this._id);
-    this.queue.push(RECALL);
+    this.dispatch.sendDrawCommand(WITH).sendDrawCommand(this.dispatch.getRenderPath()).sendDrawCommand(RECALL);
 };
 
 /**
