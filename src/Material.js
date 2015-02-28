@@ -16,7 +16,7 @@ var chunks = {
     step: {glsl: 'step(%1, %2, %3);', inputs: [1], output: 1 },
     smoothstep: {glsl: 'smoothstep(%1);', inputs: [1], output: 1 },
 
-    sine: {glsl: 'sin(time);', inputs: [1], output: 1 },
+    sin: {glsl: 'sin(%1);', inputs: [1], output: 1 },
     time: {glsl: 'time;', inputs: [], output: 1 },
 
     add: {glsl: '%1 + %2;', inputs: [4, 4], output: 4, content: '+' }, 
@@ -29,10 +29,7 @@ var chunks = {
     image: {glsl:'texture2D(image, vTextureCoordinate).rgb;', inputs: [], output: 4 },
 
     constant: {glsl: 'vec3(.5,1,1);', inputs: [], output: 4 }, 
-    parameter: {uniforms: {parameter: 1}, glsl: 'parameter;', inputs: [], output: 4 }, 
-
-    filter: {glsl: '%1 * vec3(1,0,1);', inputs: [4], output: 4 },
-    panner: {glsl: '%1 + vec3(0, sin(time * .01), 1,1);', inputs: [4], output: 4 }
+    parameter: {uniforms: {parameter: 1}, glsl: 'parameter;', inputs: [], output: 4 }
 };
 
 var expressions = {};
@@ -102,13 +99,13 @@ Material.prototype._compile = function _compile() {
  
    this.traverse(function (node, depth) {
         if (! node.chunk) return;
-        glsl += 'vec3 ' + makeLabel(node._id) + '=' + processGLSL(node.chunk.glsl, node.inputs) + '\n ';
+        glsl += 'vec3 ' + makeLabel(node) + '=' + processGLSL(node.chunk.glsl, node.inputs) + '\n ';
         if (node.uniforms) extend(uniforms, node.uniforms);
     });
 
     return {
         _id: this._id,
-        glsl: glsl + 'return ' + makeLabel(this._id) + ';',
+        glsl: glsl + 'return ' + makeLabel(this) + ';',
         uniforms: uniforms
     };
 };
@@ -117,11 +114,19 @@ function extend (a, b) { for (var k in b) a[k] = b[k]; }
 
 function processGLSL(str, inputs) {
     return str.replace(/%\d/g, function (s) {
-        return makeLabel(inputs[s[1]-1]._id);
+        return makeLabel(inputs[s[1]-1]);
     });
 }
 function makeLabel (n) {
-    return 'fa_' + (n);
+    if (typeof n == 'object') return 'fa_' + (n._id);
+    if (Array.isArray(n)) return arrayToVec(n);
+    else return JSON.stringify(n);
+}
+
+function arrayToVec(array) {
+    var len = array.length;
+    return 'vec' + len + '(' + array.join(',')  + ')';
 }
 
 module.exports = expressions;
+expressions.Material = Material;
