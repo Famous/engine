@@ -15,14 +15,9 @@ var Buffer = require('./Buffer');
 
 var BufferRegistry = require('./BufferRegistry');
 
-var uniformNames = ['perspective', 'transform', 'opacity', 'origin', 'size', 'baseColor'];
 var resolutionName = ['resolution'];
-var uniformValues = [];
 var resolutionValues = [];
 
-var inputIdx = { baseColor: 0, normal: 1, metalness: 2, glossiness: 3 };
-var inputNames = ['baseColor', 'normal', 'metalness', 'glossiness'];
-var inputValues = [[.5, .5, .5], [0,0,0], .2, .8];
 var identity = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
 
 /**
@@ -345,25 +340,6 @@ function renderOffscreen(callback, spec, context, texture) {
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     gl.bindRenderbuffer(gl.RENDERBUFFER, null);
 };
-
-/**
- * Uploads an image if it is a string
- *
- * @method loadImage
- *
- * @param {Object, String} image object or string url
- * @param {Function} proc that gets called when the image is loaded
- *
- */
-function loadImage (img, callback) {
-    var obj = (typeof img === 'string' ? new Image() : img) || {};
-    obj.crossOrigin = 'anonymous';
-    if (! obj.src) obj.src = img;
-    if (! obj.complete) obj.onload = function () { callback(obj); };
-    else callback(obj);
-
-    return obj;
-}
 
 /**
  * Diagonose the failed intialization of an FBO
