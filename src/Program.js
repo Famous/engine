@@ -288,6 +288,7 @@ Program.prototype.setUniforms = function (uniformNames, uniformValue) {
     len = uniformNames.length;
     for (i = 0; i < len; i++) {
         name = uniformNames[i];
+        value = uniformValue[i];
 
         // Retreive the cached location of the uniform,
         // requesting a new location from the WebGL context
@@ -297,8 +298,7 @@ Program.prototype.setUniforms = function (uniformNames, uniformValue) {
         if (! location) continue;
 
         this.uniformLocations[name] = location;
-        value = uniformValue[i];
-
+        
         // Check if the value is already set for the
         // given uniform.
 
