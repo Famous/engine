@@ -1,22 +1,9 @@
 'use strict';
 
-var INDICES        = 'indices';
-
-var BUFFER_DATA = 'BUFFER_DATA';
-var UNIFORM_INPUT = 'UNIFORM_INPUT';
-var MATERIAL_INPUT = 'MATERIAL_INPUT';
-var GL_SPEC = 'GL_SPEC';
-
-var FRAME_END = 'FRAME_END';
-
 var Texture = require('./Texture');
 var Program = require('./Program');
 var Buffer = require('./Buffer');
-
 var BufferRegistry = require('./BufferRegistry');
-
-var resolutionName = ['resolution'];
-var resolutionValues = [];
 
 var identity = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
 
@@ -67,8 +54,11 @@ function WebGLRenderer(container) {
         enabledAttributes: {}
     };
 
+    this.resolutionName = ['resolution'];
+    this.resolutionValues = [];
+
     this.cachedSize = [];
-    this.updateSize(containerSize[0], containerSize[1], containerSize[2], this.container);
+    this.updateSize();
 
     this.projectionTransform = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
 }
@@ -227,7 +217,7 @@ WebGLRenderer.prototype.drawBuffers = function drawBuffers(vertexBuffers, mode, 
 
         // Do not set vertexAttribPointer if index buffer.
 
-        if (attribute === INDICES) {
+        if (attribute === 'indices') {
             j = i; continue;
         }
 
@@ -380,6 +370,7 @@ function checkFrameBufferStatus(gl) {
  * @param {Number} depth Updated depth of the drawing context.
  *
  */
+
 WebGLRenderer.prototype.updateSize = function updateSize() {
     var newSize = this.container._getSize();
 
@@ -395,8 +386,8 @@ WebGLRenderer.prototype.updateSize = function updateSize() {
 
     this.gl.viewport(0, 0, this.cachedSize[0], this.cachedSize[1]);
 
-    resolutionValues[0] = this.cachedSize;
-    this.program.setUniforms(resolutionName, resolutionValues);
+    this.resolutionValues[0] = this.cachedSize;
+    this.program.setUniforms(this.resolutionName, this.resolutionValues);
 };
 
 module.exports = WebGLRenderer;
