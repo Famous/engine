@@ -1,25 +1,5 @@
 'use strict';
 
-var MESH = 'mesh';
-var ID = 'id';
-var NUMBER = 'number';
-
-var RECOMPILE = 'RECOMPILE';
-var MATERIAL = 'MATERIAL';
-var VERTEX_BUFFERS = 'VERTEX_BUFFERS';
-
-var GL_SET_GEOMETRY = 'GL_SET_GEOMETRY';
-var GL_UNIFORMS = 'GL_UNIFORMS';
-var GL_BUFFER_DATA = 'GL_BUFFER_DATA';
-
-var UNIFORM_INPUT = 'UNIFORM_INPUT';
-var MATERIAL_INPUT = 'MATERIAL_INPUT';
-
-var METALLIC = 'metallic';
-var BASE_COLOR = 'baseColor';
-var GLOSSINESS = 'glossiness';
-var NORMAL = 'normal';
-
 /**
  * The Mesh class is responsible for providing the API for how
  * a RenderNode will interact with the WebGL API by adding
@@ -45,9 +25,9 @@ function Mesh (dispatch) {
     this._geometry = void 0;
 }
 
-// Return the name of the Mesh Class: 'mesh'
+// Return the name of the Mesh Class: 'Mesh'
 Mesh.toString = function toString () {
-    return MESH;
+    return 'Mesh';
 };
 
 Mesh.prototype.init = function init() {
@@ -64,7 +44,7 @@ Mesh.prototype.init = function init() {
 Mesh.prototype._receiveTransformChange = function _receiveTransformChange(transform) {
     this.dispatch.dirtyRenderable(this._id);
 
-    this.queue.push(GL_UNIFORMS);
+    this.queue.push('GL_UNIFORMS');
     this.queue.push('transform');
     this.queue.push(transform._matrix);
 };
@@ -77,7 +57,7 @@ Mesh.prototype._receiveSizeChange = function _receiveSizeChange(size) {
     this._size[1] = size[1];
     this._size[2] = size[2];
 
-    this.queue.push(GL_UNIFORMS);
+    this.queue.push('GL_UNIFORMS');
     this.queue.push('size');
     this.queue.push(size);
 };
@@ -85,7 +65,7 @@ Mesh.prototype._receiveSizeChange = function _receiveSizeChange(size) {
 Mesh.prototype._receiveOriginChange = function _receiveOriginChange(origin) {
     this.dispatch.dirtyRenderable(this._id);
 
-    this.queue.push(GL_UNIFORMS);
+    this.queue.push('GL_UNIFORMS');
     this.queue.push('origin');
     this.queue.push(origin);
 };
@@ -93,7 +73,7 @@ Mesh.prototype._receiveOriginChange = function _receiveOriginChange(origin) {
 Mesh.prototype._receiveOpacityChange = function _receiveOpacityChange(opacity) {
     this.dispatch.dirtyRenderable(this._id);
 
-    this.queue.push(GL_UNIFORMS);
+    this.queue.push('GL_UNIFORMS');
     this.queue.push('opacity');
     this.queue.push(opacity);
 };
@@ -117,7 +97,7 @@ Mesh.prototype.setGeometry = function (geometry) {
     var bufferIndex;
 
     if (this._geometry !== geometry) {
-        this.queue.push(GL_SET_GEOMETRY);
+        this.queue.push('GL_SET_GEOMETRY');
         this.queue.push(geometry.id);
         this.queue.push(geometry.spec.type);
         this.queue.push(geometry.spec.dynamic);
@@ -147,7 +127,7 @@ Mesh.prototype.clean = function clean() {
     i = this._geometry.spec.invalidations.length;
     while (i--) {
         bufferIndex = this._geometry.spec.invalidations.pop();
-        this.dispatch.sendDrawCommand(GL_BUFFER_DATA);
+        this.dispatch.sendDrawCommand('GL_BUFFER_DATA');
         this.dispatch.sendDrawCommand(this._geometry.id);
         this.dispatch.sendDrawCommand(this._geometry.spec.bufferNames[i]);
         this.dispatch.sendDrawCommand(this._geometry.spec.bufferValues[i]);
@@ -172,8 +152,8 @@ Mesh.prototype.clean = function clean() {
 
 Mesh.prototype.baseColor = function (materialExpression) {
     if (materialExpression._compile) materialExpression = materialExpression._compile();
-    this.queue.push(Array.isArray(materialExpression) ? UNIFORM_INPUT : MATERIAL_INPUT);
-    this.queue.push(BASE_COLOR);
+    this.queue.push(Array.isArray(materialExpression) ? 'UNIFORM_INPUT' : 'MATERIAL_INPUT');
+    this.queue.push('baseColor');
     this.queue.push(materialExpression);
     return this;
 };
@@ -191,8 +171,8 @@ Mesh.prototype.baseColor = function (materialExpression) {
 
 Mesh.prototype.normal = function (materialExpression) {
     if (materialExpression._compile) materialExpression = materialExpression._compile();
-    this.queue.push(NUMBER == typeof materialExpression ? UNIFORM_INPUT : MATERIAL_INPUT);
-    this.queue.push(NORMAL);
+    this.queue.push(typeof materialExpression === 'number' ? 'UNIFORM_INPUT' : 'MATERIAL_INPUT');
+    this.queue.push('normal');
     this.queue.push(materialExpression);
     return this;
 };
@@ -209,8 +189,8 @@ Mesh.prototype.normal = function (materialExpression) {
 
 Mesh.prototype.glossiness = function (materialExpression) {
     if (materialExpression._compile) materialExpression = materialExpression._compile();
-    this.queue.push(NUMBER == typeof materialExpression ? UNIFORM_INPUT : MATERIAL_INPUT);
-    this.queue.push(GLOSSINESS);
+    this.queue.push(typeof materialExpression === 'number' ? 'UNIFORM_INPUT' : 'MATERIAL_INPUT');
+    this.queue.push('glossiness');
     this.queue.push(materialExpression);
     return this;
 };
@@ -227,8 +207,8 @@ Mesh.prototype.glossiness = function (materialExpression) {
 
 Mesh.prototype.metallic = function metallic(materialExpression) {
     if (materialExpression._compile) materialExpression = materialExpression._compile();
-    this.queue.push(NUMBER == typeof materialExpression ? UNIFORM_INPUT : MATERIAL_INPUT);
-    this.queue.push(METALLIC);
+    this.queue.push(typeof materialExpression === 'number' ? 'UNIFORM_INPUT' : 'MATERIAL_INPUT');
+    this.queue.push('metallic');
     this.queue.push(materialExpression);
     return this;
 };
