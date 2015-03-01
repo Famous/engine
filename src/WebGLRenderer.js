@@ -74,29 +74,24 @@ function WebGLRenderer(container) {
  */
 
 WebGLRenderer.prototype.receive = function receive(path, commands) {
+    var bufferName, bufferValue, bufferSpacing, uniformName, uniformValue, geometryId;
     var mesh = this.meshRegistry[path];
     var light = this.lightRegistry[path];
-
-    if (!mesh) {
-        mesh = this.meshRegistry[path] = {
-            uniformKeys: ['opacity', 'transform', 'size', 'origin', 'baseColor'],
-            uniformValues: [1, identity, [0, 0, 0], [0, 0, 0], [0.5, 0.5, 0.5]],
-            buffers: {},
-            geometry: null,
-            drawType: null
-        };
-    }
-    var bufferName;
-    var bufferValue;
-    var bufferSpacing;
-    var uniformName;
-    var uniformValue;
-    var geometryId;
 
     while (commands.length) {
         var command = commands.shift();
 
         switch (command) {
+
+            case 'GL_CREATE_MESH':
+                mesh = this.meshRegistry[path] = {
+                    uniformKeys: ['opacity', 'transform', 'size', 'origin', 'baseColor'],
+                    uniformValues: [1, identity, [0, 0, 0], [0, 0, 0], [0.5, 0.5, 0.5]],
+                    buffers: {},
+                    geometry: null,
+                    drawType: null
+                };
+                break;
 
             case 'GL_CREATE_LIGHT':
                 light = this.lightRegistry[path] = {
@@ -157,7 +152,7 @@ WebGLRenderer.prototype.receive = function receive(path, commands) {
                 bufferValue = commands.shift();
                 bufferSpacing = commands.shift();
 
-                this.bufferRegistry.allocate(geometryId, bufferName, bufferValue, bufferSpacing, mesh.dynamic);
+                this.bufferRegistry.allocate(geometryId, bufferName, bufferValue, bufferSpacing);
                 break;
 
             case 'WITH': commands.unshift(command); return;
