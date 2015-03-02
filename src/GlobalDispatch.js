@@ -6,10 +6,20 @@ var WITH = 'WITH';
 var FRAME = 'FRAME';
 var TRIGGER = 'TRIGGER';
 
+var WORKER = (typeof window === 'undefined');
+
 function GlobalDispatch () {
     this.events = [];
     this.targetedCallbacks = {};
     this.globalCallbacks = [];
+
+    if (WORKER) {
+        var _this = this;
+        self.onmessage = function(ev) {
+            _this.receiveCommands(ev.data);
+        };
+    }
+
 }
 
 GlobalDispatch.prototype.receiveCommands = function receiveCommands (commands) {
@@ -63,7 +73,13 @@ GlobalDispatch.prototype.message = function message (mess) {
 };
 
 GlobalDispatch.prototype.flush = function flush () {
-    this.events.length = 0;
+    var events = this.events;
+
+    if (events.length && WORKER) self.postMessage(events);
+
+    for (var i = 0, len = this.events.length; i < len ; i++)
+        this.events.pop();
+
     return this;
 };
 
