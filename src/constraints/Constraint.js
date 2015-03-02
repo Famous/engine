@@ -13,7 +13,6 @@ function Constraint(options) {
     this.setOptions(options);
 
     this._ID = _ID++;
-    this._index = null;
 };
 
 /**

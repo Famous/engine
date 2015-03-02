@@ -55,7 +55,6 @@ function Particle(options) {
     this.type = 1 << 0;
 
     this._ID = _ID++;
-    this._index = null;
 }
 
 /**

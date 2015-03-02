@@ -21,22 +21,28 @@ var DELTA_REGISTER = new Vec3();
  */
 function PhysicsEngine(options) {
     options = options || {};
+    /** @prop bodies The bodies currently active in the engine. */
+    this.bodies = [];
     /** @prop forces The forces currently active in the engine. */
     this.forces = [];
     /** @prop constraints The constraints currently active in the engine. */
     this.constraints = [];
-    /** @prop bodies The bodies currently active in the engine. */
-    this.bodies = [];
 
     /** @prop step The time between frames in the engine. */
     this.step = options.step || 1000/60;
     /** @prop iterations The number of times each constraint is solved per frame. */
     this.iterations = options.iterations || 10;
     /** @prop _indexPool Pools of indicies to track holes in the arrays. */
-    this._indexPool = {
+    this._indexPools = {
         bodies: [],
         forces: [],
         constraints: []
+    };
+
+    this._entityMaps = {
+        bodies: {},
+        forces: {},
+        constraints: {}
     };
 
     this.speed = options.speed || 1.0;
@@ -82,19 +88,21 @@ PhysicsEngine.prototype.setOrientation = function(w, x, y, z) {
 }
 
 /**
- * Private helper method to store an element in a library array and assign an ID.
+ * Private helper method to store an element in a library array.
  *
  * @method _addElement
  * @private
  * @param {Object} element The body, force, or constraint to add.
- * @param {Array} library Where to store the element.
- * @param {Array} idPool The relevant pool of IDs from which to pull and pass to the element.
+ * @param {String} key Where to store the element.
  */
-function _addElement(element, library, idPool) {
-    if (element._index == null) {
-        if (idPool.length) element._index = idPool.pop();
-        else element._index = library.length;
-        library[element._index] = element;
+function _addElement(context, element, key) {
+    var map = context._entityMaps[key];
+    if (map[element._ID] == null) {
+        var library = context[key];
+        var indexPool = context._indexPools[key];
+        if (indexPool.length) map[element._ID] = indexPool.pop();
+        else map[element._ID] = library.length;
+        library[map[element._ID]] = element;
     }
 }
 
@@ -104,14 +112,15 @@ function _addElement(element, library, idPool) {
  * @method _removeElement
  * @private
  * @param {Object} element The body, force, or constraint to remove.
- * @param {Array} library Where to store the element.
- * @param {Array} idPool The relevant pool of IDs from which to pull and pass to the element.
+ * @param {String} key Where to store the element.
  */
-function _removeElement(element, library, idPool) {
-    if (element._index != null) {
-        idPool.push(element._index);
-        library[element._index] = null;
-        element._index = null;
+function _removeElement(context, element, key) {
+    var map = context._entityMaps[key];
+    var index = map[element._ID];
+    if (index != null) {
+        context._indexPools[key].push(index);
+        context[key][index] = null;
+        map[element._ID] = null;
     }
 }
 
@@ -168,7 +177,7 @@ PhysicsEngine.prototype.remove = function remove() {
  * @param {Particle} body The body to track.
  */
 PhysicsEngine.prototype.addBody = function addBody(body) {
-    _addElement(body, this.bodies, this._indexPool.bodies);
+    _addElement(this, body, 'bodies');
 };
 
 /**
@@ -178,7 +187,7 @@ PhysicsEngine.prototype.addBody = function addBody(body) {
  * @param {Force} force The force to track.
  */
 PhysicsEngine.prototype.addForce = function addForce(force) {
-    _addElement(force, this.forces, this._indexPool.forces);
+    _addElement(this, force, 'forces');
 };
 
 /**
@@ -188,7 +197,7 @@ PhysicsEngine.prototype.addForce = function addForce(force) {
  * @param {Constraint} constraint The constraint to track.
  */
 PhysicsEngine.prototype.addConstraint = function addConstraint(constraint) {
-    _addElement(constraint, this.constraints, this._indexPool.constraints);
+    _addElement(this, constraint, 'constraints');
 };
 
 /**
@@ -198,7 +207,7 @@ PhysicsEngine.prototype.addConstraint = function addConstraint(constraint) {
  * @param {Particle} body The body to stop tracking.
  */
 PhysicsEngine.prototype.removeBody = function removeBody(body) {
-    _removeElement(body, this.bodies, this._indexPool.bodies)
+    _removeElement(this, body, 'bodies')
 };
 
 /**
@@ -208,7 +217,7 @@ PhysicsEngine.prototype.removeBody = function removeBody(body) {
  * @param {Force} force The force to stop tracking.
  */
 PhysicsEngine.prototype.removeForce = function removeForce(force) {
-    _removeElement(force, this.forces, this._indexPool.forces)
+    _removeElement(this, force, 'forces')
 };
 
 /**
@@ -218,7 +227,7 @@ PhysicsEngine.prototype.removeForce = function removeForce(force) {
  * @param {Constraint} constraint The constraint to stop tracking.
  */
 PhysicsEngine.prototype.removeConstraint = function removeConstraint(constraint) {
-    _removeElement(constraint, this.constraints, this._indexPool.constraints)
+    _removeElement(this, constraint, 'constraints')
 };
 
 /**

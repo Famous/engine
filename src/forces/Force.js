@@ -12,7 +12,6 @@ function Force(options) {
     this.setOptions(options);
 
     this._ID = _ID++;
-    this._index = null;
 }
 
 Force.prototype.setOptions = function setOptions(options) {
