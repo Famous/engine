@@ -20,11 +20,13 @@
  * @param {Object} options
  * @param {Boolean} options.hashBangUrls force history to use URLs
  *   in the form of /#!/route
+ * @param {String} root
  */
 function History(options) {
     if (!(this instanceof History)) return new History(options);
 
     options = options || {};
+    this._root = options.root || '';
     this._sessionHistorySupport = sessionHistorySupport;
     this.hashBangUrls = options.hashBangUrls || !this._sessionHistorySupport;
     this._location = window.location;
@@ -150,14 +152,17 @@ History.prototype.replaceState = function replaceState(data, title, url) {
  *
  * @method getState
  *
- * @return {String} state as normalized pathname
+ * @return {String|null} state as normalized pathname
  */
 History.prototype.getState = function getState() {
+    if (!this._location.pathname.match('^' + this._root)) {
+        return null;
+    }
     if (this.hashBangUrls) {
         return this._location.hash.substring(2);
     }
     else {
-        return this._location.pathname;
+        return decodeURI(this._location.pathname).substring(this._root.length);
     }
 };
 
