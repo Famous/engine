@@ -5,6 +5,7 @@ function Compositor() {
     this._contexts = {};
     this._outCommands = [];
     this._inCommands = [];
+
     this._renderers = [];
 }
 
@@ -15,13 +16,13 @@ Compositor.CommandsToOutput = {
     CHANGE_CONTENT: 'DOM',
     ADD_EVENT_LISTENER: 'DOM',
     RECALL: 'DOM',
-    GL_CREATE_MESH: 'GL',
     GL_UNIFORMS: 'GL',
     GL_BUFFER_DATA: 'GL',
     GL_SET_GEOMETRY: 'GL',
     GL_CREATE_LIGHT: 'GL',
     GL_LIGHT_POSITION: 'GL',
-    GL_LIGHT_COLOR: 'GL'
+    GL_LIGHT_COLOR: 'GL',
+    GL_CREATE_MESH: 'GL'
 };
 
 Compositor.prototype.sendEvent = function sendEvent(path, ev, payload) {
@@ -80,7 +81,7 @@ Compositor.prototype.giveSizeFor = function giveSizeFor(commands) {
     var report = {
         size: size
     };
-    this._outCommands.push('WITH', selector, 'TRIGGER', 'RESIZE', report);
+    this._outCommands.push('WITH', selector, 'TRIGGER', 'resize', report);
 };
 
 Compositor.prototype.drawCommands = function drawCommands() {
