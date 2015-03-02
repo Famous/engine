@@ -166,4 +166,9 @@ LocalDispatch.prototype.getRenderer = function getRenderer () {
     return this._modelView._renderer;
 };
 
+LocalDispatch.prototype.dirtyRenderContext = function dirtyRenderContext () {
+    this._context.dirty();
+    return this;
+};
+
 module.exports = LocalDispatch;

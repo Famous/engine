@@ -23,6 +23,7 @@ function RenderContext (dispatch) {
     this._size = new Size(this);
     this._events = new CallbackStore();
     this._needsReflow = false;
+    this._recalcAll = true;
     this._dispatch = dispatch;
 }
 
@@ -131,9 +132,14 @@ RenderContext.prototype.setMountPoint = function setMountPoint (x, y, z) {
     return this;
 };
 
+RenderContext.prototype.dirty = function dirty () {
+    this._recalcAll = true;
+    return this;
+};
+
 RenderContext.prototype.update = function update (parentContext) {
     this._size._update(
-        parentContext._size._previouslyInvalidated,
+        this._recalcAll ? 7 : parentContext._size._previouslyInvalidated,
         parentContext._size.getTopDownSize()
     );
 
@@ -145,7 +151,7 @@ RenderContext.prototype.update = function update (parentContext) {
     this._mountPoint.update(mySize);
 
     this._align.transform._update(
-        parentContext._transform._previouslyInvalidated,
+        this._recalcAll ? (1 << 16) - 1 : parentContext._transform._previouslyInvalidated,
         parentContext._transform._matrix
     );
 
@@ -182,6 +188,9 @@ RenderContext.prototype.update = function update (parentContext) {
                 this._dispatch.reflowWith(layoutFn, this._dispatch._modelView.renderer);
             this._needsReflow = false;
         }
+
+    if (this._recalcAll) this._recalcAll = false;
+
     return this;
 };
 
