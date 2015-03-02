@@ -6,22 +6,25 @@
 
 vec4 applyTransform(vec4 pos) {
     mat4 projection = perspective;
-    pos.y *= -1.0;
-    pos.xyz *= size.xyz;
     mat4 MVMatrix = invertYAxis(transform);
-    vec4 translation = convertToClipSpace(MVMatrix[3]);
+    vec4 translation = MVMatrix[3];
     MVMatrix[3] = vec4(0.0, 0.0, 0.0, 1.0);
+    
+    pos.xyz *= size.xyz;
+    pos.y *= -1.0;
+    vec4 pixelPosition = vec4(pos.x * 0.5, pos.y * 0.5, pos.z, 1.0);
+    pixelPosition += vec4(size.x * 0.5, size.y * 0.5, 0.0, 0.0);
+
     projection[0][0] = 1.0/resolution.x;
     projection[1][1] = 1.0/resolution.y;
-    projection[2][2] = (resolution.y > resolution.x) ? 1.0/resolution.y : 1.0/resolution.x;
+    projection[2][2] = (resolution.y > resolution.x) ? -1.0/resolution.y : -1.0/resolution.x;
 
-    pos = MVMatrix * pos;
 
-    vPosition = pos.xyz;
-    vPosition += translation.xyz;
+    vPosition = (transform * pixelPosition).xyz;
 
-    pos = projection * pos;
-    pos += translation;
+    pos = projection * MVMatrix * pos;
+
+    pos += convertToClipSpace(translation);
 
     return pos;
 }
