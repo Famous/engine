@@ -32,7 +32,7 @@ var NORMAL = 'normal';
 
 function Mesh (dispatch) {
     this.dispatch = dispatch;
-    this.queue = [];
+    this.queue = ['GL_CREATE_MESH'];
     this._size = [0, 0, 0];
     this._id = dispatch.addRenderable(this);
 
