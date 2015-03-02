@@ -3,17 +3,8 @@
 var _History = require('./History');
 
 /**
- * @class Router
- * @constructor
- *
- * @param {Object} routes
- * @param {Object} options
- * @param {Boolean} options.silent
- * @param {Boolean} options.hashBangUrls
- * @param {String} options.root
- * @param {Object} options.proxy
- * @param {Boolean} options.validate check for unknown routes
- *
+ * A simple router supporting HTML5 pushState and hashbang  routing ("#!/").
+ * 
  * @example
  * var router = Router({
  *     '/example-route-0': function() {
@@ -36,31 +27,43 @@ var _History = require('./History');
  *     router.navigate('/example-route-' + currentState, { invoke: true });
  *     currentState++;
  * }, 1000);
+ * 
+ * @class Router
+ * @constructor
  *
+ * @param {Object} routes
+ * @param {Object} options
+ * @param {Boolean} options.silent
+ * @param {Boolean} options.hashBangUrls
+ * @param {Object} options.proxy
+ * @param {String} options.root
+ * @param {Boolean} options.validate check for unknown routes
  */
 function Router(routes, options) {
     if (!(this instanceof Router)) return new Router(routes, options);
     
     routes = routes || {};
-    this._routes = [];
     options = options || {};
 
     this._root = options.root || '';
+
+    this._routes = [];
     this.proxy = options.proxy || {};
-    this.validate = options.validate === undefined ? false : true;
-    
+    if (options.validate) this.validate = true;
+
     // Avoids cylic routing by storing the last routed state
+    // Seems like W3C spec doesn't mention if pushState event should be
+    // dispatched on page load.
     this._lastState = null;
 
     _addInitialRoutes.call(this, routes);
 
     this._history = _History({
-        hashBangUrls: options.hashBangUrls
+        hashBangUrls: options.hashBangUrls,
+        root: this._root
     }).onStateChange(_onStateChange.bind(this));
 
-    if (!options.silent) {
-        this.start();
-    }
+    if (!options.silent) this.start();
 }
 
 /**
@@ -87,20 +90,20 @@ Router.prototype.start = function start() {
  *
  * @param {String} [state=current pathname]
  * @param {Object} options
- * @param {String} options.replace
- * @param {String} options.invoke
+ * @param {Boolean} options.replace
+ * @param {Boolean} options.invoke
  *
  * @return {Router} this
  */
 Router.prototype.navigate = function navigate(state, options) {
     options = options || {};
     state = state || this._history.getState();
-    if (!_subRoot(state, this._root)) return;
-    var method = options.replace ? 'replaceState' : 'pushState';
+    if (this._lastState === state) return this;
 
+    var method = options.replace ? 'replaceState' : 'pushState';
     this._history[method](null, null, state);
 
-    if (options.invoke) this.invoke(state);
+    if (options.invoke) this.invoke();
     return this;
 };
 
@@ -132,12 +135,11 @@ Router.prototype.addRoute = function addRoute(route, handler) {
  * @return {Router} this
  */
 Router.prototype.invoke = function invoke(state) {
-    if (this._lastState === state) return false;
+    if (this._lastState === state) return this;
     state = state || this._history.getState();
-    if (!_subRoot(state, this._root)) return;
-    var normalizedState = state.slice(this._root.length, state.length);
+    if (state === null) return;
     var unknown = this._routes.every(function (route) {
-        var result = _checkRoute(route, normalizedState);
+        var result = _checkRoute.call(this, route, state);
         if (result) {
             if (typeof route.handler === 'string' && this.proxy[route.handler]) {
                 this.proxy[route.handler].apply(null, result);
@@ -162,7 +164,7 @@ function _checkRoute(route, state) {
 }
 
 function _createRegExpRoute(route) {
-    // TODO optional params etc.
+    // TODO could be extended to splats etc.
     route = route.replace(/\:\w+/, function (param) {
         param = param.substring(1);
         return '(' + param + ')';
@@ -173,10 +175,6 @@ function _createRegExpRoute(route) {
 function _onStateChange() {
     /* jshint validthis: true */
     this.invoke();
-}
-
-function _subRoot(state, root) {
-    return (state.substr(0, root.length) === root);
 }
 
 function _addInitialRoutes(routes, scope) {
