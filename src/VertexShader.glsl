@@ -12,7 +12,7 @@ vec4 applyTransform(vec4 pos) {
    
    pos.xyz *= size.xyz;
    pos.y *= -1.0;
-   vec4 pixelPosition = vec4(pos.x * 0.5, pos.y * 0.5, pos.z, 1.0);
+   vec4 pixelPosition = vec4(pos.x * 0.5, pos.y * 0.5, pos.z * 0.5, 1.0);
    mat4 pixelTransform = transform;
    pixelTransform[3][0] += size.x * 0.5;
    pixelTransform[3][1] += size.y * 0.5;
