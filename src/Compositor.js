@@ -24,7 +24,10 @@ Compositor.CommandsToOutput = {
     ADD_EVENT_LISTENER: DOM,
     GL_UNIFORMS: GL,
     GL_BUFFER_DATA: GL,
-    GL_SET_GEOMETRY: GL
+    GL_SET_GEOMETRY: GL,
+    GL_CREATE_LIGHT: GL,
+    GL_LIGHT_POSITION: GL,
+    GL_LIGHT_COLOR: GL
 };
 
 Compositor.prototype.sendEvent = function sendEvent(path, ev, payload) {
@@ -59,7 +62,7 @@ Compositor.prototype.handleWith = function handleWith (commands) {
         case GL:
             if (!context.GL) {
                 var webglrenderer = new WebGLRenderer(context.DOM);
-                context.GL = webglrenderer; 
+                context.GL = webglrenderer;
                 this._renderers.push(webglrenderer);
             }
             context.GL.receive(path, commands);
