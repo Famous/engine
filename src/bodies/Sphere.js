@@ -1,7 +1,7 @@
 'use strict';
 
 var Particle = require('./Particle');
-var Matrix = require('famous-math').Mat33;
+var Mat33 = require('famous-math').Mat33;
 var Vec3 = require('famous-math').Vec3;
 
 var SUPPORT_REGISTER = new Vec3();
@@ -62,13 +62,13 @@ Sphere.prototype.setInertia = function setInertia() {
 
     var mrr = m * r * r;
 
-    this.inertia = new Matrix([
+    this.inertia = new Mat33([
         0.4 * mrr, 0, 0,
         0, 0.4 * mrr, 0,
         0, 0, 0.4 * mrr
     ]);
 
-    this.inverseInertia = new Matrix([
+    this.inverseInertia = new Mat33([
         2.5 / mrr, 0, 0,
         0, 2.5 / mrr, 0,
         0, 0, 2.5 / mrr

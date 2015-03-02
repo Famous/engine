@@ -12,7 +12,6 @@ var EPA = ConvexCollision.EPA;
 var ContactManifoldTable = require('./collision/ContactManifold');
 
 var ObjectManager = require('famous-utilities').ObjectManager;
-
 ObjectManager.register('CollisionData', CollisionData);
 var OMRequestCollisionData = ObjectManager.requestCollisionData;
 

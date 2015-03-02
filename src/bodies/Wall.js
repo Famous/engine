@@ -1,7 +1,7 @@
 'use strict';
 
 var Particle = require('./Particle');
-var Matrix = require('famous-math').Mat33;
+var Mat33 = require('famous-math').Mat33;
 var Vec3 = require('famous-math').Vec3;
 
 /**
@@ -54,8 +54,8 @@ function Wall(options) {
 
     this.mass = Infinity;
     this.inverseMass = 0;
-    this.inertia = new Matrix([0,0,0,0,0,0,0,0,0]);
-    this.inverseInertia = new Matrix([0,0,0,0,0,0,0,0,0]);
+    this.inertia = new Mat33([0,0,0,0,0,0,0,0,0]);
+    this.inverseInertia = new Mat33([0,0,0,0,0,0,0,0,0]);
 
     this.type = 1 << 3;
 }

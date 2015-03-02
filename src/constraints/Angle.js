@@ -2,7 +2,7 @@
 
 var Constraint = require('./Constraint');
 var Vec3 = require('famous-math').Vec3;
-var Matrix = require('famous-math').Mat33;
+var Mat33 = require('famous-math').Mat33;
 
 var DELTA_REGISTER = new Vec3();
 
@@ -25,7 +25,7 @@ function Angle(a, b, options) {
 
     Constraint.call(this, options);
 
-    this.effectiveInertia = new Matrix();
+    this.effectiveInertia = new Mat33();
     this.angularImpulse = new Vec3();
     this.error = 0;
 }
@@ -66,7 +66,7 @@ Angle.prototype.update = function update(time, dt) {
     b.applyAngularImpulse(angularImpulse);
     a.applyAngularImpulse(angularImpulse.invert());
 
-    Matrix.add(a.inverseInertia, b.inverseInertia, this.effectiveInertia);
+    Mat33.add(a.inverseInertia, b.inverseInertia, this.effectiveInertia);
     this.effectiveInertia.inverse();
 
     angularImpulse.clear();

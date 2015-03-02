@@ -3,15 +3,15 @@
 var Force = require('./Force');
 var Quaternion = require('famous-math').Quaternion;
 var Vec3 = require('famous-math').Vec3;
-var Matrix = require('famous-math').Mat33;
+var Mat33 = require('famous-math').Mat33;
 
 var Q_REGISTER = new Quaternion();
 var DAMPING_REGISTER = new Vec3();
 var XYZ_REGISTER = new Vec3();
-var MAT_REGISTER = new Matrix();
+var MAT_REGISTER = new Mat33();
 
 /** @const ZERO_MAT */
-var ZERO_MAT = new Matrix([0,0,0,0,0,0,0,0,0]);
+var ZERO_MAT = new Mat33([0,0,0,0,0,0,0,0,0]);
 /** @const PI */
 var PI = Math.PI;
 
@@ -102,7 +102,7 @@ RotationalSpring.prototype.update = function update(time, dt) {
 
         deltaOmega.scale(stiffness);
 
-        Matrix.add(invSourceInertia, target.inverseInertia, effInertia).inverse();
+        Mat33.add(invSourceInertia, target.inverseInertia, effInertia).inverse();
 
         if (damping) {
             if (source) {
