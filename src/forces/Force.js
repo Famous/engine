@@ -1,5 +1,6 @@
 'use strict';
 
+var _ID = 0;
 /**
  * Abstract force manager to apply forces to targets.
  *
@@ -10,7 +11,8 @@ function Force(options) {
     this.options = options = options || {};
     this.setOptions(options);
 
-    this._ID = null;
+    this._ID = _ID++;
+    this._index = null;
 }
 
 Force.prototype.setOptions = function setOptions(options) {

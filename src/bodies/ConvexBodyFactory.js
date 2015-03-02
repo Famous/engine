@@ -1,9 +1,9 @@
 'use strict';
 
 var Particle = require('../bodies/Particle');
-var Matrix = require('famous-math').Mat33;
+var Mat33 = require('famous-math').Mat33;
 var Vec3 = require('famous-math').Vec3;
-var Geometry = require('famous-math').Geometry;
+var Geometry = require('../Geometry');
 var ConvexHull = Geometry.ConvexHull;
 
 /**
@@ -33,14 +33,14 @@ function ConvexBodyFactory(hull) {
         var scaleY = size[1]/originalSize[1];
         var scaleZ = size[2]/originalSize[2];
 
-        var T = new Matrix([scaleX, 0, 0, 0, scaleY, 0, 0, 0, scaleZ]);
+        var T = new Mat33([scaleX, 0, 0, 0, scaleY, 0, 0, 0, scaleZ]);
 
         var properties = _computeInertiaProperties(_polyhedralProperties, options, T);
 
         this.mass = properties.mass;
         this.inverseMass = 1 / this.mass;
-        this.inertia = new Matrix(properties.inertia);
-        this.inverseInertia = Matrix.inverse(this.inertia, new Matrix());
+        this.inertia = new Mat33(properties.inertia);
+        this.inverseInertia = Mat33.inverse(this.inertia, new Mat33());
 
         this._bodyVertices = [];
         for (var i = 0, len = _vertices.length; i < len; i++) {
@@ -100,9 +100,9 @@ function _computeInertiaProperties(polyhedralProperties, options, T) {
 
     var E_o = polyhedralProperties.eulerTensor;
 
-    var E = new Matrix();
-    Matrix.multiply(T, E_o, E);
-    Matrix.multiply(E, T, E);
+    var E = new Mat33();
+    Mat33.multiply(T, E_o, E);
+    Mat33.multiply(E, T, E);
     var E_values = E.get();
 
     var Exx = E_values[0];

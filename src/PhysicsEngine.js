@@ -32,8 +32,8 @@ function PhysicsEngine(options) {
     this.step = options.step || 1000/60;
     /** @prop iterations The number of times each constraint is solved per frame. */
     this.iterations = options.iterations || 10;
-    /** @prop _IDPool Pools of ID's for new entities to draw from. */
-    this._IDPool = {
+    /** @prop _indexPool Pools of indicies to track holes in the arrays. */
+    this._indexPool = {
         bodies: [],
         forces: [],
         constraints: []
@@ -91,10 +91,10 @@ PhysicsEngine.prototype.setOrientation = function(w, x, y, z) {
  * @param {Array} idPool The relevant pool of IDs from which to pull and pass to the element.
  */
 function _addElement(element, library, idPool) {
-    if (element._ID == null) {
-        if (idPool.length) element._ID = idPool.pop();
-        else element._ID = library.length;
-        library[element._ID] = element;
+    if (element._index == null) {
+        if (idPool.length) element._index = idPool.pop();
+        else element._index = library.length;
+        library[element._index] = element;
     }
 }
 
@@ -108,10 +108,10 @@ function _addElement(element, library, idPool) {
  * @param {Array} idPool The relevant pool of IDs from which to pull and pass to the element.
  */
 function _removeElement(element, library, idPool) {
-    if (element._ID != null) {
-        idPool.push(element._ID);
-        library[element._ID] = null;
-        element._ID = null;
+    if (element._index != null) {
+        idPool.push(element._index);
+        library[element._index] = null;
+        element._index = null;
     }
 }
 
@@ -168,7 +168,7 @@ PhysicsEngine.prototype.remove = function remove() {
  * @param {Particle} body The body to track.
  */
 PhysicsEngine.prototype.addBody = function addBody(body) {
-    _addElement(body, this.bodies, this._IDPool.bodies);
+    _addElement(body, this.bodies, this._indexPool.bodies);
 };
 
 /**
@@ -178,7 +178,7 @@ PhysicsEngine.prototype.addBody = function addBody(body) {
  * @param {Force} force The force to track.
  */
 PhysicsEngine.prototype.addForce = function addForce(force) {
-    _addElement(force, this.forces, this._IDPool.forces);
+    _addElement(force, this.forces, this._indexPool.forces);
 };
 
 /**
@@ -188,7 +188,7 @@ PhysicsEngine.prototype.addForce = function addForce(force) {
  * @param {Constraint} constraint The constraint to track.
  */
 PhysicsEngine.prototype.addConstraint = function addConstraint(constraint) {
-    _addElement(constraint, this.constraints, this._IDPool.constraints);
+    _addElement(constraint, this.constraints, this._indexPool.constraints);
 };
 
 /**
@@ -198,7 +198,7 @@ PhysicsEngine.prototype.addConstraint = function addConstraint(constraint) {
  * @param {Particle} body The body to stop tracking.
  */
 PhysicsEngine.prototype.removeBody = function removeBody(body) {
-    _removeElement(body, this.bodies, this._IDPool.bodies)
+    _removeElement(body, this.bodies, this._indexPool.bodies)
 };
 
 /**
@@ -208,7 +208,7 @@ PhysicsEngine.prototype.removeBody = function removeBody(body) {
  * @param {Force} force The force to stop tracking.
  */
 PhysicsEngine.prototype.removeForce = function removeForce(force) {
-    _removeElement(force, this.forces, this._IDPool.forces)
+    _removeElement(force, this.forces, this._indexPool.forces)
 };
 
 /**
@@ -218,7 +218,7 @@ PhysicsEngine.prototype.removeForce = function removeForce(force) {
  * @param {Constraint} constraint The constraint to stop tracking.
  */
 PhysicsEngine.prototype.removeConstraint = function removeConstraint(constraint) {
-    _removeElement(constraint, this.constraints, this._IDPool.constraints)
+    _removeElement(constraint, this.constraints, this._indexPool.constraints)
 };
 
 /**

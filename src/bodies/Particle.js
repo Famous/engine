@@ -2,10 +2,11 @@
 
 var Vec3 = require('famous-math').Vec3;
 var Quaternion = require('famous-math').Quaternion;
-var Matrix = require('famous-math').Mat33;
+var Mat33 = require('famous-math').Mat33;
 
 var ZERO_VECTOR = new Vec3();
 
+var _ID = 0;
 /**
  * Fundamental physical body. Maintains translational and angular momentum, position and orientation, and other properties
  * such as size and coefficients of restitution and friction used in collision response.
@@ -35,8 +36,8 @@ function Particle(options) {
     this.restitution = options.restitution != null ? options.restitution : 0.4;
     this.friction = options.friction != null ? options.friction : 0.2;
 
-    this.inertia = new Matrix([0,0,0,0,0,0,0,0,0]);
-    this.inverseInertia = new Matrix([0,0,0,0,0,0,0,0,0]);
+    this.inertia = new Mat33([0,0,0,0,0,0,0,0,0]);
+    this.inverseInertia = new Mat33([0,0,0,0,0,0,0,0,0]);
 
     this.size = options.size || [0, 0, 0];
 
@@ -52,6 +53,9 @@ function Particle(options) {
     this.collisionGroup = options.collisionGroup || 1;
 
     this.type = 1 << 0;
+
+    this._ID = _ID++;
+    this._index = null;
 }
 
 /**
@@ -133,11 +137,11 @@ Particle.prototype.getInverseMass = function() {
  * Infers the inertia tensor. Will also compute and set the inverse inertia.
  *
  * @method setInertia
- * @param {Mat33} matrix
+ * @param {Mat33} Mat33
  */
 Particle.prototype.setInertia = function setInertia() {
-    this.inertia = new Matrix([0,0,0,0,0,0,0,0,0]);
-    this.inverseInertia = new Matrix([0,0,0,0,0,0,0,0,0]);
+    this.inertia = new Mat33([0,0,0,0,0,0,0,0,0]);
+    this.inverseInertia = new Mat33([0,0,0,0,0,0,0,0,0]);
 };
 
 /**

@@ -1,5 +1,6 @@
 'use strict';
 
+var _ID = 0;
 /**
  * Base Constraint class to be used in the Physics
  * Subclass this class to implement a constraint
@@ -11,7 +12,8 @@ function Constraint(options) {
     this.options = options = options || {};
     this.setOptions(options);
 
-    this._ID = null;
+    this._ID = _ID++;
+    this._index = null;
 };
 
 /**

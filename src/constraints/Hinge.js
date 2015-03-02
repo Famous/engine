@@ -2,7 +2,7 @@
 
 var Constraint = require('./Constraint');
 var Vec3 = require('famous-math').Vec3;
-var Matrix = require('famous-math').Mat33;
+var Mat33 = require('famous-math').Mat33;
 var Quaternion = require('famous-math').Quaternion;
 
 var VEC1_REGISTER = new Vec3();
@@ -36,7 +36,7 @@ function Hinge(a, b, options) {
     this.angImpulseB = new Vec3();
     this.error = new Vec3();
     this.errorRot = [0,0];
-    this.effMassMatrix = new Matrix();
+    this.effMassMatrix = new Mat33();
     this.effMassMatrixRot = [];
 }
 
@@ -116,13 +116,13 @@ Hinge.prototype.update = function(time, dt) {
     var rA = a.orientation.rotateVector(this.bodyRA, this.rA);
     var rB = b.orientation.rotateVector(this.bodyRB, this.rB);
 
-    var xRA = new Matrix([0,rA.z,-rA.y,-rA.z,0,rA.x,rA.y,-rA.x,0]);
-    var xRB = new Matrix([0,rB.z,-rB.y,-rB.z,0,rB.x,rB.y,-rB.x,0]);
+    var xRA = new Mat33([0,rA.z,-rA.y,-rA.z,0,rA.x,rA.y,-rA.x,0]);
+    var xRB = new Mat33([0,rB.z,-rB.y,-rB.z,0,rB.x,rB.y,-rB.x,0]);
 
-    var RIaRt = Matrix.multiply(xRA, a.inverseInertia, new Matrix()).multiply(xRA.transpose());
-    var RIbRt = Matrix.multiply(xRB, b.inverseInertia, new Matrix()).multiply(xRB.transpose());
+    var RIaRt = Mat33.multiply(xRA, a.inverseInertia, new Mat33()).multiply(xRA.transpose());
+    var RIbRt = Mat33.multiply(xRB, b.inverseInertia, new Mat33()).multiply(xRB.transpose());
 
-    var invEffInertia = Matrix.add(RIaRt, RIbRt, RIaRt);
+    var invEffInertia = Mat33.add(RIaRt, RIbRt, RIaRt);
 
     var worldA = Vec3.add(a.position, this.rA, this.anchor);
     var worldB = Vec3.add(b.position, this.rB, VEC1_REGISTER);
@@ -134,9 +134,9 @@ Hinge.prototype.update = function(time, dt) {
     var imA = a.inverseMass;
     var imB = b.inverseMass;
 
-    var invEffMass = new Matrix([imA + imB,0,0,0,imA + imB,0,0,0,imA + imB]);
+    var invEffMass = new Mat33([imA + imB,0,0,0,imA + imB,0,0,0,imA + imB]);
 
-    Matrix.add(invEffInertia, invEffMass, this.effMassMatrix)
+    Mat33.add(invEffInertia, invEffMass, this.effMassMatrix)
     this.effMassMatrix.inverse();
 
     var invIAt1xA = a.inverseInertia.vectorMultiply(t1xA, VEC1_REGISTER);

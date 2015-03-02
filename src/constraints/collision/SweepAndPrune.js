@@ -44,7 +44,6 @@ SweepAndPrune.prototype.add = function(body) {
     this._entityRegistry[body._ID] = body;
     this._boundingVolumeRegistry[body._ID] = boundingVolume;
     this._sweepVolumes.push(sweepVolume);
-
     for (var i = 0; i < 3; i++) {
         var axis = AXES[i];
         this.endpoints[axis].push(sweepVolume.points[axis][0]);

@@ -1,7 +1,7 @@
 'use strict';
 
 var Vec3 = require('famous-math').Vec3;
-var Simplex = require('famous-math').Geometry.Simplex;
+var Geometry = require('../../Geometry');
 var ObjectManager = require('famous-utilities').ObjectManager;
 
 ObjectManager.register('GJK_EPASupportPoint', GJK_EPASupportPoint);
