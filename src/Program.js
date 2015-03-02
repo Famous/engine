@@ -2,20 +2,12 @@
 
 var Utility = require('famous-utilities');
 var Texture = require('./Texture');
-
-/* Cached values */
-
-var INDICES = 'indices';
-var FLOAT = 'float';
-var VEC = 'vec';
-var MAT = 'mat';
-var UNIFORM = 'uniform ';
-var NEWLINE = '\n';
-var SEMINEWLINE = ';\n';
-var ATTRIBUTE = 'attribute ';
-var VARYING = 'varying ';
-
 var checkers = require('./Checkerboard');
+
+var VERTEX_SHADER = 35633;
+var FRAGMENT_SHADER = 35632;
+var vertexWrapper = require('famous-webgl-shaders').vertex;
+var fragmentWrapper = require('famous-webgl-shaders').fragment;
 
 var TYPES = {
     undefined: 'float ',
@@ -25,13 +17,6 @@ var TYPES = {
     4: 'vec4 ',
     16: 'mat4 '
 };
-
-var VERTEX_SHADER = 35633;
-var FRAGMENT_SHADER = 35632;
-
-var vertexWrapper = require('famous-webgl-shaders').vertex;
-
-var fragmentWrapper = require('famous-webgl-shaders').fragment;
 
 var inputs = ['baseColor', 'normals', 'metalness', 'glossiness'];
 var inputTypes = {baseColor: 'vec3', normal: 'vec3', glossiness: 'float', metalness: 'float' };
@@ -118,7 +103,7 @@ Program.prototype.registerMaterial = function registerMaterial(name, material) {
         uniformValues.push(compiled.uniforms[k]);
     }
 
-    if (inputTypes[name] == FLOAT) {
+    if (inputTypes[name] == 'float') {
         this.definitionFloat.push('float fa_' + material._id + '() {\n '  + compiled.glsl + ' \n}');
         this.applicationFloat.push('if (int(abs(ID)) == ' + material._id + ') return fa_' + material._id  + '();');
     } else {
@@ -179,28 +164,28 @@ Program.prototype.resetProgram = function resetProgram() {
 
     for(i = 0; i < this.uniformNames.length; i++) {
         name = this.uniformNames[i], value = this.uniformValues[i];
-        vertexHeader.push(UNIFORM + TYPES[value.length] + name + SEMINEWLINE);
-        fragmentHeader.push(UNIFORM + TYPES[value.length] + name + SEMINEWLINE);
+        vertexHeader.push('uniform ' + TYPES[value.length] + name + ';\n');
+        fragmentHeader.push('uniform ' + TYPES[value.length] + name + ';\n');
     }
 
     for(i = 0; i < this.attributeNames.length; i++) {
         name = this.attributeNames[i], value = this.attributeValues[i];
-        vertexHeader.push(ATTRIBUTE + TYPES[value] + name + SEMINEWLINE);
+        vertexHeader.push('attribute ' + TYPES[value] + name + ';\n');
     }
 
     for(i = 0; i < this.varyingNames.length; i++) {
         name = this.varyingNames[i], value = this.varyingValues[i];
-        vertexHeader.push(VARYING + TYPES[value]  + name + SEMINEWLINE);
-        fragmentHeader.push(VARYING + TYPES[value] + name + SEMINEWLINE);
+        vertexHeader.push('varying ' + TYPES[value]  + name + ';\n');
+        fragmentHeader.push('varying ' + TYPES[value] + name + ';\n');
     }
 
     vertexSource = vertexHeader.join('') + vertexWrapper;
 
     fragmentSource = fragmentHeader.join('') + fragmentWrapper
-        .replace('#vec_definitions', this.definitionVec.join(NEWLINE))
-        .replace('#vec_applications', this.applicationVec.join(NEWLINE))
-        .replace('#float_definitions', this.definitionFloat.join(NEWLINE))
-        .replace('#float_applications', this.applicationFloat.join(NEWLINE));
+        .replace('#vec_definitions', this.definitionVec.join('\n'))
+        .replace('#vec_applications', this.applicationVec.join('\n'))
+        .replace('#float_definitions', this.definitionFloat.join('\n'))
+        .replace('#float_applications', this.applicationFloat.join('\n'));
 
     program = this.gl.createProgram();
 
