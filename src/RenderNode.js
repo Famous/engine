@@ -12,6 +12,7 @@ function RenderNode (proxy, globalDispatch) {
 
 RenderNode.prototype.addChild = function addChild (index) {
     var layoutNode = new LayoutNode();
+    layoutNode._localDispatch.dirtyRenderContext();
     var childNode = new RenderNode(this._localDispatch._renderProxy, this._globalDispatch);
     layoutNode.addChild(childNode);
     if (index == null) {
