@@ -13,13 +13,13 @@ function Context (model, selector, globalDispatch) {
     this._drawCommands = [];
     this._globalDispatch = globalDispatch;
     this._contentNode = this._contextNode.addChild();
-    this.init(model);
+    this._model = model;
+    this._globalDispatch.message(NEED_SIZE_FOR).message(this._selector);
+    this._globalDispatch.targetedOn(this._selector, RESIZE, this._receiveContextSize.bind(this));
 }
 
 Context.prototype.init = function init (model) {
     this._contentNode.getDispatch().acceptModel(model);
-    this._globalDispatch.message(NEED_SIZE_FOR).message(this._selector);
-    this._globalDispatch.targetedOn(this._selector, RESIZE, this._receiveContextSize.bind(this));
     return this;
 };
 
@@ -40,6 +40,7 @@ Context.prototype.send = function send () {
 
 Context.prototype._receiveContextSize = function _receiveContextSize (sizeReport) {
     this._contextNode._localDispatch._context._size.setAbsolute(sizeReport.size[0], sizeReport.size[1], 0)._update(7, [0, 0, 0]);
+    this.init(this._model);
     this._needsSizeZero = true;
 };
 
@@ -53,7 +54,7 @@ Context.prototype._update = function _update (node, parent) {
     dispatch.updateModelView()
         .cleanComponents()
         .cleanRenderContext(parent)
-        .cleanRenderables(this._renderProxy);
+        .cleanRenderables();
     this._needsReflow = this._needsReflow || dispatch.requestingReflow();
     var children = node.getChildren();
     var i = 0;

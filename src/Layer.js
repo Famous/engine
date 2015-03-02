@@ -10,9 +10,11 @@ Layer.prototype.clear = function clear () {
     var componentIsDirty = this._componentIsDirty;
     var i = 0;
     var len = components.length;
+    var component;
     for (; i < len ; i++) {
-        components.shift();
+        component = components.shift();
         componentIsDirty.shift();
+        if (component.kill) component.kill();
     }
     return this;
 };

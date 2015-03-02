@@ -41,7 +41,6 @@ ModelView.prototype.acceptModel = function acceptModel (model) {
             Handler = renderer.constructor.handlers[i];
             this._rendererControllers.push(new Handler(renderer, this._dispatch));
         }
-
     }
 
     var subscriptions = this._renderer.constructor.subscribe;
@@ -123,6 +122,11 @@ ModelView.prototype.swapChildAtIndex = function swapChildAtIndex (change) {
     // todo
 };
 
+ModelView.prototype.kill = function kill () {
+    if (this._subscriptionManager) this._subscriptionManager.stopObserving();
+    if (this._childManager) this._childManager.stopObserving();
+};
+
 function _findPublication (model) {
     /*jshint validthis: true */
     var publicationKey = model.constructor.publish;
@@ -133,7 +137,7 @@ function _findPublication (model) {
     if (!publicationKey) return;
     else if (publicationKey.constructor === String)
 
-        if (model[publicationKey].constructor === Array) {
+        if (model[publicationKey] && model[publicationKey].constructor === Array) {
             i = 0;
             len = model[publicationKey].length;
             node = this._dispatch.getNode();
@@ -161,14 +165,17 @@ function _findPublication (model) {
             this._childManager = new ObjectObserver(model);
             this._childManager.subscribe(publicationKey, this.swapChild.bind(this));
 
-            node.removeAllChildren();
-            node
-                .addChild(0)
-                .getDispatch()
-                .acceptModel(model[publicationKey]);
+            if (model[publicationKey]) {
+                node.removeAllChildren();
+                node
+                    .addChild(0)
+                    .getDispatch()
+                    .acceptModel(model[publicationKey]);
 
-            if (this._renderer.layout)
-                node.reflowWith(this._renderer.layout, this._renderer);
+                if (this._renderer.layout)
+                    node.reflowWith(this._renderer.layout, this._renderer);
+            }
+
         }
     else if (publicationKey.constructor === Array) {
         i = 0;
