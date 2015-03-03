@@ -51,4 +51,11 @@ Node.prototype.getChildren = function getChildren () {
     return this._children;
 };
 
+Node.prototype.update = function update (parent) {
+    this._localDispatch.update(parent);
+    for (var i = 0, len = this._children.length ; i < len ; i++)
+        this._children[i].update(this);
+    return this;
+};
+
 module.exports = Node;

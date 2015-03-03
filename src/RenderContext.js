@@ -89,7 +89,6 @@ RenderContext.prototype.setPosition = function setPosition (x, y, z) {
 
 RenderContext.prototype.setAbsolute = function setAbsolute (x, y, z) {
     this._size.setAbsolute(x, y, z);
-
     return this;
 };
 
