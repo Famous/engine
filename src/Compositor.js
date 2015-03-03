@@ -22,6 +22,7 @@ Compositor.CommandsToOutput = {
     GL_CREATE_LIGHT: 'GL',
     GL_LIGHT_POSITION: 'GL',
     GL_LIGHT_COLOR: 'GL',
+    MATERIAL_INPUT: 'GL',
     GL_CREATE_MESH: 'GL'
 };
 
