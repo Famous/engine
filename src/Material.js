@@ -62,6 +62,8 @@ function Material(name, chunk, inputs, uniforms) {
     this.inputs = inputs ? (Array.isArray(inputs) ? inputs : [inputs]): [];
     this.uniforms = uniforms;
     this._id = Material.id++;
+
+    this.invalidations = [];
 }
 
 Material.id = 1;
@@ -83,6 +85,12 @@ Material.prototype.traverse = function traverse(callback) {
     callback(this);
 
     return this;
+};
+
+Material.prototype.setUniform = function setUniform(name, value) {
+    this.uniforms[name] = value;
+
+    this.invalidations.push(name);
 };
 
 /**
