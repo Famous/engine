@@ -11,6 +11,8 @@ function Camera(dispatch) {
     this._projectionType = Camera.ORTHOGRAPHIC_PROJECTION;
     this._focalDepth = 0;
     this._id = dispatch.addComponent(this);
+
+    this.setFlat();
 }
 
 Camera.FRUSTUM_PROJECTION = 0;
