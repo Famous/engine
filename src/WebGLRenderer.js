@@ -17,7 +17,6 @@ var identity = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
  * @param {DOMElement} canvas The dom element that GL will paint itself onto.
  *
  */
-
 function WebGLRenderer(container) {
     this.container = container;
     this.canvas = document.createElement('canvas');
@@ -41,7 +40,9 @@ function WebGLRenderer(container) {
     gl.depthFunc(gl.LEQUAL);
 
     this.meshRegistry = {};
+    this.meshRegistryKeys = [];
     this.lightRegistry = {};
+    this.lightRegistryKeys = [];
     this.textureRegistry = {};
     this.texCache = {};
     this.bufferRegistry = new BufferRegistry(gl);
@@ -51,7 +52,8 @@ function WebGLRenderer(container) {
         boundArrayBuffer: null,
         boundElementBuffer: null,
         lastDrawn: null,
-        enabledAttributes: {}
+        enabledAttributes: {},
+        enabledAttributesKeys: []
     };
 
     this.resolutionName = ['resolution'];
@@ -72,7 +74,6 @@ function WebGLRenderer(container) {
  *
  * @chainable
  */
-
 WebGLRenderer.prototype.receive = function receive(path, commands) {
     var bufferName, bufferValue, bufferSpacing, uniformName, uniformValue, geometryId;
     var mesh = this.meshRegistry[path];
@@ -91,6 +92,7 @@ WebGLRenderer.prototype.receive = function receive(path, commands) {
                     geometry: null,
                     drawType: null
                 };
+                this.meshRegistryKeys.push(path);
                 break;
 
             case 'GL_CREATE_LIGHT':
@@ -98,6 +100,7 @@ WebGLRenderer.prototype.receive = function receive(path, commands) {
                     color: [1.0, 1.0, 1.0],
                     position: [0.0, 0.0, 100.0]
                 };
+                this.lightRegistryKeys.push(path);
                 break;
 
             case 'GL_LIGHT_POSITION':
@@ -159,17 +162,19 @@ WebGLRenderer.prototype.draw = function draw() {
     var buffers;
     var size;
     var light;
+    var i;
+    var len;
 
-    for(var key in this.lightRegistry) {
-        light = this.lightRegistry[key];
+    for (i = 0, len = this.lightRegistryKeys.length; i < len; i++) {
+        light = this.lightRegistry[this.lightRegistryKeys[i]];
         this.program.setUniforms(['u_LightPosition'], [light.position]);
         this.program.setUniforms(['u_LightColor'], [light.color]);
     }
 
     this.program.setUniforms(['perspective'], [this.projectionTransform]);
 
-    for (var key in this.meshRegistry) {
-        mesh = this.meshRegistry[key];
+    for (i = 0, len = this.meshRegistryKeys.length; i < len; i++) {
+        mesh = this.meshRegistry[this.meshRegistryKeys[i]];
 
         buffers = this.bufferRegistry.registry[mesh.geometry];
         if (!buffers) return;
@@ -224,6 +229,7 @@ WebGLRenderer.prototype.drawBuffers = function drawBuffers(vertexBuffers, mode, 
         if (!this.state.enabledAttributes[attribute]) {
             gl.enableVertexAttribArray(location);
             this.state.enabledAttributes[attribute] = true;
+            this.state.enabledAttributesKeys.push(attribute);
         }
 
         // Retreive buffer information used to set attribute pointer.
@@ -246,11 +252,11 @@ WebGLRenderer.prototype.drawBuffers = function drawBuffers(vertexBuffers, mode, 
     }
 
     // Disable any attributes that not currently being used.
-
-    for(var attribute in this.state.enabledAttributes) {
-        if (this.state.enabledAttributes[attribute] && vertexBuffers.keys.indexOf(attribute) === -1) {
-            gl.disableVertexAttribArray(this.program.attributeLocations[attribute]);
-            this.state.enabledAttributes[attribute] = false;
+    for(var i = 0, len = this.state.enabledAttributesKeys.length; i < len; i++) {
+        var key = this.state.enabledAttributes[this.state.enabledAttributesKeys[i]];
+        if (this.state.enabledAttributes[key] && vertexBuffers.keys.indexOf(key) === -1) {
+            gl.disableVertexAttribArray(this.program.attributeLocations[key]);
+            this.state.enabledAttributes[key] = false;
         }
     }
 
@@ -292,7 +298,6 @@ WebGLRenderer.prototype.drawBuffers = function drawBuffers(vertexBuffers, mode, 
  * @param {Texture} The location where the render data is stored
  *
  */
-
 function renderOffscreen(callback, spec, context, texture) {
     var gl = this.gl;
     var v = context._size;
@@ -359,7 +364,6 @@ function checkFrameBufferStatus(gl) {
  * @param {Number} depth Updated depth of the drawing context.
  *
  */
-
 WebGLRenderer.prototype.updateSize = function updateSize() {
     var newSize = this.container._getSize();
 
@@ -380,4 +384,3 @@ WebGLRenderer.prototype.updateSize = function updateSize() {
 };
 
 module.exports = WebGLRenderer;
-
