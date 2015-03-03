@@ -69,7 +69,7 @@ Engine.prototype.start = function start() {
     this._startOnVisibilityChange = true;
     this._running = true;
     this._sleep += _now() - this._stoppedAt;
-    this._looper();
+    rAF(this._looper);
     return this;
 };
 
