@@ -2,19 +2,16 @@
 
 var RenderContext = require('./RenderContext');
 var ComponentStore = require('./ComponentStore');
-var ModelView = require('./ModelView');
 var RenderProxy = require('./RenderProxy');
 
 function LocalDispatch (node, proxy) {
     this._renderProxy = new RenderProxy(proxy);
     this._context = new RenderContext(this);
     this._componentStore = new ComponentStore(this);
-    this._modelView = new ModelView(this);
     this._node = node;
 }
 
 LocalDispatch.prototype.kill = function kill () {
-    this._modelView.kill();
     this._componentStore.kill();
     return this;
 };
@@ -27,18 +24,8 @@ LocalDispatch.prototype.getContext = function getContext () {
     return this._context;
 };
 
-LocalDispatch.prototype.acceptModel = function acceptModel (model) {
-    this._modelView.acceptModel(model);
-    return this;
-};
-
 LocalDispatch.prototype.getRenderPath = function getRenderPath () {
     return this._renderProxy.getRenderPath();
-};
-
-LocalDispatch.prototype.updateModelView = function updateModelView () {
-    this._modelView.update();
-    return this;
 };
 
 LocalDispatch.prototype.registerTargetedEvent = function registerTargetedEvent (event, cb) {
@@ -147,27 +134,15 @@ LocalDispatch.prototype.hasRenderables = function hasRenderables () {
     return !!this._componentStore.getRenderables().length;
 };
 
-LocalDispatch.prototype.reflowWith = function reflowWith (fn, ctx) {
-    if (this._node.reflow) this._node.reflow(fn, ctx);
+LocalDispatch.prototype.dirtyRenderContext = function dirtyRenderContext () {
+    this._context.dirty();
     return this;
 };
 
-LocalDispatch.prototype.reflow = function reflow () {
-    this._needsReflow = true;
-};
-
-LocalDispatch.prototype.requestingReflow = function requestingReflow () {
-    var result = this._needsReflow;
-    this._needsReflow = false;
-    return result;
-};
-
-LocalDispatch.prototype.getRenderer = function getRenderer () {
-    return this._modelView._renderer;
-};
-
-LocalDispatch.prototype.dirtyRenderContext = function dirtyRenderContext () {
-    this._context.dirty();
+LocalDispatch.prototype.update = function update (parent) {
+    this.cleanComponents()
+        .cleanRenderContext(parent)
+        .cleanRenderables();
     return this;
 };
 
