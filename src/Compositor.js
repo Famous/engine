@@ -82,7 +82,20 @@ Compositor.prototype.giveSizeFor = function giveSizeFor(commands) {
     var report = {
         size: size
     };
+    this.sendResize(selector, report);
+    var _this = this;
+    if (selector === 'body')
+        window.onresize = function () {
+            _this.sendResize(selector, {
+                size: _this.getOrSetContext(selector).DOM._getSize()
+            });
+        };
+    return this;
+};
+
+Compositor.prototype.sendResize = function sendResize (selector, report) {
     this._outCommands.push('WITH', selector, 'TRIGGER', 'resize', report);
+    return this;
 };
 
 Compositor.prototype.drawCommands = function drawCommands() {
