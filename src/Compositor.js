@@ -1,5 +1,6 @@
 var VirtualElement = require('famous-dom-renderers').VirtualElement;
 var WebGLRenderer = require('famous-webgl-renderers').WebGLRenderer;
+var Camera = require('famous-components').Camera;
 
 function Compositor() {
     this._contexts = {};
@@ -7,6 +8,10 @@ function Compositor() {
     this._inCommands = [];
 
     this._renderers = [];
+    this._renderState = {
+        projectionType: Camera.ORTHOGRAPHIC_PROJECTION,
+        perspectiveTransform: new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1])
+    };
 }
 
 Compositor.CommandsToOutput = {
@@ -53,6 +58,7 @@ Compositor.prototype.handleWith = function handleWith (commands) {
             var element = parent.getOrSetElement(path, index);
             element.receive(commands);
             pointer.DOM = element;
+            this._renderers.push(element);
             break;
 
         case 'GL':
@@ -111,11 +117,19 @@ Compositor.prototype.drawCommands = function drawCommands() {
             case 'NEED_SIZE_FOR':
                 this.giveSizeFor(commands);
                 break;
+            case 'PINHOLE_PROJECTION':
+                this._renderState.projectionType = Camera.PINHOLE_PROJECTION;
+                this._renderState.perspectiveTransform[11] = -1/commands.shift();
+                break;
+            case 'ORTHOGRAPHIC_PROJECTION':
+                this._renderState.projectionType = Camera.ORTHOGRAPHIC_PROJECTION;
+                this._renderState.perspectiveTransform[11] = 0;
+                break;            
         }
     }
 
     for (var i = 0; i < this._renderers.length; i++) {
-        this._renderers[i].draw();
+        this._renderers[i].draw(this._renderState);
     }
 
     return this._outCommands;
