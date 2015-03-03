@@ -122,12 +122,6 @@ WebGLRenderer.prototype.receive = function receive(path, commands) {
                 this.updateSize();
                 break;
 
-            case 'UNIFORM_INPUT':
-                var name = commands.shift();
-                var mat = commands.shift();
-                mesh.uniformValues[4] = mat;
-                break;
-
             case 'GL_SET_GEOMETRY':
                 mesh.geometry = commands.shift();
                 mesh.drawType = commands.shift();
