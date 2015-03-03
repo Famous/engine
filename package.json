@@ -22,8 +22,5 @@
     "jshint-stylish": "^1.0.0",
     "tap-spec": "^2.2.0",
     "tape": "^3.0.3"
-  },
-  "dependencies": {
-    "famous-utilities": "git+ssh://git@github.famo.us/platform/utilities#master"
   }
 }
