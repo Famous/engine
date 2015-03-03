@@ -139,4 +139,11 @@ LocalDispatch.prototype.dirtyRenderContext = function dirtyRenderContext () {
     return this;
 };
 
+LocalDispatch.prototype.update = function update (parent) {
+    this.cleanComponents()
+        .cleanRenderContext(parent)
+        .cleanRenderables();
+    return this;
+};
+
 module.exports = LocalDispatch;
