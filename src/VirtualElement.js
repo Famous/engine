@@ -13,6 +13,7 @@ var EVENT_PROPERTIES = 'EVENT_PROPERTIES';
 var EVENT_END = 'EVENT_END';
 var RECALL = 'RECALL';
 var WITH = 'WITH';
+var DRAW = 'DRAW';
 
 var DIV = 'div';
 var TRANSFORM = 'transform';
@@ -55,6 +56,7 @@ function VirtualElement (target, path, renderer, parent) {
     this._content = '';
     this._children = {};
     this._size = [0, 0, 0];
+    this._renderState = null;
 }
 
 VirtualElement.prototype.getTarget = function getTarget () {
@@ -92,6 +94,9 @@ VirtualElement.prototype.receive = function receive (commands) {
                 commands.shift(),
                 commands.shift()
             );
+            break;
+        case DRAW:
+            this.draw(commands.shift());
             break;
         case CHANGE_TRANSFORM_ORIGIN:
             this.setProperty(VENDOR_TRANSFORM_ORIGIN, stringifyTransformOrigin(commands));
@@ -193,6 +198,19 @@ VirtualElement.prototype._getSize = function _getSize () {
     return this._size;
 };
 
+VirtualElement.prototype.draw = function draw(renderState) {
+    this._renderState = renderState;
+
+    var p = renderState.perspectiveTransform;
+    multiply(
+        this._matrix,
+        this._matrix,
+        p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7], p[8], p[9], p[10], p[11], p[12], p[13], p[14], p[15]
+    );
+
+    this._target.style[VENDOR_TRANSFORM] = stringifyMatrix(this._matrix);
+};
+
 VirtualElement.prototype.setMatrix = function setMatrix (m0, m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11, m12, m13, m14, m15) {
     if (this._parent) {
         invert(this._invertedParent, this._parent._matrix);
@@ -215,7 +233,6 @@ VirtualElement.prototype.setMatrix = function setMatrix (m0, m1, m2, m3, m4, m5,
         this._matrix[14] = m14;
         this._matrix[15] = m15;
     }
-    this._target.style[VENDOR_TRANSFORM] = stringifyMatrix(this._matrix);
 };
 
 VirtualElement.prototype.addClass = function addClass (className) {
