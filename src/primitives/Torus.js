@@ -53,7 +53,7 @@ function Torus(options) {
 
 Torus.generator = function generator(c, a, u, v, pos) {
     pos[0] = (c + a * Math.cos(2 * v)) * Math.sin(2 * u);
-    pos[1] = (c + a * Math.cos(2 * v)) * Math.cos(2 * u);
+    pos[1] = -(c + a * Math.cos(2 * v)) * Math.cos(2 * u);
     pos[2] = a * Math.sin(2 * v);
 }
 

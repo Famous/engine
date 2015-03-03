@@ -22,9 +22,9 @@ function Triangle (options) {
     var detail   = options.detail || 1;
     var normals  = [];
     var textureCoords = [
-        0.0, 0.0 ,
-        0.5, 1.0 ,
-        1.0, 0.0 
+        0.0, 0.0,
+        0.5, 1.0,
+        1.0, 0.0
     ];
     var indices  = [
         0, 1, 2
@@ -37,6 +37,7 @@ function Triangle (options) {
 
     while(--detail) GeometryHelper.subdivide(indices, vertices, textureCoords);
     normals       = GeometryHelper.computeNormals(vertices, indices);
+    debugger;
 
     return new Geometry({
         buffers: [
