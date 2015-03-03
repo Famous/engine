@@ -22,7 +22,9 @@ function Mesh (dispatch) {
     this._size = [];
 
     this.init();
-    this._geometry = void 0;
+
+    this._geometry;
+    this._expressions = {};
 }
 
 // Return the name of the Mesh Class: 'Mesh'
@@ -124,14 +126,28 @@ Mesh.prototype.clean = function clean() {
         .sendDrawCommand(path);
 
     var bufferIndex;
-    i = this._geometry.spec.invalidations.length;
-    while (i--) {
-        bufferIndex = this._geometry.spec.invalidations.pop();
-        this.dispatch.sendDrawCommand('GL_BUFFER_DATA');
-        this.dispatch.sendDrawCommand(this._geometry.id);
-        this.dispatch.sendDrawCommand(this._geometry.spec.bufferNames[i]);
-        this.dispatch.sendDrawCommand(this._geometry.spec.bufferValues[i]);
-        this.dispatch.sendDrawCommand(this._geometry.spec.bufferSpacings[i]);
+    if (this._geometry) {
+        i = this._geometry.spec.invalidations.length;
+        while (i--) {
+            bufferIndex = this._geometry.spec.invalidations.pop();
+            this.dispatch.sendDrawCommand('GL_BUFFER_DATA');
+            this.dispatch.sendDrawCommand(this._geometry.id);
+            this.dispatch.sendDrawCommand(this._geometry.spec.bufferNames[i]);
+            this.dispatch.sendDrawCommand(this._geometry.spec.bufferValues[i]);
+            this.dispatch.sendDrawCommand(this._geometry.spec.bufferSpacings[i]);
+        }
+    }
+
+    var baseColor = this._expressions.baseColor;
+    var uniformKey;
+    if (baseColor) {
+        i = baseColor.invalidations.length;
+        while (i--) {
+            uniformKey = baseColor.invalidations.pop();
+            this.dispatch.sendDrawCommand('GL_UNIFORMS');
+            this.dispatch.sendDrawCommand(uniformKey);
+            this.dispatch.sendDrawCommand(baseColor.uniforms[uniformKey]);
+        }
     }
 
     var i = this.queue.length;
@@ -153,14 +169,14 @@ Mesh.prototype.clean = function clean() {
 Mesh.prototype.baseColor = function (materialExpression) {
     this.dispatch.dirtyRenderable(this._id);
 
-    if (materialExpression._compile) materialExpression = materialExpression._compile();
     if (Array.isArray(materialExpression)) {
         this.queue.push('GL_UNIFORMS');
     }
     else {
-        this._baseColor = materialExpression;
+        this._expressions.baseColor = materialExpression;
         this.queue.push('MATERIAL_INPUT');
     }
+    if (materialExpression._compile) materialExpression = materialExpression._compile();
     
     this.queue.push('baseColor');
     this.queue.push(materialExpression);
