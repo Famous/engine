@@ -42,6 +42,10 @@ function TweenTransition(options) {
     this._paused = 0;
 }
 
+TweenTransition.now = function() {
+    return Date.now();
+};
+
 TweenTransition.SUPPORTS_MULTIPLE = true;
 TweenTransition.DEFAULT_OPTIONS = {
     curve: 'linear',
@@ -132,7 +136,7 @@ TweenTransition.prototype.set = function set(endValue, transition, callback) {
         }
     }
 
-    this._startTime = Date.now();
+    this._startTime = TweenTransition.now();
     this._endValue = _clone(endValue);
     this._startVelocity = _clone(transition.velocity);
     this._duration = transition.duration;
@@ -250,7 +254,7 @@ TweenTransition.prototype.update = function update(timestamp) {
         return;
     }
 
-    if (!timestamp) timestamp = Date.now();
+    if (!timestamp) timestamp = TweenTransition.now();
     if (this._updateTime >= timestamp) return;
     this._updateTime = timestamp;
 
@@ -300,7 +304,7 @@ TweenTransition.prototype.halt = function halt() {
  * @return {TweenTransition} this
  */
 TweenTransition.prototype.pause = function pause() {
-    this._paused = Date.now();
+    this._paused = TweenTransition.now();
     return this;
 };
 
@@ -323,7 +327,7 @@ TweenTransition.prototype.isPaused = function isPaused() {
  */
 TweenTransition.prototype.resume = function resume() {
     var progressBeforePause = this._paused - this._startTime;
-    this._startTime = Date.now() - progressBeforePause;
+    this._startTime = TweenTransition.now() - progressBeforePause;
     this._paused = 0;
     return this;
 };
