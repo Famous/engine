@@ -75,62 +75,62 @@ VirtualElement.prototype.receive = function receive (commands) {
     while (commands.length) {
         var command = commands.shift();
         switch (command) {
-        case CHANGE_TRANSFORM:
-            this.setMatrix(
-                commands.shift(),
-                commands.shift(),
-                commands.shift(),
-                commands.shift(),
-                commands.shift(),
-                commands.shift(),
-                commands.shift(),
-                commands.shift(),
-                commands.shift(),
-                commands.shift(),
-                commands.shift(),
-                commands.shift(),
-                commands.shift(),
-                commands.shift(),
-                commands.shift(),
-                commands.shift()
-            );
-            break;
-        case DRAW:
-            this.draw(commands.shift());
-            break;
-        case CHANGE_TRANSFORM_ORIGIN:
-            this.setProperty(VENDOR_TRANSFORM_ORIGIN, stringifyTransformOrigin(commands));
-            break;
-        case CHANGE_PROPERTY:
-            this.setProperty(commands.shift(), commands.shift());
-            break;
-        case CHANGE_CONTENT:
-            this.setContent(commands.shift());
-            break;
-        case ADD_CLASS:
-            this.addClass(commands.shift());
-            break;
-        case REMOVE_CLASS:
-            this.removeClass(commands.shift());
-            break;
-        case ADD_EVENT_LISTENER:
-            var ev = commands.shift();
-            var methods;
-            var properties;
-            var c;
-            while ((c = commands.shift()) !== EVENT_PROPERTIES) methods = c;
-            while ((c = commands.shift()) !== EVENT_END) properties = c;
-            methods = methods || [];
-            properties = properties || [];
-            this.addEventListener(ev, this.dispatchEvent.bind(this, ev, methods, properties));
-            break;
-        case RECALL:
-            this.setProperty('display', 'none');
-            this._parent._allocator.deallocate(this._target);
-            break;
-        case WITH:
-            commands.unshift(command);
-            return;
+            case CHANGE_TRANSFORM:
+                this.setMatrix(
+                    commands.shift(),
+                    commands.shift(),
+                    commands.shift(),
+                    commands.shift(),
+                    commands.shift(),
+                    commands.shift(),
+                    commands.shift(),
+                    commands.shift(),
+                    commands.shift(),
+                    commands.shift(),
+                    commands.shift(),
+                    commands.shift(),
+                    commands.shift(),
+                    commands.shift(),
+                    commands.shift(),
+                    commands.shift()
+                );
+                break;
+            case DRAW:
+                this.draw(commands.shift());
+                break;
+            case CHANGE_TRANSFORM_ORIGIN:
+                this.setProperty(VENDOR_TRANSFORM_ORIGIN, stringifyTransformOrigin(commands));
+                break;
+            case CHANGE_PROPERTY:
+                this.setProperty(commands.shift(), commands.shift());
+                break;
+            case CHANGE_CONTENT:
+                this.setContent(commands.shift());
+                break;
+            case ADD_CLASS:
+                this.addClass(commands.shift());
+                break;
+            case REMOVE_CLASS:
+                this.removeClass(commands.shift());
+                break;
+            case ADD_EVENT_LISTENER:
+                var ev = commands.shift();
+                var methods;
+                var properties;
+                var c;
+                while ((c = commands.shift()) !== EVENT_PROPERTIES) methods = c;
+                while ((c = commands.shift()) !== EVENT_END) properties = c;
+                methods = methods || [];
+                properties = properties || [];
+                this.addEventListener(ev, this.dispatchEvent.bind(this, ev, methods, properties));
+                break;
+            case RECALL:
+                this.setProperty('display', 'none');
+                this._parent._allocator.deallocate(this._target);
+                break;
+            case WITH:
+                commands.unshift(command);
+                return;
         }
     }
 };
@@ -215,7 +215,8 @@ VirtualElement.prototype.setMatrix = function setMatrix (m0, m1, m2, m3, m4, m5,
     if (this._parent) {
         invert(this._invertedParent, this._parent._matrix);
         multiply(this._matrix, this._invertedParent, m0, m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11, m12, m13, m14, m15);
-    } else {
+    }
+    else {
         this._matrix[0] = m0;
         this._matrix[1] = m1;
         this._matrix[2] = m2;
@@ -246,15 +247,7 @@ VirtualElement.prototype.removeClass = function removeClass (className) {
 VirtualElement.prototype.setProperty = function setProperty (key, value) {
     if (this._properties[key] !== value) {
         this._properties[key] = value;
-        switch (key) {
-            case TRANSFORM:
-                var m = value;
-                this.setMatrix(m[0], m[1], m[2], m[3], m[4], m[5], m[6], m[7], m[8], m[9], m[10], m[11], m[12], m[13], m[14], m[15]);
-            break;
-        default:
-            this._target.style[key] = value;
-            break;
-        }
+        this._target.style[key] = value;
     }
 };
 
@@ -267,6 +260,7 @@ VirtualElement.prototype.setContent = function setContent (content) {
 
 VirtualElement.prototype.addEventListener = function addEventListener (name, cb) {
     if (!this._eventListeners[name]) {
+        this._eventListeners[name] = cb;
         this._target.addEventListener(name, cb);
     }
 };
