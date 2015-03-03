@@ -56,6 +56,21 @@ ElementAllocator.prototype.deallocate = function deallocate(element) {
     this._nodeCount--;
 };
 
+ElementAllocator.prototype.setContainer = function setContainer(container) {
+    this._container = container;
+
+    for (var nodeType in this._detachedNodes) {
+        for (var i = 0; i < this._detachedNodes[nodeType].length; i++) {
+            this._container.appendChild(this._detachedNodes[nodeType][i]);
+        }
+    }
+};
+
+
+ElementAllocator.prototype.getContainer = function getContainer() {
+    return this._container;
+};
+
 /**
  * Get count of total allocated nodes in the document.
  *
