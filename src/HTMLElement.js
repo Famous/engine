@@ -36,7 +36,7 @@ var RECALL = 'RECALL';
 function HTMLElement(dispatch) {
     this._dispatch = dispatch;
     this._id = dispatch.addRenderable(this);
-    this._trueSized = false;
+    this._trueSized = [false, false];
     this._size = [0, 0, 0];
     this._queue = [];
     this._callbacks = new CallbackStore();
@@ -87,12 +87,17 @@ HTMLElement.prototype._receiveTransformChange = function _receiveTransformChange
 };
 
 HTMLElement.prototype._receiveSizeChange = function _receiveSizeChange(size) {
-    if (!this._trueSized) {
-    	var topDownSize = size.getTopDownSize();
-    	this.property(WIDTH, Math.round(topDownSize[0]) + PX)
-    	    .property(HEIGHT, Math.round(topDownSize[1]) + PX);
-    	this._size[0] = topDownSize[0];
-    	this._size[1] = topDownSize[1];
+    if (!this._trueSized[0] || !this._trueSized[1]) {
+        var topDownSize = size.getTopDownSize();
+
+        if (!this._trueSized[0]) {
+            this.property(WIDTH, Math.round(topDownSize[0]) + PX);
+            this._size[0] = topDownSize[0];
+        }
+        if (!this._trueSized[1]) {
+            this.property(HEIGHT, Math.round(topDownSize[1]) + PX);
+            this._size[1] = topDownSize[1];
+        }
     }
 };
 
@@ -117,7 +122,7 @@ HTMLElement.prototype.on = function on (ev, methods, properties) {
 };
 
 HTMLElement.prototype.kill = function kill () {
-    this.dispatch.sendDrawCommand(WITH).sendDrawCommand(this.dispatch.getRenderPath()).sendDrawCommand(RECALL);
+    this._dispatch.sendDrawCommand(WITH).sendDrawCommand(this._dispatch.getRenderPath()).sendDrawCommand(RECALL);
 };
 
 /**
@@ -145,13 +150,19 @@ HTMLElement.prototype.property = function property(key, value) {
  * @method trueSize
  * @chainable
  *
+ * @param {Boolean} trueWidth
+ * @param {Boolean} trueHeight
  * @return {HTMLElement} this
  */
-HTMLElement.prototype.trueSize = function trueSize() {
-    if (!this._trueSized) {
-    	this._trueSized = true;
-    	this._dispatch.dirtyRenderable(this._id);
+HTMLElement.prototype.trueSize = function trueSize(trueWidth, trueHeight) {
+    if (trueWidth === undefined) trueWidth = true;
+    if (trueHeight === undefined) trueHeight = true;
+
+    if (this._trueSized[0] !== trueWidth || this._trueSized[1] !== trueHeight) {
+        this._dispatch.dirtyRenderable(this._id);
     }
+    this._trueSized[0] = trueWidth;
+    this._trueSized[1] = trueHeight;
     return this;
 };
 
@@ -278,13 +289,13 @@ HTMLElement.prototype.get = function get (key) {
  * @return {Component} this
  */
 HTMLElement.prototype.eventListener = function eventListener (ev, methods, properties) {
-    this.dispatch.dirtyRenderable(this._id);
-    this.queue.push(ADD_EVENT_LISTENER);
-    this.queue.push(ev);
-    if (methods != null) this.queue.push(methods);
-    this.queue.push(EVENT_PROPERTIES);
-    if (properties != null) this.queue.push(properties);
-    this.queue.push(EVENT_END);
+    this._dispatch.dirtyRenderable(this._id);
+    this._queue.push(ADD_EVENT_LISTENER);
+    this._queue.push(ev);
+    if (methods != null) this._queue.push(methods);
+    this._queue.push(EVENT_PROPERTIES);
+    if (properties != null) this._queue.push(properties);
+    this._queue.push(EVENT_END);
     return this;
 };
 
@@ -308,7 +319,8 @@ HTMLElement.prototype.isRenderable = function isRenderable () {
  * @return {HTMLElement} this
  */
 HTMLElement.prototype.clear = function clear () {
-    this._trueSized = false;
+    this._trueSized[0] = false;
+    this._trueSized[1] = false;
 
     for (var i = 0, l = this._queue.length; i < l; i++)
         this._queue.pop();
