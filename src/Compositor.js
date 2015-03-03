@@ -1,13 +1,6 @@
 var VirtualElement = require('famous-dom-renderers').VirtualElement;
 var WebGLRenderer = require('famous-webgl-renderers').WebGLRenderer;
 
-var DOM = 'DOM';
-var GL = 'GL';
-var WITH = 'WITH';
-var TRIGGER = 'TRIGGER';
-var RESIZE = 'resize';
-var NEED_SIZE_FOR = 'NEED_SIZE_FOR';
-
 function Compositor() {
     this._contexts = {};
     this._outCommands = [];
@@ -17,22 +10,23 @@ function Compositor() {
 }
 
 Compositor.CommandsToOutput = {
-    CHANGE_TRANSFORM_ORIGIN: DOM,
-    CHANGE_TRANSFORM: DOM,
-    CHANGE_PROPERTY: DOM,
-    CHANGE_CONTENT: DOM,
-    ADD_EVENT_LISTENER: DOM,
-    RECALL: DOM,
-    GL_UNIFORMS: GL,
-    GL_BUFFER_DATA: GL,
-    GL_SET_GEOMETRY: GL,
-    GL_CREATE_LIGHT: GL,
-    GL_LIGHT_POSITION: GL,
-    GL_LIGHT_COLOR: GL
+    CHANGE_TRANSFORM_ORIGIN: 'DOM',
+    CHANGE_TRANSFORM: 'DOM',
+    CHANGE_PROPERTY: 'DOM',
+    CHANGE_CONTENT: 'DOM',
+    ADD_EVENT_LISTENER: 'DOM',
+    RECALL: 'DOM',
+    GL_UNIFORMS: 'GL',
+    GL_BUFFER_DATA: 'GL',
+    GL_SET_GEOMETRY: 'GL',
+    GL_CREATE_LIGHT: 'GL',
+    GL_LIGHT_POSITION: 'GL',
+    GL_LIGHT_COLOR: 'GL',
+    GL_CREATE_MESH: 'GL'
 };
 
 Compositor.prototype.sendEvent = function sendEvent(path, ev, payload) {
-    this._outCommands.push(WITH, path, TRIGGER, ev, payload);
+    this._outCommands.push('WITH', path, 'TRIGGER', ev, payload);
 };
 
 
@@ -54,13 +48,13 @@ Compositor.prototype.handleWith = function handleWith (commands) {
     var commandOutput = Compositor.CommandsToOutput[commands[0]];
 
     switch (commandOutput) {
-        case DOM:
+        case 'DOM':
             var element = parent.getOrSetElement(path, index);
             element.receive(commands);
             pointer.DOM = element;
             break;
 
-        case GL:
+        case 'GL':
             if (!context.GL) {
                 var webglrenderer = new WebGLRenderer(context.DOM);
                 context.GL = webglrenderer;
@@ -87,7 +81,7 @@ Compositor.prototype.giveSizeFor = function giveSizeFor(commands) {
     var report = {
         size: size
     };
-    this._outCommands.push(WITH, selector, TRIGGER, RESIZE, report);
+    this._outCommands.push('WITH', selector, 'TRIGGER', 'resize', report);
 };
 
 Compositor.prototype.drawCommands = function drawCommands() {
@@ -97,10 +91,10 @@ Compositor.prototype.drawCommands = function drawCommands() {
     while (commands.length) {
         command = commands.shift();
         switch (command) {
-            case WITH:
+            case 'WITH':
                 this.handleWith(commands);
                 break;
-            case NEED_SIZE_FOR:
+            case 'NEED_SIZE_FOR':
                 this.giveSizeFor(commands);
                 break;
         }
