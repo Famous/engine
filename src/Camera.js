@@ -1,22 +1,18 @@
 'use strict';
 
-var QUARTER_PI = Math.PI * 0.25;
-
 /**
  * @class Camera
  * @constructor
  * @component
  * @param {RenderNode} RenderNode to which the instance of Camera will be a component of
  */
-function Camera(owner) {
-    this.owner = owner;
-    this.spec = {
-        projection: null,
-        near: 0,
-        far: 1000,
-        fieldOfView: QUARTER_PI,
-        focalDepth: 1000
-    };
+function Camera(dispatch) {
+    this._dispatch = dispatch;
+    this._projectionType = Camera.ORTHOGRAPHIC_PROJECTION;
+    this._focalDepth = 0;
+    this._id = dispatch.addComponent(this);
+
+    this.setFlat();
 }
 
 Camera.FRUSTUM_PROJECTION = 0;
@@ -25,57 +21,63 @@ Camera.ORTHOGRAPHIC_PROJECTION = 2;
 
 // Return the name of the Element Class: 'Camera'
 Camera.toString = function toString() {
-    return 'camera';
+    return 'Camera';
 };
 
-Camera.prototype.getProjection = function getProjection() {
-    return this.spec;
+Camera.prototype.getState = function getState() {
+    return {
+        component: this.constructor.toString(),
+        projectionType: this._projectionType,
+        focalDepth: this._focalDepth
+    };
 };
 
-Camera.prototype.frustum = function projection(near, far, fieldOfView) {
-    this.spec.projection = Camera.FRUSTUM_PROJECTION;
 
-    var cameraOptions = this.spec;
+Camera.prototype.setState = function setState(state) {
+    this._dispatch.dirtyComponent(this._id);
+    if (state.component === this.constructor.toString()) {
+        this.set(state.projectionType, state.focalDepth);
+        return true;
+    }
+    return false;
+};
 
-    this.spec.near = cameraOptions.near = near ? near : 0;
-    this.spec.far = cameraOptions.far = far ? far : 1000;
-    this.spec.fieldOfView = cameraOptions.fieldOfView = fieldOfView ? fieldOfView : QUARTER_PI;
+Camera.prototype.set = function set(type, depth) {
+    this._dispatch.dirtyComponent(this._id);
+    this._projectionType = type;
+    this._focalDepth = depth;
+};
+
+Camera.prototype.setDepth = function setDepth(depth) {
+    this._dispatch.dirtyComponent(this._id);
+    this._projectionType = Camera.PINHOLE_PROJECTION;
+    this._focalDepth = depth;
 
     return this;
 };
 
-Camera.prototype.pinhole = function pinhole(focalDepth) {
-    this.spec.projection = Camera.PINHOLE_PROJECTION;
-    this.spec.focalDepth = focalDepth ? focalDepth : 1000;
+Camera.prototype.setFlat = function setFlat() {
+    this._dispatch.dirtyComponent(this._id);
+    this._projectionType = Camera.ORTHOGRAPHIC_PROJECTION;
+    this._focalDepth = 0;
 
     return this;
 };
 
-Camera.prototype.orthographic = function orthographic (near, far) {
-    this.spec.projection = Camera.ORTHOGRAPHIC_PROJECTION;
-
-    var cameraOptions = this.spec;
-    cameraOptions.near = near ? near : 0;
-    cameraOptions.far = far ? far : 1000;
-    
-    return this;
-};
-
-Camera.prototype.clear = function clear() {
-    this.spec.projection = null;
-
-    var cameraOptions = this.spec;
-
-    cameraOptions.near = 0;
-    cameraOptions.far = 1000;
-    cameraOptions.fieldOfView = QUARTER_PI;
-    cameraOptions.focalDepth = 1000;
-
-    return this;
-};
-
-Camera.prototype.isRenderable = function isRenderable() {
-    return (this.spec.projection != null);
+Camera.prototype.clean = function clean() {
+    switch (this._projectionType) {
+        case Camera.FRUSTUM_PROJECTION:
+            this._dispatch.sendDrawCommand('FRUSTUM_PROJECTION');
+            break;
+        case Camera.PINHOLE_PROJECTION:
+            this._dispatch.sendDrawCommand('PINHOLE_PROJECTION');
+            this._dispatch.sendDrawCommand(this._focalDepth);
+            break;
+        case Camera.ORTHOGRAPHIC_PROJECTION:
+            this._dispatch.sendDrawCommand('ORTHOGRAPHIC_PROJECTION');
+            break;
+    }
+    return false;
 };
 
 module.exports = Camera;
