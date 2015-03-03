@@ -151,8 +151,9 @@ Mesh.prototype.clean = function clean() {
  */
 
 Mesh.prototype.baseColor = function (materialExpression) {
+    this.dispatch.dirtyRenderable(this._id);
     if (materialExpression._compile) materialExpression = materialExpression._compile();
-    this.queue.push(Array.isArray(materialExpression) ? 'UNIFORM_INPUT' : 'MATERIAL_INPUT');
+    this.queue.push(Array.isArray(materialExpression) ? 'GL_UNIFORMS' : 'MATERIAL_INPUT');
     this.queue.push('baseColor');
     this.queue.push(materialExpression);
     return this;
