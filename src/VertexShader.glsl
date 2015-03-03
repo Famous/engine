@@ -36,7 +36,9 @@ vec4 applyTransform(vec4 pos) {
 // attribute through position pipeline
 void main() {
    gl_PointSize = 10.0;
-   vNormal = transpose(mat3(inverse(transform))) * normals;
+   vec3 invertedNormals = normals;
+   invertedNormals.y *= -1.0;
+   vNormal = transpose(mat3(inverse(transform))) * invertedNormals;
    vTextureCoordinate = texCoord;
    gl_Position = applyTransform(vec4(pos, 1.0));
 }
