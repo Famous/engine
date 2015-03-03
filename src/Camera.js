@@ -9,7 +9,8 @@
 function Camera(dispatch) {
     this._dispatch = dispatch;
     this._projectionType = Camera.ORTHOGRAPHIC_PROJECTION;
-    this._projectionTransform = new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
+    this._focalDepth = 0;
+    this._id = dispatch.addComponent(this);
 }
 
 Camera.FRUSTUM_PROJECTION = 0;
@@ -25,36 +26,56 @@ Camera.prototype.getState = function getState() {
     return {
         component: this.constructor.toString(),
         projectionType: this._projectionType,
-        projectionTransform: this._projectionTransform
+        focalDepth: this._focalDepth
     };
 };
 
 
 Camera.prototype.setState = function setState(state) {
+    this._dispatch.dirtyComponent(this._id);
     if (state.component === this.constructor.toString()) {
-        this.set(state.projectionType, state.projectionTransform);
+        this.set(state.projectionType, state.focalDepth);
         return true;
     }
     return false;
 };
 
-Camera.prototype.set = function set(type, transform) {
+Camera.prototype.set = function set(type, depth) {
+    this._dispatch.dirtyComponent(this._id);
     this._projectionType = type;
-    this._projectionTransform = transform;
+    this._focalDepth = depth;
 };
 
 Camera.prototype.setDepth = function setDepth(depth) {
+    this._dispatch.dirtyComponent(this._id);
     this._projectionType = Camera.PINHOLE_PROJECTION;
-    this._projectionTransform[11] = -1/depth;
+    this._focalDepth = depth;
 
     return this;
 };
 
 Camera.prototype.setFlat = function setFlat() {
+    this._dispatch.dirtyComponent(this._id);
     this._projectionType = Camera.ORTHOGRAPHIC_PROJECTION;
-    this._projectionTransform[11] = 0;
+    this._focalDepth = 0;
 
     return this;
+};
+
+Camera.prototype.clean = function clean() {
+    switch (this._projectionType) {
+        case Camera.FRUSTUM_PROJECTION:
+            this._dispatch.sendDrawCommand('FRUSTUM_PROJECTION');
+            break;
+        case Camera.PINHOLE_PROJECTION:
+            this._dispatch.sendDrawCommand('PINHOLE_PROJECTION');
+            this._dispatch.sendDrawCommand(this._focalDepth);
+            break;
+        case Camera.ORTHOGRAPHIC_PROJECTION:
+            this._dispatch.sendDrawCommand('ORTHOGRAPHIC_PROJECTION');
+            break;
+    }
+    return false;
 };
 
 module.exports = Camera;
