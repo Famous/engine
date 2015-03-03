@@ -2,7 +2,6 @@
 
 var RenderContext = require('./RenderContext');
 var ComponentStore = require('./ComponentStore');
-var ModelView = require('./ModelView');
 var RenderProxy = require('./RenderProxy');
 
 function LocalDispatch (node, proxy) {
