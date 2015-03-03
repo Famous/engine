@@ -57,9 +57,9 @@ function getBuffers(detail) {
         theta = index / detail * Math.PI * 2;
 
         x = Math.cos(theta), y = Math.sin(theta);
-        vertices.push(x, y, 0);
-        normals.push(0, 0, 1);
-        textureCoords.push(0.5 + x * 0.5, 0.5 + -y * 0.5);
+        vertices.unshift(x, y, 0);
+        normals.unshift(0, 0, 1);
+        textureCoords.unshift(0.5 + x * 0.5, 0.5 + -y * 0.5);
     }
 
     return {

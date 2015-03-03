@@ -51,7 +51,7 @@ function ParametricCone (options) {
 
 ParametricCone.generator = function generator(r, u, v, pos) {
     pos[0] = r * u * Math.sin(v);
-    pos[1] = r * u * Math.cos(v);
+    pos[1] = -r * u * Math.cos(v);
     pos[2] = -u;
 }
 

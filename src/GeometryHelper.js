@@ -6,7 +6,9 @@ var Vec2 = require('famous-math').Vec2;
 var outputs = [
     new Vec3(),
     new Vec3(),
-    new Vec3()
+    new Vec3(),
+    new Vec2(),
+    new Vec2()
 ];
 
 /**
@@ -57,8 +59,8 @@ GeometryHelper.generateParametric = function generateParametric(detailX, detailY
     for (i = 0; i < detailX; i++) {
         for (j = 0; j < detailY; j++) {
             next = (j + 1) % detailY;
-            indices.push(v + j, v + next, v + j + detailY);
-            indices.push(v + next, v + next + detailY, v + j + detailY);
+            indices.push(v + j, v + j + detailY, v + next);
+            indices.push(v + next, v + j + detailY, v + next + detailY);
         }
         v += detailY;
     }
@@ -99,15 +101,15 @@ GeometryHelper.computeNormals = function computeNormals(vertices, indices, out) 
 
     for (var i = 0; i < len; i++) {
         j = i * 3;
-        indexOne = indices[j + 0] * 3;
-        indexTwo = indices[j + 1] * 3;
+        indexTwo = indices[j + 0] * 3;
+        indexOne = indices[j + 1] * 3;
         indexThree = indices[j + 2] * 3;
 
         outputs[0].set(vertices[indexOne], vertices[indexOne + 1], vertices[indexOne + 2]);
         outputs[1].set(vertices[indexTwo], vertices[indexTwo + 1], vertices[indexTwo + 2]);
         outputs[2].set(vertices[indexThree], vertices[indexThree + 1], vertices[indexThree + 2]);
 
-        normal = outputs[1].subtract(outputs[0]).cross(outputs[2].subtract(outputs[0]));
+        normal = outputs[2].subtract(outputs[0]).cross(outputs[1].subtract(outputs[0]));
         normal = normal.normalize().toArray();
 
         normals[indexOne + 0] = normal[0];
@@ -159,9 +161,9 @@ GeometryHelper.subdivide = function subdivide(indices, vertices, textureCoords) 
             tex = face.map(function(vertIndex) {
                 return new Vec2(textureCoords[vertIndex * 2], textureCoords[vertIndex * 2 + 1]);
             });
-            textureCoords.push.apply(textureCoords, Vec2.scale(Vec2.add(tex[0], tex[1], outputs[0]), 0.5, outputs[1]).toArray());
-            textureCoords.push.apply(textureCoords, Vec2.scale(Vec2.add(tex[1], tex[2], outputs[0]), 0.5, outputs[1]).toArray());
-            textureCoords.push.apply(textureCoords, Vec2.scale(Vec2.add(tex[0], tex[2], outputs[0]), 0.5, outputs[1]).toArray());
+            textureCoords.push.apply(textureCoords, Vec2.scale(Vec2.add(tex[0], tex[1], outputs[3]), 0.5, outputs[4]).toArray());
+            textureCoords.push.apply(textureCoords, Vec2.scale(Vec2.add(tex[1], tex[2], outputs[3]), 0.5, outputs[4]).toArray());
+            textureCoords.push.apply(textureCoords, Vec2.scale(Vec2.add(tex[0], tex[2], outputs[3]), 0.5, outputs[4]).toArray());
         }
 
         i = vertices.length - 3, j = i + 1, k = i + 2;
