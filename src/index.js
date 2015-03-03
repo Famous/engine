@@ -1,5 +1,4 @@
 module.exports = {
-    Geometry: require('./Geometry'),
     Mat33: require('./Mat33'),
     Quaternion: require('./Quaternion'),
     Vec2: require('./Vec2'),
