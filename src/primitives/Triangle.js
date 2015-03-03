@@ -37,7 +37,6 @@ function Triangle (options) {
 
     while(--detail) GeometryHelper.subdivide(indices, vertices, textureCoords);
     normals       = GeometryHelper.computeNormals(vertices, indices);
-    debugger;
 
     return new Geometry({
         buffers: [
