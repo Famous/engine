@@ -10,24 +10,22 @@ var Transitionable = require('famous-transitions').Transitionable;
  * Color constructor
  */
 var Color = function Color() {
-    var _r = new Transitionable(0);
-    var _g = new Transitionable(0);
-    var _b = new Transitionable(0);
+    this._r = new Transitionable(0);
+    this._g = new Transitionable(0);
+    this._b = new Transitionable(0);
     var options = _standardizeArguments(arguments);
     if (options.length) this.set(options);
 };
 
-Color.prototype.set = function set(options) {
-    var type = options[0].toLowerCase();
-    var first = options[1];
-    var second = options[2];
-    var third = options[3];
-
-    switch (type) {
-        case 'rgb': this.setRGB(first, second, third); break;
-        default console.log("ERROR!");;
+Color.prototype.set = function set() {
+    var options = _standardizeArguments(arguments);
+    var type = options[0];
+    if (typeof type === 'string' && type.toLowerCase() === 'rgb') {
+        this.setRGB(options[1], options[2], options[3], options[4]);
     }
-
+    else {
+        this.setRGB(options[0], options[1], options[2], options[3]);
+    }
     return this;
 };
 
@@ -46,10 +44,12 @@ Color.prototype.setB = function setB(b, options) {
     return this;
 };
 
-Color.prototype.setRGB = function setRGB(r, g, b, options) {
-    this.setR(r, options);
-    this.setG(g, options);
-    this.setB(b, options);
+Color.prototype.setRGB = function setRGB() {
+    var rgb = _standardizeArguments(arguments);
+    var options = rgb[3];
+    this.setR(rgb[0], options);
+    this.setG(rgb[1], options);
+    this.setB(rgb[2], options);
     return this;
 };
 
@@ -67,6 +67,10 @@ Color.prototype.getB = function getB() {
 
 Color.prototype.getRGB = function getRGB() {
     return [this.getR(), this.getG(), this.getB()];
+};
+
+Color.prototype.isActive = function isActive() {
+    return this._r.isActive() || this._g.isActive() || this._b.isActive();
 };
 
 Color.prototype.changeTo = function changeTo(color, options) {
