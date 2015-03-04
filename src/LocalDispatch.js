@@ -42,6 +42,11 @@ LocalDispatch.prototype.registerGlobalEvent = function registerGlobalEvent (even
     return this;
 };
 
+LocalDispatch.prototype.deregisterGlobalEvent = function deregisterGlobalEvent (event, cb) {
+    this._node._globalDispatch.globalOff(this.getRenderPath(), event, cb);
+    return this;
+};
+
 LocalDispatch.prototype.emit = function emit (event, payload) {
     this._node._globalDispatch.emit(event, payload);
     return this;
