@@ -1,6 +1,12 @@
 'use strict';
 
 /**
+ * Module dependencies
+ */
+var Color = require('famous-utilities').Color;
+
+
+/**
  * The Mesh class is responsible for providing the API for how
  * a RenderNode will interact with the WebGL API by adding
  * a set of commands to the renderer.
@@ -9,30 +15,24 @@
  * @constructor
  * @param {RenderNode} RenderNode to which the instance of Mesh will be a component of
  */
-
 function Mesh (dispatch) {
     this.dispatch = dispatch;
     this.queue = ['GL_CREATE_MESH'];
-    this._size = [0, 0, 0];
     this._id = dispatch.addRenderable(this);
-
-    this.uniforms = [];
-    this.buffers = [];
-
+    this._color = new Color('rgb', 0.5, 0.5, 0.5);
     this._size = [];
-
-    this.init();
-
-    this._geometry;
     this._expressions = {};
+    this._geometry;
+    init.call(this);
 }
 
-// Return the name of the Mesh Class: 'Mesh'
+
 Mesh.toString = function toString () {
     return 'Mesh';
 };
 
-Mesh.prototype.init = function init() {
+
+function init() {
     var dispatch = this.dispatch;
     dispatch.onTransformChange(this._receiveTransformChange.bind(this));
     dispatch.onSizeChange(this._receiveSizeChange.bind(this));
@@ -43,13 +43,14 @@ Mesh.prototype.init = function init() {
     return this;
 };
 
+
 Mesh.prototype._receiveTransformChange = function _receiveTransformChange(transform) {
     this.dispatch.dirtyRenderable(this._id);
-
     this.queue.push('GL_UNIFORMS');
     this.queue.push('transform');
     this.queue.push(transform._matrix);
 };
+
 
 Mesh.prototype._receiveSizeChange = function _receiveSizeChange(size) {
     var size = size.getTopDownSize();
@@ -64,21 +65,22 @@ Mesh.prototype._receiveSizeChange = function _receiveSizeChange(size) {
     this.queue.push(size);
 };
 
+
 Mesh.prototype._receiveOriginChange = function _receiveOriginChange(origin) {
     this.dispatch.dirtyRenderable(this._id);
-
     this.queue.push('GL_UNIFORMS');
     this.queue.push('origin');
     this.queue.push(origin);
 };
 
+
 Mesh.prototype._receiveOpacityChange = function _receiveOpacityChange(opacity) {
     this.dispatch.dirtyRenderable(this._id);
-
     this.queue.push('GL_UNIFORMS');
     this.queue.push('opacity');
     this.queue.push(opacity);
 };
+
 
 Mesh.prototype.getSize = function getSize() {
     return this._size;
@@ -110,6 +112,7 @@ Mesh.prototype.setGeometry = function (geometry) {
     return this;
 };
 
+
 /**
  * Empties the command queue
  *
@@ -117,7 +120,6 @@ Mesh.prototype.setGeometry = function (geometry) {
  * @chainable
  *
  */
-
 Mesh.prototype.clean = function clean() {
     var path = this.dispatch.getRenderPath();
 
@@ -150,11 +152,18 @@ Mesh.prototype.clean = function clean() {
         }
     }
 
+    if (this._color.isActive()) {
+        this.dispatch.sendDrawCommand('GL_UNIFORMS');
+        this.dispatch.sendDrawCommand('baseColor');
+        this.dispatch.sendDrawCommand(this._color.getRGB());
+    }
+
     var i = this.queue.length;
     while (i--) this.dispatch.sendDrawCommand(this.queue.shift());
 
-    return !this.queue.length;
+    return this.queue.length;
 };
+
 
 /**
  * Defines a 3-element map that provides the overall color of the mesh.
@@ -165,23 +174,25 @@ Mesh.prototype.clean = function clean() {
  * @param {Object, Array} Material, image, or vec3
  * @return {Element} current Mesh
  */
-
-Mesh.prototype.baseColor = function (materialExpression) {
+Mesh.prototype.baseColor = function baseColor() {
     this.dispatch.dirtyRenderable(this._id);
+    var materialExpression = Array.prototype.concat.apply([], arguments);
 
-    if (Array.isArray(materialExpression)) {
-        this.queue.push('GL_UNIFORMS');
+    if (materialExpression[0]._compile) {
+        this.queue.push('MATERIAL_INPUT');
+        this._expressions.baseColor = materialExpression[0];
+        materialExpression = materialExpression[0]._compile();
     }
     else {
-        this._expressions.baseColor = materialExpression;
-        this.queue.push('MATERIAL_INPUT');
+        this.queue.push('GL_UNIFORMS');
+        this._color.set(materialExpression);
     }
-    if (materialExpression._compile) materialExpression = materialExpression._compile();
-    
+
     this.queue.push('baseColor');
     this.queue.push(materialExpression);
     return this;
 };
+
 
 /**
  * Defines a 3-element map which is used to provide significant physical detail to
@@ -193,7 +204,6 @@ Mesh.prototype.baseColor = function (materialExpression) {
  * @param {Object, Array} Material, Image or vec3
  * @return {Element} current Mesh
  */
-
 Mesh.prototype.normal = function (materialExpression) {
     if (materialExpression._compile) materialExpression = materialExpression._compile();
     this.queue.push(typeof materialExpression === 'number' ? 'UNIFORM_INPUT' : 'MATERIAL_INPUT');
@@ -201,6 +211,7 @@ Mesh.prototype.normal = function (materialExpression) {
     this.queue.push(materialExpression);
     return this;
 };
+
 
 /**
  * Defines 1 element map which is used to normalize the specular and diffuseness of a surface.
@@ -211,7 +222,6 @@ Mesh.prototype.normal = function (materialExpression) {
  * @param {Object} Material or Image
  * @return {Element} current Mesh
  */
-
 Mesh.prototype.glossiness = function (materialExpression) {
     if (materialExpression._compile) materialExpression = materialExpression._compile();
     this.queue.push(typeof materialExpression === 'number' ? 'UNIFORM_INPUT' : 'MATERIAL_INPUT');
@@ -219,6 +229,7 @@ Mesh.prototype.glossiness = function (materialExpression) {
     this.queue.push(materialExpression);
     return this;
 };
+
 
 /**
  * Defines 1 element map which describes the electrical conductivity of a material.
@@ -229,7 +240,6 @@ Mesh.prototype.glossiness = function (materialExpression) {
  * @param {Object} Material or Image
  * @return {Element} current Mesh
  */
-
 Mesh.prototype.metallic = function metallic(materialExpression) {
     if (materialExpression._compile) materialExpression = materialExpression._compile();
     this.queue.push(typeof materialExpression === 'number' ? 'UNIFORM_INPUT' : 'MATERIAL_INPUT');
@@ -238,4 +248,8 @@ Mesh.prototype.metallic = function metallic(materialExpression) {
     return this;
 };
 
+
+/**
+ * Expose
+ */
 module.exports = Mesh;
