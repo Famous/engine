@@ -9,7 +9,7 @@ function Node (proxy, globalDispatch, localDispatch) {
 }
 
 Node.prototype.addChild = function addChild (index) {
-    var child = new this.constructor(this._localDispatch.getRenderProxy(), this._globalDispatch());
+    var child = new this.constructor(this._localDispatch.getRenderProxy(), this._globalDispatch);
     if (index == null) this._children.push(child);
     else this._children.splice(index, 0, child);
     return child;
@@ -49,6 +49,13 @@ Node.prototype.getDispatch = function getDispatch () {
 
 Node.prototype.getChildren = function getChildren () {
     return this._children;
+};
+
+Node.prototype.update = function update (parent) {
+    this._localDispatch.update(parent);
+    for (var i = 0, len = this._children.length ; i < len ; i++)
+        this._children[i].update(this);
+    return this;
 };
 
 module.exports = Node;

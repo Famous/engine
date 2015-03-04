@@ -60,6 +60,12 @@ GlobalDispatch.prototype.globalOn = function globalOn (path, key, cb) {
     return this;
 };
 
+GlobalDispatch.prototype.globalOff = function globalOff (path, key, cb) {
+    var depth = path.split('/').length;
+    if (this.globalCallbacks[depth]) this.globalCallbacks[depth].off(key, cb);
+    return this;
+}
+
 GlobalDispatch.prototype.emit = function emit (event, cb) {
     for (var i = 0, len = this.globalCallbacks.length ; i < len ; i++)
         if (this.globalCallbacks[i])

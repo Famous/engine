@@ -4,6 +4,7 @@ module.exports = {
     Align: require('./Align'),
     ComponentStore: require('./ComponentStore'),
     GlobalDispatch: require('./GlobalDispatch'),
+    Context: require('./Context'),
     Layer: require('./Layer'),
     Clock: require('./Clock'),
     LocalDispatch: require('./LocalDispatch'),
