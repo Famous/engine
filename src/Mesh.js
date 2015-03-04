@@ -263,6 +263,24 @@ Mesh.prototype.metallic = function metallic(materialExpression) {
  * @return {Element} current Mesh
  */
 
+Mesh.prototype.positionOffset = function positionOffset(materialExpression) {
+    if (materialExpression._compile) materialExpression = materialExpression._compile();
+    this.queue.push(typeof materialExpression === 'number' ? 'UNIFORM_INPUT' : 'MATERIAL_INPUT');
+    this.queue.push('positionOffset');
+    this.queue.push(materialExpression);
+    return this;
+};
+
+/**
+ * Defines 3 element map which displaces the position of each vertex in world space.
+ *
+ * @method metallic
+ * @chainable
+ *
+ * @param {Object} Material or Image
+ * @return {Element} current Mesh
+ */
+
 Mesh.prototype.setOptions = function setOptions(options) {
     this.queue.push('GL_SET_DRAW_OPTIONS');
     this.queue.push(options);
