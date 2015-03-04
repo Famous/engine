@@ -83,7 +83,7 @@ Color.prototype.changeTo = function changeTo(color, options) {
  * Helper functions
  */
 function _standardizeArguments(options) {
-    return Array.prototype.concat.apply(Array.prototype, options);
+    return Array.prototype.concat.apply([], options);
 }
 
 function _argsToArray(val) {
