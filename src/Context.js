@@ -1,3 +1,5 @@
+'use strict';
+
 var Clock = require('./Clock');
 var Node = require('./Node');
 var RenderProxy = require('./RenderProxy');
