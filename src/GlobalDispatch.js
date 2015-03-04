@@ -9,9 +9,9 @@ var TRIGGER = 'TRIGGER';
 var WORKER = (typeof window === 'undefined');
 
 function GlobalDispatch () {
-    this.events = [];
-    this.targetedCallbacks = {};
-    this.globalCallbacks = [];
+    this._messages = [];
+    this._targetedCallbacks = {};
+    this._globalCallbacks = [];
 
     if (WORKER) {
         var _this = this;
@@ -31,7 +31,7 @@ GlobalDispatch.prototype.receiveCommands = function receiveCommands (commands) {
                 this.handleMessage(commands);
                 break;
             case FRAME:
-                this.targetedCallbacks.engine.trigger(FRAME, commands.shift());
+                this._targetedCallbacks.engine.trigger(FRAME, commands.shift());
                 break;
         }
     }
@@ -42,43 +42,43 @@ GlobalDispatch.prototype.handleMessage = function handleMessage (commands) {
     var type = commands.shift();
     switch (type) {
         case TRIGGER:
-            if (this.targetedCallbacks[path]) this.targetedCallbacks[path].trigger(commands.shift(), commands.shift());
+            if (this._targetedCallbacks[path]) this._targetedCallbacks[path].trigger(commands.shift(), commands.shift());
             break;
     }
 };
 
 GlobalDispatch.prototype.targetedOn = function targetedOn (path, key, cb) {
-    if (!this.targetedCallbacks[path]) this.targetedCallbacks[path] = new CallbackStore();
-    this.targetedCallbacks[path].on(key, cb);
+    if (!this._targetedCallbacks[path]) this._targetedCallbacks[path] = new CallbackStore();
+    this._targetedCallbacks[path].on(key, cb);
     return this;
 };
 
 GlobalDispatch.prototype.globalOn = function globalOn (path, key, cb) {
     var depth = path.split('/').length;
-    if (!this.globalCallbacks[depth]) this.globalCallbacks[depth] = new CallbackStore();
-    this.globalCallbacks[depth].on(key, cb);
+    if (!this._globalCallbacks[depth]) this._globalCallbacks[depth] = new CallbackStore();
+    this._globalCallbacks[depth].on(key, cb);
     return this;
 };
 
 GlobalDispatch.prototype.emit = function emit (event, cb) {
-    for (var i = 0, len = this.globalCallbacks.length ; i < len ; i++)
-        if (this.globalCallbacks[i])
-            this.globalCallbacks[i].trigger(event, cb);
+    for (var i = 0, len = this._globalCallbacks.length ; i < len ; i++)
+        if (this._globalCallbacks[i])
+            this._globalCallbacks[i].trigger(event, cb);
     return this;
 };
 
 GlobalDispatch.prototype.message = function message (mess) {
-    this.events.push(mess);
+    this._messages.push(mess);
     return this;
 };
 
 GlobalDispatch.prototype.flush = function flush () {
-    var events = this.events;
+    var message = this._messages;
 
-    if (events.length && WORKER) self.postMessage(events);
+    if (message.length && WORKER) self.postMessage(message);
 
-    for (var i = 0, len = this.events.length; i < len ; i++)
-        this.events.pop();
+    for (var i = 0, len = this._messages.length; i < len ; i++)
+        this._messages.pop();
 
     return this;
 };
