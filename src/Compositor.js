@@ -19,6 +19,7 @@ Compositor.CommandsToOutput = {
     CHANGE_TRANSFORM: 'DOM',
     CHANGE_PROPERTY: 'DOM',
     CHANGE_CONTENT: 'DOM',
+    CHANGE_SIZE: 'DOM',
     ADD_EVENT_LISTENER: 'DOM',
     RECALL: 'DOM',
     GL_UNIFORMS: 'GL',
@@ -55,10 +56,12 @@ Compositor.prototype.handleWith = function handleWith (commands) {
 
     switch (commandOutput) {
         case 'DOM':
-            var element = parent.getOrSetElement(path, index);
+            var element = parent.getOrSetElement(path, index, context.DOM);
             element.receive(commands);
-            pointer.DOM = element;
-            this._renderers.push(element);
+            if (!pointer.DOM) {
+                pointer.DOM = element;
+                this._renderers.push(element);
+            }
             break;
 
         case 'GL':
@@ -107,7 +110,6 @@ Compositor.prototype.sendResize = function sendResize (selector, report) {
 Compositor.prototype.drawCommands = function drawCommands() {
     var commands = this._inCommands;
     var command;
-
     while (commands.length) {
         command = commands.shift();
         switch (command) {
