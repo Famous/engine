@@ -7,6 +7,7 @@ module.exports = {
     KeyCodes: require('./KeyCodes'),
     loadURL: require('./loadURL'),
     MethodStore: require('./MethodStore'),
-    ObjectManager: require('./ObjectManager')
+    ObjectManager: require('./ObjectManager'),
+    Color: require('./Color')
 };
 
