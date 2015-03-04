@@ -30,6 +30,11 @@ function Transitionable(start) {
     this._callbackQueue = [];
 
     this.reset(start);
+
+    var _this = this;
+    this._boundLoadNext = function() {
+        _this._loadNext();
+    };
 }
 
 var transitionMethods = {};
@@ -50,8 +55,7 @@ Transitionable.unregisterMethod = function unregisterMethod(name) {
     else return false;
 };
 
-function _loadNext() {
-    /*jshint validthis: true */
+Transitionable.prototype._loadNext = function _loadNext() {
     if (this._callback) {
         var callback = this._callback;
         this._callback = null;
@@ -86,8 +90,10 @@ function _loadNext() {
 
     this._engineInstance.reset(this.state, this.velocity);
     if (this.velocity !== undefined) this._currentTransition.velocity = this.velocity;
-    this._engineInstance.set(this._currentEndState, this._currentTransition, _loadNext.bind(this));
-}
+
+    this._engineInstance.set(this._currentEndState, this._currentTransition, this._boundLoadNext);
+};
+
 
 /**
  * Add transition to end state to the queue of pending transitions. Special
@@ -115,7 +121,7 @@ Transitionable.prototype.set = function set(endState, transition, callback) {
     this._transitionQueue.push(transition);
     this._callbackQueue.push(callback);
 
-    if (!this._currentTransition && !this._currentEndState) _loadNext.call(this);
+    if (!this._currentTransition && !this._currentEndState) this._loadNext();
     return this;
 };
 
