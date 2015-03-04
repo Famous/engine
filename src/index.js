@@ -4,6 +4,7 @@ module.exports = {
     Align: require('./Align'),
     Camera: require('./Camera'),
     EventEmitter: require('./EventEmitter'),
+    EventReceiver: require('./EventReceiver'),
     MountPoint: require('./MountPoint'),
     Opacity: require('./Opacity'),
     Origin: require('./Origin'),
