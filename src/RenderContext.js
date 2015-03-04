@@ -139,7 +139,7 @@ RenderContext.prototype.dirty = function dirty () {
 var identSize = new Float32Array([0, 0, 0]);
 var identTrans = new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
 
-function update (parentContext) {
+RenderContext.prototype.update = function update (parentContext) {
     this._size._update(
         this._recalcAll || !parentContext ? 7 : parentContext._size._previouslyInvalidated,
         parentContext ? parentContext._size.getTopDownSize() : identSize
