@@ -136,22 +136,28 @@ RenderContext.prototype.dirty = function dirty () {
     return this;
 };
 
+var identSize = [0, 0, 0];
+var identTrans = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
+
 RenderContext.prototype.update = function update (parentContext) {
     this._size._update(
-        this._recalcAll ? 7 : parentContext._size._previouslyInvalidated,
-        parentContext._size.getTopDownSize()
+        this._recalcAll || !parentContext ? 7 : parentContext._size._previouslyInvalidated,
+        parentContext ? parentContext._size.getTopDownSize() : identSize
     );
 
-    if (!this._origin.isActive)
-        this._origin._setWithoutActivating(parentContext._origin.x, parentContext._origin.y, parentContext._origin.z);
+    if (!this._origin.isActive) 
+        this._origin._setWithoutActivating(
+            parentContext ? parentContext._origin.x : 0,
+            parentContext ? parentContext._origin.y : 0,
+            parentContext ? parentContext._origin.z : 0);
     var mySize = this._size.get();
-    var parentSize = parentContext._size.get();
+    var parentSize = parentContext ? parentContext._size.get() : identSize;
     this._align.update(parentSize);
     this._mountPoint.update(mySize);
 
     this._align.transform._update(
-        this._recalcAll ? (1 << 16) - 1 : parentContext._transform._previouslyInvalidated,
-        parentContext._transform._matrix
+        this._recalcAll || !parentContext ? (1 << 16) - 1 : parentContext._transform._previouslyInvalidated,
+        parentContext ? parentContext._transform._matrix : identTrans
     );
 
     this._mountPoint.transform._update(

@@ -9,7 +9,7 @@ function Node (proxy, globalDispatch, localDispatch) {
 }
 
 Node.prototype.addChild = function addChild (index) {
-    var child = new this.constructor(this._localDispatch.getRenderProxy(), this._globalDispatch());
+    var child = new this.constructor(this._localDispatch.getRenderProxy(), this._globalDispatch);
     if (index == null) this._children.push(child);
     else this._children.splice(index, 0, child);
     return child;

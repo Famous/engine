@@ -28,6 +28,10 @@ LocalDispatch.prototype.getRenderPath = function getRenderPath () {
     return this._renderProxy.getRenderPath();
 };
 
+LocalDispatch.prototype.getRenderProxy = function getRenderProxy () {
+    return this._renderProxy;
+};
+
 LocalDispatch.prototype.registerTargetedEvent = function registerTargetedEvent (event, cb) {
     this._node._globalDispatch.targetedOn(this.getRenderPath(), event, cb);
     return this;
@@ -49,7 +53,7 @@ LocalDispatch.prototype.cleanComponents = function cleanComponents () {
 };
 
 LocalDispatch.prototype.cleanRenderContext = function cleanRenderContext (parentNode) {
-    this._context.update(parentNode.getDispatch()._context);
+    this._context.update(parentNode ? parentNode.getDispatch()._context : void 0);
     return this;
 };
 
