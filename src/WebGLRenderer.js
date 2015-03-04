@@ -10,9 +10,9 @@ var resolutionName = ['resolution'];
 var uniformValues = [];
 var resolutionValues = [];
 
-var inputIdx = { baseColor: 0, normal: 1, metalness: 2, glossiness: 3 };
-var inputNames = ['baseColor', 'normal', 'metalness', 'glossiness'];
-var inputValues = [[.5, .5, .5], [0,0,0], .2, .8];
+var inputIdx = { baseColor: 0, normal: 1, metalness: 2, glossiness: 3, positionOffset: 4};
+var inputNames = ['baseColor', 'normal', 'metalness', 'glossiness', 'positionOffset'];
+var inputValues = [[.5, .5, .5], [0,0,0], .2, .8, .8];
 var identity = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
 
 /**
@@ -36,10 +36,8 @@ function WebGLRenderer(container) {
     this.container.getTarget().appendChild(this.canvas);
     this.canvas.className = 'famous-webgl GL';
 
-    var context = this.canvas.getContext('webgl') || this.canvas.getContext('experimental-webgl');
+    var gl = this.gl = this.canvas.getContext('webgl') || this.canvas.getContext('experimental-webgl');
     var containerSize = this.container._getSize();
-
-    var gl = this.gl = context;
 
     gl.polygonOffset(0.1, 0.1);
     gl.enable(gl.POLYGON_OFFSET_FILL);
@@ -87,10 +85,31 @@ WebGLRenderer.prototype.receive = function receive(path, commands) {
     var mesh = this.meshRegistry[path];
     var light = this.lightRegistry[path];
 
+    if (!mesh) {
+        mesh = this.meshRegistry[path] = {
+            uniformKeys: ['opacity', 'transform', 'size', 'origin', 'baseColor', 'positionOffset'],
+            uniformValues: [1, identity, [0, 0, 0], [0, 0, 0], [0.5, 0.5, 0.5], [1,1,1]],
+            buffers: {},
+            geometry: null,
+            drawType: null,
+            options: {}
+        };
+    }
+    var bufferName;
+    var bufferValue;
+    var bufferSpacing;
+    var uniformName;
+    var uniformValue;
+    var geometryId;
+    
+
     while (commands.length) {
         var command = commands.shift();
 
         switch (command) {
+            case 'GL_SET_DRAW_OPTIONS':
+                mesh.options = commands.shift();
+                break;
 
             case 'GL_CREATE_MESH':
                 mesh = this.meshRegistry[path] = {
@@ -128,7 +147,7 @@ WebGLRenderer.prototype.receive = function receive(path, commands) {
             case 'MATERIAL_INPUT':
                 var name = commands.shift();
                 var mat = commands.shift();
-                mesh.uniformValues[4][0] = -mat._id;
+                mesh.uniformValues[name == 'baseColor' ? 4 : 5][0] = -mat._id;
                 this.program.registerMaterial(name, mat);
                 this.updateSize();
                 break;
@@ -189,7 +208,12 @@ WebGLRenderer.prototype.draw = function draw() {
         if (!buffers) return;
 
         this.program.setUniforms(mesh.uniformKeys, mesh.uniformValues);
+        
+        this.handleOptions(mesh.options);
+        
         this.drawBuffers(buffers, mesh.drawType, mesh.geometry);
+
+        this.resetOptions(mesh.options);
     }
 };
 
@@ -416,3 +440,12 @@ function IDL(){
     xhr.send(null);  
 }
 
+WebGLRenderer.prototype.handleOptions = function handleOptions(options) {
+    var gl = this.gl;
+    if (options.blending) gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
+};
+
+WebGLRenderer.prototype.resetOptions = function handleOptions(options) {
+    var gl = this.gl;
+    if (options.blending) gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA); 
+};
