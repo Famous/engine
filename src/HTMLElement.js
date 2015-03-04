@@ -87,18 +87,12 @@ HTMLElement.prototype._receiveTransformChange = function _receiveTransformChange
 };
 
 HTMLElement.prototype._receiveSizeChange = function _receiveSizeChange(size) {
-    if (!this._trueSized[0] || !this._trueSized[1]) {
-        var topDownSize = size.getTopDownSize();
-
-        if (!this._trueSized[0]) {
-            this.property(WIDTH, Math.round(topDownSize[0]) + PX);
-            this._size[0] = topDownSize[0];
-        }
-        if (!this._trueSized[1]) {
-            this.property(HEIGHT, Math.round(topDownSize[1]) + PX);
-            this._size[1] = topDownSize[1];
-        }
-    }
+    this._dispatch.dirtyRenderable(this._id);
+    var width = this._trueSized[0] ? this._trueSized[0] : size._size[0];
+    var height = this._trueSized[1] ? this._trueSize[1] : size._size[1];
+    this._queue.push('CHANGE_SIZE');
+    this._queue.push(width);
+    this._queue.push(height);
 };
 
 HTMLElement.prototype._receiveOriginChange = function _receiveOriginChange(origin) {
