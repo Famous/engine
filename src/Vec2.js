@@ -1,5 +1,12 @@
 'use strict';
 
+/** @alias */
+var sin = Math.sin;
+/** @alias */
+var cos = Math.cos;
+/** @alias */
+var sqrt = Math.sqrt;
+
 /**
  * A two-dimensional vector.
  *
@@ -27,8 +34,8 @@ var Vec2 = function(x, y){
  * @chainable
  */
 Vec2.prototype.set = function set(x, y) {
-    if (x !== undefined) this.x = x;
-    if (y !== undefined) this.y = y;
+    if (x != null) this.x = x;
+    if (y != null) this.y = y;
     return this;
 };
 
@@ -77,6 +84,48 @@ Vec2.prototype.scale = function scale(s) {
 };
 
 /**
+ * Rotate the Vec2 counter-clockwise by theta about the z-axis.
+ *
+ * @method rotate
+ * @param {Number} theta Angle by which to rotate.
+ * @chainable
+ */
+Vec2.prototype.rotate = function(theta) {
+    var x = this.x;
+    var y = this.y;
+
+    var cosTheta = cos(theta);
+    var sinTheta = sin(theta);
+
+    this.x = x * cosTheta - y * sinTheta;
+    this.y = x * sinTheta + y * cosTheta;
+
+    return this;
+};
+
+/**
+ * The dot product of of the current Vec2 with the input Vec2.
+ *
+ * @method dot
+ * @param {Number} v The other Vec2.
+ * @chainable
+ */
+Vec2.prototype.dot = function(v) {
+    return this.x * v.x + this.y * v.y;
+};
+
+/**
+ * The cross product of of the current Vec2 with the input Vec2.
+ *
+ * @method cross
+ * @param {Number} v The other Vec2.
+ * @chainable
+ */
+Vec2.prototype.cross = function(v) {
+    return this.x * v.y - this.y * v.x;
+};
+
+/**
  * Preserve the magnitude but invert the orientation of the current Vec2.
  *
  * @method invert
@@ -111,7 +160,7 @@ Vec2.prototype.length = function length() {
     var x = this.x;
     var y = this.y;
 
-    return Math.sqrt(x * x + y * y);
+    return sqrt(x * x + y * y);
 };
 
 /**
@@ -151,17 +200,6 @@ Vec2.prototype.isZero = function isZero() {
 };
 
 /**
- * Check whether Vec2 is equal to Current Vec2
- *
- * @param  {Vec2} v Vec2 to compare
- * @return {Boolean}
- */
-Vec2.prototype.identity = function identity(v) {
-    if (this.x !== v.x || this.y !== v.y) return false;
-    else return true;
-};
-
-/**
  * The array form of the current Vec2.
  *
  * @method toArray
@@ -180,9 +218,13 @@ Vec2.prototype.toArray = function toArray() {
  * @return {Vec2} The normalize Vec2.
  */
 Vec2.normalize = function normalize(v, output) {
-    var length = v.length();
-    output.x = v.x/length;
-    output.y = v.y/length;
+    var x = v.x;
+    var y = v.y;
+
+    var length = sqrt(x * x + y * y) || 1;
+    length = 1 / length;
+    output.x = v.x * length;
+    output.y = v.y * length;
 
     return output;
 };
@@ -247,24 +289,25 @@ Vec2.scale = function scale(v, s, output) {
 /**
  * The dot product of the input Vec2's.
  *
- * @method dotProduct
+ * @method dot
  * @param {Vec2} v1 The left Vec2.
  * @param {Vec2} v2 The right Vec2.
  * @return {Number} The dot product.
  */
-Vec2.dotProduct = function dotProduct(v1, v2) {
+Vec2.dot = function dot(v1, v2) {
     return v1.x * v2.x + v1.y * v2.y;
 };
 
 /**
- * Check whether two Vec2's are equal
+ * The cross product of the input Vec2's.
  *
- * @param  {Vec2} v1 The left Vec2
- * @param  {Vec2} v2 The right Vec2
- * @return {Boolean}
+ * @method cross
+ * @param {Number} v The left Vec2.
+ * @param {Number} v The right Vec2.
+ * @return {Number} The z-component of the cross product.
  */
-Vec2.equals = function equals(v1, v2) {
-    return v1.x === v2.x && v1.y === v2.y;
+Vec2.cross = function(v1,v2) {
+    return v1.x * v2.y - v1.y * v2.x;
 };
 
 module.exports = Vec2;
