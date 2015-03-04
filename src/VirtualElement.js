@@ -14,6 +14,7 @@ var EVENT_END = 'EVENT_END';
 var RECALL = 'RECALL';
 var WITH = 'WITH';
 var DRAW = 'DRAW';
+var CHANGE_SIZE = 'CHANGE_SIZE';
 var CHANGE_TAG = 'CHANGE_TAG';
 
 var DIV = 'div';
@@ -43,7 +44,7 @@ function vendorPrefix(property) {
 var VENDOR_TRANSFORM = vendorPrefix(TRANSFORM);
 var VENDOR_TRANSFORM_ORIGIN = vendorPrefix(TRANSFORM_ORIGIN);
 
-function VirtualElement (target, path, renderer, parent) {
+function VirtualElement (target, path, renderer, parent, rootElement) {
     this._path = path;
     this._target = target;
     this._renderer = renderer;
@@ -57,8 +58,9 @@ function VirtualElement (target, path, renderer, parent) {
     this._content = '';
     this._children = {};
     this._size = [0, 0, 0];
-    this._renderState = null;
     this._tagName = DIV;
+    this._origin = [0, 0];
+    this._rootElement = rootElement || this;
 }
 
 VirtualElement.prototype.getTarget = function getTarget () {
@@ -99,7 +101,7 @@ VirtualElement.prototype.changeTag = function changeTag (tagName) {
 VirtualElement.prototype.getOrSetElement = function getOrSetElement (path, index) {
     if (this._children[index]) return this._children[index];
     var div = this._allocator.allocate(this._tagName);
-    var child = new VirtualElement(div, path, this._renderer, this);
+    var child = new VirtualElement(div, path, this._renderer, this, this._rootElement);
     this._children[index] = child;
     return child;
 };
@@ -128,11 +130,18 @@ VirtualElement.prototype.receive = function receive (commands) {
                     commands.shift()
                 );
                 break;
-            case DRAW:
-                this.draw(commands.shift());
-                break;
             case CHANGE_TRANSFORM_ORIGIN:
+                this._origin[0] = commands[0];
+                this._origin[1] = commands[1];
                 this.setProperty(VENDOR_TRANSFORM_ORIGIN, stringifyTransformOrigin(commands));
+                break;
+            case CHANGE_SIZE:
+                var width = commands.shift();
+                var height = commands.shift();
+                this._size[0] = width;
+                this._size[1] = height;
+                if (width !== true) this.setProperty('width', width + 'px');
+                if (height !== true) this.setProperty('height', height + 'px');
                 break;
             case CHANGE_PROPERTY:
                 this.setProperty(commands.shift(), commands.shift());
@@ -235,16 +244,38 @@ VirtualElement.prototype._getSize = function _getSize () {
 };
 
 VirtualElement.prototype.draw = function draw(renderState) {
-    this._renderState = renderState;
+    var m = this._matrix;
+    var perspectiveTransform = renderState.perspectiveTransform;
 
-    var p = renderState.perspectiveTransform;
-    multiply(
-        this._matrix,
-        this._matrix,
-        p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7], p[8], p[9], p[10], p[11], p[12], p[13], p[14], p[15]
+    var originShiftedPerspective = [
+        perspectiveTransform[0],
+        perspectiveTransform[1],
+        perspectiveTransform[2],
+        perspectiveTransform[3],
+
+        perspectiveTransform[4],
+        perspectiveTransform[5],
+        perspectiveTransform[6],
+        perspectiveTransform[7],
+
+        perspectiveTransform[11] * ((this._rootElement._size[0] * 0.5) - (this._size[0] * this._origin[0])),
+        perspectiveTransform[11] * ((this._rootElement._size[1] * 0.5) - (this._size[1] * this._origin[1])),
+        perspectiveTransform[10],
+        perspectiveTransform[11],
+
+        perspectiveTransform[12],
+        perspectiveTransform[13],
+        perspectiveTransform[14],
+        perspectiveTransform[15]
+    ];
+
+    var finalTransform = multiply(
+        [],
+        originShiftedPerspective,
+        m[0], m[1], m[2], m[3], m[4], m[5], m[6], m[7], m[8], m[9], m[10], m[11], m[12], m[13], m[14], m[15]
     );
 
-    this._target.style[VENDOR_TRANSFORM] = stringifyMatrix(this._matrix);
+    this._target.style[VENDOR_TRANSFORM] = stringifyMatrix(finalTransform);
 };
 
 VirtualElement.prototype.setMatrix = function setMatrix (m0, m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11, m12, m13, m14, m15) {
