@@ -47,10 +47,12 @@ Context.prototype._receiveContextSize = function _receiveContextSize (sizeReport
         .getDispatch()
         .getContext()
         .setAbsolute(sizeReport.size[0], sizeReport.size[1], 0);
+
     if (this.dirty) {
         this.dirty = false;
         for (var i = 0, len = this.dirtyQueue.length ; i < len ; i++) this.receive(this.dirtyQueue.shift());
     }
+
     return this;
 };
 

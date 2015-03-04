@@ -136,10 +136,10 @@ RenderContext.prototype.dirty = function dirty () {
     return this;
 };
 
-var identSize = [0, 0, 0];
-var identTrans = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
+var identSize = new Float32Array([0, 0, 0]);
+var identTrans = new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
 
-RenderContext.prototype.update = function update (parentContext) {
+function update (parentContext) {
     this._size._update(
         this._recalcAll || !parentContext ? 7 : parentContext._size._previouslyInvalidated,
         parentContext ? parentContext._size.getTopDownSize() : identSize
