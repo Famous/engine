@@ -19,8 +19,7 @@ function Mesh (dispatch, options) {
     this.dispatch = dispatch;
     this.queue = ['GL_CREATE_MESH'];
     this._id = dispatch.addRenderable(this);
-    this._color = new Color('rgb', 0.5, 0.5, 0.5);
-    this._origin = new Float32Array([0, 0, 0]);
+    this._color = new Color();
     this._size = [];
 
     this._expressions = {};
@@ -76,11 +75,7 @@ Mesh.prototype._receiveOriginChange = function _receiveOriginChange(origin) {
     this.dispatch.dirtyRenderable(this._id);
     this.queue.push('GL_UNIFORMS');
     this.queue.push('origin');
-    this._origin[0] = origin.x;
-    this._origin[1] = origin.y;
-    this._origin[2] = origin.z;
-
-    this.queue.push(this._origin);
+    this.queue.push(origin);
 };
 
 
@@ -162,14 +157,14 @@ Mesh.prototype.clean = function clean() {
         }
     }
 
+    var i = this.queue.length;
+    while (i--) this.dispatch.sendDrawCommand(this.queue.shift());
+
     if (this._color.isActive()) {
         this.dispatch.sendDrawCommand('GL_UNIFORMS');
         this.dispatch.sendDrawCommand('baseColor');
-        this.dispatch.sendDrawCommand(this._color.getRGB());
+        this.dispatch.sendDrawCommand(this._color.getNormalizedRGB());
     }
-
-    var i = this.queue.length;
-    while (i--) this.dispatch.sendDrawCommand(this.queue.shift());
 
     return this.queue.length;
 };
@@ -195,7 +190,13 @@ Mesh.prototype.baseColor = function baseColor() {
     }
     else {
         this.queue.push('GL_UNIFORMS');
-        this._color.set(materialExpression);
+        if (materialExpression[0] instanceof Color) {
+            this._color = materialExpression[0];
+        }
+        else {
+            this._color.set(materialExpression);
+        }
+        materialExpression = this._color.getNormalizedRGB();
     }
 
     this.queue.push('baseColor');
