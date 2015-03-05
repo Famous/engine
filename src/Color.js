@@ -7,25 +7,8 @@ var Transitionable = require('famous-transitions').Transitionable;
 
 
 /**
- * Color Constructor
- * Color('rgb', 255, 255, 255) RGB
- * Color('rgb', '255', '255', '255') RGB
- *
- * Color('hsl', '360', '10%', '50%') HSL
- * Color('hsl', 360, '10%', '50%') HSL
- * Color('hsl', '360', '0.5', '0.3') HSL
- *
- * Color('nrgb', 1.0, 0.5, 0.5) Normalized RGB
- * Color('rgb', '1.0', '0.5', '0.5') Normalized RGB
- *
- * Color('#FF00000') HEX
- * Color('beige') Color name
- *
- * Color('rgb(255, 255, 255)') String RGB
- * Color('hsl(360, 10%, 50%)') String HSL
- * Color('rgb(1.0, 0.0, 0.0)') String Normalized RGB
- *
- * Color(otherColor) Color instance
+ * Color
+ * Accepts RGB, HSL, HEX with getters and setters
  */
 var Color = function Color() {
     this._r = new Transitionable(0);
@@ -47,11 +30,14 @@ Color.prototype.set = function set() {
         var rgb = type.getRGB();
         this.setRGB(rgb, options[1]);
     }
-    else if (_isHex(type)) {
+    else if (_isType('hex', type)) {
         this.setHex(options[1], options[2]);
     }
-    else if (_isRGB(type)) {
+    else if (_isType('rgb', type)) {
         this.setRGB(options.slice(1));
+    }
+    else if (_isType('hsl', type)) {
+        this.setHSL(options.slice(1));
     }
     else {
         this.setRGB(options);
@@ -211,7 +197,162 @@ Color.prototype.equals = function equals(color) {
                 this.getG() === color.getG() &&
                 this.getB() === color.getB();
     }
+    return false;
 };
+
+Color.prototype.copyGammaToLinear = function copyGammaToLinear(color) {
+    if (_isColorInstance(color)) {
+        var r = color.getR();
+        var g = color.getG();
+        var b = color.getB();
+        this.setRGB(r*r, g*g, b*b);
+    }
+    return this;
+};
+
+Color.prototype.convertGammaToLinear = function convertGammaToLinear() {
+    var r = this.getR();
+    var g = this.getG();
+    var b = this.getB();
+    this.setRGB(r*r, g*g, b*b);
+    return this;
+};
+
+Color.prototype.addColors = function addColors(color1, color2) {
+    var r = color1.getR() + color2.getR();
+    var g = color1.getG() + color2.getG();
+    var b = color1.getB() + color2.getB();
+    return [r, g, b];
+};
+
+Color.prototype.hueToRGB = function hueToRGB(p, q, t) {
+    if (t < 0) t += 1;
+    if (t > 1) t -= 1;
+    if (t < 1/6) return p + (q - p) * 6 * t;
+    if (t < 1/2) return q;
+    if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+    return p;
+}
+
+Color.prototype.setHSL = function setHSL(h, s, l, options) {
+    h /= 360.0;
+    s /= 100.0;
+    l /= 100.0;
+    var r, g, b;
+    if (s === 0) {
+        r = g = b = l;
+    }
+    else {
+        var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+        var p = 2 * l - q;
+        r = this.hueToRGB(p, q, h + 1/3);
+        g = this.hueToRGB(p, q, h);
+        b = this.hueToRGB(p, q, h - 1/3);
+    }
+    r = Math.round(r * 255);
+    g = Math.round(g * 255);
+    b = Math.round(b * 255);
+    this.setRGB(r, g, b, options);
+    return this;
+};
+
+Color.prototype.getHSL = function getHSL() {
+    var rgb = this.getNormalizedRGB();
+    var r = rgb[0], g = rgb[1], b = rgb[2];
+    var max = Math.max(r, g, b);
+    var min = Math.min(r, g, b);
+    var h, s, l = (max + min) / 2;
+    if (max === min) {
+        h = s = 0;
+    }
+    else {
+        var d = max - min;
+        s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+        switch (max) {
+            case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+            case g: h = (b - r) / d + 2; break;
+            case b: h = (r - g) / d + 4; break;
+        }
+        h *= 60;
+    }
+    return [h, s*100, l*100];
+};
+
+Color.prototype.getHue = function getHue() {
+    var hsl = this.getHSL();
+    return hsl[0];
+};
+
+Color.prototype.setHue = function setHue(h, options) {
+    var hsl = this.getHSL();
+    this.setHSL(h, hsl[1], hsl[2], options);
+    return this;
+};
+
+Color.prototype.getSaturation = function getSaturation() {
+    var hsl = this.getHSL();
+    return hsl[1];
+};
+
+Color.prototype.setSaturation = function setSaturation(s, options) {
+    var hsl = this.getHSL();
+    this.setHSL(hsl[0], s, hsl[2], options);
+    return this;
+};
+
+Color.prototype.getLightness = function getLightness() {
+    var hsl = this.getHSL();
+    return hsl[2];
+};
+
+Color.prototype.setLightness = function setLightness(l, options) {
+    var hsl = this.getHSL();
+    this.setHSL(hsl[0], hsl[0], l, options);
+    return this;
+};
+
+Color.prototype.setHSV = function setHSV(h, s, v, options) {
+    var r, g, b;
+
+    var i = Math.floor(h * 6);
+    var f = h * 6 - i;
+    var p = v * (1 - s);
+    var q = v * (1 - f * s);
+    var t = v * (1 - (1 - f) * s);
+
+    switch (i % 6) {
+        case 0: r = v, g = t, b = p; break;
+        case 1: r = q, g = v, b = p; break;
+        case 2: r = p, g = v, b = t; break;
+        case 3: r = p, g = q, b = v; break;
+        case 4: r = t, g = p, b = v; break;
+        case 5: r = v, g = p, b = q; break;
+    }
+
+    this.setRGB(r*255, g*255, b*255, options);
+    return this;
+}
+
+Color.prototype.getHSV = function getHSV() {
+    var rgb = this.getNormalizedRGB();
+    var r = rgb[0], g = rgb[1], b = rgb[2];
+    var max = Math.max(r, g, b), min = Math.min(r, g, b);
+    var h, s, v = max;
+    var d = max - min;
+    s = max == 0 ? 0 : d / max;
+    if (max == min) {
+        h = 0;
+    }
+    else {
+        switch (max) {
+            case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+            case g: h = (b - r) / d + 2; break;
+            case b: h = (r - g) / d + 4; break;
+        }
+        h /= 6;
+    }
+    return [h, s, v];
+}
 
 
 /**
@@ -258,9 +399,9 @@ function _allInts(val) {
 };
 
 function _allStrings() {
-    var val = _argsToArray(arguments);
-    for(var i = 0; i < val.length; i++) {
-        if (!_isString(item)) return false;
+    var values = _argsToArray(arguments);
+    for(var i = 0; i < values.length; i++) {
+        if (!_isString(values[i])) return false;
     }
     return true;
 };
@@ -269,12 +410,8 @@ function _isPercentage(val) {
     return /%/.test(val);
 };
 
-function _isRGB(type) {
-    return _isString(type) && type.toLowerCase() === 'rgb';
-}
-
-function _isHex(type) {
-    return _isString(type) && type.toLowerCase() === 'hex';
+function _isType(type, value) {
+    return _allStrings(type, value) && type.toLowerCase() === value.toLowerCase();
 }
 
 function _clamp(val, min, max) {
