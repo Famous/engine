@@ -1,8 +1,6 @@
 'use strict';
 
 var Utility = require('famous-utilities');
-var Texture = require('./Texture');
-var checkers = require('./Checkerboard');
 
 var VERTEX_SHADER = 35633;
 var FRAGMENT_SHADER = 35632;
@@ -94,15 +92,6 @@ function Program(gl) {
 
 Program.prototype.registerMaterial = function registerMaterial(name, material) {
     var compiled = material;
-
-    if (compiled.uniforms.image) {
-        var t = new Texture(this.gl);
-        t.setImage(checkers);
-        loadImage(compiled.uniforms.image, function (img) {
-            t.setImage(img);
-        });
-        delete compiled.uniforms.image;
-    }
 
     for (var k in compiled.uniforms) {
         uniformNames.push(k);
@@ -367,16 +356,6 @@ Program.prototype.compileShader = function compileShader(shader, source) {
 
     return shader;
 };
-
-function loadImage (img, callback) {
-    var obj = (typeof img === 'string' ? new Image() : img) || {};
-    obj.crossOrigin = 'anonymous';
-    if (! obj.src) obj.src = img;
-    if (! obj.complete) obj.onload = function () { callback(obj); };
-    else callback(obj);
-
-    return obj;
-}
 
 module.exports = Program;
 

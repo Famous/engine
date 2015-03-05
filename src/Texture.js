@@ -12,8 +12,8 @@
 function Texture(gl, options) {
     options = options || {};
     this.id = gl.createTexture();
-    this.width = options.width || 0;
-    this.height = options.height || 0;
+    this.width = options.width || 255;
+    this.height = options.height || 255;
     this.format = options.format || gl.RGBA;
     this.type = options.type || gl.UNSIGNED_BYTE;
     this.gl = gl;
@@ -31,9 +31,9 @@ function Texture(gl, options) {
 
     gl.texImage2D(gl.TEXTURE_2D, 0, this.format, this.width, this.height, 0, this.format, this.type, null);
 
-    //if (options.mipmap) {
+    if (options.mipmap) {
         gl.generateMipmap(gl.TEXTURE_2D);
-    //}
+    }
 }
 
 /**
@@ -75,7 +75,9 @@ Texture.prototype.unbind = function unbind(unit) {
  */
 
 Texture.prototype.setImage = function setImage(img) {
+    this.gl.bindTexture(this.gl.TEXTURE_2D, this.id);
     this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.format, this.format, this.type, img);
+    this.gl.bindTexture(this.gl.TEXTURE_2D, null);
     return this;
 };
 
