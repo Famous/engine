@@ -112,79 +112,72 @@ VirtualElement.prototype.getOrSetElement = function getOrSetElement (path, index
 };
 
 VirtualElement.prototype.receive = function receive (commands) {
-    while (commands.length) {
-        var command = commands.shift();
-        switch (command) {
-            case CHANGE_TRANSFORM:
-                this.setMatrix(
-                    commands.shift(),
-                    commands.shift(),
-                    commands.shift(),
-                    commands.shift(),
-                    commands.shift(),
-                    commands.shift(),
-                    commands.shift(),
-                    commands.shift(),
-                    commands.shift(),
-                    commands.shift(),
-                    commands.shift(),
-                    commands.shift(),
-                    commands.shift(),
-                    commands.shift(),
-                    commands.shift(),
-                    commands.shift()
-                );
-                break;
-            case CHANGE_TRANSFORM_ORIGIN:
-                this._origin[0] = commands[0];
-                this._origin[1] = commands[1];
-                this.setProperty(VENDOR_TRANSFORM_ORIGIN, stringifyTransformOrigin(commands));
-                break;
-            case CHANGE_SIZE:
-                var width = commands.shift();
-                var height = commands.shift();
-                this._size[0] = width;
-                this._size[1] = height;
-                if (width !== true) this.setProperty('width', width + 'px');
-                if (height !== true) this.setProperty('height', height + 'px');
-                break;
-            case CHANGE_PROPERTY:
-                this.setProperty(commands.shift(), commands.shift());
-                break;
-            case CHANGE_ATTRIBUTE:
-                this.setAttribute(commands.shift(), commands.shift());
-                break;
-            case CHANGE_TAG:
-                this.changeTag(commands.shift());
-                break;
-            case CHANGE_CONTENT:
-                this.setContent(commands.shift());
-                break;
-            case ADD_CLASS:
-                this.addClass(commands.shift());
-                break;
-            case REMOVE_CLASS:
-                this.removeClass(commands.shift());
-                break;
-            case ADD_EVENT_LISTENER:
-                var ev = commands.shift();
-                var methods;
-                var properties;
-                var c;
-                while ((c = commands.shift()) !== EVENT_PROPERTIES) methods = c;
-                while ((c = commands.shift()) !== EVENT_END) properties = c;
-                methods = methods || [];
-                properties = properties || [];
-                this.addEventListener(ev, this.dispatchEvent.bind(this, ev, methods, properties));
-                break;
-            case RECALL:
-                this.setProperty('display', 'none');
-                this._parent._allocator.deallocate(this._target);
-                break;
-            case WITH:
-                commands.unshift(command);
-                return;
-        }
+    var command = commands.shift();
+    switch (command) {
+        case CHANGE_TRANSFORM:
+            this.setMatrix(
+                commands.shift(),
+                commands.shift(),
+                commands.shift(),
+                commands.shift(),
+                commands.shift(),
+                commands.shift(),
+                commands.shift(),
+                commands.shift(),
+                commands.shift(),
+                commands.shift(),
+                commands.shift(),
+                commands.shift(),
+                commands.shift(),
+                commands.shift(),
+                commands.shift(),
+                commands.shift()
+            );
+            break;
+        case CHANGE_TRANSFORM_ORIGIN:
+            this._origin[0] = commands[0];
+            this._origin[1] = commands[1];
+            this.setProperty(VENDOR_TRANSFORM_ORIGIN, stringifyTransformOrigin(commands));
+            break;
+        case CHANGE_SIZE:
+            var width = commands.shift();
+            var height = commands.shift();
+            this._size[0] = width;
+            this._size[1] = height;
+            if (width !== true) this.setProperty('width', width + 'px');
+            if (height !== true) this.setProperty('height', height + 'px');
+            break;
+        case CHANGE_PROPERTY:
+            this.setProperty(commands.shift(), commands.shift());
+            break;
+        case CHANGE_TAG:
+            this.changeTag(commands.shift());
+            break;
+        case CHANGE_CONTENT:
+            this.setContent(commands.shift());
+            break;
+        case ADD_CLASS:
+            this.addClass(commands.shift());
+            break;
+        case REMOVE_CLASS:
+            this.removeClass(commands.shift());
+            break;
+        case ADD_EVENT_LISTENER:
+            var ev = commands.shift();
+            var methods;
+            var properties;
+            var c;
+            while ((c = commands.shift()) !== EVENT_PROPERTIES) methods = c;
+            while ((c = commands.shift()) !== EVENT_END) properties = c;
+            methods = methods || [];
+            properties = properties || [];
+            this.addEventListener(ev, this.dispatchEvent.bind(this, ev, methods, properties));
+            break;
+        case RECALL:
+            this.setProperty('display', 'none');
+            this._parent._allocator.deallocate(this._target);
+            break;
+        default: commands.unshift(command); return;
     }
 };
 
