@@ -19,10 +19,17 @@ test('CallbackStore', function(t) {
 
         var eggEv = {};
 
-        cs.on('egg', function(ev) {
+        var i = 0;
+        var id = cs.on('egg', function(ev) {
+            if (i++ > 0) {
+                t.fail('cs.off should remove the listener with the id returned by cs.off');
+            }
             t.equal(ev, eggEv);
         });
 
+        cs.trigger('egg', eggEv);
+
+        cs.off('egg', id);
         cs.trigger('egg', eggEv);
     });
 

@@ -6,14 +6,13 @@ function CallbackStore () {
 
 CallbackStore.prototype.on = function on (key, cb) {
     if (!this.events[key]) this.events[key] = [];
-    this.events[key].push(cb);
-    return this;
+    return this.events[key].push(cb) - 1;
 };
 
 CallbackStore.prototype.off = function off (key, cb) {
     var events = this.events[key];
     if (events) {
-        var index = events.indexOf(cb);
+        var index = cb.constructor === Number ? cb : events.indexOf(cb);
         if (index > -1) events.splice(index, 1);
     }
     return this;
