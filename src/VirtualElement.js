@@ -13,7 +13,7 @@ var EVENT_PROPERTIES = 'EVENT_PROPERTIES';
 var EVENT_END = 'EVENT_END';
 var RECALL = 'RECALL';
 var WITH = 'WITH';
-var DRAW = 'DRAW';
+var CHANGE_ATTRIBUTE = 'CHANGE_ATTRIBUTE';
 var CHANGE_SIZE = 'CHANGE_SIZE';
 var CHANGE_TAG = 'CHANGE_TAG';
 
@@ -54,6 +54,7 @@ function VirtualElement (target, path, renderer, parent, rootElement) {
     target.classList.add(FA_SURFACE);
     this._allocator = new ElementAllocator(target);
     this._properties = {};
+    this._attributes = {};
     this._eventListeners = {};
     this._content = '';
     this._children = {};
@@ -81,6 +82,10 @@ VirtualElement.prototype.changeTag = function changeTag (tagName) {
     var key;
     for (key in this._properties) {
         this.setProperty(key, this._properties[key]);
+    }
+
+    for (key in this._attributes) {
+        this.setAttribute(key, this._attributes[key]);
     }
     
     for (key in this._eventListeners) {
@@ -145,6 +150,9 @@ VirtualElement.prototype.receive = function receive (commands) {
                 break;
             case CHANGE_PROPERTY:
                 this.setProperty(commands.shift(), commands.shift());
+                break;
+            case CHANGE_ATTRIBUTE:
+                this.setAttribute(commands.shift(), commands.shift());
                 break;
             case CHANGE_TAG:
                 this.changeTag(commands.shift());
@@ -315,6 +323,13 @@ VirtualElement.prototype.setProperty = function setProperty (key, value) {
     if (this._properties[key] !== value) {
         this._properties[key] = value;
         this._target.style[key] = value;
+    }
+};
+
+VirtualElement.prototype.setAttribute = function setAttribute (key, value) {
+    if (this._attributes[key] !== value) {
+        this._attributes[key] = value;
+        this._target.setAttribute(key, value);
     }
 };
 
