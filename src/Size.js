@@ -19,7 +19,7 @@ Size.prototype.get = function get () {
         return this.getTopDownSize();
 };
 
-Size.prototype.setProportions = function (x, y, z) {
+Size.prototype.setProportions = function setProportions(x, y, z) {
     if (x !== this._proportions[0] && x != null) {
         this._proportions[0] = x;
         this._invalidated |= 1;

@@ -4,12 +4,13 @@ var GlobalDispatch = require('./GlobalDispatch');
 
 var FRAME = 'FRAME';
 
-function noop() {}
-
 function Clock () {
     this.dispatch = new GlobalDispatch();
     this.roots = [];
-    this.dispatch.targetedOn('engine', FRAME, this.step.bind(this));
+    var _this = this;
+    this.dispatch.targetedOn('engine', FRAME, function(time) {
+        _this.step(time);
+    });
 }
 
 Clock.prototype.step = function step (time) {
