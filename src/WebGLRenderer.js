@@ -101,7 +101,7 @@ WebGLRenderer.prototype.receive = function receive(path, commands) {
     var uniformName;
     var uniformValue;
     var geometryId;
-    
+
 
     while (commands.length) {
         var command = commands.shift();
@@ -162,7 +162,7 @@ WebGLRenderer.prototype.receive = function receive(path, commands) {
                 uniformName = commands.shift();
                 uniformValue = commands.shift();
                 var index = mesh.uniformKeys.indexOf(uniformName);
-            
+
                 if (index === -1) {
                     mesh.uniformKeys.push(uniformName);
                     mesh.uniformValues.push(uniformValue);
@@ -208,12 +208,14 @@ WebGLRenderer.prototype.draw = function draw() {
         if (!buffers) return;
 
         this.program.setUniforms(mesh.uniformKeys, mesh.uniformValues);
-        
-        this.handleOptions(mesh.options);
-        
+
+
         this.drawBuffers(buffers, mesh.drawType, mesh.geometry);
 
-        this.resetOptions(mesh.options);
+        if (mesh.options) {
+            this.handleOptions(mesh.options);
+            this.resetOptions(mesh.options);
+        }
     }
 };
 
@@ -420,10 +422,10 @@ module.exports = WebGLRenderer;
 function IDL(){
     var onLoadEnvironment = function (xhr, gl) {
 
-        gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);                                                                                  
-        gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);                                                                      
-        gl.pixelStorei(gl.UNPACK_COLORSPACE_CONVERSION_WEBGL, gl.NONE);    
-        if (xhr.status !== 200) return; 
+        gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+        gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
+        gl.pixelStorei(gl.UNPACK_COLORSPACE_CONVERSION_WEBGL, gl.NONE);
+        if (xhr.status !== 200) return;
         this.texture0 = gl.createTexture();
         gl.bindTexture(gl.TEXTURE_2D, this.texture0);
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1024, 1024, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array(xhr.response));
@@ -433,11 +435,11 @@ function IDL(){
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
     };
 
-    var xhr = new XMLHttpRequest();                                                                                                                  
+    var xhr = new XMLHttpRequest();
     xhr.open('GET', 'luv.bin', true);
     xhr.responseType = 'arraybuffer';
     xhr.onload = onLoadEnvironment.bind(this, xhr, this.gl);
-    xhr.send(null);  
+    xhr.send(null);
 }
 
 WebGLRenderer.prototype.handleOptions = function handleOptions(options) {
@@ -447,5 +449,5 @@ WebGLRenderer.prototype.handleOptions = function handleOptions(options) {
 
 WebGLRenderer.prototype.resetOptions = function handleOptions(options) {
     var gl = this.gl;
-    if (options.blending) gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA); 
+    if (options.blending) gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 };

@@ -34,7 +34,7 @@ var identityMatrix = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
 var uniformNames = [
     'perspective', 'resolution',
     'transform', 'origin', 'size', 'opacity',
-    'baseColor', 'normal', 'metalness', 'glossiness', 'positionOffset', 
+    'baseColor', 'normal', 'metalness', 'glossiness', 'positionOffset',
     'u_LightPosition', 'u_LightColor'
 ];
 
@@ -194,8 +194,8 @@ Program.prototype.resetProgram = function resetProgram() {
     }
 
     vertexSource = vertexHeader.join('') + vertexWrapper
-        .replace('#vert_definitions', this.definitionVert.join(NEWLINE))
-        .replace('#vert_applications', this.applicationVert.join(NEWLINE));
+        .replace('#vert_definitions', this.definitionVert.join(';\n'))
+        .replace('#vert_applications', this.applicationVert.join(';\n'));
 
     fragmentSource = fragmentHeader.join('') + fragmentWrapper
         .replace('#vec_definitions', this.definitionVec.join('\n'))
@@ -314,7 +314,7 @@ Program.prototype.setUniforms = function (uniformNames, uniformValue) {
         if (! location) continue;
 
         this.uniformLocations[name] = location;
-        
+
         // Check if the value is already set for the
         // given uniform.
 
