@@ -18,8 +18,15 @@ var TYPES = {
     16: 'mat4 '
 };
 
-var inputs = ['baseColor', 'normals', 'metalness', 'glossiness'];
-var inputTypes = {baseColor: 'vec3', normal: 'vec3', glossiness: 'float', metalness: 'float' };
+var VERTEX_SHADER = 35633;
+var FRAGMENT_SHADER = 35632;
+
+var vertexWrapper = require('famous-webgl-shaders').vertex;
+
+var fragmentWrapper = require('famous-webgl-shaders').fragment;
+
+var inputs = ['baseColor', 'normals', 'metalness', 'glossiness', 'positionOffset'];
+var inputTypes = {baseColor: 'vec3', normal: 'vec3', glossiness: 'float', metalness: 'float', positionOffset: 'vert' };
 
 /* Default values used in the every shader instance */
 var identityMatrix = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
@@ -27,14 +34,14 @@ var identityMatrix = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
 var uniformNames = [
     'perspective', 'resolution',
     'transform', 'origin', 'size', 'opacity',
-    'baseColor', 'normal', 'metalness', 'glossiness',
+    'baseColor', 'normal', 'metalness', 'glossiness', 'positionOffset', 
     'u_LightPosition', 'u_LightColor'
 ];
 
 var uniformValues = [
     identityMatrix, [0, 0, 0],
     identityMatrix, [0.5, 0.5], [1, 1, 1], 0,
-    [1, 1, 1], [1, 1, 1], 1, 1,
+    [1, 1, 1], [1, 1, 1], 1, 1, [0,0,0],
     [1, 1, 1], [1, 1, 1]
 ];
 
@@ -70,6 +77,8 @@ function Program(gl) {
     this.definitionFloat = [];
     this.applicationVec = [];
     this.applicationFloat = [];
+    this.applicationVert = [];
+    this.definitionVert = [];
 
     this.resetProgram();
 }
@@ -84,9 +93,6 @@ function Program(gl) {
  */
 
 Program.prototype.registerMaterial = function registerMaterial(name, material) {
-    if (this.registeredMaterials[material._id]) return;
-    this.registeredMaterials[material._id] = true;
-
     var compiled = material;
 
     if (compiled.uniforms.image) {
@@ -106,9 +112,16 @@ Program.prototype.registerMaterial = function registerMaterial(name, material) {
     if (inputTypes[name] == 'float') {
         this.definitionFloat.push('float fa_' + material._id + '() {\n '  + compiled.glsl + ' \n}');
         this.applicationFloat.push('if (int(abs(ID)) == ' + material._id + ') return fa_' + material._id  + '();');
-    } else {
+    }
+
+    if (inputTypes[name] == 'vec3'){
         this.definitionVec.push('vec3 fa_' + material._id + '() {\n '  + compiled.glsl + ' \n}');
         this.applicationVec.push('if (int(abs(ID.x)) == ' + material._id + ') return fa_' + material._id + '();');
+    }
+
+    if (inputTypes[name] == 'vert'){
+        this.definitionVert.push('vec3 fa_' + material._id + '() {\n '  + compiled.glsl + ' \n}');
+        this.applicationVert.push('if (int(abs(ID.x)) == ' + material._id + ') return fa_' + material._id + '();');
     }
 
     this.resetProgram();
@@ -161,6 +174,7 @@ Program.prototype.resetProgram = function resetProgram() {
     this.cachedUniforms = {};
 
     fragmentHeader.push('uniform sampler2D image;\n');
+    vertexHeader.push('uniform sampler2D image;\n');
 
     for(i = 0; i < this.uniformNames.length; i++) {
         name = this.uniformNames[i], value = this.uniformValues[i];
@@ -179,7 +193,9 @@ Program.prototype.resetProgram = function resetProgram() {
         fragmentHeader.push('varying ' + TYPES[value] + name + ';\n');
     }
 
-    vertexSource = vertexHeader.join('') + vertexWrapper;
+    vertexSource = vertexHeader.join('') + vertexWrapper
+        .replace('#vert_definitions', this.definitionVert.join(NEWLINE))
+        .replace('#vert_applications', this.applicationVert.join(NEWLINE));
 
     fragmentSource = fragmentHeader.join('') + fragmentWrapper
         .replace('#vec_definitions', this.definitionVec.join('\n'))
@@ -288,6 +304,7 @@ Program.prototype.setUniforms = function (uniformNames, uniformValue) {
     len = uniformNames.length;
     for (i = 0; i < len; i++) {
         name = uniformNames[i];
+        value = uniformValue[i];
 
         // Retreive the cached location of the uniform,
         // requesting a new location from the WebGL context
@@ -297,8 +314,7 @@ Program.prototype.setUniforms = function (uniformNames, uniformValue) {
         if (! location) continue;
 
         this.uniformLocations[name] = location;
-        value = uniformValue[i];
-
+        
         // Check if the value is already set for the
         // given uniform.
 

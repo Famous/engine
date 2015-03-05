@@ -31,9 +31,9 @@ function Texture(gl, options) {
 
     gl.texImage2D(gl.TEXTURE_2D, 0, this.format, this.width, this.height, 0, this.format, this.type, null);
 
-    if (options.mipmap) {
+    //if (options.mipmap) {
         gl.generateMipmap(gl.TEXTURE_2D);
-    }
+    //}
 }
 
 /**

@@ -5,6 +5,14 @@ var Program = require('./Program');
 var Buffer = require('./Buffer');
 var BufferRegistry = require('./BufferRegistry');
 
+var uniformNames = ['perspective', 'transform', 'opacity', 'origin', 'size', 'baseColor', 'time'];
+var resolutionName = ['resolution'];
+var uniformValues = [];
+var resolutionValues = [];
+
+var inputIdx = { baseColor: 0, normal: 1, metalness: 2, glossiness: 3, positionOffset: 4};
+var inputNames = ['baseColor', 'normal', 'metalness', 'glossiness', 'positionOffset'];
+var inputValues = [[.5, .5, .5], [0,0,0], .2, .8, .8];
 var identity = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
 
 /**
@@ -28,10 +36,8 @@ function WebGLRenderer(container) {
     this.container.getTarget().appendChild(this.canvas);
     this.canvas.className = 'famous-webgl GL';
 
-    var context = this.canvas.getContext('webgl') || this.canvas.getContext('experimental-webgl');
+    var gl = this.gl = this.canvas.getContext('webgl') || this.canvas.getContext('experimental-webgl');
     var containerSize = this.container._getSize();
-
-    var gl = this.gl = context;
 
     gl.polygonOffset(0.1, 0.1);
     gl.enable(gl.POLYGON_OFFSET_FILL);
@@ -79,10 +85,31 @@ WebGLRenderer.prototype.receive = function receive(path, commands) {
     var mesh = this.meshRegistry[path];
     var light = this.lightRegistry[path];
 
+    if (!mesh) {
+        mesh = this.meshRegistry[path] = {
+            uniformKeys: ['opacity', 'transform', 'size', 'origin', 'baseColor', 'positionOffset'],
+            uniformValues: [1, identity, [0, 0, 0], [0, 0, 0], [0.5, 0.5, 0.5], [1,1,1]],
+            buffers: {},
+            geometry: null,
+            drawType: null,
+            options: {}
+        };
+    }
+    var bufferName;
+    var bufferValue;
+    var bufferSpacing;
+    var uniformName;
+    var uniformValue;
+    var geometryId;
+    
+
     while (commands.length) {
         var command = commands.shift();
 
         switch (command) {
+            case 'GL_SET_DRAW_OPTIONS':
+                mesh.options = commands.shift();
+                break;
 
             case 'GL_CREATE_MESH':
                 mesh = this.meshRegistry[path] = {
@@ -120,7 +147,7 @@ WebGLRenderer.prototype.receive = function receive(path, commands) {
             case 'MATERIAL_INPUT':
                 var name = commands.shift();
                 var mat = commands.shift();
-                mesh.uniformValues[4][0] = -mat._id;
+                mesh.uniformValues[name == 'baseColor' ? 4 : 5][0] = -mat._id;
                 this.program.registerMaterial(name, mat);
                 this.updateSize();
                 break;
@@ -135,6 +162,7 @@ WebGLRenderer.prototype.receive = function receive(path, commands) {
                 uniformName = commands.shift();
                 uniformValue = commands.shift();
                 var index = mesh.uniformKeys.indexOf(uniformName);
+            
                 if (index === -1) {
                     mesh.uniformKeys.push(uniformName);
                     mesh.uniformValues.push(uniformValue);
@@ -180,7 +208,12 @@ WebGLRenderer.prototype.draw = function draw() {
         if (!buffers) return;
 
         this.program.setUniforms(mesh.uniformKeys, mesh.uniformValues);
+        
+        this.handleOptions(mesh.options);
+        
         this.drawBuffers(buffers, mesh.drawType, mesh.geometry);
+
+        this.resetOptions(mesh.options);
     }
 };
 
@@ -261,7 +294,6 @@ WebGLRenderer.prototype.drawBuffers = function drawBuffers(vertexBuffers, mode, 
     }
 
     if (length) {
-
         // If index buffer, use drawElements.
 
         if (j !== undefined) {
@@ -298,9 +330,8 @@ WebGLRenderer.prototype.drawBuffers = function drawBuffers(vertexBuffers, mode, 
  * @param {Texture} The location where the render data is stored
  *
  */
-function renderOffscreen(callback, spec, context, texture) {
+function renderOffscreen(callback, size, texture) {
     var gl = this.gl;
-    var v = context._size;
 
     var framebuffer  = this.framebuffer ? this.framebuffer : this.framebuffer = gl.createFramebuffer();
     var renderbuffer = this.renderbuffer ? this.renderbuffer : this.renderbuffer = gl.createRenderbuffer();
@@ -308,10 +339,10 @@ function renderOffscreen(callback, spec, context, texture) {
     gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
     gl.bindRenderbuffer(gl.RENDERBUFFER, renderbuffer);
 
-    if (v[0] != renderbuffer.width || v[1] != renderbuffer.height) {
-        renderbuffer.width = v[0];
-        renderbuffer.height = v[1];
-        gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, v[0], v[1]);
+    if (size[0] != renderbuffer.width || size[1] != renderbuffer.height) {
+        renderbuffer.width = size[0];
+        renderbuffer.height = size[1];
+        gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, size[0], size[1]);
     }
 
     gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texture.id, 0);
@@ -319,7 +350,7 @@ function renderOffscreen(callback, spec, context, texture) {
 
     if (this.debug) checkFrameBufferStatus(gl);
 
-    callback.call(this, spec);
+    callback.call(this);
 
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     gl.bindRenderbuffer(gl.RENDERBUFFER, null);
@@ -384,3 +415,37 @@ WebGLRenderer.prototype.updateSize = function updateSize() {
 };
 
 module.exports = WebGLRenderer;
+
+
+function IDL(){
+    var onLoadEnvironment = function (xhr, gl) {
+
+        gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);                                                                                  
+        gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);                                                                      
+        gl.pixelStorei(gl.UNPACK_COLORSPACE_CONVERSION_WEBGL, gl.NONE);    
+        if (xhr.status !== 200) return; 
+        this.texture0 = gl.createTexture();
+        gl.bindTexture(gl.TEXTURE_2D, this.texture0);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1024, 1024, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array(xhr.response));
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    };
+
+    var xhr = new XMLHttpRequest();                                                                                                                  
+    xhr.open('GET', 'luv.bin', true);
+    xhr.responseType = 'arraybuffer';
+    xhr.onload = onLoadEnvironment.bind(this, xhr, this.gl);
+    xhr.send(null);  
+}
+
+WebGLRenderer.prototype.handleOptions = function handleOptions(options) {
+    var gl = this.gl;
+    if (options.blending) gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
+};
+
+WebGLRenderer.prototype.resetOptions = function handleOptions(options) {
+    var gl = this.gl;
+    if (options.blending) gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA); 
+};
