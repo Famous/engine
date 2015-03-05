@@ -105,7 +105,10 @@ Engine.prototype.update = function update(item) {
 };
 
 Engine.prototype.noLongerUpdate = function noLongerUpdate(item) {
-    this._updates.splice(this._updates.indexOf(item), 1);
+    var index = this._updates.indexOf(item);
+    if (index > -1) {
+        this._updates.splice(index, 1);
+    }
     return this;
 };
 
