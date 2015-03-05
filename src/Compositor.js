@@ -52,26 +52,28 @@ Compositor.prototype.handleWith = function handleWith (commands) {
     }
     if (!pointer[index]) pointer[index] = {};
     pointer = pointer[index];
-    var commandOutput = Compositor.CommandsToOutput[commands[0]];
+    while (commands.length) {
+        var commandOutput = Compositor.CommandsToOutput[commands[0]];
+        switch (commandOutput) {
+            case 'DOM':
+                var element = parent.getOrSetElement(path, index, context.DOM);
+                element.receive(commands);
+                if (!pointer.DOM) {
+                    pointer.DOM = element;
+                    this._renderers.push(element);
+                }
+                break;
 
-    switch (commandOutput) {
-        case 'DOM':
-            var element = parent.getOrSetElement(path, index, context.DOM);
-            element.receive(commands);
-            if (!pointer.DOM) {
-                pointer.DOM = element;
-                this._renderers.push(element);
-            }
-            break;
-
-        case 'GL':
-            if (!context.GL) {
-                var webglrenderer = new WebGLRenderer(context.DOM);
-                context.GL = webglrenderer;
-                this._renderers.push(webglrenderer);
-            }
-            context.GL.receive(path, commands);
-            break;
+            case 'GL':
+                if (!context.GL) {
+                    var webglrenderer = new WebGLRenderer(context.DOM);
+                    context.GL = webglrenderer;
+                    this._renderers.push(webglrenderer);
+                }
+                context.GL.receive(path, commands);
+                break;
+            default: return;
+        }
     }
 };
 
