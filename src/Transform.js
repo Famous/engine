@@ -403,7 +403,6 @@ Transform.prototype.getScale = function getScale() {
     return this._vectors.scale;
 };
 
-
 Transform.prototype.toIdentity = function toIdentity() {
     this.setTranslation(0, 0, 0);
     this.setRotation(0, 0, 0);

@@ -62,14 +62,14 @@ GlobalDispatch.prototype.globalOn = function globalOn (path, key, cb) {
 
 GlobalDispatch.prototype.globalOff = function globalOff (path, key, cb) {
     var depth = path.split('/').length;
-    if (this.globalCallbacks[depth]) this.globalCallbacks[depth].off(key, cb);
+    if (this._globalCallbacks[depth]) this._globalCallbacks[depth].off(key, cb);
     return this;
 }
 
-GlobalDispatch.prototype.emit = function emit (event, cb) {
+GlobalDispatch.prototype.emit = function emit (ev, cb) {
     for (var i = 0, len = this._globalCallbacks.length ; i < len ; i++)
         if (this._globalCallbacks[i])
-            this._globalCallbacks[i].trigger(event, cb);
+            this._globalCallbacks[i].trigger(ev, cb);
     return this;
 };
 
