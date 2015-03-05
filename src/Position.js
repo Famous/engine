@@ -39,17 +39,20 @@ Position.prototype.clean = function clean() {
 
 Position.prototype.setX = function setX(val, options, callback) {
     this._dispatch.dirtyComponent(this._id);
-    return this._x.set(val, options, callback);
+    this._x.set(val, options, callback);
+    return this;
 };
 
 Position.prototype.setY = function setY(val, options, callback) {
     this._dispatch.dirtyComponent(this._id);
-    return this._y.set(val, options, callback);
+    this._y.set(val, options, callback);
+    return this;
 };
 
 Position.prototype.setZ = function setZ(val, options, callback) {
     this._dispatch.dirtyComponent(this._id);
-    return this._z.set(val, options, callback);
+    this._z.set(val, options, callback);
+    return this;
 };
 
 Position.prototype.set = function set(x, y, z, options, callback) {
