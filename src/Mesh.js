@@ -15,15 +15,20 @@ var Color = require('famous-utilities').Color;
  * @constructor
  * @param {RenderNode} RenderNode to which the instance of Mesh will be a component of
  */
-function Mesh (dispatch) {
+function Mesh (dispatch, options) {
     this.dispatch = dispatch;
     this.queue = ['GL_CREATE_MESH'];
     this._id = dispatch.addRenderable(this);
     this._color = new Color('rgb', 0.5, 0.5, 0.5);
     this._size = [];
+
     this._expressions = {};
-    this._geometry;
+    this._geometry = void 0;
+
     init.call(this);
+
+
+    if (options) this.setOptions(options);
 }
 
 
@@ -78,7 +83,7 @@ Mesh.prototype._receiveOpacityChange = function _receiveOpacityChange(opacity) {
     this.dispatch.dirtyRenderable(this._id);
     this.queue.push('GL_UNIFORMS');
     this.queue.push('opacity');
-    this.queue.push(opacity);
+    this.queue.push(opacity.value);
 };
 
 
@@ -248,8 +253,38 @@ Mesh.prototype.metallic = function metallic(materialExpression) {
     return this;
 };
 
+/**
+ * Defines 3 element map which displaces the position of each vertex in world space.
+ *
+ * @method metallic
+ * @chainable
+ *
+ * @param {Object} Material or Image
+ * @return {Element} current Mesh
+ */
+
+Mesh.prototype.positionOffset = function positionOffset(materialExpression) {
+    if (materialExpression._compile) materialExpression = materialExpression._compile();
+    this.queue.push(typeof materialExpression === 'number' ? 'UNIFORM_INPUT' : 'MATERIAL_INPUT');
+    this.queue.push('positionOffset');
+    this.queue.push(materialExpression);
+    return this;
+};
 
 /**
- * Expose
+ * Defines 3 element map which displaces the position of each vertex in world space.
+ *
+ * @method metallic
+ * @chainable
+ *
+ * @param {Object} Material or Image
+ * @return {Element} current Mesh
  */
+
+Mesh.prototype.setOptions = function setOptions(options) {
+    this.queue.push('GL_SET_DRAW_OPTIONS');
+    this.queue.push(options);
+    return this;
+};
+
 module.exports = Mesh;
