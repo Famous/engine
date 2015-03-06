@@ -92,13 +92,11 @@ RotationalSpring.prototype.update = function update(time, dt) {
         Quaternion.conjugate(q, deltaQ);
         deltaQ.leftMultiply(anchor);
 
-        var theta = deltaQ.w > 1 ? 0 : 2*Math.acos(deltaQ.w);
-
-        var length = Math.sin(theta*0.5);
-
+        var halftheta = deltaQ.w > 1 ? 0 : Math.acos(deltaQ.w);
+        var length = Math.sqrt(1-deltaQ.w*deltaQ.w);
         if (Math.abs(length) < 1e-6) continue;
 
-        var deltaOmega = XYZ.copy(deltaQ).scale(theta/length);
+        var deltaOmega = XYZ.copy(deltaQ).scale(2*halftheta/length);
 
         deltaOmega.scale(stiffness);
 
