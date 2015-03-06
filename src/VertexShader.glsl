@@ -51,5 +51,5 @@ void main() {
    vTextureCoordinate = texCoord;
    vec3 offsetPos = pos + calculateOffset(positionOffset);
    gl_Position = applyTransform(vec4(offsetPos, 1.0));
-   vPosition = gl_position.xyz;
+   vPosition = gl_Position.xyz;
 }
