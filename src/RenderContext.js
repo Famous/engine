@@ -186,14 +186,6 @@ RenderContext.prototype.update = function update (parentContext) {
         this._opacity.clean();
     }
 
-    if (this._needsReflow)
-        if (!this._dispatch._modelView.renderer) {
-            var layoutFn = this._dispatch._modelView.renderer.layout;
-            if (layoutFn)
-                this._dispatch.reflowWith(layoutFn, this._dispatch._modelView.renderer);
-            this._needsReflow = false;
-        }
-
     if (this._recalcAll) this._recalcAll = false;
 
     return this;
