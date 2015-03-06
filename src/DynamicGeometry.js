@@ -19,6 +19,10 @@ function DynamicGeometry(options) {
     this.spec.dynamic = true;
 }
 
+DynamicGeometry.prototype.getLength = function getVertexBuffer(bufferName) {
+    return this.getVertexPositions().length;
+};
+
 /**
  * Gets the buffer object based on buffer name. Throws error
  * if bufferName is not provided.
@@ -46,6 +50,7 @@ DynamicGeometry.prototype.getVertexBuffer = function getVertexBuffer(bufferName)
  * @method setVertexBuffer
  * @return {Object} current geometry.
  */
+
 DynamicGeometry.prototype.setVertexBuffer = function setVertexBuffer(bufferName, value, size) {
     var idx = this.spec.bufferNames.indexOf(bufferName);
 
