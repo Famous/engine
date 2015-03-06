@@ -19,7 +19,7 @@ function DynamicGeometry(options) {
     this.spec.dynamic = true;
 }
 
-DynamicGeometry.prototype.getLength = function getVertexBuffer(bufferName) {
+DynamicGeometry.prototype.getLength = function getLength(bufferName) {
     return this.getVertexPositions().length;
 };
 
