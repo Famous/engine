@@ -43,10 +43,10 @@ var uniformValues = [
     [1, 1, 1], [1, 1, 1]
 ];
 
-var attributeNames = ['pos', 'texCoord', 'normals', 'displacement'];
+var attributeNames = ['pos', 'texCoord', 'normals'];
 var attributeValues = [3, 2, 3, 1];
 
-var varyingNames = ['vTextureCoordinate', 'vNormal', 'vPosition', 'vDisplacement'];
+var varyingNames = ['vTextureCoordinate', 'vNormal', 'vPosition'];
 var varyingValues = [2, 3, 3, 1];
 
 var header = 'precision mediump float;\n';
