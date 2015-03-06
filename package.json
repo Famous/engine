@@ -4,7 +4,7 @@
   "description": "Famous DOM Renderers",
   "main": "src/index.js",
   "scripts": {
-    "test": "testling '' | tap-spec",
+    "test": "tape test/*.js | tap-spec",
     "lint": "jshint --reporter node_modules/jshint-stylish/stylish.js src/"
   },
   "repository": {
@@ -16,17 +16,11 @@
   "bugs": {
     "url": "https://github.com/Famous/dom-renderers/issues"
   },
-  "testling": {
-    "files": [
-      "test/*.js"
-    ]
-  },
   "homepage": "https://github.com/Famous/dom-renderers",
   "devDependencies": {
     "jshint": "^2.5.11",
     "jshint-stylish": "^1.0.0",
     "tap-spec": "^2.2.0",
-    "tape": "^3.0.3",
-    "testling": "^1.7.1"
+    "tape": "^3.0.3"
   }
 }
