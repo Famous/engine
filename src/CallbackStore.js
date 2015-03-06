@@ -1,25 +1,62 @@
 'use strict';
 
+/**
+ * A lightweight, featureless EventEmitter.
+ * 
+ * @class CallbackStore
+ * @constructor
+ */
 function CallbackStore () {
-    this.events = {};
+    this._events = {};
 }
 
-CallbackStore.prototype.on = function on (key, cb) {
-    if (!this.events[key]) this.events[key] = [];
-    return this.events[key].push(cb) - 1;
+/**
+ * Adds a listener for the specified event (= key).
+ *
+ * @method on
+ * @chainable
+ * 
+ * @param  {String}   key
+ * @param  {Function} callback
+ * @return {Number}   Unique callback id. Useful for removing the listener later
+ *   on without storing a reference to the passed in callback function.
+ */
+CallbackStore.prototype.on = function on (key, callback) {
+    if (!this._events[key]) this._events[key] = [];
+    return this._events[key].push(callback) - 1;
 };
 
-CallbackStore.prototype.off = function off (key, cb) {
-    var events = this.events[key];
+/**
+ * Removes a previously added event listener.
+ *
+ * @method off
+ * @chainable
+ * 
+ * @param  {String}          key
+ * @param  {Function|Number} callbackOrId
+ * @return {CallbackStore}   this
+ */
+CallbackStore.prototype.off = function off (key, callbackOrId) {
+    var events = this._events[key];
     if (events) {
-        var index = cb.constructor === Number ? cb : events.indexOf(cb);
+        var index = callbackOrId.constructor === Number ? callbackOrId : events.indexOf(callbackOrId);
         if (index > -1) events.splice(index, 1);
     }
     return this;
 };
 
+/**
+ * Invokes all the previously for this key registered callbacks.
+ *
+ * @method trigger
+ * @chainable
+ * 
+ * @param  {String}        key
+ * @param  {Object}        payload
+ * @return {CallbackStore} this
+ */
 CallbackStore.prototype.trigger = function trigger (key, payload) {
-    var events = this.events[key];
+    var events = this._events[key];
     if (events) {
         var i = 0;
         var len = events.length;
