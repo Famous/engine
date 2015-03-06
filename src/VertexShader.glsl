@@ -34,6 +34,12 @@ vec4 applyTransform(vec4 pos) {
    return pos;
 }
 
+#vert_definitions
+vec3 calculateOffset (vec3 ID) {
+    #vert_applications
+     return vec3(.5 );
+}
+
 // Main function of the vertex shader.  Passes texture coordinat
 // and normal attributes as varyings and passes the position
 // attribute through position pipeline
@@ -43,5 +49,7 @@ void main() {
    invertedNormals.y *= -1.0;
    vNormal = transpose(mat3(inverse(transform))) * invertedNormals;
    vTextureCoordinate = texCoord;
-   gl_Position = applyTransform(vec4(pos, 1.0));
+   vec3 offsetPos = pos + calculateOffset(positionOffset);
+   gl_Position = applyTransform(vec4(offsetPos, 1.0));
+   vPosition = gl_position.xyz;
 }
