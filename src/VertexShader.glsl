@@ -5,15 +5,25 @@
 #pragma glslify: transpose = require(./chunks/transpose)
 
 vec4 applyTransform(vec4 pos) {
+   float xOrigin = (origin.x - 0.5) * size.x;
+   float yOrigin = (origin.y - 0.5) * size.y;
+   float zOrigin = (origin.z - 0.5) * size.z;
+
+   mat4 forwardOrigin = mat4(1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, xOrigin, yOrigin, zOrigin, 1.0);
+   mat4 negatedOrigin = mat4(1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, -xOrigin, -yOrigin, -zOrigin, 1.0);
+
+   mat4 originMVMatrix = forwardOrigin * transform;
+   originMVMatrix = transform * negatedOrigin;
+
    mat4 projection = perspective;
-   mat4 MVMatrix = invertYAxis(transform);
+   mat4 MVMatrix = invertYAxis(originMVMatrix);
    MVMatrix[3][2] *= 2.0;
    vec4 translation = MVMatrix[3];
    
    pos.xyz *= size;
    pos.y *= -1.0;
    vec4 pixelPosition = vec4(pos.x * 0.5, pos.y * 0.5, pos.z * 0.5, 1.0);
-   mat4 pixelTransform = transform;
+   mat4 pixelTransform = originMVMatrix;
    pixelTransform[3][0] += size.x * 0.5;
    pixelTransform[3][1] += size.y * 0.5;
 
