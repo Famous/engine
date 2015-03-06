@@ -281,12 +281,14 @@ WebGLRenderer.prototype.draw = function draw(renderState) {
 
         buffers = this.bufferRegistry.registry[mesh.geometry];
 
+        if (mesh.texture) mesh.texture.bind();
+
         this.program.setUniforms(mesh.uniformKeys, mesh.uniformValues);
 
         this.handleOptions(mesh.options);
         
-        if (mesh.texture) mesh.texture.bind();
         this.drawBuffers(buffers, mesh.drawType, mesh.geometry);
+
         if (mesh.texture) mesh.texture.unbind();
 
         this.resetOptions(mesh.options);
@@ -531,7 +533,6 @@ function loadImage (img, callback) {
     if (! obj.src) obj.src = img;
     if (! obj.complete) obj.onload = function () { callback(obj); };
     else callback(obj);
-    document.body.appendChild(obj);
     return obj;
 }
 

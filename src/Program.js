@@ -43,11 +43,11 @@ var uniformValues = [
     [1, 1, 1], [1, 1, 1]
 ];
 
-var attributeNames = ['pos', 'texCoord', 'normals'];
-var attributeValues = [3, 2, 3];
+var attributeNames = ['pos', 'texCoord', 'normals', 'displacement'];
+var attributeValues = [3, 2, 3, 1];
 
-var varyingNames = ['vTextureCoordinate', 'vNormal', 'vPosition'];
-var varyingValues = [2, 3, 3];
+var varyingNames = ['vTextureCoordinate', 'vNormal', 'vPosition', 'vDisplacement'];
+var varyingValues = [2, 3, 3, 1];
 
 var header = 'precision mediump float;\n';
 
@@ -96,6 +96,11 @@ Program.prototype.registerMaterial = function registerMaterial(name, material) {
     for (var k in compiled.uniforms) {
         uniformNames.push(k);
         uniformValues.push(compiled.uniforms[k]);
+    }
+
+    for (var k in compiled.varyings) {
+        varyingNames.push(k);
+        varyingValues.push(compiled.uniforms[k]);
     }
 
     if (inputTypes[name] == 'float') {
