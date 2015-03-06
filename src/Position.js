@@ -30,33 +30,33 @@ Position.prototype.setState = function setState(state) {
     }
     return false;
 };
-        
+
 Position.prototype.clean = function clean() {
     var context = this._dispatch._context;
     context.setPosition(this._x.get(), this._y.get(), this._z.get());
     return this._x.isActive() || this._y.isActive() || this._z.isActive();
 };
 
-Position.prototype.setX = function setX(val, options) {
+Position.prototype.setX = function setX(val, options, callback) {
     this._dispatch.dirtyComponent(this._id);
-    return this._x.set(val, options);
+    return this._x.set(val, options, callback);
 };
 
-Position.prototype.setY = function setY(val, options) {
+Position.prototype.setY = function setY(val, options, callback) {
     this._dispatch.dirtyComponent(this._id);
-    return this._y.set(val, options);
+    return this._y.set(val, options, callback);
 };
 
-Position.prototype.setZ = function setZ(val, options) {
+Position.prototype.setZ = function setZ(val, options, callback) {
     this._dispatch.dirtyComponent(this._id);
-    return this._z.set(val, options);
+    return this._z.set(val, options, callback);
 };
 
-Position.prototype.set = function set(x, y, z, options) {
+Position.prototype.set = function set(x, y, z, options, callback) {
     this._dispatch.dirtyComponent(this._id);
-    this._x.set(x, options);
-    this._y.set(y, options);
-    this._z.set(z, options);
+    this._x.set(x, options, callback);
+    this._y.set(y, options, callback);
+    this._z.set(z, options, callback);
     return this;
 };
 
