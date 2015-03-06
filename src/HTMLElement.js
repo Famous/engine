@@ -93,6 +93,8 @@ HTMLElement.prototype._receiveSizeChange = function _receiveSizeChange(size) {
     this._queue.push('CHANGE_SIZE');
     this._queue.push(width);
     this._queue.push(height);
+    this._size[0] = width;
+    this._size[1] = height;
 };
 
 HTMLElement.prototype._receiveOriginChange = function _receiveOriginChange(origin) {
