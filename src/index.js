@@ -100,7 +100,7 @@ Engine.prototype.loop = function loop(time) {
 };
 
 Engine.prototype.update = function update(item) {
-    this._updates.push(item);
+    if (this._updates.indexOf(item) === -1) this._updates.push(item);
     return this;
 };
 
