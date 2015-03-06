@@ -123,59 +123,59 @@ Size.prototype.clean = function clean () {
     }
 };
 
-Size.prototype.setAbsolute = function setAbsolute(x, y, z, options) {
+Size.prototype.setAbsolute = function setAbsolute(x, y, z, options, callback) {
     this._dispatch.dirtyComponent(this._id);
     var abs = this._absolute;
     this._absoluteMode = true;
     if (x != null) {
-        abs.x.set(x, options);
+        abs.x.set(x, options, callback);
         abs.dirtyX = true;
     }
     if (y != null) {
-        abs.y.set(y, options);
+        abs.y.set(y, options, callback);
         abs.dirtyY = true;
     }
     if (z != null) {
-        abs.z.set(z, options);
+        abs.z.set(z, options, callback);
         abs.dirtyZ = true;
     }
     return this;
 };
 
-Size.prototype.setProportional = function setProportional(x, y, z, options) {
+Size.prototype.setProportional = function setProportional(x, y, z, options, callback) {
     this._dispatch.dirtyComponent(this._id);
     this._needsDEBUG = true;
     var prop = this._proportional;
     this._absoluteMode = false;
     if (x != null) {
-        prop.x.set(x, options);
+        prop.x.set(x, options, callback);
         prop.dirtyX = true;
     }
     if (y != null) {
-        prop.y.set(y, options);
+        prop.y.set(y, options, callback);
         prop.dirtyY = true;
     }
     if (z != null) {
-        prop.z.set(z, options);
+        prop.z.set(z, options, callback);
         prop.dirtyZ = true;
     }
     return this;
 };
 
-Size.prototype.setDifferential = function setDifferential(x, y, z, options) {
+Size.prototype.setDifferential = function setDifferential(x, y, z, options, callback) {
     this._dispatch.dirtyComponent(this._id);
     var prop = this._differential;
     this._absoluteMode = false;
     if (x != null) {
-        prop.x.set(x, options);
+        prop.x.set(x, options, callback);
         prop.dirtyX = true;
     }
     if (y != null) {
-        prop.y.set(y, options);
+        prop.y.set(y, options, callback);
         prop.dirtyY = true;
     }
     if (z != null) {
-        prop.z.set(z, options);
+        prop.z.set(z, options, callback);
         prop.dirtyZ = true;
     }
     return this;

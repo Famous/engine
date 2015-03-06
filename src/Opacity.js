@@ -33,9 +33,9 @@ Opacity.prototype.clean = function clean() {
     return this._value.isActive();
 };
 
-Opacity.prototype.set = function set(value, options) {
+Opacity.prototype.set = function set(value, options, callback) {
     this._dispatch.dirtyComponent(this._id);
-    this._value.set(value, options);
+    this._value.set(value, options, callback);
     return this;
 };
 
