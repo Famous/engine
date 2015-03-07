@@ -4,7 +4,7 @@ var Clock = require('./Clock');
 var Node = require('./Node');
 var RenderProxy = require('./RenderProxy');
 
-var GLOBAL_DISPATCH = Clock.dispatch;
+var GLOBAL_DISPATCH = Clock.getGlobalDispatch();
 
 function Context (selector) {
     this.proxy = new RenderProxy(this);
