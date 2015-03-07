@@ -19,7 +19,8 @@ function Mesh (dispatch, options) {
     this.dispatch = dispatch;
     this.queue = ['GL_CREATE_MESH'];
     this._id = dispatch.addRenderable(this);
-    this._color = new Color();
+    this._color = new Color('rgb', 255, 0, 0);
+    this._origin = new Float32Array([0, 0, 0]);
     this._size = [];
     this._expressions = {};
     this._geometry = void 0;
@@ -72,7 +73,10 @@ Mesh.prototype._receiveOriginChange = function _receiveOriginChange(origin) {
     this.dispatch.dirtyRenderable(this._id);
     this.queue.push('GL_UNIFORMS');
     this.queue.push('origin');
-    this.queue.push(origin);
+    this._origin[0] = origin.x;
+    this._origin[1] = origin.y;
+    this._origin[2] = origin.z;
+    this.queue.push(this._origin);
 };
 
 
@@ -107,6 +111,7 @@ Mesh.prototype.setGeometry = function (geometry) {
         this.queue.push(geometry.id);
         this.queue.push(geometry.spec.type);
         this.queue.push(geometry.spec.dynamic);
+
         this._geometry = geometry;
     }
 
@@ -195,7 +200,6 @@ Mesh.prototype.baseColor = function baseColor() {
         }
         materialExpression = this._color.getNormalizedRGB();
     }
-
     this.queue.push('baseColor');
     this.queue.push(materialExpression);
     return this;

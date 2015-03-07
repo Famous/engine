@@ -36,17 +36,14 @@ PointLight.prototype._receiveTransformChange = function _receiveTransformChange(
 PointLight.prototype.setColor = function setColor() {
     this.dispatch.dirtyComponent(this._id);
     var values = Array.prototype.concat.apply([], arguments);
-
     if (values[0] instanceof Color) {
         this._color = materialExpression[0];
     }
     else {
         this._color.set(values);
     }
-
-    values = this._color.getNormalizedRGB();
     this.queue.push('GL_LIGHT_COLOR');
-    this.queue.push(values);
+    this.queue.push(this._color.getNormalizedRGB());
     return this;
 };
 
