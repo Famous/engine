@@ -16,17 +16,17 @@ var helpers = require('./Color').helpers;
  * @constructor
  */
 var ColorPalette = function ColorPalette() {
-    this.palette = [];
+    this._palette = [];
     var options = helpers.flattenArguments(arguments);
     (options.length) ? this.makePalette(options) : this.setRandomPalette();
 };
 
 ColorPalette.prototype.getPalette = function getPalette() {
-    return this.palette;
+    return this._palette;
 };
 
 ColorPalette.prototype.getColor = function getColor(i) {
-    return this.palette[i];
+    return this._palette[i];
 };
 
 ColorPalette.prototype.makeColor = function makeColor() {
@@ -41,7 +41,7 @@ ColorPalette.prototype.makePalette = function makePalette() {
         var color = this.makeColor(options[i]);
         palette.push(color);
     }
-    this.palette = palette;
+    this._palette = palette;
     return this;
 };
 
@@ -54,10 +54,10 @@ ColorPalette.prototype.setRandomPalette = function setRandomPalette() {
 ColorPalette.prototype.getLighestColor = function() {
     var lightestValue = 0, lightestRef;
 
-    for (var i = 0; i < this.palette.length; i++) {
-        var light = this.palette[i].getLightness();
+    for (var i = 0; i < this._palette.length; i++) {
+        var light = this._palette[i].getLightness();
         if (light > lightestValue) {
-            lightestRef = this.palette[i];
+            lightestRef = this._palette[i];
             lightestValue = light;
         }
     }
@@ -67,10 +67,10 @@ ColorPalette.prototype.getLighestColor = function() {
 ColorPalette.prototype.getDarkestColor = function() {
     var darkestValue = 100, darkestRef;
 
-    for (var i = 0; i < this.palette.length; i++) {
-        var dark = this.palette[i].getLightness();
+    for (var i = 0; i < this._palette.length; i++) {
+        var dark = this._palette[i].getLightness();
         if( dark < darkestValue ) {
-            darkestRef = this.palette[i];
+            darkestRef = this._palette[i];
             darkestValue = dark;
         }
     }
@@ -78,7 +78,7 @@ ColorPalette.prototype.getDarkestColor = function() {
 };
 
 ColorPalette.prototype.getPaletteCount = function getPaletteCount() {
-    return this.palette.length;
+    return this._palette.length;
 };
 
 
