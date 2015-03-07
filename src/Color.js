@@ -15,7 +15,7 @@ var Color = function Color() {
     this._r = new Transitionable(0);
     this._g = new Transitionable(0);
     this._b = new Transitionable(0);
-    var options = _flattenArguments(arguments);
+    var options = helpers.flattenArguments(arguments);
     if (options.length) this.set(options);
 };
 
@@ -28,8 +28,8 @@ Color.toString = function toString() {
  * GENERAL
  */
 Color.prototype.set = function set() {
-    var options = _flattenArguments(arguments);
-    var type = _determineType(options[0]);
+    var options = helpers.flattenArguments(arguments);
+    var type = helpers.determineType(options[0]);
 
     switch (type) {
         case 'hsl': this.setHSL(options.slice(1)); break;
@@ -48,15 +48,15 @@ Color.prototype.isActive = function isActive() {
 };
 
 Color.prototype.changeTo = function changeTo() {
-    var options = _flattenArguments(arguments);
+    var options = helpers.flattenArguments(arguments);
     if (options.length) this.set(options);
     return this;
 };
 
 Color.prototype.copy = function copy() {
-    var values = _flattenArguments(arguments);
+    var values = helpers.flattenArguments(arguments);
     var color = values[0], options = values[1];
-    if (_isColorInstance(color)) {
+    if (helpers.isColorInstance(color)) {
         this.setRGB(color.getRGB(), options);
     }
     return this;
@@ -68,7 +68,7 @@ Color.prototype.clone = function clone() {
 };
 
 Color.prototype.setColor = function setColor() {
-    var values = _flattenArguments(arguments);
+    var values = helpers.flattenArguments(arguments);
     var color = values[0], options = values[1];
     this.setHex(colorNames[color], options);
     return this;
@@ -94,7 +94,7 @@ Color.prototype.setB = function setB(b, options) {
 };
 
 Color.prototype.setRGB = function setRGB() {
-    var values = _flattenArguments(arguments);
+    var values = helpers.flattenArguments(arguments);
     var options = values[3];
     this.setR(values[0], options);
     this.setG(values[1], options);
@@ -133,39 +133,39 @@ Color.prototype.getRGBString = function toRGBString() {
 };
 
 Color.prototype.addRGB = function addRGB(r, g, b) {
-    var r = _clamp(this.getR() + r);
-    var g = _clamp(this.getG() + g);
-    var b = _clamp(this.getB() + b);
+    var r = helpers.clamp(this.getR() + r);
+    var g = helpers.clamp(this.getG() + g);
+    var b = helpers.clamp(this.getB() + b);
     this.setRGB(r, g, b);
     return this;
 };
 
 Color.prototype.addScalar = function addScalar(s) {
-    var r = _clamp(this.getR() + s);
-    var g = _clamp(this.getG() + s);
-    var b = _clamp(this.getB() + s);
+    var r = helpers.clamp(this.getR() + s);
+    var g = helpers.clamp(this.getG() + s);
+    var b = helpers.clamp(this.getB() + s);
     this.setRGB(r, g, b);
     return this;
 };
 
 Color.prototype.multiplyRGB = function multiplyRGB(r, g, b) {
-    var r = _clamp(this.getR() * r);
-    var g = _clamp(this.getG() * g);
-    var b = _clamp(this.getB() * b);
+    var r = helpers.clamp(this.getR() * r);
+    var g = helpers.clamp(this.getG() * g);
+    var b = helpers.clamp(this.getB() * b);
     this.setRGB(r, g, b);
     return this;
 };
 
 Color.prototype.multiplyScalar = function multiplyScalar(s) {
-    var r = _clamp(this.getR() * s);
-    var g = _clamp(this.getG() * s);
-    var b = _clamp(this.getB() * s);
+    var r = helpers.clamp(this.getR() * s);
+    var g = helpers.clamp(this.getG() * s);
+    var b = helpers.clamp(this.getB() * s);
     this.setRGB(r, g, b);
     return this;
 };
 
 Color.prototype.equals = function equals(color) {
-    if (_isColorInstance(color)) {
+    if (helpers.isColorInstance(color)) {
         return  this.getR() === color.getR() &&
                 this.getG() === color.getG() &&
                 this.getB() === color.getB();
@@ -174,7 +174,7 @@ Color.prototype.equals = function equals(color) {
 };
 
 Color.prototype.copyGammaToLinear = function copyGammaToLinear(color) {
-    if (_isColorInstance(color)) {
+    if (helpers.isColorInstance(color)) {
         var r = color.getR();
         var g = color.getG();
         var b = color.getB();
@@ -215,7 +215,7 @@ Color.prototype.getHex = function getHex() {
 };
 
 Color.prototype.setHex = function setHex() {
-    var values = _flattenArguments(arguments);
+    var values = helpers.flattenArguments(arguments);
     var hex = values[0], options = values[1];
     hex = (hex.charAt(0) === '#') ? hex.substring(1, hex.length) : hex;
 
@@ -241,10 +241,10 @@ Color.prototype.hueToRGB = function hueToRGB(p, q, t) {
     if (t < 1/2) return q;
     if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
     return p;
-}
+};
 
 Color.prototype.setHSL = function setHSL() {
-    var values = _flattenArguments(arguments);
+    var values = helpers.flattenArguments(arguments);
     var h = values[0], s = values[1], l = values[2];
     var options = values[3];
     h /= 360.0;
@@ -339,7 +339,7 @@ Color.prototype.setLightness = function setLightness(l, options) {
  * HSV
  */
 Color.prototype.setHSV = function setHSV() {
-    var values = _flattenArguments(arguments);
+    var values = helpers.flattenArguments(arguments);
     var h = values[0], s = values[1], v = values[2];
     var options = values[3];
     var r, g, b;
@@ -360,7 +360,7 @@ Color.prototype.setHSV = function setHSV() {
 
     this.setRGB(r*255, g*255, b*255, options);
     return this;
-}
+};
 
 Color.prototype.getHSV = function getHSV() {
     var rgb = this.getNormalizedRGB();
@@ -381,80 +381,82 @@ Color.prototype.getHSV = function getHSV() {
         h /= 6;
     }
     return [h, s, v];
-}
+};
 
 
 /**
  * Helper functions
  */
-function _flattenArguments(options) {
+var helpers = {};
+
+helpers.flattenArguments = function(options) {
     return Array.prototype.concat.apply([], options);
 }
 
-function _argsToArray(val) {
+helpers.argsToArray = function(val) {
     return Array.prototype.slice.call(val);
 }
 
-function _isColorInstance(val) {
+helpers.isColorInstance = function(val) {
     return (val instanceof Color);
 }
 
-function _isArray(val) {
+helpers.isArray = function(val) {
     return Array.isArray(val);
 }
 
-function _isString(val) {
+helpers.isString = function(val) {
     return (typeof val === 'string');
 }
 
-function _isInt(val) {
+helpers.isInt = function(val) {
     return parseInt(val) === val;
 }
 
-function _isFloat(val) {
-    return !_isInt(val);
+helpers.isFloat = function(val) {
+    return !helpers.isInt(val);
 }
 
-function _allFloats() {
-    var val = _argsToArray(arguments);
+helpers.allFloats = function() {
+    var val = helpers.argsToArray(arguments);
     for(var i = 0; i < val.length; i++) {
-        if (!_isFloat(val[i])) return false;
+        if (!helpers.isFloat(val[i])) return false;
     }
     return true;
 }
 
-function _allInts(val) {
-    return !_allFloats(val);
+helpers.allInts = function(val) {
+    return !helpers.allFloats(val);
 }
 
-function _allStrings() {
-    var values = _argsToArray(arguments);
+helpers.allStrings = function() {
+    var values = helpers.argsToArray(arguments);
     for(var i = 0; i < values.length; i++) {
-        if (!_isString(values[i])) return false;
+        if (!helpers.isString(values[i])) return false;
     }
     return true;
 }
 
-function _isPercentage(val) {
+helpers.isPercentage = function(val) {
     return /%/.test(val);
 }
 
-function _isType(type, value) {
-    return _allStrings(type, value) && type.toLowerCase() === value.toLowerCase();
+helpers.isType = function(type, value) {
+    return helpers.allStrings(type, value) && type.toLowerCase() === value.toLowerCase();
 }
 
-function _clamp(val, min, max) {
+helpers.clamp = function(val, min, max) {
     min = min || 0;
     max = max || 255;
     return Math.max(Math.min(val, max), min);
 }
 
-function _determineType(val) {
-    if (_isColorInstance(val)) return 'instance';
+helpers.determineType = function(val) {
+    if (helpers.isColorInstance(val)) return 'instance';
     if (colorNames[val]) return 'color';
     var types = ['rgb', 'hsl', 'hex', 'hsv'];
     for(var i = 0; i < types.length; i++) {
-        if (_isType(val, types[i])) return types[i];
+        if (helpers.isType(val, types[i])) return types[i];
     }
 }
 
@@ -617,4 +619,5 @@ var colorNames = {
 /**
  * Expose
  */
-module.exports = Color;
+module.exports.Color = Color;
+module.exports.helpers = helpers;
