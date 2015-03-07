@@ -21,12 +21,9 @@ function Mesh (dispatch, options) {
     this._id = dispatch.addRenderable(this);
     this._color = new Color();
     this._size = [];
-
     this._expressions = {};
     this._geometry = void 0;
-
     init.call(this);
-
 
     if (options) this.setOptions(options);
 }
@@ -110,7 +107,6 @@ Mesh.prototype.setGeometry = function (geometry) {
         this.queue.push(geometry.id);
         this.queue.push(geometry.spec.type);
         this.queue.push(geometry.spec.dynamic);
-
         this._geometry = geometry;
     }
 
@@ -164,6 +160,7 @@ Mesh.prototype.clean = function clean() {
         this.dispatch.sendDrawCommand('GL_UNIFORMS');
         this.dispatch.sendDrawCommand('baseColor');
         this.dispatch.sendDrawCommand(this._color.getNormalizedRGB());
+        return true;
     }
 
     return this.queue.length;
@@ -268,7 +265,6 @@ Mesh.prototype.metallic = function metallic(materialExpression) {
  * @param {Object} Material or Image
  * @return {Element} current Mesh
  */
-
 Mesh.prototype.positionOffset = function positionOffset(materialExpression) {
     if (materialExpression._compile) materialExpression = materialExpression._compile();
     this.queue.push(typeof materialExpression === 'number' ? 'UNIFORM_INPUT' : 'MATERIAL_INPUT');
@@ -286,11 +282,14 @@ Mesh.prototype.positionOffset = function positionOffset(materialExpression) {
  * @param {Object} Material or Image
  * @return {Element} current Mesh
  */
-
 Mesh.prototype.setOptions = function setOptions(options) {
     this.queue.push('GL_SET_DRAW_OPTIONS');
     this.queue.push(options);
     return this;
 };
 
+
+/**
+ * Expose
+ */
 module.exports = Mesh;
