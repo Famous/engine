@@ -35,7 +35,7 @@ Color.prototype.set = function set() {
         case 'hsl': this.setHSL(options.slice(1)); break;
         case 'rgb': this.setRGB(options.slice(1)); break;
         case 'hsv': this.setHSV(options.slice(1)); break;
-        case 'hex': this.setHex(options.slice(1)); break;
+        case 'hex': this.setHex(options); break;
         case 'color': this.setColor(options); break;
         case 'instance': this.copy(options); break;
         default: this.setRGB(options);
@@ -216,7 +216,15 @@ Color.prototype.getHex = function getHex() {
 
 Color.prototype.setHex = function setHex() {
     var values = helpers.flattenArguments(arguments);
-    var hex = values[0], options = values[1];
+    var hex, options;
+
+    if (helpers.isHex(values[0])) {
+        hex = values[0];
+        options = values[1];
+    }
+    else {
+        hex = values[1]; options = values[2];
+    }
     hex = (hex.charAt(0) === '#') ? hex.substring(1, hex.length) : hex;
 
     if (hex.length === 3) {
@@ -441,6 +449,10 @@ helpers.isPercentage = function(val) {
     return /%/.test(val);
 }
 
+helpers.isHex = function(val) {
+    return /#/.test(val);
+}
+
 helpers.isType = function(type, value) {
     return helpers.allStrings(type, value) && type.toLowerCase() === value.toLowerCase();
 }
@@ -453,6 +465,7 @@ helpers.clamp = function(val, min, max) {
 
 helpers.determineType = function(val) {
     if (helpers.isColorInstance(val)) return 'instance';
+    if (helpers.isHex(val)) return 'hex';
     if (colorNames[val]) return 'color';
     var types = ['rgb', 'hsl', 'hex', 'hsv'];
     for(var i = 0; i < types.length; i++) {
