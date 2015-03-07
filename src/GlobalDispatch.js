@@ -42,7 +42,15 @@ GlobalDispatch.prototype.handleMessage = function handleMessage (commands) {
     var type = commands.shift();
     switch (type) {
         case TRIGGER:
-            if (this._targetedCallbacks[path]) this._targetedCallbacks[path].trigger(commands.shift(), commands.shift());
+            var ev = commands.shift();
+            switch (ev) {
+                case 'resize':
+                    if (this._targetedCallbacks[path]) this._targetedCallbacks[path].trigger('resize', [commands.shift(), commands.shift()]);
+                    break;
+                default:
+                    if (this._targetedCallbacks[path]) this._targetedCallbacks[path].trigger(ev, commands.shift());
+                    break;
+            }
             break;
     }
 };
