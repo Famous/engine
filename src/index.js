@@ -15,5 +15,6 @@ module.exports = {
     Origin: require('./Origin'),
     RenderContext: require('./RenderContext'),
     RenderProxy: require('./RenderProxy'),
-    Size: require('./Size')
+    Size: require('./Size'),
+    Transform: require('./Transform')
 };
