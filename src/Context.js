@@ -3,8 +3,11 @@
 var Node = require('./Node');
 var RenderProxy = require('./RenderProxy');
 
-function Context (selector, globalDispatch) {
-    this._globalDispatch = globalDispatch;
+var Famous = require('./Famous');
+
+function Context (selector) {
+    this._globalDispatch = Famous.getGlobalDispatch();
+    Famous.getClock().update(this);
     this.proxy = new RenderProxy(this);
     this.node = new Node(this.proxy, this._globalDispatch);
     this.selector = selector;

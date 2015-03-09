@@ -30,12 +30,13 @@ Famous.prototype.receiveCommands = function receiveCommands (commands) {
     return this;
 };
 
-Famous.prototype.createContext = function createContext (selector) {
-    var context = new Context(selector, this._globalDispatch);
-    this._contexts.push(context);
-    this._clock.update(context);
-    return context;
-};
+// Use this when deprecation of `new Context` is complete
+// Famous.prototype.createContext = function createContext (selector) {
+//     var context = new Context(selector, this._globalDispatch);
+//     this._contexts.push(context);
+//     this._clock.update(context);
+//     return context;
+// };
 
 Famous.prototype.getClock = function getClock () {
     return this._clock;
