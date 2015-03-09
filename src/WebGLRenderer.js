@@ -217,12 +217,13 @@ WebGLRenderer.prototype.receive = function receive(path, commands) {
                 break;
 
             case 'MATERIAL_INPUT':
+               console.log(445);
                 var name = commands.shift();
                 var mat = commands.shift();
                 mesh.uniformValues[name == 'baseColor' ? 4 : 5][0] = -mat._id;
-                this.updateSize();
                 mesh.texture = handleImage.call(this, mat);
                 this.program.registerMaterial(name, mat);
+                this.updateSize();
                 break;
 
             case 'GL_SET_GEOMETRY':
@@ -519,11 +520,13 @@ function IDL(){
 
 WebGLRenderer.prototype.handleOptions = function handleOptions(options) {
     var gl = this.gl;
+    if (! options) return;
     if (options.blending) gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
 };
 
 WebGLRenderer.prototype.resetOptions = function handleOptions(options) {
     var gl = this.gl;
+    if (! options) return;
     if (options.blending) gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 };
 

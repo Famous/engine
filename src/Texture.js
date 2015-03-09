@@ -12,8 +12,8 @@
 function Texture(gl, options) {
     options = options || {};
     this.id = gl.createTexture();
-    this.width = options.width || 255;
-    this.height = options.height || 255;
+    this.width = options.width || 0;
+    this.height = options.height || 0;
     this.format = options.format || gl.RGBA;
     this.type = options.type || gl.UNSIGNED_BYTE;
     this.gl = gl;
