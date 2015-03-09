@@ -12,8 +12,6 @@ var ADD_EVENT_LISTENER = 'ADD_EVENT_LISTENER';
 var EVENT_PROPERTIES = 'EVENT_PROPERTIES';
 var EVENT_END = 'EVENT_END';
 var RECALL = 'RECALL';
-var WITH = 'WITH';
-var CHANGE_ATTRIBUTE = 'CHANGE_ATTRIBUTE';
 var CHANGE_SIZE = 'CHANGE_SIZE';
 var CHANGE_TAG = 'CHANGE_TAG';
 
@@ -81,15 +79,21 @@ VirtualElement.prototype.changeTag = function changeTag (tagName) {
 
     var key;
     for (key in this._properties) {
-        this.setProperty(key, this._properties[key]);
+        newTarget.style[key] = this._properties[key];
     }
 
     for (key in this._attributes) {
-        this.setAttribute(key, this._attributes[key]);
+        newTarget.setAttribute(key, this._attributes[key]);
     }
     
+    var i;
     for (key in this._eventListeners) {
-        this.addEventListener(key, this._eventListeners[key]);
+        for (i = 0; i < this._eventListeners[key].length; i++) {
+            newTarget.addEventListener(key, this._eventListeners[key]);
+
+            // prevent possible memory leaks in IE
+            oldTarget.removeEventListener(key, this._eventListeners[key]);
+        }
     }
 
     this.setContent(this._content);
@@ -333,10 +337,21 @@ VirtualElement.prototype.setContent = function setContent (content) {
     }
 };
 
-VirtualElement.prototype.addEventListener = function addEventListener (name, cb) {
-    if (!this._eventListeners[name]) {
-        this._eventListeners[name] = cb;
-        this._target.addEventListener(name, cb);
+VirtualElement.prototype.addEventListener = function addEventListener (name, listener) {
+    this._eventListeners[name] = this._eventListeners[name] || [];
+    if (this._eventListeners[name].indexOf(listener) === -1) {
+        this._eventListeners[name].push(listener);
+        this._target.addEventListener(name, listener);
+    }
+};
+
+VirtualElement.prototype.removeEventListener = function removeEventListener (name, listener) {
+    if (this._eventListeners[name]) {
+        var index = this._eventListeners[name].indexOf(listener);
+        if (index !== -1) {
+            this._eventListeners[name].splice(index, 1);
+            this._target.removeEventListener(name, listener);
+        }
     }
 };
 
@@ -428,7 +443,6 @@ function multiply (out, a, b0, b1, b2, b3, b4, b5, b6, b7, b8, b9, b10, b11, b12
         a30 = a[12], a31 = a[13], a32 = a[14], a33 = a[15];
 
     // Cache only the current line of the second matrix
-    var b0  = b0, b1 = b1, b2 = b2, b3 = b3;
     out[0] = b0*a00 + b1*a10 + b2*a20 + b3*a30;
     out[1] = b0*a01 + b1*a11 + b2*a21 + b3*a31;
     out[2] = b0*a02 + b1*a12 + b2*a22 + b3*a32;
