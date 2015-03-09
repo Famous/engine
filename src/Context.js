@@ -3,18 +3,24 @@
 var Clock = require('./Clock');
 var Node = require('./Node');
 var RenderProxy = require('./RenderProxy');
-
-var GLOBAL_DISPATCH = Clock.getGlobalDispatch();
+var GlobalDispatch = require('./GlobalDispatch');
 
 function Context (selector) {
+    this._globalDispatch = new GlobalDispatch();
     this.proxy = new RenderProxy(this);
-    this.node = new Node(this.proxy, GLOBAL_DISPATCH);
+    this.node = new Node(this.proxy, this._globalDispatch);
     this.selector = selector;
     this.dirty = true;
     this.dirtyQueue = [];
 
-    GLOBAL_DISPATCH.message('NEED_SIZE_FOR').message(selector);
-    GLOBAL_DISPATCH.targetedOn(selector, 'resize', this._receiveContextSize.bind(this));
+    var _this = this;
+    this._globalDispatch.targetedOn('engine', 'FRAME', function (time) {
+        Clock.step(time);
+        _this._globalDispatch.flush();
+    });
+
+    this._globalDispatch.message('NEED_SIZE_FOR').message(selector);
+    this._globalDispatch.targetedOn(selector, 'resize', this._receiveContextSize.bind(this));
     Clock.update(this);
 }
 
@@ -38,7 +44,7 @@ Context.prototype.getRenderPath = function getRenderPath () {
 
 Context.prototype.receive = function receive (command) {
     if (this.dirty) this.dirtyQueue.push(command);
-    else GLOBAL_DISPATCH.message(command);
+    else this._globalDispatch.message(command);
     return this;
 };
 

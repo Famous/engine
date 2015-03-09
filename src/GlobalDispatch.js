@@ -15,9 +15,9 @@ function GlobalDispatch () {
 
     if (WORKER) {
         var _this = this;
-        self.onmessage = function(ev) {
+        self.addEventListener('message', function(ev) {
             _this.receiveCommands(ev.data);
-        };
+        });
     }
 
 }
