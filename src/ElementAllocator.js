@@ -1,5 +1,7 @@
 'use strict';
 
+var DEALLOCATION_ERROR = new Error('Can\'t deallocate non-allocated element');
+
 /**
  * Internal helper object to Container that handles the process of
  *   creating and allocating DOM elements within a managed div.
@@ -13,8 +15,10 @@
 function ElementAllocator(container) {
     if (!container) container = document.createDocumentFragment();
     this._container = container;
-    this._detachedNodes = {};
     this._nodeCount = 0;
+
+    this._allocatedNodes = {};
+    this._deallocatedNodes = {};
 }
 
 /**
@@ -28,14 +32,16 @@ function ElementAllocator(container) {
  */
 ElementAllocator.prototype.allocate = function allocate(type) {
     type = type.toLowerCase();
-    if (!(type in this._detachedNodes)) this._detachedNodes[type] = [];
-    var nodeStore = this._detachedNodes[type];
     var result;
-    if (nodeStore.length > 0) {
+    var nodeStore = this._deallocatedNodes[type];
+    if (nodeStore && nodeStore.length > 0) {
         result = nodeStore.pop();
-    } else {
+    }
+    else {
         result = document.createElement(type);
         this._container.appendChild(result);
+        this._allocatedNodes[type] = this._allocatedNodes[type] ? this._allocatedNodes[type] : [];
+        this._allocatedNodes[type].push(result);
     }
     this._nodeCount++;
     result.style.display = '';
@@ -50,18 +56,29 @@ ElementAllocator.prototype.allocate = function allocate(type) {
  * @param {DOMElement} element document element to deallocate
  */
 ElementAllocator.prototype.deallocate = function deallocate(element) {
-    var nodeType = element.nodeName.toLowerCase();
-    var nodeStore = this._detachedNodes[nodeType];
-    nodeStore.push(element);
+    var type = element.nodeName.toLowerCase();
+    this._deallocatedNodes[type] = this._deallocatedNodes[type] ? this._deallocatedNodes[type] : [];
+    var allocatedNodeStore = this._allocatedNodes[type];
+    var deallocatedNodeStore = this._deallocatedNodes[type];
+    if (!allocatedNodeStore) throw DEALLOCATION_ERROR;
+    var index = allocatedNodeStore.indexOf(element);
+    if (index === -1) throw DEALLOCATION_ERROR;
+    allocatedNodeStore.splice(index, 1);
+    deallocatedNodeStore.push(element);
+
     this._nodeCount--;
 };
 
 ElementAllocator.prototype.setContainer = function setContainer(container) {
     this._container = container;
 
-    for (var nodeType in this._detachedNodes) {
-        for (var i = 0; i < this._detachedNodes[nodeType].length; i++) {
-            this._container.appendChild(this._detachedNodes[nodeType][i]);
+    var nodeType, i;
+    for (nodeType in this._deallocatedNodes) {
+        for (i = 0; i < this._deallocatedNodes[nodeType].length; i++) {
+            this._container.appendChild(this._deallocatedNodes[nodeType][i]);
+        }
+        for (i = 0; i < this._allocatedNodes[nodeType].length; i++) {
+            this._container.appendChild(this._allocatedNodes[nodeType][i]);
         }
     }
 };
