@@ -1,27 +1,18 @@
 'use strict';
 
-var Clock = require('./Clock');
 var Node = require('./Node');
 var RenderProxy = require('./RenderProxy');
-var GlobalDispatch = require('./GlobalDispatch');
 
-function Context (selector) {
-    this._globalDispatch = new GlobalDispatch();
+function Context (selector, globalDispatch) {
+    this._globalDispatch = globalDispatch;
     this.proxy = new RenderProxy(this);
     this.node = new Node(this.proxy, this._globalDispatch);
     this.selector = selector;
     this.dirty = true;
     this.dirtyQueue = [];
 
-    var _this = this;
-    this._globalDispatch.targetedOn('engine', 'FRAME', function (time) {
-        Clock.step(time);
-        _this._globalDispatch.flush();
-    });
-
     this._globalDispatch.message('NEED_SIZE_FOR').message(selector);
     this._globalDispatch.targetedOn(selector, 'resize', this._receiveContextSize.bind(this));
-    Clock.update(this);
 }
 
 Context.prototype.addChild = function addChild () {

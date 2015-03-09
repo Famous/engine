@@ -19,9 +19,8 @@ Clock.prototype.update = function update (target) {
 
 Clock.prototype.noLongerUpdate = function noLongerUpdate(target) {
     var index = this._updates.indexOf(target);
-    if (index > -1) {
+    if (index > -1)
         this._updates.splice(index, 1);
-    }
     return this;
 };
 
@@ -29,4 +28,4 @@ Clock.prototype.getTime = function getTime () {
     return this._time;
 };
 
-module.exports = new Clock();
+module.exports = Clock;
