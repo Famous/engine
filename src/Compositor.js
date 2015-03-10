@@ -102,13 +102,16 @@ Compositor.prototype.giveSizeFor = function giveSizeFor(commands) {
     var _this = this;
     if (selector === 'body')
         window.addEventListener('resize', function() {
-            _this.sendResize(selector, _this.getOrSetContext(selector).DOM._getSize());
+            if (!_this._sentResize) {
+                _this.sendResize(selector, _this.getOrSetContext(selector).DOM._getSize());
+            }
         });
     return this;
 };
 
 Compositor.prototype.sendResize = function sendResize (selector, size) {
     this._outCommands.push('WITH', selector, 'TRIGGER', 'resize', size[0], size[1]);
+    this._sentResize = true;
     return this;
 };
 
@@ -172,6 +175,7 @@ Compositor.prototype.receiveCommands = function receiveCommands(commands) {
 
 Compositor.prototype.clearCommands = function clearCommands() {
     this._outCommands.length = 0;
+    this._sentResize = false;
 };
 
 module.exports = Compositor;
