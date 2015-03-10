@@ -42,11 +42,11 @@ Context.prototype.receive = function receive (command) {
     return this;
 };
 
-Context.prototype._receiveContextSize = function _receiveContextSize (sizeReport) {
+Context.prototype._receiveContextSize = function _receiveContextSize (size) {
     this.node
         .getDispatch()
         .getContext()
-        .setAbsolute(sizeReport.size[0], sizeReport.size[1], 0);
+        .setAbsolute(size[0], size[1], 0);
 
     if (this.dirty) {
         this.dirty = false;
