@@ -459,11 +459,7 @@ function loadImage (img, callback) {
 function handleImage(material) {
     if (! material.uniforms.image) return;
     var t = new Texture(this.gl);
-<<<<<<< HEAD
 
-=======
-
->>>>>>> Fix: Clean rebase conflict
     t.src = material.uniforms.image;
     t.setImage(checkers);
     loadImage(material.uniforms.image, function (img) {
