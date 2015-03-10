@@ -4,10 +4,7 @@ var CallbackStore = require('famous-utilities').CallbackStore;
 
 var ELEMENT = 'element';
 var ID = 'id';
-var WIDTH = 'width';
-var HEIGHT = 'height';
 var OPACITY = 'opacity';
-var PX = 'px';
 var WITH = 'WITH';
 var CHANGE_TRANSFORM = 'CHANGE_TRANSFORM';
 var CHANGE_TRANSFORM_ORIGIN = 'CHANGE_TRANSFORM_ORIGIN';
