@@ -160,7 +160,10 @@ Transform.prototype._copyParent = function _copyParent(parentReport, parentMatri
  * @return {Number} invalidation scheme
  */
 Transform.prototype._update = function _update(parentReport, parentMatrix) {
-    if (!(parentReport || this._invalidated)) return 0;
+    if (!(parentReport || this._invalidated)) {
+        this._previouslyInvalidated = 0;
+        return 0;
+    }
     if (this._isIdentity()) return this._copyParent(parentReport, parentMatrix);
     if (parentReport) this._invalidateFromParent(parentReport);
     if (!parentMatrix) parentMatrix = IDENTITY;
