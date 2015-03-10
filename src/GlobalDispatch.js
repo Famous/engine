@@ -3,7 +3,6 @@
 var CallbackStore = require('famous-utilities').CallbackStore;
 
 var WITH = 'WITH';
-var FRAME = 'FRAME';
 var TRIGGER = 'TRIGGER';
 
 function GlobalDispatch () {
@@ -19,9 +18,6 @@ GlobalDispatch.prototype.receiveCommands = function receiveCommands (commands) {
         switch (command) {
             case WITH:
                 this.handleMessage(commands);
-                break;
-            case FRAME:
-                this._targetedCallbacks.engine.trigger(FRAME, commands.shift());
                 break;
         }
     }

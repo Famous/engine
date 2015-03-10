@@ -19,21 +19,26 @@ function Famous() {
             _this.postMessage(ev.data);
         });
     }
-
-    this._globalDispatch.targetedOn('engine', 'FRAME', function (time) {
-        _this._clock.step(time);
-
-        var messages = _this._globalDispatch.getMessages();
-        if (messages.length) {
-            if (isWorker) self.postMessage(messages);
-            else _this.onmessage(messages);
-        }
-        messages.length = 0;
-    });
 }
 
+Famous.prototype.step = function step (time) {
+    this._clock.step(time);
+
+    var messages = this._globalDispatch.getMessages();
+    if (messages.length) {
+        if (isWorker) self.postMessage(messages);
+        else this.onmessage(messages);
+    }
+    messages.length = 0;
+};
+
 Famous.prototype.postMessage = function postMessage (message) {
-    this._globalDispatch.receiveCommands(message);
+    if (typeof message === 'number') {
+        this.step(message);
+    }
+    else {
+        this._globalDispatch.receiveCommands(message);
+    }
 };
 
 Famous.prototype.onmessage = function onmessage () {};
