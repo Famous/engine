@@ -217,7 +217,6 @@ WebGLRenderer.prototype.receive = function receive(path, commands) {
                 break;
 
             case 'MATERIAL_INPUT':
-               console.log(445);
                 var name = commands.shift();
                 var mat = commands.shift();
                 mesh.uniformValues[name == 'baseColor' ? 4 : 5][0] = -mat._id;
