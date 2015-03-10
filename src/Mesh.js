@@ -19,15 +19,12 @@ function Mesh (dispatch, options) {
     this.dispatch = dispatch;
     this.queue = ['GL_CREATE_MESH'];
     this._id = dispatch.addRenderable(this);
-    this._color = new Color('rgb', 0.5, 0.5, 0.5);
+    this._color = new Color('rgb', 255, 0, 0);
     this._origin = new Float32Array([0, 0, 0]);
     this._size = [];
-
     this._expressions = {};
     this._geometry = void 0;
-
     init.call(this);
-
 
     if (options) this.setOptions(options);
 }
@@ -79,7 +76,6 @@ Mesh.prototype._receiveOriginChange = function _receiveOriginChange(origin) {
     this._origin[0] = origin.x;
     this._origin[1] = origin.y;
     this._origin[2] = origin.z;
-
     this.queue.push(this._origin);
 };
 
@@ -162,14 +158,15 @@ Mesh.prototype.clean = function clean() {
         }
     }
 
+    var i = this.queue.length;
+    while (i--) this.dispatch.sendDrawCommand(this.queue.shift());
+
     if (this._color.isActive()) {
         this.dispatch.sendDrawCommand('GL_UNIFORMS');
         this.dispatch.sendDrawCommand('baseColor');
-        this.dispatch.sendDrawCommand(this._color.getRGB());
+        this.dispatch.sendDrawCommand(this._color.getNormalizedRGB());
+        return true;
     }
-
-    var i = this.queue.length;
-    while (i--) this.dispatch.sendDrawCommand(this.queue.shift());
 
     return this.queue.length;
 };
@@ -195,9 +192,14 @@ Mesh.prototype.baseColor = function baseColor() {
     }
     else {
         this.queue.push('GL_UNIFORMS');
-        this._color.set(materialExpression);
+        if (materialExpression[0] instanceof Color) {
+            this._color = materialExpression[0];
+        }
+        else {
+            this._color.set(materialExpression);
+        }
+        materialExpression = this._color.getNormalizedRGB();
     }
-
     this.queue.push('baseColor');
     this.queue.push(materialExpression);
     return this;
@@ -267,7 +269,6 @@ Mesh.prototype.metallic = function metallic(materialExpression) {
  * @param {Object} Material or Image
  * @return {Element} current Mesh
  */
-
 Mesh.prototype.positionOffset = function positionOffset(materialExpression) {
     if (materialExpression._compile) materialExpression = materialExpression._compile();
     this.queue.push(typeof materialExpression === 'number' ? 'UNIFORM_INPUT' : 'MATERIAL_INPUT');
@@ -285,11 +286,14 @@ Mesh.prototype.positionOffset = function positionOffset(materialExpression) {
  * @param {Object} Material or Image
  * @return {Element} current Mesh
  */
-
 Mesh.prototype.setOptions = function setOptions(options) {
     this.queue.push('GL_SET_DRAW_OPTIONS');
     this.queue.push(options);
     return this;
 };
 
+
+/**
+ * Expose
+ */
 module.exports = Mesh;
