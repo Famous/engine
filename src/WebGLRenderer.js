@@ -4,6 +4,7 @@ var Texture = require('./Texture');
 var Program = require('./Program');
 var Buffer = require('./Buffer');
 var BufferRegistry = require('./BufferRegistry');
+var checkers = require('./Checkerboard');
 
 var uniformNames = ['perspective', 'view', 'transform', 'opacity', 'origin', 'size', 'baseColor', 'time'];
 var resolutionName = ['resolution'];
@@ -85,16 +86,6 @@ WebGLRenderer.prototype.receive = function receive(path, commands) {
     var mesh = this.meshRegistry[path];
     var light = this.lightRegistry[path];
 
-    if (!mesh) {
-        mesh = this.meshRegistry[path] = {
-            uniformKeys: ['opacity', 'transform', 'size', 'origin', 'baseColor', 'positionOffset'],
-            uniformValues: [1, identity, [0, 0, 0], [0, 0, 0], [0.5, 0.5, 0.5], [1,1,1]],
-            buffers: {},
-            geometry: null,
-            drawType: null,
-            options: {}
-        };
-    }
     var bufferName;
     var bufferValue;
     var bufferSpacing;
@@ -105,80 +96,83 @@ WebGLRenderer.prototype.receive = function receive(path, commands) {
     var command = commands.shift();
 
     switch (command) {
-        case 'GL_SET_DRAW_OPTIONS':
-            mesh.options = commands.shift();
-            break;
+    case 'GL_SET_DRAW_OPTIONS':
+        mesh.options = commands.shift();
+        break;
 
-        case 'GL_CREATE_MESH':
-            mesh = this.meshRegistry[path] = {
-                uniformKeys: ['opacity', 'transform', 'size', 'origin', 'baseColor'],
-                uniformValues: [1, identity, [0, 0, 0], [0, 0, 0], [0.5, 0.5, 0.5]],
-                buffers: {},
-                geometry: null,
-                drawType: null
-            };
-            this.meshRegistryKeys.push(path);
-            break;
+    case 'GL_CREATE_MESH':
+        mesh = this.meshRegistry[path] = {
+            uniformKeys: ['opacity', 'transform', 'size', 'origin', 'baseColor', 'positionOffset'],
+            uniformValues: [1, identity, [0, 0, 0], [0, 0, 0], [0.5, 0.5, 0.5], [0,0,0]],
+            buffers: {},
+            options: {},
+            geometry: null,
+            drawType: null,
+            texture: null
+        };
+        this.meshRegistryKeys.push(path);
+        break;
 
-        case 'GL_CREATE_LIGHT':
-            light = this.lightRegistry[path] = {
-                color: [1.0, 1.0, 1.0],
-                position: [0.0, 0.0, 100.0]
-            };
-            this.lightRegistryKeys.push(path);
-            break;
+    case 'GL_CREATE_LIGHT':
+        light = this.lightRegistry[path] = {
+            color: [1.0, 1.0, 1.0],
+            position: [0.0, 0.0, 100.0]
+        };
+        this.lightRegistryKeys.push(path);
+        break;
 
-        case 'GL_LIGHT_POSITION':
-            var transform = commands.shift();
-            light.position[0] = transform[12];
-            light.position[1] = transform[13];
-            light.position[2] = transform[14];
-            break;
+    case 'GL_LIGHT_POSITION':
+        var transform = commands.shift();
+        light.position[0] = transform[12];
+        light.position[1] = transform[13];
+        light.position[2] = transform[14];
+        break;
 
-        case 'GL_LIGHT_COLOR':
-            var color = commands.shift();
-            light.color[0] = color[0];
-            light.color[1] = color[1];
-            light.color[2] = color[2];
-            break;
+    case 'GL_LIGHT_COLOR':
+        var color = commands.shift();
+        light.color[0] = color[0];
+        light.color[1] = color[1];
+        light.color[2] = color[2];
+        break;
 
-        case 'MATERIAL_INPUT':
-            var name = commands.shift();
-            var mat = commands.shift();
-            mesh.uniformValues[name == 'baseColor' ? 4 : 5][0] = -mat._id;
-            this.program.registerMaterial(name, mat);
-            this.updateSize();
-            break;
+    case 'MATERIAL_INPUT':
+        var name = commands.shift();
+        var mat = commands.shift();
+        mesh.uniformValues[name == 'baseColor' ? 4 : 5][0] = -mat._id;
+        mesh.texture = handleImage.call(this, mat);
+        this.program.registerMaterial(name, mat);
+        this.updateSize();
+        break;
 
-        case 'GL_SET_GEOMETRY':
-            mesh.geometry = commands.shift();
-            mesh.drawType = commands.shift();
-            mesh.dynamic = commands.shift();
-            break;
+    case 'GL_SET_GEOMETRY':
+        mesh.geometry = commands.shift();
+        mesh.drawType = commands.shift();
+        mesh.dynamic = commands.shift();
+        break;
 
-        case 'GL_UNIFORMS':
-            uniformName = commands.shift();
-            uniformValue = commands.shift();
-            var index = mesh.uniformKeys.indexOf(uniformName);
+    case 'GL_UNIFORMS':
+        uniformName = commands.shift();
+        uniformValue = commands.shift();
+        var index = mesh.uniformKeys.indexOf(uniformName);
 
-            if (index === -1) {
-                mesh.uniformKeys.push(uniformName);
-                mesh.uniformValues.push(uniformValue);
-            } else {
-                mesh.uniformValues[index] = uniformValue;
-            }
-            break;
+        if (index === -1) {
+            mesh.uniformKeys.push(uniformName);
+            mesh.uniformValues.push(uniformValue);
+        } else {
+            mesh.uniformValues[index] = uniformValue;
+        }
+        break;
 
-        case 'GL_BUFFER_DATA':
-            geometryId = commands.shift();
-            bufferName = commands.shift();
-            bufferValue = commands.shift();
-            bufferSpacing = commands.shift();
+    case 'GL_BUFFER_DATA':
+        geometryId = commands.shift();
+        bufferName = commands.shift();
+        bufferValue = commands.shift();
+        bufferSpacing = commands.shift();
 
-            this.bufferRegistry.allocate(geometryId, bufferName, bufferValue, bufferSpacing);
-            break;
+        this.bufferRegistry.allocate(geometryId, bufferName, bufferValue, bufferSpacing);
+        break;
 
-        default: commands.unshift(command); return;
+    case 'WITH': commands.unshift(command); return;
     }
 };
 
@@ -204,17 +198,18 @@ WebGLRenderer.prototype.draw = function draw(renderState) {
         mesh = this.meshRegistry[this.meshRegistryKeys[i]];
 
         buffers = this.bufferRegistry.registry[mesh.geometry];
-        if (!buffers) return;
+
+        if (mesh.texture) mesh.texture.bind();
 
         this.program.setUniforms(mesh.uniformKeys, mesh.uniformValues);
 
-
+        this.handleOptions(mesh.options);
+        
         this.drawBuffers(buffers, mesh.drawType, mesh.geometry);
 
-        if (mesh.options) {
-            this.handleOptions(mesh.options);
-            this.resetOptions(mesh.options);
-        }
+        if (mesh.texture) mesh.texture.unbind();
+
+        this.resetOptions(mesh.options);
     }
 };
 
@@ -369,18 +364,18 @@ function checkFrameBufferStatus(gl) {
     var status = gl.checkFramebufferStatus(gl.FRAMEBUFFER);
 
     switch (status) {
-        case gl.FRAMEBUFFER_COMPLETE:
-            break;
-        case gl.FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
-            throw("Incomplete framebuffer: FRAMEBUFFER_INCOMPLETE_ATTACHMENT"); break;
-        case gl.FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
-            throw("Incomplete framebuffer: FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT"); break;
-        case gl.FRAMEBUFFER_INCOMPLETE_DIMENSIONS:
-            throw("Incomplete framebuffer: FRAMEBUFFER_INCOMPLETE_DIMENSIONS"); break;
-        case gl.FRAMEBUFFER_UNSUPPORTED:
-            throw("Incomplete framebuffer: FRAMEBUFFER_UNSUPPORTED"); break;
-        default:
-            throw("Incomplete framebuffer: " + status);
+    case gl.FRAMEBUFFER_COMPLETE:
+        break;
+    case gl.FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
+        throw("Incomplete framebuffer: FRAMEBUFFER_INCOMPLETE_ATTACHMENT"); break;
+    case gl.FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
+        throw("Incomplete framebuffer: FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT"); break;
+    case gl.FRAMEBUFFER_INCOMPLETE_DIMENSIONS:
+        throw("Incomplete framebuffer: FRAMEBUFFER_INCOMPLETE_DIMENSIONS"); break;
+    case gl.FRAMEBUFFER_UNSUPPORTED:
+        throw("Incomplete framebuffer: FRAMEBUFFER_UNSUPPORTED"); break;
+    default:
+        throw("Incomplete framebuffer: " + status);
     }
 };
 
@@ -417,7 +412,6 @@ WebGLRenderer.prototype.updateSize = function updateSize() {
 
 module.exports = WebGLRenderer;
 
-
 function IDL(){
     var onLoadEnvironment = function (xhr, gl) {
 
@@ -443,10 +437,34 @@ function IDL(){
 
 WebGLRenderer.prototype.handleOptions = function handleOptions(options) {
     var gl = this.gl;
+    if (! options) return;
     if (options.blending) gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
 };
 
 WebGLRenderer.prototype.resetOptions = function handleOptions(options) {
     var gl = this.gl;
+    if (! options) return;
     if (options.blending) gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 };
+
+function loadImage (img, callback) {
+    var obj = (typeof img === 'string' ? new Image() : img) || {};
+    obj.crossOrigin = 'anonymous';
+    if (! obj.src) obj.src = img;
+    if (! obj.complete) obj.onload = function () { callback(obj); };
+    else callback(obj);
+    return obj;
+}
+
+function handleImage(material) {
+    if (! material.uniforms.image) return;
+    var t = new Texture(this.gl);
+    
+    t.src = material.uniforms.image;
+    t.setImage(checkers);
+    loadImage(material.uniforms.image, function (img) {
+        t.setImage(img);
+    });
+    delete material.uniforms.image;
+    return t;
+}

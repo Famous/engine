@@ -1,8 +1,6 @@
 'use strict';
 
 var Utility = require('famous-utilities');
-var Texture = require('./Texture');
-var checkers = require('./Checkerboard');
 
 var VERTEX_SHADER = 35633;
 var FRAGMENT_SHADER = 35632;
@@ -28,6 +26,12 @@ var fragmentWrapper = require('famous-webgl-shaders').fragment;
 var inputs = ['baseColor', 'normals', 'metalness', 'glossiness', 'positionOffset'];
 var inputTypes = {baseColor: 'vec3', normal: 'vec3', glossiness: 'float', metalness: 'float', positionOffset: 'vert' };
 
+var masks =  {
+    vert: 1,
+    vec3: 2,
+    float : 4
+};
+
 /* Default values used in the every shader instance */
 var identityMatrix = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
 
@@ -46,10 +50,10 @@ var uniformValues = [
 ];
 
 var attributeNames = ['pos', 'texCoord', 'normals'];
-var attributeValues = [3, 2, 3];
+var attributeValues = [3, 2, 3, 1];
 
 var varyingNames = ['vTextureCoordinate', 'vNormal', 'vPosition'];
-var varyingValues = [2, 3, 3];
+var varyingValues = [2, 3, 3, 1];
 
 var header = 'precision mediump float;\n';
 
@@ -94,32 +98,34 @@ function Program(gl) {
 
 Program.prototype.registerMaterial = function registerMaterial(name, material) {
     var compiled = material;
+    var type = inputTypes[name];
+    var mask = masks[type];
 
-    if (compiled.uniforms.image) {
-        var t = new Texture(this.gl);
-        t.setImage(checkers);
-        loadImage(compiled.uniforms.image, function (img) {
-            t.setImage(img);
-        });
-        delete compiled.uniforms.image;
-    }
+    if ((this.registeredMaterials[material._id] & mask) == mask) return;
 
     for (var k in compiled.uniforms) {
         uniformNames.push(k);
         uniformValues.push(compiled.uniforms[k]);
     }
 
-    if (inputTypes[name] == 'float') {
+    for (var k in compiled.varyings) {
+        varyingNames.push(k);
+        varyingValues.push(compiled.uniforms[k]);
+    }
+
+    this.registeredMaterials[material._id] |= mask;
+
+    if (type == 'float') {
         this.definitionFloat.push('float fa_' + material._id + '() {\n '  + compiled.glsl + ' \n}');
         this.applicationFloat.push('if (int(abs(ID)) == ' + material._id + ') return fa_' + material._id  + '();');
     }
 
-    if (inputTypes[name] == 'vec3'){
+    if (type == 'vec3'){
         this.definitionVec.push('vec3 fa_' + material._id + '() {\n '  + compiled.glsl + ' \n}');
         this.applicationVec.push('if (int(abs(ID.x)) == ' + material._id + ') return fa_' + material._id + '();');
     }
 
-    if (inputTypes[name] == 'vert'){
+    if (type == 'vert'){
         this.definitionVert.push('vec3 fa_' + material._id + '() {\n '  + compiled.glsl + ' \n}');
         this.applicationVert.push('if (int(abs(ID.x)) == ' + material._id + ') return fa_' + material._id + '();');
     }
@@ -367,16 +373,6 @@ Program.prototype.compileShader = function compileShader(shader, source) {
 
     return shader;
 };
-
-function loadImage (img, callback) {
-    var obj = (typeof img === 'string' ? new Image() : img) || {};
-    obj.crossOrigin = 'anonymous';
-    if (! obj.src) obj.src = img;
-    if (! obj.complete) obj.onload = function () { callback(obj); };
-    else callback(obj);
-
-    return obj;
-}
 
 module.exports = Program;
 
