@@ -270,10 +270,16 @@ VirtualElement.prototype.draw = function draw(renderState) {
         perspectiveTransform[15]
     ];
 
+    var MV = multiply(
+        [],
+        renderState.viewTransform,
+        m[0], m[1], m[2], m[3], m[4], m[5], m[6], m[7], m[8], m[9], m[10], m[11], m[12], m[13], m[14], m[15]
+    );
+
     var finalTransform = multiply(
         [],
         originShiftedPerspective,
-        m[0], m[1], m[2], m[3], m[4], m[5], m[6], m[7], m[8], m[9], m[10], m[11], m[12], m[13], m[14], m[15]
+        MV[0], MV[1], MV[2], MV[3], MV[4], MV[5], MV[6], MV[7], MV[8], MV[9], MV[10], MV[11], MV[12], MV[13], MV[14], MV[15]
     );
 
     this._target.style[VENDOR_TRANSFORM] = stringifyMatrix(finalTransform);
