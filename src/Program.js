@@ -39,14 +39,14 @@ var uniformNames = [
     'perspective', 'view', 'resolution',
     'transform', 'origin', 'size', 'opacity',
     'baseColor', 'normal', 'metalness', 'glossiness', 'positionOffset',
-    'u_LightPosition', 'u_LightColor', 'u_LightAmbient', 'u_Shininess'
+    'u_LightPosition', 'u_LightColor', 'u_LightAmbient', 'u_Shininess', 'time'
 ];
 
 var uniformValues = [
     identityMatrix, identityMatrix, [0, 0, 0],
     identityMatrix, [0.5, 0.5, 0.5], [1, 1, 1], 0,
     [1, 1, 1], [1, 1, 1], 1, 1, [0,0,0],
-    [1, 1, 1], [1, 1, 1], [0, 0, 0], 0
+    [1, 1, 1], [1, 1, 1], [0, 0, 0], 0, 0
 ];
 
 var attributeNames = ['pos', 'texCoord', 'normals'];
@@ -116,16 +116,20 @@ Program.prototype.registerMaterial = function registerMaterial(name, material) {
     this.registeredMaterials[material._id] |= mask;
 
     if (type == 'float') {
+        this.definitionFloat.push(material.defines);
         this.definitionFloat.push('float fa_' + material._id + '() {\n '  + compiled.glsl + ' \n}');
         this.applicationFloat.push('if (int(abs(ID)) == ' + material._id + ') return fa_' + material._id  + '();');
     }
 
-    if (type == 'vec3'){
+    if (type == 'vec3') {
+        console.log(5555, material.defines);
+        this.definitionVec.push(material.defines);
         this.definitionVec.push('vec3 fa_' + material._id + '() {\n '  + compiled.glsl + ' \n}');
         this.applicationVec.push('if (int(abs(ID.x)) == ' + material._id + ') return fa_' + material._id + '();');
     }
 
-    if (type == 'vert'){
+    if (type == 'vert') {
+        this.definitionVert.push(material.defines);
         this.definitionVert.push('vec3 fa_' + material._id + '() {\n '  + compiled.glsl + ' \n}');
         this.applicationVert.push('if (int(abs(ID.x)) == ' + material._id + ') return fa_' + material._id + '();');
     }
