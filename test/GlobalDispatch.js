@@ -22,28 +22,54 @@ test('GlobalDispatch', function(t) {
     });
 
     t.test('handleMessage method', function(t) {
-        t.plan(1);
+        t.plan(3);
         var globalDispatch = new GlobalDispatch();
         t.equal(typeof globalDispatch.handleMessage, 'function', 'globalDispatch.handleMessage should be a function');
 
+        globalDispatch.targetedOn('chicken/egg', 'eventname', function (ev) {
+            t.equal(ev, 'event');
+        });
+
+        t.equal(globalDispatch.handleMessage(['chicken/egg', 'TRIGGER', 'eventname', 'event']), globalDispatch, 'globalDispatch.handleMessage should be chainable');
     });
 
     t.test('targetedOn method', function(t) {
         t.plan(1);
         var globalDispatch = new GlobalDispatch();
         t.equal(typeof globalDispatch.targetedOn, 'function', 'globalDispatch.targetedOn should be a function');
+    });
 
+    t.test('targetedOff method', function(t) {
+        t.plan(1);
+        var globalDispatch = new GlobalDispatch();
+        t.equal(typeof globalDispatch.targetedOff, 'function', 'globalDispatch.targetedOff should be a function');
     });
 
     t.test('globalOn method', function(t) {
-        t.plan(1);
+        t.plan(2);
         var globalDispatch = new GlobalDispatch();
         t.equal(typeof globalDispatch.globalOn, 'function', 'globalDispatch.globalOn should be a function');
 
+        t.equal(globalDispatch.globalOn('path/path2', 'testEvent', function() {}), globalDispatch, 'globalDispatch.globalOn should be chainable');
+    });
+
+    t.test('globalOff method', function(t) {
+        t.plan(2);
+        var globalDispatch = new GlobalDispatch();
+        t.equal(typeof globalDispatch.globalOff, 'function', 'globalDispatch.globalOff should be a function');
+
+        var listener = function() {
+            t.fail();
+        };
+        globalDispatch.globalOn('path/path2', 'testEvent', listener);
+        t.equal(globalDispatch.globalOff('path/path2', 'testEvent', listener), globalDispatch, 'globalDispatch.globalOff should be chainable');
+
+        var testEvent = {};
+        globalDispatch.emit('testEvent', testEvent);
     });
 
     t.test('emit method', function(t) {
-        t.plan(2);
+        t.plan(3);
         var globalDispatch = new GlobalDispatch();
         t.equal(typeof globalDispatch.emit, 'function', 'globalDispatch.emit should be a function');
 
@@ -52,7 +78,7 @@ test('GlobalDispatch', function(t) {
         });
 
         var testEvent = {};
-        globalDispatch.emit('testEvent', testEvent);
+        t.equal(globalDispatch.emit('testEvent', testEvent), globalDispatch, 'globalDispatch.emit should be chainable');
     });
 
     t.test('message method', function(t) {
@@ -61,22 +87,16 @@ test('GlobalDispatch', function(t) {
         t.equal(typeof globalDispatch.message, 'function', 'globalDispatch.message should be a function');
     });
 
-    t.test('flush method', function(t) {
+    t.test('getMessages method', function(t) {
         t.plan(2);
         var globalDispatch = new GlobalDispatch();
-        t.equal(typeof globalDispatch.flush, 'function', 'globalDispatch.flush should be a function');
-
-        var postedMessages = null;
-        global.self.postMessage = function (receivedMessages) {
-            postedMessages = receivedMessages.slice();
-        };
+        t.equal(typeof globalDispatch.getMessages, 'function', 'globalDispatch.getMessages should be a function');
 
         var messages = ['this', 'is', 'a', 'test'];
         messages.forEach(function(message) {
             globalDispatch.message(message);
         });
 
-        globalDispatch.flush();
-        t.deepEqual(postedMessages, messages);
+        t.deepEqual(globalDispatch.getMessages(), messages);
     });
 });

@@ -43,11 +43,17 @@ GlobalDispatch.prototype.handleMessage = function handleMessage (commands) {
             }
             break;
     }
+    return this;
 };
 
 GlobalDispatch.prototype.targetedOn = function targetedOn (path, key, cb) {
     if (!this._targetedCallbacks[path]) this._targetedCallbacks[path] = new CallbackStore();
     this._targetedCallbacks[path].on(key, cb);
+    return this;
+};
+
+GlobalDispatch.prototype.targetedOff = function targetedOff (path, key, cb) {
+    if (!this._targetedCallbacks[path]) this._targetedCallbacks[path].off(key, cb);
     return this;
 };
 
