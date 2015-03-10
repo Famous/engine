@@ -10,6 +10,8 @@ Clock.prototype.step = function step (time) {
 
     for (var i = 0, len = this._updates.length ; i < len ; i++)
         this._updates[i].update(time);
+
+    return this;
 };
 
 Clock.prototype.update = function update (target) {
