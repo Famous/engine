@@ -25,6 +25,7 @@ function RenderContext (dispatch) {
     this._needsReflow = false;
     this._recalcAll = true;
     this._dispatch = dispatch;
+    this._noParent = false;
 }
 
 RenderContext.prototype.onChange = function onChange (cb) {
@@ -140,8 +141,18 @@ var identSize = new Float32Array([0, 0, 0]);
 var identTrans = new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
 
 RenderContext.prototype.update = function update (parentContext) {
+    var sizeInvalidations;
+
+    if (this._recalcAll || (!this._noParent && !parentContext)) {
+        sizeInvalidations = 7;
+    } else if (this._noParent && !parentContext) {
+        sizeInvalidations = 0;
+    } else {
+        sizeInvalidations = parentContext._size._previouslyInvalidated;
+    }
+
     this._size._update(
-        this._recalcAll || !parentContext ? 7 : parentContext._size._previouslyInvalidated,
+        sizeInvalidations,
         parentContext ? parentContext._size.getTopDownSize() : identSize
     );
 
@@ -155,8 +166,18 @@ RenderContext.prototype.update = function update (parentContext) {
     this._align.update(parentSize);
     this._mountPoint.update(mySize);
 
+    var alignInvalidations;
+
+    if (this._recalcAll || (!this._noParent && !parentContext)) {
+        alignInvalidations = (1 << 16) - 1;
+    } else if (this._noParent && !parentContext) {
+        alignInvalidations = 0;
+    } else {
+        alignInvalidations = parentContext._transform._previouslyInvalidated;
+    }
+
     this._align.transform._update(
-        this._recalcAll || !parentContext ? (1 << 16) - 1 : parentContext._transform._previouslyInvalidated,
+        alignInvalidations,
         parentContext ? parentContext._transform._matrix : identTrans
     );
 
@@ -187,6 +208,7 @@ RenderContext.prototype.update = function update (parentContext) {
     }
 
     if (this._recalcAll) this._recalcAll = false;
+    if (!parentContext) this._noParent = true;
 
     return this;
 };
