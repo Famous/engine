@@ -143,14 +143,22 @@ VirtualElement.prototype.receive = function receive (commands) {
             this._origin[1] = commands[1];
             this.setProperty(VENDOR_TRANSFORM_ORIGIN, stringifyTransformOrigin(commands));
             break;
-        case CHANGE_SIZE:
-            var width = commands.shift();
-            var height = commands.shift();
-            this._size[0] = width;
-            this._size[1] = height;
-            if (width !== true) this.setProperty('width', width + 'px');
-            if (height !== true) this.setProperty('height', height + 'px');
-            break;
+            case CHANGE_SIZE:
+                var width = commands.shift();
+                var height = commands.shift();
+                this._size[0] = width;
+                this._size[1] = height;
+                if (width !== true) {
+                    this.setProperty('width', width + 'px');
+                } else {
+                    this.setProperty('width', '');
+                }
+                if (height !== true) {
+                    this.setProperty('height', height + 'px');
+                } else {
+                    this.setProperty('height', '');
+                }
+                break;
         case CHANGE_PROPERTY:
             this.setProperty(commands.shift(), commands.shift());
             break;
