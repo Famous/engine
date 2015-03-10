@@ -10,7 +10,8 @@ function Compositor() {
     this._renderers = [];
     this._renderState = {
         projectionType: Camera.ORTHOGRAPHIC_PROJECTION,
-        perspectiveTransform: new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1])
+        perspectiveTransform: new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]),
+        viewTransform: new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1])
     };
 }
 
@@ -134,7 +135,28 @@ Compositor.prototype.drawCommands = function drawCommands() {
             case 'ORTHOGRAPHIC_PROJECTION':
                 this._renderState.projectionType = Camera.ORTHOGRAPHIC_PROJECTION;
                 this._renderState.perspectiveTransform[11] = 0;
-                break;            
+                break;
+            case 'CHANGE_VIEW_TRANSFORM':
+                this._renderState.viewTransform[0] = commands.shift();
+                this._renderState.viewTransform[1] = commands.shift();
+                this._renderState.viewTransform[2] = commands.shift();
+                this._renderState.viewTransform[3] = commands.shift();
+
+                this._renderState.viewTransform[4] = commands.shift();
+                this._renderState.viewTransform[5] = commands.shift();
+                this._renderState.viewTransform[6] = commands.shift();
+                this._renderState.viewTransform[7] = commands.shift();
+
+                this._renderState.viewTransform[8] = commands.shift();
+                this._renderState.viewTransform[9] = commands.shift();
+                this._renderState.viewTransform[10] = commands.shift();
+                this._renderState.viewTransform[11] = commands.shift();
+
+                this._renderState.viewTransform[12] = commands.shift();
+                this._renderState.viewTransform[13] = commands.shift();
+                this._renderState.viewTransform[14] = commands.shift();
+                this._renderState.viewTransform[15] = commands.shift();
+                break;
         }
     }
 
