@@ -19,7 +19,7 @@ ComponentStore.prototype.clearRenderables = function clearRenderables () {
 };
 
 ComponentStore.prototype.clear = function clear () {
-    this.clearComponents().clearRenderables();
+    return this.clearComponents().clearRenderables();
 };
 
 ComponentStore.prototype.kill = ComponentStore.prototype.clear;
@@ -32,6 +32,10 @@ ComponentStore.prototype.cleanComponents = function cleanComponents () {
 ComponentStore.prototype.cleanRenderables = function cleanRenderables () {
     this._renderables.clean();
     return this;
+};
+
+ComponentStore.prototype.clean = function clean () {
+    return this.cleanComponents().cleanRenderables();
 };
 
 ComponentStore.prototype.requestComponentId = function requestComponentId () {
