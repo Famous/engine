@@ -14,6 +14,7 @@ var EVENT_END = 'EVENT_END';
 var RECALL = 'RECALL';
 var CHANGE_SIZE = 'CHANGE_SIZE';
 var CHANGE_TAG = 'CHANGE_TAG';
+var CHANGE_ATTRIBUTE = 'CHANGE_ATTRIBUTE';
 
 var DIV = 'div';
 var TRANSFORM = 'transform';
