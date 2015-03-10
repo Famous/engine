@@ -41,7 +41,7 @@ CallbackStore.prototype.on = function on (key, callback) {
  */
 CallbackStore.prototype.off = function off (key, callback) {
     var events = this._events[key];
-    if (events) events.splice(events.indexOf(callbackOrId), 1);
+    if (events) events.splice(events.indexOf(callback), 1);
     return this;
 };
 
