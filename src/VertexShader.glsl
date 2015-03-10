@@ -12,13 +12,15 @@ vec4 applyTransform(vec4 pos) {
    mat4 forwardOrigin = mat4(1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, xOrigin, yOrigin, zOrigin, 1.0);
    mat4 negatedOrigin = mat4(1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, -xOrigin, -yOrigin, -zOrigin, 1.0);
 
-   mat4 originMVMatrix = forwardOrigin * transform;
-   originMVMatrix = transform * negatedOrigin;
+   mat4 MVMatrix = view * transform;
+
+   mat4 originMVMatrix = forwardOrigin * MVMatrix;
+   originMVMatrix = MVMatrix * negatedOrigin;
 
    mat4 projection = perspective;
-   mat4 MVMatrix = invertYAxis(originMVMatrix);
-   MVMatrix[3][2] *= 2.0;
-   vec4 translation = MVMatrix[3];
+   mat4 invertedYMatrix = invertYAxis(originMVMatrix);
+   invertedYMatrix[3][2] *= 2.0;
+   vec4 translation = invertedYMatrix[3];
    
    pos.xyz *= size;
    pos.y *= -1.0;
@@ -34,7 +36,7 @@ vec4 applyTransform(vec4 pos) {
 
    vPosition = (pixelTransform * pixelPosition).xyz;
 
-   mat4 MVPMatrix = projection * MVMatrix;
+   mat4 MVPMatrix = projection * invertedYMatrix;
    MVPMatrix[3] = vec4(0.0, 0.0, 0.0, MVPMatrix[3][3]);
 
    pos = MVPMatrix * pos;
@@ -47,7 +49,7 @@ vec4 applyTransform(vec4 pos) {
 #vert_definitions
 vec3 calculateOffset (vec3 ID) {
     #vert_applications
-     return vec3(.5 );
+     return vec3(0.0);
 }
 
 // Main function of the vertex shader.  Passes texture coordinat
