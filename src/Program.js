@@ -39,21 +39,21 @@ var uniformNames = [
     'perspective', 'view', 'resolution',
     'transform', 'origin', 'size', 'opacity',
     'baseColor', 'normal', 'metalness', 'glossiness', 'positionOffset',
-    'u_LightPosition', 'u_LightColor'
+    'u_LightPosition', 'u_LightColor', 'u_LightAmbient', 'u_Shininess'
 ];
 
 var uniformValues = [
     identityMatrix, identityMatrix, [0, 0, 0],
     identityMatrix, [0.5, 0.5, 0.5], [1, 1, 1], 0,
     [1, 1, 1], [1, 1, 1], 1, 1, [0,0,0],
-    [1, 1, 1], [1, 1, 1]
+    [1, 1, 1], [1, 1, 1], [0, 0, 0], 0
 ];
 
 var attributeNames = ['pos', 'texCoord', 'normals'];
 var attributeValues = [3, 2, 3, 1];
 
-var varyingNames = ['vTextureCoordinate', 'vNormal', 'vPosition'];
-var varyingValues = [2, 3, 3, 1];
+var varyingNames = ['v_TextureCoordinate', 'v_Normal', 'v_Position', 'v_LightDirection', 'v_EyeVector'];
+var varyingValues = [2, 3, 3, 3, 3];
 
 var header = 'precision mediump float;\n';
 
@@ -375,4 +375,3 @@ Program.prototype.compileShader = function compileShader(shader, source) {
 };
 
 module.exports = Program;
-
