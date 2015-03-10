@@ -1,5 +1,5 @@
 vec3 lambertianLight() {
-    vec3 Ia = u_LightAmbient;
+    vec3 Ia = u_LightAmbient * baseColor;
     vec3 normal = normalize(v_Normal);
     vec3 lightDirection = normalize(-v_LightDirection);
     float nDotL = max(dot(lightDirection, normal), 0.0);
