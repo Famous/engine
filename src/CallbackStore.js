@@ -18,12 +18,15 @@ function CallbackStore () {
  * 
  * @param  {String}   key
  * @param  {Function} callback
- * @return {Number}   Unique callback id. Useful for removing the listener later
- *   on without storing a reference to the passed in callback function.
+ * @return {Function} A function to call if you want to remove the callback
  */
 CallbackStore.prototype.on = function on (key, callback) {
     if (!this._events[key]) this._events[key] = [];
-    return this._events[key].push(callback) - 1;
+    var callbackList = this._events[key];
+    callbackList.push(callback);
+    return function () {
+        callbackList.splice(callbackList.indexOf(callback), 1);
+    }
 };
 
 /**
@@ -33,15 +36,12 @@ CallbackStore.prototype.on = function on (key, callback) {
  * @chainable
  * 
  * @param  {String}          key
- * @param  {Function|Number} callbackOrId
+ * @param  {Function}        callback
  * @return {CallbackStore}   this
  */
-CallbackStore.prototype.off = function off (key, callbackOrId) {
+CallbackStore.prototype.off = function off (key, callback) {
     var events = this._events[key];
-    if (events) {
-        var index = callbackOrId.constructor === Number ? callbackOrId : events.indexOf(callbackOrId);
-        if (index > -1) events.splice(index, 1);
-    }
+    if (events) events.splice(events.indexOf(callbackOrId), 1);
     return this;
 };
 
