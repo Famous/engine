@@ -156,6 +156,9 @@ VirtualElement.prototype.receive = function receive (commands) {
         case CHANGE_CONTENT:
             this.setContent(commands.shift());
             break;
+        case CHANGE_ATTRIBUTE:
+            this.setAttribute(commands.shift(), commands.shift());
+            break;
         case ADD_CLASS:
             this.addClass(commands.shift());
             break;
