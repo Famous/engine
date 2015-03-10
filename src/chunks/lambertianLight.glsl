@@ -1,9 +1,10 @@
-vec3 lambertianLight(vec3 baseColor, vec3 vPosition, vec3 vNormal, vec3 u_LightPosition, vec3 u_LightColor) {
-    vec3 normal = normalize(vNormal);
-    vec3 lightDirection = normalize(u_LightPosition - vPosition);
+vec3 lambertianLight() {
+    vec3 Ia = u_LightAmbient;
+    vec3 normal = normalize(v_Normal);
+    vec3 lightDirection = normalize(-v_LightDirection);
     float nDotL = max(dot(lightDirection, normal), 0.0);
     vec3 diffuse = u_LightColor * baseColor * nDotL;
-    return diffuse;
+    return (Ia.r > 0.0 || Ia.g > 0.0 || Ia.b > 0.0) ?  Ia + diffuse : diffuse;
 }
 
 #pragma glslify: export(lambertianLight)
