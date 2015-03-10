@@ -375,4 +375,3 @@ Program.prototype.compileShader = function compileShader(shader, source) {
 };
 
 module.exports = Program;
-
