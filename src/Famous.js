@@ -4,6 +4,8 @@ var Clock = require('./Clock');
 var GlobalDispatch = require('./GlobalDispatch');
 var Context = require('./Context');
 
+var isWorker = self.window !== self;
+
 function Famous() {
     this._globalDispatch = new GlobalDispatch();
     this._clock = new Clock();
@@ -12,18 +14,29 @@ function Famous() {
 
     var _this = this;
 
-    self.addEventListener('message', function(ev) {
-        _this._globalDispatch.receiveCommands(ev.data);
-    });
+    if (isWorker) {
+        self.addEventListener('message', function(ev) {
+            _this.postMessage(ev.data);
+        });
+    }
 
     this._globalDispatch.targetedOn('engine', 'FRAME', function (time) {
         _this._clock.step(time);
 
         var messages = _this._globalDispatch.getMessages();
-        if (messages.length) self.postMessage(messages);
+        if (messages.length) {
+            if (isWorker) self.postMessage(messages);
+            else _this.onmessage(messages);
+        }
         messages.length = 0;
     });
 }
+
+Famous.prototype.postMessage = function postMessage (message) {
+    this._globalDispatch.receiveCommands(message);
+};
+
+Famous.prototype.onmessage = function onmessage () {};
 
 Famous.prototype.receiveCommands = function receiveCommands (commands) {
     this._globalDispatch.receiveCommands(commands);
