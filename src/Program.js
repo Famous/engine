@@ -32,14 +32,14 @@ var inputTypes = {baseColor: 'vec3', normal: 'vec3', glossiness: 'float', metaln
 var identityMatrix = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
 
 var uniformNames = [
-    'perspective', 'resolution',
+    'perspective', 'view', 'resolution',
     'transform', 'origin', 'size', 'opacity',
     'baseColor', 'normal', 'metalness', 'glossiness', 'positionOffset',
     'u_LightPosition', 'u_LightColor'
 ];
 
 var uniformValues = [
-    identityMatrix, [0, 0, 0],
+    identityMatrix, identityMatrix, [0, 0, 0],
     identityMatrix, [0.5, 0.5, 0.5], [1, 1, 1], 0,
     [1, 1, 1], [1, 1, 1], 1, 1, [0,0,0],
     [1, 1, 1], [1, 1, 1]

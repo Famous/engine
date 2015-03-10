@@ -5,7 +5,7 @@ var Program = require('./Program');
 var Buffer = require('./Buffer');
 var BufferRegistry = require('./BufferRegistry');
 
-var uniformNames = ['perspective', 'transform', 'opacity', 'origin', 'size', 'baseColor', 'time'];
+var uniformNames = ['perspective', 'view', 'transform', 'opacity', 'origin', 'size', 'baseColor', 'time'];
 var resolutionName = ['resolution'];
 var uniformValues = [];
 var resolutionValues = [];
@@ -198,6 +198,7 @@ WebGLRenderer.prototype.draw = function draw(renderState) {
 
     this.projectionTransform[11] = renderState.perspectiveTransform[11];
     this.program.setUniforms(['perspective'], [this.projectionTransform]);
+    this.program.setUniforms(['view'], [renderState.viewTransform]);
 
     for (i = 0, len = this.meshRegistryKeys.length; i < len; i++) {
         mesh = this.meshRegistry[this.meshRegistryKeys[i]];
