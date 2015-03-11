@@ -2,5 +2,5 @@
 
 module.exports = {
     Mesh: require('./Mesh'),
-    PointLight: require('./PointLight')
+    PointLight: require('./lights/PointLight')
 };
