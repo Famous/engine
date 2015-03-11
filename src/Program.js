@@ -2,8 +2,13 @@
 
 var Utility = require('famous-utilities');
 
+var vertexWrapper = require('famous-webgl-shaders').vertex;
+var fragmentWrapper = require('famous-webgl-shaders').fragment;
+
 var VERTEX_SHADER = 35633;
 var FRAGMENT_SHADER = 35632;
+
+var identityMatrix = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
 
 var TYPES = {
     undefined: 'float ',
@@ -14,34 +19,56 @@ var TYPES = {
     16: 'mat4 '
 };
 
-var vertexWrapper = require('famous-webgl-shaders').vertex;
-
-var fragmentWrapper = require('famous-webgl-shaders').fragment;
-
-var inputs = ['baseColor', 'normals', 'metalness', 'glossiness', 'positionOffset'];
-var inputTypes = {baseColor: 'vec3', normal: 'vec3', glossiness: 'float', metalness: 'float', positionOffset: 'vert' };
+var inputTypes = {
+    baseColor: 'vec3',
+    normal: 'vec3',
+    glossiness: 'float',
+    metalness: 'float',
+    positionOffset: 'vert'
+};
 
 var masks =  {
     vert: 1,
     vec3: 2,
-    float : 4
+    float: 4
 };
 
-/* Default values used in the every shader instance */
-var identityMatrix = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
-
 var uniformNames = [
-    'perspective', 'view', 'resolution',
-    'transform', 'origin', 'size', 'opacity',
-    'baseColor', 'normal', 'metalness', 'glossiness', 'positionOffset',
-    'u_LightPosition', 'u_LightColor', 'u_LightAmbient', 'u_Shininess', 'time'
+    'perspective',
+    'view',
+    'resolution',
+    'transform',
+    'origin',
+    'size',
+    'time'
+    'opacity',
+    'metalness',
+    'glossiness',
+    'baseColor',
+    'normal',
+    'positionOffset',
+    'u_LightPosition',
+    'u_LightColor',
+    'u_Ambience'
 ];
 
 var uniformValues = [
-    identityMatrix, identityMatrix, [0, 0, 0],
-    identityMatrix, [0.5, 0.5, 0.5], [1, 1, 1], 0,
-    [1, 1, 1], [1, 1, 1], 1, 1, [0,0,0],
-    [1, 1, 1], [1, 1, 1], [0, 0, 0], 0, 0
+    identityMatrix,
+    identityMatrix,
+    [0, 0, 0],
+    identityMatrix,
+    [0.5, 0.5, 0.5],
+    [1, 1, 1],
+    0,
+    1,
+    0,
+    0,
+    [1, 1, 1],
+    [1, 1, 1],
+    [0, 0, 0],
+    [1, 1, 1],
+    [-1, -1, -1],
+    [0, 0, 0]
 ];
 
 var attributeNames = ['pos', 'texCoord', 'normals'];
