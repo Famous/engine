@@ -40,7 +40,7 @@ var uniformNames = [
     'transform',
     'origin',
     'size',
-    'time'
+    'time',
     'opacity',
     'metalness',
     'glossiness',
