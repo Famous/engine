@@ -43,14 +43,6 @@ Famous.prototype.postMessage = function postMessage (message) {
 
 Famous.prototype.onmessage = function onmessage () {};
 
-/**
- * @deprecated
- */
-Famous.prototype.receiveCommands = function receiveCommands (commands) {
-    this._globalDispatch.receiveCommands(commands);
-    return this;
-};
-
 // Use this when deprecation of `new Context` is complete
 // Famous.prototype.createContext = function createContext (selector) {
 //     var context = new Context(selector, this._globalDispatch);
