@@ -18,7 +18,7 @@ var Color = require('famous-utilities').Color;
  */
 function Mesh (dispatch, options) {
     this.dispatch = dispatch;
-    this.queue = ['GL_CREATE_MESH'];
+    this.queue = [];
     this._id = dispatch.addRenderable(this);
     this._color = new Color();
     this._glossiness = new Transitionable(0);
