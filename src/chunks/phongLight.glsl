@@ -1,4 +1,4 @@
-vec3 phongLight() {
+vec3 phongLight(in vec3 baseColor) {
     vec3 normal = normalize(v_Normal);
     vec3 lightDirection = normalize(v_LightDirection);
     float lambertTerm = dot(normal, -lightDirection);

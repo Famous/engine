@@ -4,6 +4,6 @@
 void main() {
     vec3 material = baseColor.x >= 0.0 ? baseColor : applyMaterial(baseColor);
     bool lightsEnabled = u_LightColor.r > 0.0 || u_LightColor.g > 0.0 || u_LightColor.b > 0.0;
-    vec3 color = lightsEnabled ? applyLight() : baseColor;
+    vec3 color = lightsEnabled ? applyLight(material) : baseColor;
     gl_FragColor = vec4(color, opacity);
 }
