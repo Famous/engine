@@ -3,6 +3,7 @@
 /**
  * Module dependencies
  */
+var Transitionable = require('famous-transitions').Transitionable;
 var Color = require('famous-utilities').Color;
 
 
@@ -20,6 +21,7 @@ function Mesh (dispatch, options) {
     this.queue = ['GL_CREATE_MESH'];
     this._id = dispatch.addRenderable(this);
     this._color = new Color('rgb', 255, 0, 0);
+    this._glossiness = new Transitionable(0);
     this._origin = new Float32Array([0, 0, 0]);
     this._size = [];
     this._expressions = {};
@@ -168,6 +170,13 @@ Mesh.prototype.clean = function clean() {
         return true;
     }
 
+    if (this._glossiness.isActive()) {
+        this.dispatch.sendDrawCommand('GL_UNIFORMS');
+        this.dispatch.sendDrawCommand('glossiness');
+        this.dispatch.sendDrawCommand(this._glossiness.get());
+        return true;
+    }
+
     return this.queue.length;
 };
 
@@ -217,6 +226,7 @@ Mesh.prototype.baseColor = function baseColor() {
  * @return {Element} current Mesh
  */
 Mesh.prototype.normal = function (materialExpression) {
+    this.dispatch.dirtyRenderable(this._id);
     if (materialExpression._compile) materialExpression = materialExpression._compile();
     this.queue.push(typeof materialExpression === 'number' ? 'UNIFORM_INPUT' : 'MATERIAL_INPUT');
     this.queue.push('normal');
@@ -234,9 +244,20 @@ Mesh.prototype.normal = function (materialExpression) {
  * @param {Object} Material or Image
  * @return {Element} current Mesh
  */
-Mesh.prototype.glossiness = function (materialExpression) {
-    if (materialExpression._compile) materialExpression = materialExpression._compile();
-    this.queue.push(typeof materialExpression === 'number' ? 'UNIFORM_INPUT' : 'MATERIAL_INPUT');
+Mesh.prototype.glossiness = function(materialExpression) {
+    this.dispatch.dirtyRenderable(this._id);
+    var materialExpression = Array.prototype.concat.apply([], arguments);
+
+    if (materialExpression[0]._compile) {
+        this.queue.push('MATERIAL_INPUT');
+        this._expressions.glossiness = materialExpression[0];
+        materialExpression = materialExpression[0]._compile();
+    }
+    else {
+        this._glossiness.set(materialExpression[0], materialExpression[1]);
+        this.queue.push('GL_UNIFORMS');
+        materialExpression = this._glossiness.get();
+    }
     this.queue.push('glossiness');
     this.queue.push(materialExpression);
     return this;
@@ -253,6 +274,7 @@ Mesh.prototype.glossiness = function (materialExpression) {
  * @return {Element} current Mesh
  */
 Mesh.prototype.metallic = function metallic(materialExpression) {
+    this.dispatch.dirtyRenderable(this._id);
     if (materialExpression._compile) materialExpression = materialExpression._compile();
     this.queue.push(typeof materialExpression === 'number' ? 'UNIFORM_INPUT' : 'MATERIAL_INPUT');
     this.queue.push('metallic');
