@@ -33,14 +33,7 @@ GlobalDispatch.prototype.handleMessage = function handleMessage (commands) {
     switch (type) {
         case TRIGGER:
             var ev = commands.shift();
-            switch (ev) {
-                case 'resize':
-                    if (this._targetedCallbacks[path]) this._targetedCallbacks[path].trigger('resize', [commands.shift(), commands.shift()]);
-                    break;
-                default:
-                    if (this._targetedCallbacks[path]) this._targetedCallbacks[path].trigger(ev, commands.shift());
-                    break;
-            }
+            if (this._targetedCallbacks[path]) this._targetedCallbacks[path].trigger(ev, commands.shift());
             break;
     }
     return this;
