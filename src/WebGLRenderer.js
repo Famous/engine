@@ -449,14 +449,34 @@ function loadImage (img, callback) {
 }
 
 function handleImage(material) {
-    if (! material.uniforms.image) return;
-    var t = new Texture(this.gl);
+    if (! material.uniforms.hasOwnProperty('image')) return;
 
-    t.src = material.uniforms.image;
-    t.setImage(checkers);
-    loadImage(material.uniforms.image, function (img) {
-        t.setImage(img);
-    });
+    var source = material.uniforms.image;
+
+    if (Array.isArray(source)) {
+        var t = new Texture(this.gl);
+        t.setArray(source);
+    }
+    
+    if (window && source instanceof window.HTMLVideoElement) {
+        var t = new Texture(this.gl);
+        t.src = material.uniforms.image;
+        t.setImage(checkers);
+        source.addEventListener('loadeddata', function(x) {
+            t.setImage(source);
+            setInterval(function () { t.setImage(source); }, 16);
+        });  
+    }
+    
+    if ('string' === typeof source) {
+        var t = new Texture(this.gl);
+        t.src = material.uniforms.image;
+        t.setImage(checkers);
+        loadImage(material.uniforms.image, function (img) {
+            t.setImage(img);
+        });
+    }
+    
     delete material.uniforms.image;
     return t;
 }

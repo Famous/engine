@@ -81,6 +81,14 @@ Texture.prototype.setImage = function setImage(img) {
     return this;
 };
 
+
+Texture.prototype.setArray = function setImage(img) {
+    this.gl.bindTexture(this.gl.TEXTURE_2D, this.id);
+    this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.format, 1, 1, 0, this.format, this.type, new Uint8Array(img));
+    this.gl.bindTexture(this.gl.TEXTURE_2D, null);
+    return this;
+};
+
 /**
  * Dumps the rgb-pixel contents of a texture into an array for debugging purposes
  *
