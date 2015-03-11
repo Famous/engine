@@ -76,10 +76,15 @@ WebGLRenderer.prototype.createLight = function createLight(path) {
 
 
 WebGLRenderer.prototype.createMesh = function createMesh(path) {
-    this.lightRegistryKeys.push(path);
-    return this.lightRegistry[path] = {
-        color: [0, 0, 0],
-        position: [0, 0, 0]
+    this.meshRegistryKeys.push(path);
+    return this.meshRegistry[path] = {
+        uniformKeys: ['opacity', 'transform', 'size', 'origin', 'baseColor', 'positionOffset'],
+        uniformValues: [1, identity, [0, 0, 0], [0, 0, 0], [0.5, 0.5, 0.5], [0, 0, 0]],
+        buffers: {},
+        options: {},
+        geometry: null,
+        drawType: null,
+        texture: null
     };
 };
 
@@ -102,20 +107,8 @@ WebGLRenderer.prototype.receive = function receive(path, commands) {
     switch (command) {
 
         case 'GL_SET_DRAW_OPTIONS':
+            if (!mesh) mesh = this.createMesh(path);
             mesh.options = commands.shift();
-            break;
-
-        case 'GL_CREATE_MESH':
-            mesh = this.meshRegistry[path] = {
-                uniformKeys: ['opacity', 'transform', 'size', 'origin', 'baseColor', 'positionOffset'],
-                uniformValues: [1, identity, [0, 0, 0], [0, 0, 0], [0.5, 0.5, 0.5], [0, 0, 0]],
-                buffers: {},
-                options: {},
-                geometry: null,
-                drawType: null,
-                texture: null
-            };
-            this.meshRegistryKeys.push(path);
             break;
 
         case 'GL_AMBIENT_LIGHT':
@@ -139,6 +132,7 @@ WebGLRenderer.prototype.receive = function receive(path, commands) {
             break;
 
         case 'MATERIAL_INPUT':
+            if (!mesh) mesh = this.createMesh(path);
             var name = commands.shift();
             var mat = commands.shift();
             mesh.uniformValues[name == 'baseColor' ? 4 : 5][0] = -mat._id;
@@ -148,12 +142,14 @@ WebGLRenderer.prototype.receive = function receive(path, commands) {
             break;
 
         case 'GL_SET_GEOMETRY':
+            if (!mesh) mesh = this.createMesh(path);
             mesh.geometry = commands.shift();
             mesh.drawType = commands.shift();
             mesh.dynamic = commands.shift();
             break;
 
         case 'GL_UNIFORMS':
+            if (!mesh) mesh = this.createMesh(path);
             uniformName = commands.shift();
             uniformValue = commands.shift();
             var index = mesh.uniformKeys.indexOf(uniformName);
