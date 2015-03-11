@@ -66,5 +66,5 @@ void main() {
    vec3 offsetPos = pos + calculateOffset(positionOffset);
    gl_Position = applyTransform(vec4(offsetPos, 1.0));
    v_LightDirection = v_Position - u_LightPosition;
-   v_EyeVector = -vec3(gl_Position);
+   v_EyeVector = -normalize(vec3(gl_Position));
 }
