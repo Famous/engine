@@ -110,7 +110,7 @@ Compositor.prototype.giveSizeFor = function giveSizeFor(commands) {
 };
 
 Compositor.prototype.sendResize = function sendResize (selector, size) {
-    this._outCommands.push('WITH', selector, 'TRIGGER', 'resize', size[0], size[1]);
+    this._outCommands.push('WITH', selector, 'TRIGGER', 'resize', size);
     this._sentResize = true;
     return this;
 };
