@@ -40,6 +40,7 @@ function WebGLRenderer(container) {
 
     this.meshRegistry = {};
     this.meshRegistryKeys = [];
+    this.ambientLight = [-1, -1, -1];
     this.lightRegistry = {};
     this.lightRegistryKeys = [];
     this.textureRegistry = {};
@@ -64,6 +65,30 @@ function WebGLRenderer(container) {
     this.projectionTransform = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
 }
 
+
+WebGLRenderer.prototype.createLight = function createLight(path) {
+    this.lightRegistryKeys.push(path);
+    return this.lightRegistry[path] = {
+        color: [0, 0, 0],
+        position: [0, 0, 0]
+    };
+};
+
+
+WebGLRenderer.prototype.createMesh = function createMesh(path) {
+    this.meshRegistryKeys.push(path);
+    return this.meshRegistry[path] = {
+        uniformKeys: ['opacity', 'transform', 'size', 'origin', 'baseColor', 'positionOffset'],
+        uniformValues: [1, identity, [0, 0, 0], [0, 0, 0], [0.5, 0.5, 0.5], [0, 0, 0]],
+        buffers: {},
+        options: {},
+        geometry: null,
+        drawType: null,
+        texture: null
+    };
+};
+
+
 /**
  * Draws a mesh onto the screen
  *
@@ -78,57 +103,36 @@ WebGLRenderer.prototype.receive = function receive(path, commands) {
     var mesh = this.meshRegistry[path];
     var light = this.lightRegistry[path];
 
-    var bufferName;
-    var bufferValue;
-    var bufferSpacing;
-    var uniformName;
-    var uniformValue;
-    var geometryId;
-
     var command = commands.shift();
-
     switch (command) {
 
         case 'GL_SET_DRAW_OPTIONS':
+            if (!mesh) mesh = this.createMesh(path);
             mesh.options = commands.shift();
             break;
 
-        case 'GL_CREATE_MESH':
-            mesh = this.meshRegistry[path] = {
-                uniformKeys: ['opacity', 'transform', 'size', 'origin', 'baseColor', 'positionOffset'],
-                uniformValues: [1, identity, [0, 0, 0], [0, 0, 0], [0.5, 0.5, 0.5], [0, 0, 0]],
-                buffers: {},
-                options: {},
-                geometry: null,
-                drawType: null,
-                texture: null
-            };
-            this.meshRegistryKeys.push(path);
-            break;
-
-        case 'GL_CREATE_LIGHT':
-            light = this.lightRegistry[path] = {
-                color: [1.0, 1.0, 1.0],
-                position: [0.0, 0.0, 100.0]
-            };
-            this.lightRegistryKeys.push(path);
+        case 'GL_AMBIENT_LIGHT':
+            this.ambientLight[0] = commands.shift();
+            this.ambientLight[1] = commands.shift();
+            this.ambientLight[2] = commands.shift();
             break;
 
         case 'GL_LIGHT_POSITION':
-            var transform = commands.shift();
-            light.position[0] = transform[12];
-            light.position[1] = transform[13];
-            light.position[2] = transform[14];
+            if (!light) light = this.createLight(path);
+            light.position[0] = commands.shift();
+            light.position[1] = commands.shift();
+            light.position[2] = commands.shift();
             break;
 
         case 'GL_LIGHT_COLOR':
-            var color = commands.shift();
-            light.color[0] = color[0];
-            light.color[1] = color[1];
-            light.color[2] = color[2];
+            if (!light) light = this.createLight(path);
+            light.color[0] = commands.shift();
+            light.color[1] = commands.shift();
+            light.color[2] = commands.shift();
             break;
 
         case 'MATERIAL_INPUT':
+            if (!mesh) mesh = this.createMesh(path);
             var name = commands.shift();
             var mat = commands.shift();
             mesh.uniformValues[name == 'baseColor' ? 4 : 5][0] = -mat._id;
@@ -138,12 +142,14 @@ WebGLRenderer.prototype.receive = function receive(path, commands) {
             break;
 
         case 'GL_SET_GEOMETRY':
+            if (!mesh) mesh = this.createMesh(path);
             mesh.geometry = commands.shift();
             mesh.drawType = commands.shift();
             mesh.dynamic = commands.shift();
             break;
 
         case 'GL_UNIFORMS':
+            if (!mesh) mesh = this.createMesh(path);
             uniformName = commands.shift();
             uniformValue = commands.shift();
             var index = mesh.uniformKeys.indexOf(uniformName);
@@ -176,6 +182,10 @@ WebGLRenderer.prototype.draw = function draw(renderState) {
     var i;
     var len;
 
+    /**
+     * Light updates
+     */
+    this.program.setUniforms(['u_AmbientLight'], [this.ambientLight]);
     for (i = 0, len = this.lightRegistryKeys.length; i < len; i++) {
         light = this.lightRegistry[this.lightRegistryKeys[i]];
         this.program.setUniforms(['u_LightPosition'], [light.position]);
