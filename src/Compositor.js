@@ -1,6 +1,9 @@
+'use strict';
+
 var VirtualElement = require('famous-dom-renderers').VirtualElement;
 var WebGLRenderer = require('famous-webgl-renderers').WebGLRenderer;
 var Camera = require('famous-components').Camera;
+var VirtualObservable = require('./VirtualObservable');
 
 function Compositor() {
     this._contexts = {};
@@ -13,6 +16,8 @@ function Compositor() {
         perspectiveTransform: new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]),
         viewTransform: new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1])
     };
+
+    this._virtualObservables = [];
 }
 
 Compositor.CommandsToOutput = {
@@ -170,14 +175,14 @@ Compositor.prototype.drawCommands = function drawCommands() {
 };
 
 Compositor.prototype.proxy = function proxy (commands) {
-    var path = commands.shift();
+    var target = commands.shift();
     var type = commands.shift();
 
-    var _this = this;
-    window[path].addEventListener(type, function(ev) {
-        // ev = JSON.stringify(ev);
-        _this._outCommands.push('WITH', path, 'TRIGGER', type, ev);
-    });
+    if (!this._virtualObservables[target]) {
+        this._virtualObservables[target] = new VirtualObservable(target, this);
+    }
+
+    this._virtualObservables[target].addEventListener(type);
 };
 
 Compositor.prototype.receiveCommands = function receiveCommands(commands) {
