@@ -49,7 +49,7 @@ var uniformNames = [
     'positionOffset',
     'u_LightPosition',
     'u_LightColor',
-    'u_Ambience'
+    'u_AmbientLight'
 ];
 
 var uniformValues = [
