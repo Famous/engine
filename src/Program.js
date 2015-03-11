@@ -4,8 +4,6 @@ var Utility = require('famous-utilities');
 
 var VERTEX_SHADER = 35633;
 var FRAGMENT_SHADER = 35632;
-var vertexWrapper = require('famous-webgl-shaders').vertex;
-var fragmentWrapper = require('famous-webgl-shaders').fragment;
 
 var TYPES = {
     undefined: 'float ',
@@ -15,9 +13,6 @@ var TYPES = {
     4: 'vec4 ',
     16: 'mat4 '
 };
-
-var VERTEX_SHADER = 35633;
-var FRAGMENT_SHADER = 35632;
 
 var vertexWrapper = require('famous-webgl-shaders').vertex;
 
@@ -39,14 +34,14 @@ var uniformNames = [
     'perspective', 'view', 'resolution',
     'transform', 'origin', 'size', 'opacity',
     'baseColor', 'normal', 'metalness', 'glossiness', 'positionOffset',
-    'u_LightPosition', 'u_LightColor', 'u_LightAmbient', 'u_Shininess'
+    'u_LightPosition', 'u_LightColor', 'u_LightAmbient', 'u_Shininess', 'time'
 ];
 
 var uniformValues = [
     identityMatrix, identityMatrix, [0, 0, 0],
     identityMatrix, [0.5, 0.5, 0.5], [1, 1, 1], 0,
     [1, 1, 1], [1, 1, 1], 1, 1, [0,0,0],
-    [1, 1, 1], [1, 1, 1], [0, 0, 0], 0
+    [1, 1, 1], [1, 1, 1], [0, 0, 0], 0, 0
 ];
 
 var attributeNames = ['pos', 'texCoord', 'normals'];
@@ -110,22 +105,30 @@ Program.prototype.registerMaterial = function registerMaterial(name, material) {
 
     for (var k in compiled.varyings) {
         varyingNames.push(k);
-        varyingValues.push(compiled.uniforms[k]);
+        varyingValues.push(compiled.varyings[k].length);
+    }
+
+    for (var k in compiled.attributes) {
+        attributeNames.push(k);
+        attributeValues.push(compiled.attributes[k].length);
     }
 
     this.registeredMaterials[material._id] |= mask;
 
     if (type == 'float') {
+        this.definitionFloat.push(material.defines);
         this.definitionFloat.push('float fa_' + material._id + '() {\n '  + compiled.glsl + ' \n}');
         this.applicationFloat.push('if (int(abs(ID)) == ' + material._id + ') return fa_' + material._id  + '();');
     }
 
-    if (type == 'vec3'){
+    if (type == 'vec3') {
+        this.definitionVec.push(material.defines);
         this.definitionVec.push('vec3 fa_' + material._id + '() {\n '  + compiled.glsl + ' \n}');
         this.applicationVec.push('if (int(abs(ID.x)) == ' + material._id + ') return fa_' + material._id + '();');
     }
 
-    if (type == 'vert'){
+    if (type == 'vert') {
+        this.definitionVert.push(material.defines);
         this.definitionVert.push('vec3 fa_' + material._id + '() {\n '  + compiled.glsl + ' \n}');
         this.applicationVert.push('if (int(abs(ID.x)) == ' + material._id + ') return fa_' + material._id + '();');
     }
@@ -200,8 +203,8 @@ Program.prototype.resetProgram = function resetProgram() {
     }
 
     vertexSource = vertexHeader.join('') + vertexWrapper
-        .replace('#vert_definitions', this.definitionVert.join(';\n'))
-        .replace('#vert_applications', this.applicationVert.join(';\n'));
+        .replace('#vert_definitions', this.definitionVert.join('\n'))
+        .replace('#vert_applications', this.applicationVert.join('\n'));
 
     fragmentSource = fragmentHeader.join('') + fragmentWrapper
         .replace('#vec_definitions', this.definitionVec.join('\n'))
