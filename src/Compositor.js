@@ -3,7 +3,7 @@
 var VirtualElement = require('famous-dom-renderers').VirtualElement;
 var WebGLRenderer = require('famous-webgl-renderers').WebGLRenderer;
 var Camera = require('famous-components').Camera;
-var VirtualObservable = require('./VirtualObservable');
+var VirtualWindow = require('./VirtualWindow');
 
 function Compositor() {
     this._contexts = {};
@@ -17,7 +17,7 @@ function Compositor() {
         viewTransform: new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1])
     };
 
-    this._virtualObservables = [];
+    this._virtualWindow = new VirtualWindow(this);
 }
 
 Compositor.CommandsToOutput = {
@@ -130,7 +130,7 @@ Compositor.prototype.drawCommands = function drawCommands() {
                 this.handleWith(commands);
                 break;
             case 'PROXY':
-                this.proxy(commands);
+                this._virtualWindow.listen(commands.shift(), commands.shift());
                 break;
             case 'NEED_SIZE_FOR':
                 this.giveSizeFor(commands);
@@ -172,17 +172,6 @@ Compositor.prototype.drawCommands = function drawCommands() {
     }
 
     return this._outCommands;
-};
-
-Compositor.prototype.proxy = function proxy (commands) {
-    var target = commands.shift();
-    var type = commands.shift();
-
-    if (!this._virtualObservables[target]) {
-        this._virtualObservables[target] = new VirtualObservable(target, this);
-    }
-
-    this._virtualObservables[target].addEventListener(type);
 };
 
 Compositor.prototype.receiveCommands = function receiveCommands(commands) {
