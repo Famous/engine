@@ -48,7 +48,8 @@ function VirtualElement (target, path, renderer, parent, rootElement) {
     this._target = target;
     this._renderer = renderer;
     this._parent = parent;
-    this._matrix = new Float32Array(16);
+    this._receivedMatrix = new Float32Array(16);
+    this._finalMatrix = new Float32Array(16);
     this._invertedParent = [];
     target.classList.add(FA_SURFACE);
     this._allocator = new ElementAllocator(target);
@@ -75,7 +76,7 @@ VirtualElement.prototype.changeTag = function changeTag (tagName) {
 
     this._target = newTarget;
 
-    this.setMatrix.apply(this, this._matrix);
+    this.setMatrix.apply(this, this._finalMatrix);
     newTarget.classList.add(FA_SURFACE);
 
     var key;
@@ -261,7 +262,7 @@ VirtualElement.prototype._getSize = function _getSize () {
 };
 
 VirtualElement.prototype.draw = function draw(renderState) {
-    var m = this._matrix;
+    var m = this._finalMatrix;
     var perspectiveTransform = renderState.perspectiveTransform;
 
     var originShiftedPerspective = [
@@ -302,27 +303,43 @@ VirtualElement.prototype.draw = function draw(renderState) {
 };
 
 VirtualElement.prototype.setMatrix = function setMatrix (m0, m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11, m12, m13, m14, m15) {
+    this._receivedMatrix[0] = m0;
+    this._receivedMatrix[1] = m1;
+    this._receivedMatrix[2] = m2;
+    this._receivedMatrix[3] = m3;
+    this._receivedMatrix[4] = m4;
+    this._receivedMatrix[5] = m5;
+    this._receivedMatrix[6] = m6;
+    this._receivedMatrix[7] = m7;
+    this._receivedMatrix[8] = m8;
+    this._receivedMatrix[9] = m9;
+    this._receivedMatrix[10] = m10;
+    this._receivedMatrix[11] = m11;
+    this._receivedMatrix[12] = m12;
+    this._receivedMatrix[13] = m13;
+    this._receivedMatrix[14] = m14;
+    this._receivedMatrix[15] = m15;
     if (this._parent) {
-        invert(this._invertedParent, this._parent._matrix);
-        multiply(this._matrix, this._invertedParent, m0, m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11, m12, m13, m14, m15);
+        invert(this._invertedParent, this._parent._receivedMatrix);
+        multiply(this._finalMatrix, this._invertedParent, m0, m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11, m12, m13, m14, m15);
     }
     else {
-        this._matrix[0] = m0;
-        this._matrix[1] = m1;
-        this._matrix[2] = m2;
-        this._matrix[3] = m3;
-        this._matrix[4] = m4;
-        this._matrix[5] = m5;
-        this._matrix[6] = m6;
-        this._matrix[7] = m7;
-        this._matrix[8] = m8;
-        this._matrix[9] = m9;
-        this._matrix[10] = m10;
-        this._matrix[11] = m11;
-        this._matrix[12] = m12;
-        this._matrix[13] = m13;
-        this._matrix[14] = m14;
-        this._matrix[15] = m15;
+        this._finalMatrix[0] = m0;
+        this._finalMatrix[1] = m1;
+        this._finalMatrix[2] = m2;
+        this._finalMatrix[3] = m3;
+        this._finalMatrix[4] = m4;
+        this._finalMatrix[5] = m5;
+        this._finalMatrix[6] = m6;
+        this._finalMatrix[7] = m7;
+        this._finalMatrix[8] = m8;
+        this._finalMatrix[9] = m9;
+        this._finalMatrix[10] = m10;
+        this._finalMatrix[11] = m11;
+        this._finalMatrix[12] = m12;
+        this._finalMatrix[13] = m13;
+        this._finalMatrix[14] = m14;
+        this._finalMatrix[15] = m15;
     }
 };
 
