@@ -192,7 +192,7 @@ WebGLRenderer.prototype.draw = function draw(renderState) {
 
     this.projectionTransform[11] = renderState.perspectiveTransform[11];
     
-    this.program.setUniforms(['perspective', 'time', 'view'], [this.projectionTransform, Date.now(), renderState.viewTransform]);
+    this.program.setUniforms(['perspective', 'time', 'view'], [this.projectionTransform, Date.now()  % 100000 / 1000, renderState.viewTransform]);
 
     for (i = 0, len = this.meshRegistryKeys.length; i < len; i++) {
         mesh = this.meshRegistry[this.meshRegistryKeys[i]];
