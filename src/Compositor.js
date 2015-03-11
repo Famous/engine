@@ -124,6 +124,9 @@ Compositor.prototype.drawCommands = function drawCommands() {
             case 'WITH':
                 this.handleWith(commands);
                 break;
+            case 'PROXY':
+                this.proxy(commands);
+                break;
             case 'NEED_SIZE_FOR':
                 this.giveSizeFor(commands);
                 break;
@@ -164,6 +167,17 @@ Compositor.prototype.drawCommands = function drawCommands() {
     }
 
     return this._outCommands;
+};
+
+Compositor.prototype.proxy = function proxy (commands) {
+    var path = commands.shift();
+    var type = commands.shift();
+
+    var _this = this;
+    window[path].addEventListener(type, function(ev) {
+        // ev = JSON.stringify(ev);
+        _this._outCommands.push('WITH', path, 'TRIGGER', type, ev);
+    });
 };
 
 Compositor.prototype.receiveCommands = function receiveCommands(commands) {
