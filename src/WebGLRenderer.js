@@ -6,14 +6,6 @@ var Buffer = require('./Buffer');
 var BufferRegistry = require('./BufferRegistry');
 var checkers = require('./Checkerboard');
 
-var uniformNames = ['perspective', 'view', 'transform', 'opacity', 'origin', 'size', 'baseColor', 'time'];
-var resolutionName = ['resolution'];
-var uniformValues = [];
-var resolutionValues = [];
-
-var inputIdx = { baseColor: 0, normal: 1, metalness: 2, glossiness: 3, positionOffset: 4};
-var inputNames = ['baseColor', 'normal', 'metalness', 'glossiness', 'positionOffset'];
-var inputValues = [[.5, .5, .5], [0,0,0], .2, .8, .8];
 var identity = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
 
 /**
