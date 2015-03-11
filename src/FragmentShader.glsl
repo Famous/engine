@@ -1,9 +1,9 @@
 #pragma glslify: applyMaterial = require(./chunks/applyMaterial)
-#pragma glslify: lambertianLight = require(./chunks/lambertianLight)
-#pragma glslify: phongLight = require(./chunks/phongLight)
+#pragma glslify: applyLight = require(./chunks/applyLight)
 
 void main() {
     vec3 material = baseColor.x >= 0.0 ? baseColor : applyMaterial(baseColor);
-    vec3 color = (u_Shininess > 0.0) ? phongLight() : lambertianLight();
+    bool lightsEnabled = u_LightColor.r > 0.0 || u_LightColor.g > 0.0 || u_LightColor.b > 0.0;
+    vec3 color = lightsEnabled ? applyLight() : baseColor;
     gl_FragColor = vec4(color, opacity);
 }
