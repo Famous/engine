@@ -132,7 +132,7 @@ Transform.prototype._isIdentity = function _isIdentity() {
     var trans = vectors.translation;
     var rot = vectors.rotation;
     var scale = vectors.scale;
-    return !(trans[0] || trans[1] || trans[2] || rot[0] || rot[1] || rot[2]) && scale[0] && scale[1] && scale[2];
+    return !(trans[0] || trans[1] || trans[2] || rot[0] || rot[1] || rot[2]) && (scale[0] === 1) && (scale[1] === 1) && (scale[2] === 1);
 };
 
 Transform.prototype._copyParent = function _copyParent(parentReport, parentMatrix) {
@@ -160,7 +160,10 @@ Transform.prototype._copyParent = function _copyParent(parentReport, parentMatri
  * @return {Number} invalidation scheme
  */
 Transform.prototype._update = function _update(parentReport, parentMatrix) {
-    if (!(parentReport || this._invalidated)) return 0;
+    if (!(parentReport || this._invalidated)) {
+        this._previouslyInvalidated = 0;
+        return 0;
+    }
     if (this._isIdentity()) return this._copyParent(parentReport, parentMatrix);
     if (parentReport) this._invalidateFromParent(parentReport);
     if (!parentMatrix) parentMatrix = IDENTITY;

@@ -5,6 +5,7 @@ module.exports = {
     ComponentStore: require('./ComponentStore'),
     GlobalDispatch: require('./GlobalDispatch'),
     Context: require('./Context'),
+    Famous: require('./Famous'),
     Layer: require('./Layer'),
     Clock: require('./Clock'),
     LocalDispatch: require('./LocalDispatch'),
@@ -14,5 +15,6 @@ module.exports = {
     Origin: require('./Origin'),
     RenderContext: require('./RenderContext'),
     RenderProxy: require('./RenderProxy'),
-    Size: require('./Size')
+    Size: require('./Size'),
+    Transform: require('./Transform')
 };

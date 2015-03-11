@@ -6,20 +6,10 @@ var WITH = 'WITH';
 var FRAME = 'FRAME';
 var TRIGGER = 'TRIGGER';
 
-var WORKER = (typeof window === 'undefined');
-
 function GlobalDispatch () {
     this._messages = [];
     this._targetedCallbacks = {};
     this._globalCallbacks = [];
-
-    if (WORKER) {
-        var _this = this;
-        self.onmessage = function(ev) {
-            _this.receiveCommands(ev.data);
-        };
-    }
-
 }
 
 GlobalDispatch.prototype.receiveCommands = function receiveCommands (commands) {
@@ -42,14 +32,28 @@ GlobalDispatch.prototype.handleMessage = function handleMessage (commands) {
     var type = commands.shift();
     switch (type) {
         case TRIGGER:
-            if (this._targetedCallbacks[path]) this._targetedCallbacks[path].trigger(commands.shift(), commands.shift());
+            var ev = commands.shift();
+            switch (ev) {
+                case 'resize':
+                    if (this._targetedCallbacks[path]) this._targetedCallbacks[path].trigger('resize', [commands.shift(), commands.shift()]);
+                    break;
+                default:
+                    if (this._targetedCallbacks[path]) this._targetedCallbacks[path].trigger(ev, commands.shift());
+                    break;
+            }
             break;
     }
+    return this;
 };
 
 GlobalDispatch.prototype.targetedOn = function targetedOn (path, key, cb) {
     if (!this._targetedCallbacks[path]) this._targetedCallbacks[path] = new CallbackStore();
     this._targetedCallbacks[path].on(key, cb);
+    return this;
+};
+
+GlobalDispatch.prototype.targetedOff = function targetedOff (path, key, cb) {
+    if (!this._targetedCallbacks[path]) this._targetedCallbacks[path].off(key, cb);
     return this;
 };
 
@@ -78,15 +82,8 @@ GlobalDispatch.prototype.message = function message (mess) {
     return this;
 };
 
-GlobalDispatch.prototype.flush = function flush () {
-    var message = this._messages;
-
-    if (message.length && WORKER) self.postMessage(message);
-
-    for (var i = 0, len = this._messages.length; i < len ; i++)
-        this._messages.pop();
-
-    return this;
+GlobalDispatch.prototype.getMessages = function getMessages() {
+    return this._messages;
 };
 
 module.exports = GlobalDispatch;
