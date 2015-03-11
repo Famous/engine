@@ -19,12 +19,12 @@ EventHandler.toString = function toString() {
 
 EventHandler.prototype.on = function on (ev, cb) {
     this._events.on(ev, cb);
-    this.dispatch.registerGlobalEvent(ev, this.trigger.bind(this, eventName));
+    this.dispatch.registerGlobalEvent(ev, this.trigger.bind(this, ev));
 };
 
 EventHandler.prototype.off = function off (ev, cb) {
     this._events.off(ev, cb);
-    this.dispatch.deregisterGlobalEvent(ev, this.trigger.bind(this, eventName))
+    this.dispatch.deregisterGlobalEvent(ev, this.trigger.bind(this, ev))
 };
 
 
