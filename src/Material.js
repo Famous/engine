@@ -1,35 +1,35 @@
 'use strict';
 
-var STRING = 'string';
-
-var chunks = {
-    abs: {glsl: 'abs(%1);', inputs: [0], output: 0 },
-    sign: {glsl: 'sign(%1);', inputs: [0], output: 0 },
-    floor: {glsl: 'floor(%1);', inputs: [0], output: 0 },
-    ceiling: {glsl: 'ceil(%1);', inputs: [0], output: 0 },
+var snippets = {
+    abs: {glsl: 'abs(%1);'},
+    sign: {glsl: 'sign(%1);'},
+    floor: {glsl: 'floor(%1);'},
+    ceiling: {glsl: 'ceil(%1);'},
     
-    mod: {glsl: 'mod(%1, %2);', inputs: [1], output: 1 },
-    min: {glsl: 'min(%1, %2);', inputs: [1], output: 1 },
-    max: {glsl: 'max(%1, %2);', inputs: [1], output: 1 },
-    clamp: {glsl: 'clamp(%1, %2, %3);', inputs: [1], output: 1 },
-    mix: {glsl: 'mix(%1, %2, %3);', inputs: [1], output: 1 },
-    step: {glsl: 'step(%1, %2, %3);', inputs: [1], output: 1 },
-    smoothstep: {glsl: 'smoothstep(%1);', inputs: [1], output: 1 },
+    mod: {glsl: 'mod(%1, %2);'},
+    min: {glsl: 'min(%1, %2);'},
+    max: {glsl: 'max(%1, %2);'},
+    clamp: {glsl: 'clamp(%1, %2, %3);'},
+    mix: {glsl: 'mix(%1, %2, %3);'},
+    step: {glsl: 'step(%1, %2, %3);'},
+    smoothstep: {glsl: 'smoothstep(%1);'},
 
-    sin: {glsl: 'sin(%1);', inputs: [1], output: 1 },
-    time: {glsl: 'time;', inputs: [], output: 1 },
+    fragCoord: {glsl: 'gl_FragColor.xy;'},
 
-    add: {glsl: '%1 + %2;', inputs: [4, 4], output: 4, content: '+' }, 
-    multiply: {glsl: '%1 * %2;', inputs: [4, 4], output: 4, content: '+' }, 
+    sin: {glsl: 'sin(%1);'},
+    time: {glsl: 'time;'},
 
-    normal: {glsl:'vNormal;', inputs: [], output: 4 },
-    uv: {glsl:'vec3(vTextureCoordinate, 1);', inputs: [], output: 4 },
-    meshPosition: {glsl:'(vPosition + 1.0) * 0.5;', inputs: [], output: 4 },
+    add: {glsl: '%1 + %2;'}, 
+    multiply: {glsl: '%1 * %2;'}, 
 
-    image: {glsl:'texture2D(image, vTextureCoordinate).rgb;', inputs: [], output: 4 },
+    normal: {glsl:'v_Normal;'},
+    uv: {glsl:'vec3(v_TextureCoordinate, 1);'},
+    meshPosition: {glsl:'(v_Position + 1.0) * 0.5;'},
 
-    constant: {glsl: 'vec3(.5,1,1);', inputs: [], output: 4 }, 
-    parameter: {uniforms: {parameter: 1}, glsl: 'parameter;', inputs: [], output: 4 }
+    image: {glsl:'texture2D(image, v_TextureCoordinate).rgb;'},
+
+    constant: {glsl: '%1;'}, 
+    parameter: {uniforms: {parameter: 1}, glsl: 'parameter;'}
 };
 
 var expressions = {};
@@ -40,8 +40,8 @@ expressions.registerExpression = function registerExpression(name, schema) {
     };
 };
 
-for (var name in chunks) {
-    expressions.registerExpression(name, chunks[name]);
+for (var name in snippets) {
+    expressions.registerExpression(name, snippets[name]);
 }
 
 /**
@@ -60,7 +60,9 @@ function Material(name, chunk, inputs, uniforms) {
     this.name = name;
     this.chunk = chunk;
     this.inputs = inputs ? (Array.isArray(inputs) ? inputs : [inputs]): [];
-    this.uniforms = uniforms;
+    this.uniforms = uniforms || {};
+    this.varyings = this.uniforms.varyings;
+    this.attributes = this.uniforms.attributes;
     this._id = Material.id++;
 
     this.invalidations = [];
@@ -104,17 +106,26 @@ Material.prototype.setUniform = function setUniform(name, value) {
 Material.prototype._compile = function _compile() {
     var glsl = '';
     var uniforms = {};
- 
-   this.traverse(function (node, depth) {
+    var varyings = {};
+    var attributes = {};
+    var defines = [];
+    
+    this.traverse(function (node, depth) {
         if (! node.chunk) return;
         glsl += 'vec3 ' + makeLabel(node) + '=' + processGLSL(node.chunk.glsl, node.inputs) + '\n ';
         if (node.uniforms) extend(uniforms, node.uniforms);
+        if (node.varyings) extend(varyings, node.varying);
+        if (node.attributes) extend(attributes, node.attributes);
+        if (node.chunk.defines) defines.push(node.chunk.defines);
     });
 
     return {
         _id: this._id,
         glsl: glsl + 'return ' + makeLabel(this) + ';',
-        uniforms: uniforms
+        defines: defines.join('\n'),
+        uniforms: uniforms,
+        varyings: varyings, 
+        attributes: attributes
     };
 };
 
@@ -126,8 +137,8 @@ function processGLSL(str, inputs) {
     });
 }
 function makeLabel (n) {
-    if (typeof n == 'object') return 'fa_' + (n._id);
     if (Array.isArray(n)) return arrayToVec(n);
+    if (typeof n == 'object') return 'fa_' + (n._id);
     else return JSON.stringify(n);
 }
 
@@ -138,3 +149,7 @@ function arrayToVec(array) {
 
 module.exports = expressions;
 expressions.Material = Material;
+expressions.Texture = function (source) {
+    if (! window) return console.log('this constructor cannot be run inside of a work');
+    return expressions.image([], {image: source});
+};
