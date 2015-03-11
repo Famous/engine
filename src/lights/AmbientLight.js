@@ -7,35 +7,20 @@ var Color = require('famous-utilities').Color;
 
 
 /**
- * PointLight Component
+ * AmbientLight Component
  */
-var PointLight = function PointLight(dispatch) {
+var AmbientLight = function AmbientLight(dispatch) {
     this.dispatch = dispatch;
     this.queue = [];
     this._color = new Color();
     this._id = dispatch.addComponent(this);
-    init.call(this);
 };
 
-PointLight.toString = function toString() {
-    return 'PointLight';
+AmbientLight.toString = function toString() {
+    return 'AmbientLight';
 };
 
-function init() {
-    var dispatch = this.dispatch;
-    this._receiveTransformChange(dispatch.getContext()._transform);
-    dispatch.onTransformChange(this._receiveTransformChange.bind(this));
-};
-
-PointLight.prototype._receiveTransformChange = function _receiveTransformChange(transform) {
-    this.dispatch.dirtyComponent(this._id);
-    this.queue.push('GL_LIGHT_POSITION');
-    this.queue.push(transform._matrix[12]);
-    this.queue.push(transform._matrix[13]);
-    this.queue.push(transform._matrix[14]);
-};
-
-PointLight.prototype.setColor = function setColor() {
+AmbientLight.prototype.setColor = function setColor() {
     this.dispatch.dirtyComponent(this._id);
     var values = Array.prototype.concat.apply([], arguments);
     if (values[0] instanceof Color) {
@@ -44,7 +29,7 @@ PointLight.prototype.setColor = function setColor() {
     else {
         this._color.set(values);
     }
-    this.queue.push('GL_LIGHT_COLOR');
+    this.queue.push('GL_AMBIENT_LIGHT');
     var color = this._color.getNormalizedRGB();
     this.queue.push(color[0]);
     this.queue.push(color[1]);
@@ -52,7 +37,7 @@ PointLight.prototype.setColor = function setColor() {
     return this;
 };
 
-PointLight.prototype.clean = function clean() {
+AmbientLight.prototype.clean = function clean() {
     var path = this.dispatch.getRenderPath();
 
     this.dispatch
@@ -65,7 +50,7 @@ PointLight.prototype.clean = function clean() {
     }
 
     if (this._color.isActive()) {
-        this.dispatch.sendDrawCommand('GL_LIGHT_COLOR');
+        this.dispatch.sendDrawCommand('GL_AMBIENT_LIGHT');
         var color = this._color.getNormalizedRGB();
         this.dispatch.sendDrawCommand(color[0]);
         this.dispatch.sendDrawCommand(color[1]);
@@ -80,4 +65,4 @@ PointLight.prototype.clean = function clean() {
 /**
  * Expose
  */
-module.exports = PointLight;
+module.exports = AmbientLight;
