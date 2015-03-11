@@ -63,7 +63,6 @@ void main() {
    v_TextureCoordinate = texCoord;
    vec3 offsetPos = pos + calculateOffset(positionOffset);
    gl_Position = applyTransform(vec4(offsetPos, 1.0));
-   v_Position = gl_Position.xyz;
    v_LightDirection = gl_Position.xyz - u_LightPosition;
    v_EyeVector = -vec3(gl_Position);
 }
