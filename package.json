@@ -14,10 +14,10 @@
   },
   "homepage": "https://github.com/Famous/webgl-shaders",
   "dependencies": {
-    "glslify": "latest"
+    "glslify": "^1.6.0"
   },
-  "browserify" : {
-    "transform" : [
+  "browserify": {
+    "transform": [
       "glslify"
     ]
   }
