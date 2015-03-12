@@ -2,6 +2,7 @@
 
 function Clock () {
     this._updates = [];
+    this._nextStepUpdates = [];
     this._time = null;
 }
 
@@ -10,6 +11,10 @@ Clock.prototype.step = function step (time) {
 
     for (var i = 0, len = this._updates.length ; i < len ; i++)
         this._updates[i].update(time);
+
+    while (this._nextStepUpdates.length > 0) {
+        this._nextStepUpdates.shift().update(time);
+    }
 
     return this;
 };
@@ -28,6 +33,11 @@ Clock.prototype.noLongerUpdate = function noLongerUpdate(target) {
 
 Clock.prototype.getTime = function getTime () {
     return this._time;
+};
+
+Clock.prototype.nextStep = function nextStep (target) {
+    this._nextStepUpdates.push(target);
+    return this;
 };
 
 module.exports = Clock;
