@@ -32,10 +32,9 @@ Compositor.CommandsToOutput = {
     GL_UNIFORMS: 'GL',
     GL_BUFFER_DATA: 'GL',
     GL_SET_GEOMETRY: 'GL',
-    GL_CREATE_LIGHT: 'GL',
+    GL_AMBIENT_LIGHT: 'GL',
     GL_LIGHT_POSITION: 'GL',
     GL_LIGHT_COLOR: 'GL',
-    GL_CREATE_MESH: 'GL',
     GL_SET_DRAW_OPTIONS: 'GL',
     MATERIAL_INPUT: 'GL'
 };
