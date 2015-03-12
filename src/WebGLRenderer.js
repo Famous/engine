@@ -415,29 +415,6 @@ WebGLRenderer.prototype.updateSize = function updateSize() {
 
 module.exports = WebGLRenderer;
 
-function IDL(){
-    var onLoadEnvironment = function (xhr, gl) {
-
-        gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
-        gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
-        gl.pixelStorei(gl.UNPACK_COLORSPACE_CONVERSION_WEBGL, gl.NONE);
-        if (xhr.status !== 200) return;
-        this.texture0 = gl.createTexture();
-        gl.bindTexture(gl.TEXTURE_2D, this.texture0);
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1024, 1024, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array(xhr.response));
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-    };
-
-    var xhr = new XMLHttpRequest();
-    xhr.open('GET', 'luv.bin', true);
-    xhr.responseType = 'arraybuffer';
-    xhr.onload = onLoadEnvironment.bind(this, xhr, this.gl);
-    xhr.send(null);
-}
-
 WebGLRenderer.prototype.handleOptions = function handleOptions(options) {
     var gl = this.gl;
     if (! options) return;
