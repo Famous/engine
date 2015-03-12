@@ -5,11 +5,14 @@ var CallbackStore = require('famous-utilities').CallbackStore;
 function EventHandler (dispatch, events) {
     this.dispatch = dispatch;
     this._events = new CallbackStore();
-    for (var i = 0, len = events.length; i < len; i++) {
-        var eventName = events[i].event;
-        var callback = events[i].callback;
-        this._events.on(eventName, callback);
-        dispatch.registerGlobalEvent(eventName, this.trigger.bind(this, eventName));
+
+    if (events) {
+        for (var i = 0, len = events.length; i < len; i++) {
+            var eventName = events[i].event;
+            var callback = events[i].callback;
+            this._events.on(eventName, callback);
+            dispatch.registerGlobalEvent(eventName, this.trigger.bind(this, eventName));
+        }
     }
 }
 
