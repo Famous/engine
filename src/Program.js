@@ -123,7 +123,7 @@ Program.prototype.registerMaterial = function registerMaterial(name, material) {
     var type = inputTypes[name];
     var mask = masks[type];
 
-    if ((this.registeredMaterials[material._id] & mask) == mask) return;
+    if ((this.registeredMaterials[material._id] & mask) === mask) return;
 
     for (var k in compiled.uniforms) {
         if (uniformNames.indexOf(k) === -1) {

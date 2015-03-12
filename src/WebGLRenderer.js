@@ -136,7 +136,7 @@ WebGLRenderer.prototype.receive = function receive(path, commands) {
             var name = commands.shift();
             var mat = commands.shift();
             mesh.uniformValues[name === 'baseColor' ? 4 : 5][0] = -mat._id;
-            mesh.texture = handleTexture.call(this, mat);
+            mesh.texture = handleTexture.call(this, mat.texture);
             this.program.registerMaterial(name, mat);
             this.updateSize();
             break;
@@ -435,17 +435,10 @@ function loadImage (img, callback) {
     return obj;
 }
 
-function handleTexture(material) {
-    var source, textureId, texture;
-
-    if (material.uniforms.image instanceof Object) {
-        source = material.uniforms.image.data;
-        textureId = material.uniforms.image.id;
-        texture = this.textureRegistry[textureId];
-    }
-    else {
-        source = material.uniforms.image;
-    }
+function handleTexture(texture) {
+    var source = texture.data;
+    var textureId = texture.id;
+    var texture = this.textureRegistry[textureId];
 
     if (!texture) {
         if (Array.isArray(source)) {
@@ -455,7 +448,7 @@ function handleTexture(material) {
 
         else if (window && source instanceof window.HTMLVideoElement) {
             texture = new Texture(this.gl);
-            texture.src = material.uniforms.image;
+            texture.src = texture;
             texture.setImage(checkers);
             source.addEventListener('loadeddata', function(x) {
                 texture.setImage(source);
@@ -471,7 +464,7 @@ function handleTexture(material) {
             });
         }
 
-        if (textureId) this.textureRegistry[textureId] = texture;
+        this.textureRegistry[textureId] = texture;
     }
 
     return texture;
