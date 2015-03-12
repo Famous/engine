@@ -1,6 +1,9 @@
+'use strict';
+
 var VirtualElement = require('famous-dom-renderers').VirtualElement;
 var WebGLRenderer = require('famous-webgl-renderers').WebGLRenderer;
 var Camera = require('famous-components').Camera;
+var VirtualWindow = require('./VirtualWindow');
 
 function Compositor() {
     this._contexts = {};
@@ -13,6 +16,8 @@ function Compositor() {
         perspectiveTransform: new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]),
         viewTransform: new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1])
     };
+
+    this._virtualWindow = new VirtualWindow(this);
 }
 
 Compositor.CommandsToOutput = {
@@ -122,6 +127,9 @@ Compositor.prototype.drawCommands = function drawCommands() {
         switch (command) {
             case 'WITH':
                 this.handleWith(commands);
+                break;
+            case 'PROXY':
+                this._virtualWindow.listen(commands.shift(), commands.shift());
                 break;
             case 'NEED_SIZE_FOR':
                 this.giveSizeFor(commands);
