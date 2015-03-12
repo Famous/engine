@@ -74,8 +74,8 @@ var uniformValues = [
 var attributeNames = ['pos', 'texCoord', 'normals'];
 var attributeValues = [3, 2, 3, 1];
 
-var varyingNames = ['v_TextureCoordinate', 'v_Normal', 'v_Position', 'v_LightDirection', 'v_EyeVector'];
-var varyingValues = [2, 3, 3, 3, 3];
+var varyingNames = ['v_TextureCoordinate', 'v_Normal', 'v_Position'];
+var varyingValues = [2, 3, 3];
 
 var header = 'precision mediump float;\n';
 
@@ -335,7 +335,7 @@ Program.prototype.setUniforms = function (uniformNames, uniformValue) {
     var len;
     var i;
 
-    if (! this.program) return;
+    if (!this.program) return;
 
     len = uniformNames.length;
     for (i = 0; i < len; i++) {
@@ -346,7 +346,7 @@ Program.prototype.setUniforms = function (uniformNames, uniformValue) {
         // if it does not yet exist.
 
         location = this.uniformLocations[name] || gl.getUniformLocation(this.program, name);
-        if (! location) continue;
+        if (!location) continue;
 
         this.uniformLocations[name] = location;
 
