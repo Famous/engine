@@ -5,7 +5,7 @@
  */
 var Transitionable = require('famous-transitions').Transitionable;
 var Color = require('famous-utilities').Color;
-
+var Geometry = require('famous-webgl-geometries');
 
 /**
  * The Mesh class is responsible for providing the API for how
@@ -102,11 +102,16 @@ Mesh.prototype.getSize = function getSize() {
  *
  * @param {Geometry} geometry instance to be associated with the mesh
  */
-Mesh.prototype.setGeometry = function (geometry) {
+Mesh.prototype.setGeometry = function (geometry, options) {
     var i;
     var key;
     var buffers;
     var bufferIndex;
+
+    if (typeof geometry === 'string') {
+        if (!Geometry[geometry]) throw 'Invalid geometry: "' + geometry + '".';
+        else geometry = new Geometry[geometry](options);
+    }
 
     if (this._geometry !== geometry) {
         this.queue.push('GL_SET_GEOMETRY');

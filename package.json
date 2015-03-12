@@ -35,5 +35,7 @@
     "watchify": "^2.1.1"
   },
   "dependencies": {
+    "famous-utilities": "git+ssh://git@github.famo.us/platform/utilities#master",
+    "famous-webgl-geometries": "git+ssh://git@github.famo.us/platform/webgl-geometries#master"
   }
 }
