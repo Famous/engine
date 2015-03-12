@@ -74,8 +74,8 @@ var uniformValues = [
 var attributeNames = ['pos', 'texCoord', 'normals'];
 var attributeValues = [3, 2, 3, 1];
 
-var varyingNames = ['v_TextureCoordinate', 'v_Normal', 'v_Position', 'v_LightDirection', 'v_EyeVector'];
-var varyingValues = [2, 3, 3, 3, 3];
+var varyingNames = ['v_TextureCoordinate', 'v_Normal', 'v_Position'];
+var varyingValues = [2, 3, 3];
 
 var header = 'precision mediump float;\n';
 
