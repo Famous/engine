@@ -135,8 +135,8 @@ WebGLRenderer.prototype.receive = function receive(path, commands) {
             if (!mesh) mesh = this.createMesh(path);
             var name = commands.shift();
             var mat = commands.shift();
-            mesh.uniformValues[name == 'baseColor' ? 4 : 5][0] = -mat._id;
-            mesh.texture = handleTexture.call(this, mat);
+            mesh.uniformValues[name === 'baseColor' ? 4 : 5][0] = -mat._id;
+            mesh.texture = handleTexture.call(this, mat.texture);
             this.program.registerMaterial(name, mat);
             this.updateSize();
             break;
@@ -198,21 +198,18 @@ WebGLRenderer.prototype.draw = function draw(renderState) {
 
     for (i = 0, len = this.meshRegistryKeys.length; i < len; i++) {
         mesh = this.meshRegistry[this.meshRegistryKeys[i]];
-
         buffers = this.bufferRegistry.registry[mesh.geometry];
+
         if (!buffers) continue;
 
+        if (mesh.options) this.handleOptions(mesh.options);
         if (mesh.texture) mesh.texture.bind();
 
         this.program.setUniforms(mesh.uniformKeys, mesh.uniformValues);
-
-        this.handleOptions(mesh.options);
-
         this.drawBuffers(buffers, mesh.drawType, mesh.geometry);
 
         if (mesh.texture) mesh.texture.unbind();
-
-        this.resetOptions(mesh.options);
+        if (mesh.options) this.resetOptions(mesh.options);
     }
 };
 
@@ -284,6 +281,7 @@ WebGLRenderer.prototype.drawBuffers = function drawBuffers(vertexBuffers, mode, 
     }
 
     // Disable any attributes that not currently being used.
+
     for(var i = 0, len = this.state.enabledAttributesKeys.length; i < len; i++) {
         var key = this.state.enabledAttributes[this.state.enabledAttributesKeys[i]];
         if (this.state.enabledAttributes[key] && vertexBuffers.keys.indexOf(key) === -1) {
@@ -293,6 +291,7 @@ WebGLRenderer.prototype.drawBuffers = function drawBuffers(vertexBuffers, mode, 
     }
 
     if (length) {
+
         // If index buffer, use drawElements.
 
         if (j !== undefined) {
@@ -436,19 +435,10 @@ function loadImage (img, callback) {
     return obj;
 }
 
-function handleTexture(material) {
-    var source, textureId, texture;
-
-    if (!material.uniforms.hasOwnProperty('image')) return;
-
-    if (material.uniforms.image instanceof Object) {
-        source = material.uniforms.image.data;
-        textureId = material.uniforms.image.id;
-        texture = this.textureRegistry[textureId];
-    }
-    else {
-        source = material.uniforms.image;
-    }
+function handleTexture(texture) {
+    var source = texture.data;
+    var textureId = texture.id;
+    var texture = this.textureRegistry[textureId];
 
     if (!texture) {
         if (Array.isArray(source)) {
@@ -458,7 +448,7 @@ function handleTexture(material) {
 
         else if (window && source instanceof window.HTMLVideoElement) {
             texture = new Texture(this.gl);
-            texture.src = material.uniforms.image;
+            texture.src = texture;
             texture.setImage(checkers);
             source.addEventListener('loadeddata', function(x) {
                 texture.setImage(source);
@@ -474,9 +464,8 @@ function handleTexture(material) {
             });
         }
 
-        if (textureId) this.textureRegistry[textureId] = texture;
+        this.textureRegistry[textureId] = texture;
     }
 
-    delete material.uniforms.image;
     return texture;
 }
