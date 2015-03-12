@@ -3,7 +3,6 @@
 var CallbackStore = require('famous-utilities').CallbackStore;
 
 function GlobalDispatch () {
-    this._messages = [];
     this._targetedCallbacks = {};
     this._globalCallbacks = [];
 }
@@ -42,15 +41,6 @@ GlobalDispatch.prototype.emit = function emit (ev, cb) {
         if (this._globalCallbacks[i])
             this._globalCallbacks[i].trigger(ev, cb);
     return this;
-};
-
-GlobalDispatch.prototype.message = function message (mess) {
-    this._messages.push(mess);
-    return this;
-};
-
-GlobalDispatch.prototype.getMessages = function getMessages() {
-    return this._messages;
 };
 
 module.exports = GlobalDispatch;

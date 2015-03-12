@@ -4,12 +4,14 @@
 
 var Clock = require('./Clock');
 var GlobalDispatch = require('./GlobalDispatch');
+var MessageQueue = require('./MessageQueue');
 
 var isWorker = self.window !== self;
 
 function Famous() {
     this._globalDispatch = new GlobalDispatch();
     this._clock = new Clock();
+    this._messageQueue = new MessageQueue();
 
     var _this = this;
     if (isWorker) {
@@ -22,12 +24,12 @@ function Famous() {
 Famous.prototype.step = function step (time) {
     this._clock.step(time);
 
-    var messages = this._globalDispatch.getMessages();
+    var messages = this._messageQueue.getAll();
     if (messages.length) {
         if (isWorker) self.postMessage(messages);
         else this.onmessage(messages);
     }
-    messages.length = 0;
+    this._messageQueue.clear();
     return this;
 };
 
@@ -83,6 +85,10 @@ Famous.prototype.onmessage = function onmessage () {};
 
 Famous.prototype.getClock = function getClock () {
     return this._clock;
+};
+
+Famous.prototype.getMessageQueue = function getMessageQueue () {
+    return this._messageQueue;
 };
 
 Famous.prototype.getGlobalDispatch = function getGlobalDispatch () {
