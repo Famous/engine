@@ -200,6 +200,7 @@ WebGLRenderer.prototype.draw = function draw(renderState) {
         mesh = this.meshRegistry[this.meshRegistryKeys[i]];
 
         buffers = this.bufferRegistry.registry[mesh.geometry];
+        if (!buffers) continue;
 
         if (mesh.texture) mesh.texture.bind();
 
@@ -459,7 +460,7 @@ function loadImage (img, callback) {
 }
 
 function handleImage(material) {
-    if (! material.uniforms.hasOwnProperty('image')) return;
+    if (!material.uniforms.hasOwnProperty('image')) return;
 
     var source = material.uniforms.image;
 
@@ -467,7 +468,7 @@ function handleImage(material) {
         var t = new Texture(this.gl);
         t.setArray(source);
     }
-    
+
     if (window && source instanceof window.HTMLVideoElement) {
         var t = new Texture(this.gl);
         t.src = material.uniforms.image;
@@ -475,9 +476,9 @@ function handleImage(material) {
         source.addEventListener('loadeddata', function(x) {
             t.setImage(source);
             setInterval(function () { t.setImage(source); }, 16);
-        });  
+        });
     }
-    
+
     if ('string' === typeof source) {
         var t = new Texture(this.gl);
         t.src = material.uniforms.image;
@@ -486,7 +487,7 @@ function handleImage(material) {
             t.setImage(img);
         });
     }
-    
+
     delete material.uniforms.image;
     return t;
 }
