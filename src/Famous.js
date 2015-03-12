@@ -32,22 +32,25 @@ Famous.prototype.step = function step (time) {
 };
 
 Famous.prototype.postMessage = function postMessage (message) {
-    if (message.constructor === Number) {
-        this.step(message);
-    }
-    else {
-        while (message.length > 0) {
-            var command = message.shift();
-            switch (command) {
-                case 'WITH':
-                    this.handleWith(message);
-                    break;
-                default:
-                    console.error('Unknown command ' + command);
-                    break;
-            }
+    while (message.length > 0) {
+        var command = message.shift();
+        switch (command) {
+            case 'WITH':
+                this.handleWith(message);
+                break;
+            case 'FRAME':
+                this.handleFrame(message);
+                break;
+            default:
+                console.error('Unknown command ' + command);
+                break;
         }
     }
+    return this;
+};
+
+Famous.prototype.handleFrame = function handleFrame (message) {
+    this.step(message.shift());
     return this;
 };
 
