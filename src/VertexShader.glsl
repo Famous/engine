@@ -28,7 +28,6 @@ vec4 applyTransform(vec4 pos) {
    mat4 pixelTransform = originMVMatrix;
    pixelTransform[3][0] += size.x * 0.5;
    pixelTransform[3][1] += size.y * 0.5;
-   pixelTransform[3][2] += (size.z * (origin.z - 0.5));
 
    projection[0][0] = 1.0/resolution.x;
    projection[1][1] = 1.0/resolution.y;
