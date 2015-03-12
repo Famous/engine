@@ -1,8 +1,9 @@
 'use strict';
 
+/* global self, console */
+
 var Clock = require('./Clock');
 var GlobalDispatch = require('./GlobalDispatch');
-var Context = require('./Context');
 
 var isWorker = self.window !== self;
 
@@ -10,10 +11,7 @@ function Famous() {
     this._globalDispatch = new GlobalDispatch();
     this._clock = new Clock();
 
-    this._contexts = [];
-
     var _this = this;
-
     if (isWorker) {
         self.addEventListener('message', function(ev) {
             _this.postMessage(ev.data);
@@ -30,20 +28,49 @@ Famous.prototype.step = function step (time) {
         else this.onmessage(messages);
     }
     messages.length = 0;
+    return this;
 };
 
 Famous.prototype.postMessage = function postMessage (message) {
-    if (typeof message === 'number') {
+    if (message.constructor === Number) {
         this.step(message);
     }
     else {
-        this._globalDispatch.receiveCommands(message);
+        while (message.length > 0) {
+            var command = message.shift();
+            switch (command) {
+                case 'WITH':
+                    this.handleWith(message);
+                    break;
+                default:
+                    console.error('Unknown command ' + command);
+                    break;
+            }
+        }
     }
+    return this;
+};
+
+Famous.prototype.handleWith = function handleWith (message) {
+    var path = message.shift();
+    var command = message.shift();
+
+    switch (command) {
+        case 'TRIGGER':
+            var type = message.shift();
+            var ev = message.shift();
+            this._globalDispatch.targetedTrigger(path, type, ev);
+            break;
+        default:
+            console.error('Unknown command ' + command);
+            break;
+    }
+    return this;
 };
 
 Famous.prototype.onmessage = function onmessage () {};
 
-// Use this when deprecation of `new Context` is complete
+// Use this when deprecation of `new Context` pattern is complete
 // Famous.prototype.createContext = function createContext (selector) {
 //     var context = new Context(selector, this._globalDispatch);
 //     this._contexts.push(context);
