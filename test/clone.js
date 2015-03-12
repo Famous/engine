@@ -4,10 +4,10 @@ var test = require('tape');
 var clone = require('../src/clone');
 
 test('clone', function(t) {
-    t.equal(typeof clone, 'function', 'Utility.clone should be a function');
+    t.equal(typeof clone, 'function', 'clone should be a function');
 
     var flatObject = {a: {}, b: {}, c: {}};
-    t.deepEqual(clone(flatObject), flatObject, 'Utility.clone should clone flat object');
+    t.deepEqual(clone(flatObject), flatObject, 'clone should clone flat object');
 
     var nestedObject = {
         test1: {
@@ -19,6 +19,6 @@ test('clone', function(t) {
         test2: {},
         test3: {}
     };
-    t.deepEqual(clone(nestedObject), nestedObject, 'Utility.clone should deep clone nested object');
+    t.deepEqual(clone(nestedObject), nestedObject, 'clone should deep clone nested object');
     t.end();
 });
