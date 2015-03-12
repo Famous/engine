@@ -4,6 +4,7 @@
  * Module dependencies
  */
 var Transitionable = require('famous-transitions').Transitionable;
+var helpers = require('./helpers');
 
 
 /**
@@ -29,7 +30,7 @@ Color.toString = function toString() {
  */
 Color.prototype.set = function set() {
     var options = helpers.flattenArguments(arguments);
-    var type = helpers.determineType(options[0]);
+    var type = this.determineType(options[0]);
 
     switch (type) {
         case 'hsl': this.setHSL(options.slice(1)); break;
@@ -56,7 +57,7 @@ Color.prototype.changeTo = function changeTo() {
 Color.prototype.copy = function copy() {
     var values = helpers.flattenArguments(arguments);
     var color = values[0], options = values[1];
-    if (helpers.isColorInstance(color)) {
+    if (this.isColorInstance(color)) {
         this.setRGB(color.getRGB(), options);
     }
     return this;
@@ -83,6 +84,20 @@ Color.prototype.getColor = function getColor(option) {
         case 'hex': return this.getHex();
         case 'hsv': return this.getHSV();
         default: return this.getRGB();;
+    }
+};
+
+Color.prototype.isColorInstance = function isColorInstance(val) {
+    return (val instanceof Color);
+};
+
+Color.prototype.determineType = function determineType(val) {
+    if (this.isColorInstance(val)) return 'instance';
+    if (helpers.isHex(val)) return 'hex';
+    if (colorNames[val]) return 'color';
+    var types = ['rgb', 'hsl', 'hex', 'hsv'];
+    for(var i = 0; i < types.length; i++) {
+        if (helpers.isType(val, types[i])) return types[i];
     }
 };
 
@@ -177,7 +192,7 @@ Color.prototype.multiplyScalar = function multiplyScalar(s) {
 };
 
 Color.prototype.equals = function equals(color) {
-    if (helpers.isColorInstance(color)) {
+    if (this.isColorInstance(color)) {
         return  this.getR() === color.getR() &&
                 this.getG() === color.getG() &&
                 this.getB() === color.getB();
@@ -186,7 +201,7 @@ Color.prototype.equals = function equals(color) {
 };
 
 Color.prototype.copyGammaToLinear = function copyGammaToLinear(color) {
-    if (helpers.isColorInstance(color)) {
+    if (this.isColorInstance(color)) {
         var r = color.getR();
         var g = color.getG();
         var b = color.getB();
@@ -405,88 +420,6 @@ Color.prototype.getHSV = function getHSV() {
 
 
 /**
- * Helper functions
- */
-var helpers = {};
-
-helpers.flattenArguments = function(options) {
-    return Array.prototype.concat.apply([], options);
-}
-
-helpers.argsToArray = function(val) {
-    return Array.prototype.slice.call(val);
-}
-
-helpers.isColorInstance = function(val) {
-    return (val instanceof Color);
-}
-
-helpers.isArray = function(val) {
-    return Array.isArray(val);
-}
-
-helpers.isString = function(val) {
-    return (typeof val === 'string');
-}
-
-helpers.isInt = function(val) {
-    return parseInt(val) === val;
-}
-
-helpers.isFloat = function(val) {
-    return !helpers.isInt(val);
-}
-
-helpers.allFloats = function() {
-    var val = helpers.argsToArray(arguments);
-    for(var i = 0; i < val.length; i++) {
-        if (!helpers.isFloat(val[i])) return false;
-    }
-    return true;
-}
-
-helpers.allInts = function(val) {
-    return !helpers.allFloats(val);
-}
-
-helpers.allStrings = function() {
-    var values = helpers.argsToArray(arguments);
-    for(var i = 0; i < values.length; i++) {
-        if (!helpers.isString(values[i])) return false;
-    }
-    return true;
-}
-
-helpers.isPercentage = function(val) {
-    return /%/.test(val);
-}
-
-helpers.isHex = function(val) {
-    return /#/.test(val);
-}
-
-helpers.isType = function(type, value) {
-    return helpers.allStrings(type, value) && type.toLowerCase() === value.toLowerCase();
-}
-
-helpers.clamp = function(val, min, max) {
-    min = min || 0;
-    max = max || 255;
-    return Math.max(Math.min(val, max), min);
-}
-
-helpers.determineType = function(val) {
-    if (helpers.isColorInstance(val)) return 'instance';
-    if (helpers.isHex(val)) return 'hex';
-    if (colorNames[val]) return 'color';
-    var types = ['rgb', 'hsl', 'hex', 'hsv'];
-    for(var i = 0; i < types.length; i++) {
-        if (helpers.isType(val, types[i])) return types[i];
-    }
-}
-
-
-/**
  * Generic color names
  */
 var colorNames = {
@@ -644,5 +577,4 @@ var colorNames = {
 /**
  * Expose
  */
-module.exports.Color = Color;
-module.exports.helpers = helpers;
+module.exports = Color;

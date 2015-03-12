@@ -3,8 +3,8 @@
 /**
  * Module dependencies
  */
-var Color = require('./Color').Color;
-var helpers = require('./Color').helpers;
+var Color = require('./Color');
+var helpers = require('./helpers');
 
 
 /**
