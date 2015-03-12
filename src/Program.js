@@ -335,7 +335,7 @@ Program.prototype.setUniforms = function (uniformNames, uniformValue) {
     var len;
     var i;
 
-    if (! this.program) return;
+    if (!this.program) return;
 
     len = uniformNames.length;
     for (i = 0; i < len; i++) {
@@ -346,7 +346,7 @@ Program.prototype.setUniforms = function (uniformNames, uniformValue) {
         // if it does not yet exist.
 
         location = this.uniformLocations[name] || gl.getUniformLocation(this.program, name);
-        if (! location) continue;
+        if (!location) continue;
 
         this.uniformLocations[name] = location;
 
