@@ -15,7 +15,7 @@ vec4 applyTransform(vec4 pos) {
    mat4 MVMatrix = view * transform;
 
    mat4 originMVMatrix = forwardOrigin * MVMatrix;
-   originMVMatrix = MVMatrix * negatedOrigin;
+   originMVMatrix = originMVMatrix * negatedOrigin;
 
    mat4 projection = perspective;
    mat4 invertedYMatrix = invertYAxis(originMVMatrix);
@@ -26,10 +26,8 @@ vec4 applyTransform(vec4 pos) {
    pos.y *= -1.0;
    vec4 pixelPosition = vec4(pos.x * 0.5, pos.y * 0.5, pos.z * 0.5, 1.0);
    mat4 pixelTransform = originMVMatrix;
-   pixelTransform[3][0] += (size.x * origin.x);
-   pixelTransform[3][1] += (size.y * origin.y);
-   pixelTransform[3][2] += (size.z * (origin.z - 0.5));
-
+   pixelTransform[3][0] += size.x * 0.5;
+   pixelTransform[3][1] += size.y * 0.5;
 
    projection[0][0] = 1.0/resolution.x;
    projection[1][1] = 1.0/resolution.y;
