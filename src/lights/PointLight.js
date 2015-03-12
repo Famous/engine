@@ -52,6 +52,10 @@ PointLight.prototype.setColor = function setColor() {
     return this;
 };
 
+PointLight.prototype.getColor = function getColor(option) {
+    return this._color.getColor(option);
+};
+
 PointLight.prototype.clean = function clean() {
     var path = this.dispatch.getRenderPath();
 

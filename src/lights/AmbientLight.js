@@ -37,6 +37,10 @@ AmbientLight.prototype.setColor = function setColor() {
     return this;
 };
 
+AmbientLight.prototype.getColor = function getColor(option) {
+    return this._color.getColor(option);
+};
+
 AmbientLight.prototype.clean = function clean() {
     var path = this.dispatch.getRenderPath();
 
