@@ -1,5 +1,7 @@
 'use strict';
 
+var TextureRegistry = require('./TextureRegistry');
+
 var snippets = {
     abs: {glsl: 'abs(%1);'},
     sign: {glsl: 'sign(%1);'},
@@ -35,8 +37,8 @@ var snippets = {
 var expressions = {};
 
 expressions.registerExpression = function registerExpression(name, schema) {
-    this[name] = function (inputs, uniforms) {
-        return new Material(name, schema, inputs, uniforms);
+    this[name] = function (inputs, options) {
+        return new Material(name, schema, inputs, options);
     };
 };
 
@@ -56,13 +58,19 @@ for (var name in snippets) {
  * @param {Object} map of uniform data of float, vec2, vec3, vec4
  */
 
-function Material(name, chunk, inputs, uniforms) {
+function Material(name, chunk, inputs, options) {
+    options = options || {};
+
     this.name = name;
     this.chunk = chunk;
     this.inputs = inputs ? (Array.isArray(inputs) ? inputs : [inputs]): [];
-    this.uniforms = uniforms || {};
-    this.varyings = this.uniforms.varyings;
-    this.attributes = this.uniforms.attributes;
+    this.uniforms = options.uniforms || {};
+    this.varyings = options.varyings;
+    this.attributes = options.attributes;
+    if (options.texture) {
+        this.texture = (options.texture instanceof Object) ? options.texture : TextureRegistry.register(null, options.texture);
+    }
+
     this._id = Material.id++;
 
     this.invalidations = [];
@@ -109,6 +117,7 @@ Material.prototype._compile = function _compile() {
     var varyings = {};
     var attributes = {};
     var defines = [];
+    var texture;
     
     this.traverse(function (node, depth) {
         if (! node.chunk) return;
@@ -117,6 +126,7 @@ Material.prototype._compile = function _compile() {
         if (node.varyings) extend(varyings, node.varying);
         if (node.attributes) extend(attributes, node.attributes);
         if (node.chunk.defines) defines.push(node.chunk.defines);
+        if (node.texture) texture = node.texture;
     });
 
     return {
@@ -125,7 +135,8 @@ Material.prototype._compile = function _compile() {
         defines: defines.join('\n'),
         uniforms: uniforms,
         varyings: varyings, 
-        attributes: attributes
+        attributes: attributes,
+        texture: texture
     };
 };
 
@@ -151,5 +162,5 @@ module.exports = expressions;
 expressions.Material = Material;
 expressions.Texture = function (source) {
     if (! window) return console.log('this constructor cannot be run inside of a work');
-    return expressions.image([], {image: source});
+    return expressions.image([], { texture: source });
 };
