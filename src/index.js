@@ -1,5 +1,6 @@
 'use strict';
 
 module.exports = {
-    Material: require('./Material')
+    Material: require('./Material'),
+    TextureRegistry: require('./TextureRegistry')
 };
