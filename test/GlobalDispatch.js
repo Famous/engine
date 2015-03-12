@@ -15,24 +15,6 @@ test('GlobalDispatch', function(t) {
         });
     });
 
-    t.test('receiveCommands method', function(t) {
-        t.plan(1);
-        var globalDispatch = new GlobalDispatch();
-        t.equal(typeof globalDispatch.receiveCommands, 'function', 'globalDispatch.receiveCommands should be a function');
-    });
-
-    t.test('handleMessage method', function(t) {
-        t.plan(3);
-        var globalDispatch = new GlobalDispatch();
-        t.equal(typeof globalDispatch.handleMessage, 'function', 'globalDispatch.handleMessage should be a function');
-
-        globalDispatch.targetedOn('chicken/egg', 'eventname', function (ev) {
-            t.equal(ev, 'event');
-        });
-
-        t.equal(globalDispatch.handleMessage(['chicken/egg', 'TRIGGER', 'eventname', 'event']), globalDispatch, 'globalDispatch.handleMessage should be chainable');
-    });
-
     t.test('targetedOn method', function(t) {
         t.plan(1);
         var globalDispatch = new GlobalDispatch();

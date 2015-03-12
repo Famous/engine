@@ -58,11 +58,6 @@ test('Famous', function(t) {
         t.end();
     });
 
-    t.test('receiveCommands function', function(t) {
-        t.equal(typeof Famous.receiveCommands, 'function', 'Famous.receiveCommands should be a function');
-        t.end();
-    });
-
     t.test('getClock function', function(t) {
         t.plan(3);
         t.equal(typeof Famous.getClock, 'function', 'Famous.getClock should be a function');
