@@ -126,21 +126,21 @@ Program.prototype.registerMaterial = function registerMaterial(name, material) {
     if ((this.registeredMaterials[material._id] & mask) == mask) return;
 
     for (var k in compiled.uniforms) {
-        if (uniformNames.indexOf(k) !== -1) {
+        if (uniformNames.indexOf(k) === -1) {
             uniformNames.push(k);
             uniformValues.push(compiled.uniforms[k]);
         }
     }
 
     for (var k in compiled.varyings) {
-        if (varyingNames.index(k) !== -1) {
+        if (varyingNames.indexOf(k) === -1) {
             varyingNames.push(k);
             varyingValues.push(compiled.varyings[k].length);
         }
     }
 
     for (var k in compiled.attributes) {
-        if (attributeNames.index(k) !== -1) {
+        if (attributeNames.indexOf(k) === -1) {
             attributeNames.push(k);
             attributeValues.push(compiled.attributes[k].length);
         }

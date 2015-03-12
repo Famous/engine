@@ -135,7 +135,7 @@ WebGLRenderer.prototype.receive = function receive(path, commands) {
             if (!mesh) mesh = this.createMesh(path);
             var name = commands.shift();
             var mat = commands.shift();
-            mesh.uniformValues[name == 'baseColor' ? 4 : 5][0] = -mat._id;
+            mesh.uniformValues[name === 'baseColor' ? 4 : 5][0] = -mat._id;
             mesh.texture = handleTexture.call(this, mat);
             this.program.registerMaterial(name, mat);
             this.updateSize();
@@ -281,6 +281,7 @@ WebGLRenderer.prototype.drawBuffers = function drawBuffers(vertexBuffers, mode, 
     }
 
     // Disable any attributes that not currently being used.
+
     for(var i = 0, len = this.state.enabledAttributesKeys.length; i < len; i++) {
         var key = this.state.enabledAttributes[this.state.enabledAttributesKeys[i]];
         if (this.state.enabledAttributes[key] && vertexBuffers.keys.indexOf(key) === -1) {
@@ -290,6 +291,7 @@ WebGLRenderer.prototype.drawBuffers = function drawBuffers(vertexBuffers, mode, 
     }
 
     if (length) {
+
         // If index buffer, use drawElements.
 
         if (j !== undefined) {
