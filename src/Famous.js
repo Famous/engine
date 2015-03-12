@@ -98,9 +98,9 @@ Famous.prototype.getGlobalDispatch = function getGlobalDispatch () {
 Famous.prototype.proxyOn = function proxyOn(target, type, callback) {
     this._globalDispatch.targetedOn(target, type, callback);
 
-    this._globalDispatch.message('PROXY');
-    this._globalDispatch.message(target);
-    this._globalDispatch.message(type);
+    this._messageQueue.enqueue('PROXY');
+    this._messageQueue.enqueue(target);
+    this._messageQueue.enqueue(type);
 };
 
 module.exports = new Famous();
