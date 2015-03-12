@@ -126,18 +126,24 @@ Program.prototype.registerMaterial = function registerMaterial(name, material) {
     if ((this.registeredMaterials[material._id] & mask) == mask) return;
 
     for (var k in compiled.uniforms) {
-        uniformNames.push(k);
-        uniformValues.push(compiled.uniforms[k]);
+        if (uniformNames.indexOf(k) !== -1) {
+            uniformNames.push(k);
+            uniformValues.push(compiled.uniforms[k]);
+        }
     }
 
     for (var k in compiled.varyings) {
-        varyingNames.push(k);
-        varyingValues.push(compiled.varyings[k].length);
+        if (varyingNames.index(k) !== -1) {
+            varyingNames.push(k);
+            varyingValues.push(compiled.varyings[k].length);
+        }
     }
 
     for (var k in compiled.attributes) {
-        attributeNames.push(k);
-        attributeValues.push(compiled.attributes[k].length);
+        if (attributeNames.index(k) !== -1) {
+            attributeNames.push(k);
+            attributeValues.push(compiled.attributes[k].length);
+        }
     }
 
     this.registeredMaterials[material._id] |= mask;

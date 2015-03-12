@@ -198,21 +198,18 @@ WebGLRenderer.prototype.draw = function draw(renderState) {
 
     for (i = 0, len = this.meshRegistryKeys.length; i < len; i++) {
         mesh = this.meshRegistry[this.meshRegistryKeys[i]];
-
         buffers = this.bufferRegistry.registry[mesh.geometry];
+
         if (!buffers) continue;
 
+        if (mesh.options) this.handleOptions(mesh.options);
         if (mesh.texture) mesh.texture.bind();
 
         this.program.setUniforms(mesh.uniformKeys, mesh.uniformValues);
-
-        this.handleOptions(mesh.options);
-
         this.drawBuffers(buffers, mesh.drawType, mesh.geometry);
 
         if (mesh.texture) mesh.texture.unbind();
-
-        this.resetOptions(mesh.options);
+        if (mesh.options) this.resetOptions(mesh.options);
     }
 };
 
@@ -439,8 +436,6 @@ function loadImage (img, callback) {
 function handleTexture(material) {
     var source, textureId, texture;
 
-    if (!material.uniforms.hasOwnProperty('image')) return;
-
     if (material.uniforms.image instanceof Object) {
         source = material.uniforms.image.data;
         textureId = material.uniforms.image.id;
@@ -477,6 +472,5 @@ function handleTexture(material) {
         if (textureId) this.textureRegistry[textureId] = texture;
     }
 
-    delete material.uniforms.image;
     return texture;
 }
