@@ -37,6 +37,18 @@ AmbientLight.prototype.setColor = function setColor() {
     return this;
 };
 
+AmbientLight.prototype.getColor = function getColor(option) {
+    option = option || 'undefined';
+    switch (option.toLowerCase()) {
+        case 'undefined': return this._color.getRGB();
+        case 'rgb': return this._color.getRGB();
+        case 'hsl': return this._color.getHSL();
+        case 'hex': return this._color.getHex();
+        case 'hsv': return this._color.getHSV();
+        default: return this._color.getRGB();;
+    }
+};
+
 AmbientLight.prototype.clean = function clean() {
     var path = this.dispatch.getRenderPath();
 
