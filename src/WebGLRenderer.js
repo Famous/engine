@@ -43,7 +43,7 @@ function WebGLRenderer(container) {
     this.ambientLight = [-1, -1, -1];
     this.lightRegistry = {};
     this.lightRegistryKeys = [];
-    this.textureRegistry = {};
+    this.textureRegistry = [];
     this.texCache = {};
     this.bufferRegistry = new BufferRegistry(gl);
     this.program = new Program(gl);
@@ -136,7 +136,7 @@ WebGLRenderer.prototype.receive = function receive(path, commands) {
             var name = commands.shift();
             var mat = commands.shift();
             mesh.uniformValues[name == 'baseColor' ? 4 : 5][0] = -mat._id;
-            mesh.texture = handleImage.call(this, mat);
+            mesh.texture = handleTexture.call(this, mat);
             this.program.registerMaterial(name, mat);
             this.updateSize();
             break;
@@ -367,18 +367,18 @@ function checkFrameBufferStatus(gl) {
     var status = gl.checkFramebufferStatus(gl.FRAMEBUFFER);
 
     switch (status) {
-    case gl.FRAMEBUFFER_COMPLETE:
-        break;
-    case gl.FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
-        throw("Incomplete framebuffer: FRAMEBUFFER_INCOMPLETE_ATTACHMENT"); break;
-    case gl.FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
-        throw("Incomplete framebuffer: FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT"); break;
-    case gl.FRAMEBUFFER_INCOMPLETE_DIMENSIONS:
-        throw("Incomplete framebuffer: FRAMEBUFFER_INCOMPLETE_DIMENSIONS"); break;
-    case gl.FRAMEBUFFER_UNSUPPORTED:
-        throw("Incomplete framebuffer: FRAMEBUFFER_UNSUPPORTED"); break;
-    default:
-        throw("Incomplete framebuffer: " + status);
+        case gl.FRAMEBUFFER_COMPLETE:
+            break;
+        case gl.FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
+            throw("Incomplete framebuffer: FRAMEBUFFER_INCOMPLETE_ATTACHMENT"); break;
+        case gl.FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
+            throw("Incomplete framebuffer: FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT"); break;
+        case gl.FRAMEBUFFER_INCOMPLETE_DIMENSIONS:
+            throw("Incomplete framebuffer: FRAMEBUFFER_INCOMPLETE_DIMENSIONS"); break;
+        case gl.FRAMEBUFFER_UNSUPPORTED:
+            throw("Incomplete framebuffer: FRAMEBUFFER_UNSUPPORTED"); break;
+        default:
+            throw("Incomplete framebuffer: " + status);
     }
 };
 
@@ -459,35 +459,47 @@ function loadImage (img, callback) {
     return obj;
 }
 
-function handleImage(material) {
+function handleTexture(material) {
+    var source, textureId, texture;
+
     if (!material.uniforms.hasOwnProperty('image')) return;
 
-    var source = material.uniforms.image;
-
-    if (Array.isArray(source)) {
-        var t = new Texture(this.gl);
-        t.setArray(source);
+    if (material.uniforms.image instanceof Object) {
+        source = material.uniforms.image.data;
+        textureId = material.uniforms.image.id;
+        texture = this.textureRegistry[textureId];
+    }
+    else {
+        source = material.uniforms.image;
     }
 
-    if (window && source instanceof window.HTMLVideoElement) {
-        var t = new Texture(this.gl);
-        t.src = material.uniforms.image;
-        t.setImage(checkers);
-        source.addEventListener('loadeddata', function(x) {
-            t.setImage(source);
-            setInterval(function () { t.setImage(source); }, 16);
-        });
-    }
+    if (!texture) {
+        if (Array.isArray(source)) {
+            texture = new Texture(this.gl);
+            texture.setArray(source);
+        }
 
-    if ('string' === typeof source) {
-        var t = new Texture(this.gl);
-        t.src = material.uniforms.image;
-        t.setImage(checkers);
-        loadImage(material.uniforms.image, function (img) {
-            t.setImage(img);
-        });
+        else if (window && source instanceof window.HTMLVideoElement) {
+            texture = new Texture(this.gl);
+            texture.src = material.uniforms.image;
+            texture.setImage(checkers);
+            source.addEventListener('loadeddata', function(x) {
+                texture.setImage(source);
+                setInterval(function () { texture.setImage(source); }, 16);
+            });
+        }
+
+        else if ('string' === typeof source) {
+            texture = new Texture(this.gl);
+            texture.setImage(checkers);
+            loadImage(source, function (img) {
+                texture.setImage(img);
+            });
+        }
+
+        this.textureRegistry[textureId] = texture;
     }
 
     delete material.uniforms.image;
-    return t;
+    return texture;
 }
