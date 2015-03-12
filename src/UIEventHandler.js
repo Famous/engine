@@ -5,7 +5,7 @@ var CallbackStore = require('famous-utilities').CallbackStore;
 function UIEventHandler (dispatch, events) {
     this._events = new CallbackStore();
     var renderables = dispatch.getRenderables();
-    for (i = 0, len = renderables.length; i < len; i++)
+    for (var i = 0, len = renderables.length; i < len; i++)
         for (var j = 0, len2 = events.length; j < len2; j++) {
             var eventName = events[i].event;
             var methods = events[i].methods;
