@@ -1,7 +1,7 @@
 var TextureRegistry = {
 	registry: {},
 
-	textureIds: 0,
+	textureIds: 1,
 
 	register: function register(accessor, data) {
 		this.registry[accessor] = { id: this.textureIds++, data: data }
