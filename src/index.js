@@ -7,7 +7,8 @@ module.exports = {
     loadURL: require('./loadURL'),
     MethodStore: require('./MethodStore'),
     ObjectManager: require('./ObjectManager'),
-    Color: require('./Color').Color,
-    ColorPalette: require('./ColorPalette')
+    Color: require('./Color'),
+    ColorPalette: require('./ColorPalette'),
+    helpers: require('./helpers')
 };
 
