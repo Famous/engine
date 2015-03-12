@@ -74,6 +74,18 @@ Color.prototype.setColor = function setColor() {
     return this;
 };
 
+Color.prototype.getColor = function getColor(option) {
+    option = option || 'undefined';
+    switch (option.toLowerCase()) {
+        case 'undefined': return this.getRGB();
+        case 'rgb': return this.getRGB();
+        case 'hsl': return this.getHSL();
+        case 'hex': return this.getHex();
+        case 'hsv': return this.getHSV();
+        default: return this.getRGB();;
+    }
+};
+
 
 /**
  * RGB
