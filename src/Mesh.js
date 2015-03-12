@@ -232,8 +232,8 @@ Mesh.prototype.setBaseColor = function setBaseColor() {
     return this;
 };
 
-Mesh.prototype.getBaseColor = function getBaseColor() {
-    return this._expressions.baseColor || this._color.getRGB();
+Mesh.prototype.getBaseColor = function getBaseColor(option) {
+    return this._expressions.baseColor || this._color.getColor(option);
 };
 
 /**
