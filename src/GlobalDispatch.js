@@ -2,40 +2,14 @@
 
 var CallbackStore = require('famous-utilities').CallbackStore;
 
-var WITH = 'WITH';
-var FRAME = 'FRAME';
-var TRIGGER = 'TRIGGER';
-
 function GlobalDispatch () {
     this._messages = [];
     this._targetedCallbacks = {};
     this._globalCallbacks = [];
 }
 
-GlobalDispatch.prototype.receiveCommands = function receiveCommands (commands) {
-    var command;
-    while (commands.length) {
-        command = commands.shift();
-        switch (command) {
-            case WITH:
-                this.handleMessage(commands);
-                break;
-            case FRAME:
-                this._targetedCallbacks.engine.trigger(FRAME, commands.shift());
-                break;
-        }
-    }
-};
-
-GlobalDispatch.prototype.handleMessage = function handleMessage (commands) {
-    var path = commands.shift();
-    var type = commands.shift();
-    switch (type) {
-        case TRIGGER:
-            var ev = commands.shift();
-            if (this._targetedCallbacks[path]) this._targetedCallbacks[path].trigger(ev, commands.shift());
-            break;
-    }
+GlobalDispatch.prototype.targetedTrigger = function targetedTrigger(path, key, ev) {
+    if (this._targetedCallbacks[path]) this._targetedCallbacks[path].trigger(key, ev);
     return this;
 };
 
