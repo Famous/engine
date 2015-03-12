@@ -474,7 +474,7 @@ function handleTexture(material) {
             });
         }
 
-        this.textureRegistry[textureId] = texture;
+        if (textureId) this.textureRegistry[textureId] = texture;
     }
 
     delete material.uniforms.image;
