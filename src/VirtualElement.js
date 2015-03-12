@@ -62,6 +62,8 @@ function VirtualElement (target, path, renderer, parent, rootElement) {
     this._tagName = DIV;
     this._origin = [0, 0];
     this._rootElement = rootElement || this;
+    this._finalTransform = new Float32Array(16);
+    this._MV = new Float32Array(16);
 }
 
 VirtualElement.prototype.getTarget = function getTarget () {
@@ -287,19 +289,20 @@ VirtualElement.prototype.draw = function draw(renderState) {
         perspectiveTransform[15]
     ];
 
-    var MV = multiply(
-        [],
+    this._MV = multiply(
+        this._MV,
         renderState.viewTransform,
         m[0], m[1], m[2], m[3], m[4], m[5], m[6], m[7], m[8], m[9], m[10], m[11], m[12], m[13], m[14], m[15]
     );
 
-    var finalTransform = multiply(
-        [],
+    var MV = this._MV;
+    this._finalTransform = multiply(
+        this._finalTransform,
         originShiftedPerspective,
         MV[0], MV[1], MV[2], MV[3], MV[4], MV[5], MV[6], MV[7], MV[8], MV[9], MV[10], MV[11], MV[12], MV[13], MV[14], MV[15]
     );
 
-    this._target.style[VENDOR_TRANSFORM] = stringifyMatrix(finalTransform);
+    this._target.style[VENDOR_TRANSFORM] = stringifyMatrix(this._finalTransform);
 };
 
 VirtualElement.prototype.setMatrix = function setMatrix (m0, m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11, m12, m13, m14, m15) {
