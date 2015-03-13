@@ -5,6 +5,7 @@
 var Clock = require('./Clock');
 var GlobalDispatch = require('./GlobalDispatch');
 var MessageQueue = require('./MessageQueue');
+var ProxyRegistry = require('./ProxyRegistry');
 
 var isWorker = self.window !== self;
 
@@ -28,6 +29,7 @@ function Famous() {
     this._globalDispatch = new GlobalDispatch();
     this._clock = new Clock();
     this._messageQueue = new MessageQueue();
+    this._proxyRegistry = new ProxyRegistry(this._messageQueue);
 
     var _this = this;
     if (isWorker) {
@@ -84,6 +86,9 @@ Famous.prototype.postMessage = function postMessage (message) {
             case 'FRAME':
                 this.handleFrame(message);
                 break;
+            case 'INVOKE':
+                this.handleInvoke(message);
+                break;
             default:
                 console.error('Unknown command ' + command);
                 break;
@@ -105,6 +110,13 @@ Famous.prototype.postMessage = function postMessage (message) {
  */
 Famous.prototype.handleFrame = function handleFrame (message) {
     this.step(message.shift());
+    return this;
+};
+
+Famous.prototype.handleInvoke = function handleInvoke (message) {
+    var id = message.shift();
+    var args = message.shift();
+    this._proxyRegistry.invokeCallback(id, args);
     return this;
 };
 
@@ -193,12 +205,16 @@ Famous.prototype.getGlobalDispatch = function getGlobalDispatch () {
     return this._globalDispatch;
 };
 
-Famous.prototype.proxyOn = function proxyOn(target, type, callback) {
-    this._globalDispatch.targetedOn(target, type, callback);
+// Famous.prototype.proxyOn = function proxyOn(target, type, callback) {
+//     this._globalDispatch.targetedOn(target, type, callback);
 
-    this._messageQueue.enqueue('PROXY');
-    this._messageQueue.enqueue(target);
-    this._messageQueue.enqueue(type);
+//     this._messageQueue.enqueue('PROXY');
+//     this._messageQueue.enqueue(target);
+//     this._messageQueue.enqueue(type);
+// };
+
+Famous.prototype.proxy = function proxy (target) {
+    return this._proxyRegistry.getInstance(target);
 };
 
 module.exports = new Famous();
