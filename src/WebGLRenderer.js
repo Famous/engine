@@ -136,7 +136,7 @@ WebGLRenderer.prototype.receive = function receive(path, commands) {
             var name = commands.shift();
             var mat = commands.shift();
             mesh.uniformValues[name === 'baseColor' ? 4 : 5][0] = -mat._id;
-            mesh.texture = handleTexture.call(this, mat.texture);
+            if (mat.texture) mesh.texture = handleTexture.call(this, mat.texture);
             this.program.registerMaterial(name, mat);
             this.updateSize();
             break;
