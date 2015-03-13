@@ -7,7 +7,7 @@ var snippets = {
     sign: {glsl: 'sign(%1);'},
     floor: {glsl: 'floor(%1);'},
     ceiling: {glsl: 'ceil(%1);'},
-    
+
     mod: {glsl: 'mod(%1, %2);'},
     min: {glsl: 'min(%1, %2);'},
     max: {glsl: 'max(%1, %2);'},
@@ -21,8 +21,8 @@ var snippets = {
     sin: {glsl: 'sin(%1);'},
     time: {glsl: 'time;'},
 
-    add: {glsl: '%1 + %2;'}, 
-    multiply: {glsl: '%1 * %2;'}, 
+    add: {glsl: '%1 + %2;'},
+    multiply: {glsl: '%1 * %2;'},
 
     normal: {glsl:'v_Normal;'},
     uv: {glsl:'vec3(v_TextureCoordinate, 1);'},
@@ -30,7 +30,7 @@ var snippets = {
 
     image: {glsl:'texture2D(image, v_TextureCoordinate).rgb;'},
 
-    constant: {glsl: '%1;'}, 
+    constant: {glsl: '%1;'},
     parameter: {uniforms: {parameter: 1}, glsl: 'parameter;'}
 };
 
@@ -52,7 +52,7 @@ for (var name in snippets) {
  *
  * @class Material
  * @constructor
- * 
+ *
  * @param {Object} definiton of nascent expression with shader code, inputs and uniforms
  * @param {Array} list of Material expressions, images, or constant
  * @param {Object} map of uniform data of float, vec2, vec3, vec4
@@ -83,7 +83,7 @@ Material.id = 1;
  *
  * @method traverse
  * @chainable
- * 
+ *
  * @param {Function} invoked upon every expression in the graph
  */
 
@@ -91,7 +91,7 @@ Material.prototype.traverse = function traverse(callback) {
     var len = this.inputs && this.inputs.length, idx = -1;
 
     while (++idx < len) traverse.call(this.inputs[idx], callback, idx);
-    
+
     callback(this);
 
     return this;
@@ -108,7 +108,7 @@ Material.prototype.setUniform = function setUniform(name, value) {
  *
  * @method _compile
  * @protected
- * 
+ *
  */
 
 Material.prototype._compile = function _compile() {
@@ -118,12 +118,12 @@ Material.prototype._compile = function _compile() {
     var attributes = {};
     var defines = [];
     var texture;
-    
+
     this.traverse(function (node, depth) {
         if (! node.chunk) return;
         glsl += 'vec3 ' + makeLabel(node) + '=' + processGLSL(node.chunk.glsl, node.inputs) + '\n ';
         if (node.uniforms) extend(uniforms, node.uniforms);
-        if (node.varyings) extend(varyings, node.varying);
+        if (node.varyings) extend(varyings, node.varyings);
         if (node.attributes) extend(attributes, node.attributes);
         if (node.chunk.defines) defines.push(node.chunk.defines);
         if (node.texture) texture = node.texture;
@@ -134,7 +134,7 @@ Material.prototype._compile = function _compile() {
         glsl: glsl + 'return ' + makeLabel(this) + ';',
         defines: defines.join('\n'),
         uniforms: uniforms,
-        varyings: varyings, 
+        varyings: varyings,
         attributes: attributes,
         texture: texture
     };
