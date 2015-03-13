@@ -4,7 +4,6 @@
  * Module dependencies
  */
 var Color = require('./Color');
-var helpers = require('./helpers');
 
 
 /**
@@ -17,7 +16,7 @@ var helpers = require('./helpers');
  */
 var ColorPalette = function ColorPalette() {
     this._palette = [];
-    var options = helpers.flattenArguments(arguments);
+    var options = Color.flattenArguments(arguments);
     (options.length) ? this.makePalette(options) : this.setRandomPalette();
 };
 
@@ -30,12 +29,12 @@ ColorPalette.prototype.getColor = function getColor(i) {
 };
 
 ColorPalette.prototype.makeColor = function makeColor() {
-    var options = helpers.flattenArguments(arguments);
+    var options = Color.flattenArguments(arguments);
     return new Color(options[0], options[1], options[2]);
 };
 
 ColorPalette.prototype.makePalette = function makePalette() {
-    var options = helpers.flattenArguments(arguments);
+    var options = Color.flattenArguments(arguments);
     var palette = [];
     for(var i = 0; i < options.length; i++) {
         var color = this.makeColor(options[i]);

@@ -9,6 +9,5 @@ module.exports = {
     ObjectManager: require('./ObjectManager'),
     Color: require('./Color'),
     ColorPalette: require('./ColorPalette'),
-    helpers: require('./helpers')
 };
 

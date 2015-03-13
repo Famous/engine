@@ -4,7 +4,6 @@
  * Module dependencies
  */
 var Transitionable = require('famous-transitions').Transitionable;
-var helpers = require('./helpers');
 
 
 /**
@@ -16,7 +15,7 @@ var Color = function Color() {
     this._r = new Transitionable(0);
     this._g = new Transitionable(0);
     this._b = new Transitionable(0);
-    var options = helpers.flattenArguments(arguments);
+    var options = Color.flattenArguments(arguments);
     if (options.length) this.set(options);
 };
 
@@ -29,7 +28,7 @@ Color.toString = function toString() {
  * GENERAL
  */
 Color.prototype.set = function set() {
-    var options = helpers.flattenArguments(arguments);
+    var options = Color.flattenArguments(arguments);
     var type = this.determineType(options[0]);
 
     switch (type) {
@@ -49,13 +48,13 @@ Color.prototype.isActive = function isActive() {
 };
 
 Color.prototype.changeTo = function changeTo() {
-    var options = helpers.flattenArguments(arguments);
+    var options = Color.flattenArguments(arguments);
     if (options.length) this.set(options);
     return this;
 };
 
 Color.prototype.copy = function copy() {
-    var values = helpers.flattenArguments(arguments);
+    var values = Color.flattenArguments(arguments);
     var color = values[0], options = values[1];
     if (this.isColorInstance(color)) {
         this.setRGB(color.getRGB(), options);
@@ -69,7 +68,7 @@ Color.prototype.clone = function clone() {
 };
 
 Color.prototype.setColor = function setColor() {
-    var values = helpers.flattenArguments(arguments);
+    var values = Color.flattenArguments(arguments);
     var color = values[0], options = values[1];
     this.setHex(colorNames[color], options);
     return this;
@@ -93,11 +92,11 @@ Color.prototype.isColorInstance = function isColorInstance(val) {
 
 Color.prototype.determineType = function determineType(val) {
     if (this.isColorInstance(val)) return 'instance';
-    if (helpers.isHex(val)) return 'hex';
+    if (Color.isHex(val)) return 'hex';
     if (colorNames[val]) return 'color';
     var types = ['rgb', 'hsl', 'hex', 'hsv'];
     for(var i = 0; i < types.length; i++) {
-        if (helpers.isType(val, types[i])) return types[i];
+        if (Color.isType(val, types[i])) return types[i];
     }
 };
 
@@ -121,7 +120,7 @@ Color.prototype.setB = function setB(b, options) {
 };
 
 Color.prototype.setRGB = function setRGB() {
-    var values = helpers.flattenArguments(arguments);
+    var values = Color.flattenArguments(arguments);
     var options = values[3];
     this.setR(values[0], options);
     this.setG(values[1], options);
@@ -160,33 +159,33 @@ Color.prototype.getRGBString = function toRGBString() {
 };
 
 Color.prototype.addRGB = function addRGB(r, g, b) {
-    var r = helpers.clamp(this.getR() + r);
-    var g = helpers.clamp(this.getG() + g);
-    var b = helpers.clamp(this.getB() + b);
+    var r = Color.clamp(this.getR() + r);
+    var g = Color.clamp(this.getG() + g);
+    var b = Color.clamp(this.getB() + b);
     this.setRGB(r, g, b);
     return this;
 };
 
 Color.prototype.addScalar = function addScalar(s) {
-    var r = helpers.clamp(this.getR() + s);
-    var g = helpers.clamp(this.getG() + s);
-    var b = helpers.clamp(this.getB() + s);
+    var r = Color.clamp(this.getR() + s);
+    var g = Color.clamp(this.getG() + s);
+    var b = Color.clamp(this.getB() + s);
     this.setRGB(r, g, b);
     return this;
 };
 
 Color.prototype.multiplyRGB = function multiplyRGB(r, g, b) {
-    var r = helpers.clamp(this.getR() * r);
-    var g = helpers.clamp(this.getG() * g);
-    var b = helpers.clamp(this.getB() * b);
+    var r = Color.clamp(this.getR() * r);
+    var g = Color.clamp(this.getG() * g);
+    var b = Color.clamp(this.getB() * b);
     this.setRGB(r, g, b);
     return this;
 };
 
 Color.prototype.multiplyScalar = function multiplyScalar(s) {
-    var r = helpers.clamp(this.getR() * s);
-    var g = helpers.clamp(this.getG() * s);
-    var b = helpers.clamp(this.getB() * s);
+    var r = Color.clamp(this.getR() * s);
+    var g = Color.clamp(this.getG() * s);
+    var b = Color.clamp(this.getB() * s);
     this.setRGB(r, g, b);
     return this;
 };
@@ -242,10 +241,10 @@ Color.prototype.getHex = function getHex() {
 };
 
 Color.prototype.setHex = function setHex() {
-    var values = helpers.flattenArguments(arguments);
+    var values = Color.flattenArguments(arguments);
     var hex, options;
 
-    if (helpers.isHex(values[0])) {
+    if (Color.isHex(values[0])) {
         hex = values[0];
         options = values[1];
     }
@@ -279,7 +278,7 @@ Color.prototype.hueToRGB = function hueToRGB(p, q, t) {
 };
 
 Color.prototype.setHSL = function setHSL() {
-    var values = helpers.flattenArguments(arguments);
+    var values = Color.flattenArguments(arguments);
     var h = values[0], s = values[1], l = values[2];
     var options = values[3];
     h /= 360.0;
@@ -374,7 +373,7 @@ Color.prototype.setLightness = function setLightness(l, options) {
  * HSV
  */
 Color.prototype.setHSV = function setHSV() {
-    var values = helpers.flattenArguments(arguments);
+    var values = Color.flattenArguments(arguments);
     var h = values[0], s = values[1], v = values[2];
     var options = values[3];
     var r, g, b;
@@ -571,6 +570,69 @@ var colorNames = {
     whitesmoke: '#f5f5f5',
     yellow: '#ffff00',
     yellowgreen: '#9acd32'
+};
+
+
+
+/**
+ * Helper functions
+ */
+Color.flattenArguments = function(options) {
+    return Array.prototype.concat.apply([], options);
+};
+
+Color.argsToArray = function(val) {
+    return Array.prototype.slice.call(val);
+};
+
+Color.isString = function(val) {
+    return (typeof val === 'string');
+};
+
+Color.isInt = function(val) {
+    return parseInt(val) === val;
+};
+
+Color.isFloat = function(val) {
+    return !Color.isInt(val);
+};
+
+Color.allFloats = function() {
+    var val = Color.argsToArray(arguments);
+    for(var i = 0; i < val.length; i++) {
+        if (!Color.isFloat(val[i])) return false;
+    }
+    return true;
+};
+
+Color.allInts = function(val) {
+    return !Color.allFloats(val);
+};
+
+Color.allStrings = function() {
+    var values = Color.argsToArray(arguments);
+    for(var i = 0; i < values.length; i++) {
+        if (!Color.isString(values[i])) return false;
+    }
+    return true;
+};
+
+Color.isPercentage = function(val) {
+    return /%/.test(val);
+};
+
+Color.isHex = function(val) {
+    return /#/.test(val);
+};
+
+Color.isType = function(type, value) {
+    return Color.allStrings(type, value) && type.toLowerCase() === value.toLowerCase();
+};
+
+Color.clamp = function(val, min, max) {
+    min = min || 0;
+    max = max || 255;
+    return Math.max(Math.min(val, max), min);
 };
 
 
