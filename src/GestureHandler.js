@@ -6,11 +6,13 @@ var Vec2 = require('famous-math').Vec2;
 var VEC_REGISTER = new Vec2();
 
 var gestures = {drag: true, tap: true, rotate: true, pinch: true};
-var callbacks = [processTouchStart, processTouchMove, processTouchEnd];
+var progressbacks = [processPointerStart, processPointerMove, processPointerEnd];
 
 var touchEvents = ['touchstart', 'touchmove', 'touchend'];
+var mouseEvents = ['mousedown', 'mousemove', 'mouseup'];
 var methods = ['preventDefault'];
-var properties = [{targetTouches: {0: ['pageX', 'pageY', 'identifier'], 1: ['pageX', 'pageY', 'identifier']}}];
+var touchProperties = [{targetTouches: {0: ['pageX', 'pageY', 'identifier'], 1: ['pageX', 'pageY', 'identifier']}}];
+var mouseProperties = ['pageX', 'pageY'];
 
 function GestureHandler (dispatch, events) {
     this.dispatch = dispatch;
@@ -54,9 +56,11 @@ function GestureHandler (dispatch, events) {
         current: 0
     };
 
-    this.trackedTouchIDs = [-1, -1];
+    this.trackedPointerIDs = [-1, -1];
     this.timeOfPointer = 0;
     this.multiTap = 0;
+
+    this.mice = [];
 
     this.gestures = [];
     this.options = {};
@@ -76,11 +80,16 @@ function GestureHandler (dispatch, events) {
 
     var renderables = dispatch.getRenderables();
     for (var i = 0, len = renderables.length; i < len; i++) {
-        for (var j = 0, lenj = touchEvents.length; j < lenj; j++) {
+        for (var j = 0; j < 3; j++) {
             var touchEvent = touchEvents[j];
-            if (renderables[i].on) renderables[i].on(touchEvent, methods, properties);
-            dispatch.registerTargetedEvent(touchEvent, callbacks[j].bind(this));
+            var mouseEvent = mouseEvents[j];
+            if (renderables[i].on) renderables[i].on(touchEvent, methods, touchProperties);
+            dispatch.registerTargetedEvent(touchEvent, progressbacks[j].bind(this));
+            if (renderables[i].on) renderables[i].on(mouseEvent, methods, mouseProperties);
+            dispatch.registerTargetedEvent(mouseEvent, progressbacks[j].bind(this));
         }
+        if (renderables[i].on) renderables[i].on('mouseleave', methods, mouseProperties);
+        dispatch.registerTargetedEvent('mouseleave', processMouseLeave.bind(this));
     }
 }
 
@@ -117,16 +126,22 @@ GestureHandler.prototype.trigger = function trigger (ev, payload) {
     this._events.trigger(ev, payload);
 };
 
-function processTouchStart(e) {
-    var t = e.targetTouches;
+function processPointerStart(e) {
+    var t;
+    if (!e.targetTouches) {
+        this.mice[0] = e;
+        t = this.mice;
+        e.identifier = 1;
+    }
+    else t = e.targetTouches;
 
-    if (t[0] && t[1] && this.trackedTouchIDs[0] === t[0].identifier && this.trackedTouchIDs[1] === t[1].identifier) {
+    if (t[0] && t[1] && this.trackedPointerIDs[0] === t[0].identifier && this.trackedPointerIDs[1] === t[1].identifier) {
         return;
     }
 
     this.event.time = Date.now();
 
-    if (this.trackedTouchIDs[0] !== t[0].identifier) {
+    if (this.trackedPointerIDs[0] !== t[0].identifier) {
         if (this.trackedGestures['tap']) {
             var threshold = (this.options['tap'] && this.options['tap'].threshold) || 250;
             if (this.event.time - this.timeOfPointer < threshold) this.event.taps++;
@@ -137,14 +152,14 @@ function processTouchStart(e) {
         this.event.current = 1;
         this.event.points = 1;
         var id = t[0].identifier;
-        this.trackedTouchIDs[0] = id;
+        this.trackedPointerIDs[0] = id;
 
         this.last1.set(t[0].pageX, t[0].pageY);
         this.velocity1.clear();
         this.delta1.clear();
         this.event.pointers.push(this.pointer1);
     }
-    if (t[1] && this.trackedTouchIDs[1] !== t[1].identifier) {
+    if (t[1] && this.trackedPointerIDs[1] !== t[1].identifier) {
         if (this.trackedGestures['tap']) {
             var threshold = (this.options['tap'] && this.options['tap'].threshold) || 250;
             if (this.event.time - this.timeOfPointer < threshold) this.multiTap = 2;
@@ -152,7 +167,7 @@ function processTouchStart(e) {
         this.event.current = 2;
         this.event.points = 2;
         var id = t[1].identifier;
-        this.trackedTouchIDs[1] = id;
+        this.trackedPointerIDs[1] = id;
 
         this.last2.set(t[1].pageX, t[1].pageY);
         this.velocity2.clear();
@@ -184,10 +199,12 @@ function processTouchStart(e) {
         this.centerDelta.clear();
         this.centerVelocity.clear();
         if (this.trackedGestures['pinch']) {
+            this.event.scale = 1;
             this.event.scaleDelta = 0;
             this.event.scaleVelocity = 0;
         }
         if (this.trackedGestures['rotate']) {
+            this.event.rotation = 0;
             this.event.rotationDelta = 0;
             this.event.rotationVelocity = 0;
         }
@@ -195,8 +212,16 @@ function processTouchStart(e) {
     this.triggerGestures();
 }
 
-function processTouchMove(e) {
-    var t = e.targetTouches;
+function processPointerMove(e) {
+    var t;
+    if (!e.targetTouches) {
+        if (!this.event.current) return;
+        this.mice[0] = e;
+        t = this.mice;
+        e.identifier = 1;
+    }
+    else t = e.targetTouches;
+
     var time = Date.now();
     var dt = time - this.event.time;
     if (dt === 0) return;
@@ -205,7 +230,7 @@ function processTouchMove(e) {
 
     this.event.current = 1;
     this.event.points = 1;
-    if (this.trackedTouchIDs[0] === t[0].identifier) {
+    if (this.trackedPointerIDs[0] === t[0].identifier) {
         VEC_REGISTER.set(t[0].pageX, t[0].pageY);
         Vec2.subtract(VEC_REGISTER, this.last1, this.delta1);
         Vec2.scale(this.delta1, invDt, this.velocity1);
@@ -255,10 +280,12 @@ function processTouchMove(e) {
         this.centerDelta.copy(this.delta1);
         this.centerVelocity.copy(this.velocity1);
         if (this.trackedGestures['pinch']) {
+            this.event.scale = 1;
             this.event.scaleDelta = 0;
             this.event.scaleVelocity = 0;
         }
         if (this.trackedGestures['rotate']) {
+            this.event.rotation = 0;
             this.event.rotationDelta = 0;
             this.event.rotationVelocity = 0;
         }
@@ -266,27 +293,33 @@ function processTouchMove(e) {
     this.triggerGestures();
 }
 
-function processTouchEnd(e) {
-    var t = e.targetTouches;
+function processPointerEnd(e) {
+    var t;
+    if (!e.targetTouches) {
+        if (!this.event.current) return;
+        this.mice.pop();
+        t = this.mice;
+    }
+    else t = e.targetTouches;
 
-    if (t[0] && t[1] && this.trackedTouchIDs[0] === t[0].identifier && this.trackedTouchIDs[1] === t[1].identifier) {
+    if (t[0] && t[1] && this.trackedPointerIDs[0] === t[0].identifier && this.trackedPointerIDs[1] === t[1].identifier) {
             return;
     }
 
     this.event.status = 'end';
     if (!t[0]) {
         this.event.current = 0;
-        this.trackedTouchIDs[0] = -1;
-        this.trackedTouchIDs[1] = -1;
+        this.trackedPointerIDs[0] = -1;
+        this.trackedPointerIDs[1] = -1;
         this.triggerGestures();
         this.event.pointers.pop();
         this.event.pointers.pop();
         return;
     }
-    else if(this.trackedTouchIDs[0] !== t[0].identifier) {
-        this.trackedTouchIDs[0] = -1;
+    else if(this.trackedPointerIDs[0] !== t[0].identifier) {
+        this.trackedPointerIDs[0] = -1;
         var id = t[0].identifier;
-        this.trackedTouchIDs[0] = id;
+        this.trackedPointerIDs[0] = id;
 
         this.last1.set(t[0].pageX, t[0].pageY);
         this.velocity1.clear();
@@ -294,16 +327,16 @@ function processTouchEnd(e) {
     }
     if (!t[1]) {
         this.event.current = 1;
-        this.trackedTouchIDs[1] = -1;
+        this.trackedPointerIDs[1] = -1;
         this.triggerGestures();
         this.event.points = 1;
         this.event.pointers.pop();
     }
-    else if (this.trackedTouchIDs[1] !== t[1].identifier) {
-        this.trackedTouchIDs[1] = -1;
+    else if (this.trackedPointerIDs[1] !== t[1].identifier) {
+        this.trackedPointerIDs[1] = -1;
         this.event.points = 2;
         var id = t[1].identifier;
-        this.trackedTouchIDs[1] = id;
+        this.trackedPointerIDs[1] = id;
 
         this.last2.set(t[1].pageX, t[1].pageY);
         this.velocity2.clear();
@@ -315,6 +348,16 @@ function processTouchEnd(e) {
 
         Vec2.subtract(this.last2, this.last1, this.diff12);
         this.dist = this.diff12.length();
+    }
+}
+
+function processMouseLeave(e) {
+    if (this.event.current) {
+        this.event.status = 'end';
+        this.event.current = 0;
+        this.trackedPointerIDs[0] = -1;
+        this.triggerGestures();
+        this.event.pointers.pop();
     }
 }
 
