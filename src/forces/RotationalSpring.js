@@ -48,7 +48,7 @@ RotationalSpring.prototype.init = function init(options) {
         this.period = null;
         this.dampingRatio = null;
     }
-    else if (options.period) {
+    else if (options.period || options.dampingRatio) {
         this.stiffness = 2 * PI / this.period;
         this.stiffness *= this.stiffness;
 

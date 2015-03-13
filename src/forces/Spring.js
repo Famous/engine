@@ -74,7 +74,7 @@ Spring.prototype.init = function(options) {
         this.period = null;
         this.dampingRatio = null;
     }
-    else if (options.period) {
+    else if (options.period || options.dampingRatio) {
         this.dampingRatio = this.dampingRatio || 0;
 
         this.stiffness = 2 * PI / this.period;
