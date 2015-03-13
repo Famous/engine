@@ -574,7 +574,7 @@ function handleTexture(input) {
             texture = new Texture(this.gl, options);
             texture.src = texture;
             texture.setImage(checkers);
-            source.addEventListener('loadeddata', function(x) {
+            source.addEventListener('loadeddata', function() {
                 texture.setImage(source);
                 setInterval(function () { texture.setImage(source); }, 16);
             });
