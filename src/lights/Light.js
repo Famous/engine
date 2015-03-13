@@ -4,7 +4,6 @@
  * Module dependencies
  */
 var Color = require('famous-utilities').Color;
-var helpers = require('famous-utilities').helpers;
 
 
 /**
@@ -24,7 +23,7 @@ Light.toString = function toString() {
 
 Light.prototype.setColor = function setColor() {
     this.dispatch.dirtyComponent(this._id);
-    var values = helpers.flattenArguments(arguments);
+    var values = Color.flattenArguments(arguments);
 
     if (values[0] instanceof Color) {
         this._color = materialExpression[0];
