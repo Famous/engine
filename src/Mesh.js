@@ -177,6 +177,17 @@ Mesh.prototype.clean = function clean() {
         }
     }
 
+    var positionOffset = this._expressions.positionOffset;
+    if (positionOffset) {
+        i = positionOffset.invalidations.length;
+        while (i--) {
+            uniformKey = positionOffset.invalidations.pop();
+            this.dispatch.sendDrawCommand('GL_UNIFORMS');
+            this.dispatch.sendDrawCommand(uniformKey);
+            this.dispatch.sendDrawCommand(positionOffset.uniforms[uniformKey]);
+        }
+    }
+
     var i = this.queue.length;
     while (i--) this.dispatch.sendDrawCommand(this.queue.shift());
 
