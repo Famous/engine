@@ -5,7 +5,7 @@ var TextureRegistry = {
 
 	register: function register(accessor, data) {
 		if (accessor) return (this.registry[accessor] = { id: this.textureIds++, data: data });
-		else return { id: this.textureIds++, data: data };
+		else return { id: this.textureIds++, data: data, __isATexture__: true };
 	},
 
 	get: function get(accessor) {
