@@ -29,7 +29,7 @@ function WebGLRenderer(container) {
     this.container.getTarget().appendChild(this.canvas);
     this.canvas.className = 'famous-webgl GL';
 
-    var gl = this.gl = this.canvas.getContext('webgl') || this.canvas.getContext('experimental-webgl');
+    var gl = this.gl = this.getWebGLContext(this.canvas);
     var containerSize = this.container._getSize();
 
     gl.polygonOffset(0.1, 0.1);
@@ -64,6 +64,25 @@ function WebGLRenderer(container) {
 
     this.projectionTransform = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
 }
+
+
+WebGLRenderer.prototype.getWebGLContext = function getWebGLContext(canvas) {
+    var names = ['webgl', 'experimental-webgl', 'webkit-3d', 'moz-webgl'];
+    var context = null;
+    for (var i = 0; i < names.length; i++) {
+        try {
+            context = canvas.getContext(names[i]);
+        }
+        catch (error) {
+            var msg = 'Error creating WebGL context: ' + error.toString();
+            console.error(msg);
+        }
+        if (context) {
+            break;
+        }
+    }
+    return context ? context : false;
+};
 
 
 WebGLRenderer.prototype.createLight = function createLight(path) {
