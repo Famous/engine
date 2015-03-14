@@ -45,7 +45,9 @@ function HTMLElement(dispatch) {
     this._dispatch.onOpacityChange(this._receiveOpacityChange.bind(this));
     this._dispatch.onOriginChange(this._receiveOriginChange.bind(this));
     this._receiveTransformChange(this._dispatch.getContext()._transform);
+    this._receiveSizeChange(this._dispatch.getContext()._size);
     this._receiveOriginChange(this._dispatch.getContext()._origin);
+    this._receiveOpacityChange(this._dispatch.getContext()._opacity);
 }
 
 // Return the name of the Element Class: 'element'
