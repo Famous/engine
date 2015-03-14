@@ -27,7 +27,7 @@ ProxyRegistry.prototype.invokeCallback = function invokeCallback (id, args) {
     // TL;DR We return this, because we can't do anything meaningful with the
     // return value
     if (this._callbacks[id].apply(null, args) !== undefined) {
-        console.warning('Return value of proxied functions are being ignored');
+        console.warn('Return value of proxied functions are being ignored');
     }
     return this;
 };

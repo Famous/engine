@@ -205,14 +205,6 @@ Famous.prototype.getGlobalDispatch = function getGlobalDispatch () {
     return this._globalDispatch;
 };
 
-// Famous.prototype.proxyOn = function proxyOn(target, type, callback) {
-//     this._globalDispatch.targetedOn(target, type, callback);
-
-//     this._messageQueue.enqueue('PROXY');
-//     this._messageQueue.enqueue(target);
-//     this._messageQueue.enqueue(type);
-// };
-
 Famous.prototype.proxy = function proxy (target) {
     return this._proxyRegistry.getInstance(target);
 };
