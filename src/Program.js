@@ -289,15 +289,15 @@ Program.prototype.resetProgram = function resetProgram() {
 
 Program.prototype.uniformIsCached = function (targetName, value) {
     if(this.cachedUniforms[targetName] == null) {
-        if (Array.isArray(value)) {
-            this.cachedUniforms[targetName] = value.slice();
+        if (value.length) {
+            this.cachedUniforms[targetName] = new Float32Array(value);
         }
         else {
             this.cachedUniforms[targetName] = value;
         }
         return false;
     }
-    else if (Array.isArray(value)){
+    else if (value.length) {
         var i = value.length;
         while (i--) {
             if(value[i] !== this.cachedUniforms[targetName][i]) {
@@ -359,7 +359,7 @@ Program.prototype.setUniforms = function (uniformNames, uniformValue) {
         // Check if the value is already set for the
         // given uniform.
 
-        // if (this.uniformIsCached(name, value)) continue;
+        if (this.uniformIsCached(name, value)) continue;
 
         // Determine the correct function and pass the uniform
         // value to WebGL.

@@ -18,23 +18,29 @@ function Texture(gl, options) {
     this.type = options.type || gl.UNSIGNED_BYTE;
     this.gl = gl;
 
+    this.bind();
+
     gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
-    gl.bindTexture(gl.TEXTURE_2D, this.id);
     
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl[options.magFilter] || gl.NEAREST);
-
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl[options.minFilter] || gl.NEAREST);
 
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl[options.wrapS] || gl.CLAMP_TO_EDGE);
-
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl[options.wrapS] || gl.CLAMP_TO_EDGE);
 
     gl.texImage2D(gl.TEXTURE_2D, 0, this.format, this.width, this.height, 0, this.format, this.type, null);
 
-    if (options.mipmap) {
+    if (options.mipmap !== false && isPowerOfTwo(this.width, this.height)) {
         gl.generateMipmap(gl.TEXTURE_2D);
     }
+
+    this.unbind();
 }
+
+function isPowerOfTwo(width, height) {
+    return (width & width - 1) === 0 
+        && (height & height - 1) === 0;
+};
 
 /**
  * Binds this texture as the selected target
