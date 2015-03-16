@@ -18,7 +18,7 @@ var DRAW_TYPES = {
 
 /**
  * Geometry is a component that defines the data that should
- *   be drawn to the webGL canvas. Manages vertex data and attributes.
+ * be drawn to the webGL canvas. Manages vertex data and attributes.
  *
  * @class Geometry
  * @constructor
