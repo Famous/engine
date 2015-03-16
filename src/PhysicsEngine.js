@@ -396,8 +396,6 @@ function _integratePose(body, dt) {
     q.z += (wz * qw + wx * qy - wy * qx) * hdt;
 
     q.normalize();
-
-    body.updateShape();
 };
 
 module.exports = PhysicsEngine;

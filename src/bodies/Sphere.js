@@ -15,10 +15,10 @@ var SUPPORT_REGISTER = new Vec3();
  */
 function Sphere(options) {
     Particle.call(this, options);
-    var r  = options.radius || 0;
+    var r  = options.radius || 1;
     this.radius = r;
     this.size = [2*r, 2*r, 2*r];
-    this.setInertia();
+    this.updateInertia();
 
     this.type = 1 << 2;
 }
@@ -46,7 +46,6 @@ Sphere.prototype.getRadius = function getRadius() {
 Sphere.prototype.setRadius = function setRadius(radius) {
     this.radius = radius;
     this.size = [2*this.radius, 2*this.radius, 2*this.radius];
-    this.setInertia();
     return this;
 };
 
@@ -54,21 +53,21 @@ Sphere.prototype.setRadius = function setRadius(radius) {
  * Infers the inertia tensor.
  *
  * @override
- * @method setInertia
+ * @method updateInertia
  */
-Sphere.prototype.setInertia = function setInertia() {
+Sphere.prototype.updateInertia = function updateInertia() {
     var m = this.mass;
     var r = this.radius;
 
     var mrr = m * r * r;
 
-    this.inertia = new Mat33([
+    this.inertia.set([
         0.4 * mrr, 0, 0,
         0, 0.4 * mrr, 0,
         0, 0, 0.4 * mrr
     ]);
 
-    this.inverseInertia = new Mat33([
+    this.inverseInertia.set([
         2.5 / mrr, 0, 0,
         0, 2.5 / mrr, 0,
         0, 0, 2.5 / mrr

@@ -118,7 +118,6 @@ Particle.prototype.getMass = function getMass() {
 Particle.prototype.setMass = function setMass(mass) {
     this.mass = mass;
     this.inverseMass = 1 / mass;
-    this.setInertia();
     return this;
 };
 
@@ -135,10 +134,10 @@ Particle.prototype.getInverseMass = function() {
 /**
  * Infers the inertia tensor. Will also compute and set the inverse inertia.
  *
- * @method setInertia
+ * @method updateInertia
  * @param {Mat33} Mat33
  */
-Particle.prototype.setInertia = function setInertia() {
+Particle.prototype.updateInertia = function updateInertia() {
     this.inertia = new Mat33([0,0,0,0,0,0,0,0,0]);
     this.inverseInertia = new Mat33([0,0,0,0,0,0,0,0,0]);
 };
