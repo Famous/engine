@@ -31,10 +31,26 @@ Position.prototype.setState = function setState(state) {
     return false;
 };
 
-Position.prototype.clean = function clean() {
-    var context = this._dispatch._context;
-    context.setPosition(this._x.get(), this._y.get(), this._z.get());
+Position.prototype.getX = function getX() {
+    return this._x.get();
+};
+
+Position.prototype.getY = function getY() {
+    return this._y.get();
+};
+
+Position.prototype.getZ = function getZ() {
+    return this._z.get();
+};
+
+Position.prototype.isActive = function isActive() {
     return this._x.isActive() || this._y.isActive() || this._z.isActive();
+};
+
+Position.prototype.clean = function clean() {
+    var context = this._dispatch.getContext();
+    context.setPosition(this._x.get(), this._y.get(), this._z.get());
+    return this.isActive();
 };
 
 Position.prototype.setX = function setX(val, options, callback) {
