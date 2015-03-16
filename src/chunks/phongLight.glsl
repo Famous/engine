@@ -1,16 +1,21 @@
 vec3 phongLight(in vec3 material, in vec3 lightDirection, in vec3 eyeVector) {
     vec3 normal = normalize(v_Normal);
-    float lambertTerm = dot(normal, -lightDirection);
-    vec3 Id = vec3(0.0, 0.0, 0.0);
-    vec3 Is = vec3(0.0, 0.0, 0.0);
-    if (lambertTerm > 0.0) {
-        Id = material * lambertTerm;
+    float lambertianTerm = dot(lightDirection, normal);
+    vec3 diffuse = vec3(0.0, 0.0, 0.0);
+    vec3 specular = vec3(0.0, 0.0, 0.0);
+
+    if (lambertianTerm > 0.0 && glossiness > 0.0) {
+        diffuse = material * lambertianTerm;
         vec3 E = normalize(eyeVector);
         vec3 R = reflect(lightDirection, normal);
-        float specular = pow(max(dot(R, E), 0.0), glossiness);
-        Is = u_LightColor * specular;
+        float specularWeight = pow(max(dot(R, E), 0.0), glossiness);
+        specular = u_LightColor * specularWeight;
+        return diffuse + specular;
     }
-    return Id + Is;
+    else {
+        lambertianTerm = max(lambertianTerm, 0.0);
+        return u_LightColor * material * lambertianTerm;
+    }
 }
 
 #pragma glslify: export(phongLight)
