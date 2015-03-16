@@ -39,6 +39,10 @@ Opacity.prototype.set = function set(value, options, callback) {
     return this;
 };
 
+Opacity.prototype.get = function get() {
+    return this._value.get();
+};
+
 Opacity.prototype.halt = function halt() {
     this._value.halt();
     return this;
