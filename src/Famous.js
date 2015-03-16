@@ -142,10 +142,8 @@ Famous.prototype.handleWith = function handleWith (message) {
  * @method onmessage
  * @override
  * @private
- * 
- * @return {[type]} [description]
  */
-Famous.prototype.onmessage = function onmessage () {};
+Famous.prototype.onmessage = function onmessage (message) {};
 
 // Use this when deprecation of `new Context` pattern is complete
 // Famous.prototype.createContext = function createContext (selector) {

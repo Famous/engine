@@ -67,7 +67,7 @@ function Transform() {
  *
  * @method getGlobalMatrix
  *
- * @return {Float32 Array} representation of this Transform being applied to it's parent
+ * @return {Float32Array} representation of this Transform being applied to it's parent
  */
 Transform.prototype.getGlobalMatrix = function getGlobalMatrix() {
     return this._matrix;
@@ -181,7 +181,6 @@ Transform.prototype._update = function _update(parentReport, parentMatrix) {
 Transform.prototype.translate = function translate(x, y, z) {
     var translation = this._vectors.translation;
     var dirty = false;
-    var size;
 
     if (x) {
         translation[0] += x;
@@ -265,7 +264,6 @@ Transform.prototype.scale = function scale(x, y, z) {
 Transform.prototype.setTranslation = function setTranslation(x, y, z) {
     var translation = this._vectors.translation;
     var dirty = false;
-    var size;
 
     if (x !== translation[0] && x != null) {
         translation[0] = x;
