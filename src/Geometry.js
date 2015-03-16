@@ -2,6 +2,10 @@
 
 var GeometryIds = 0;
 
+// WebGL drawing primitives map. This is generated in geometry to 
+// avoid chrome deoptimizations in WebGLRenderer draw function.
+// TODO: return draw type data retreival to WebGLRenderer.
+
 var DRAW_TYPES = {
     POINTS: 0,
     LINES: 1,
