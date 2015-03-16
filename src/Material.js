@@ -161,6 +161,6 @@ function arrayToVec(array) {
 module.exports = expressions;
 expressions.Material = Material;
 expressions.Texture = function (source) {
-    if (! window) return console.log('this constructor cannot be run inside of a work');
+    if (typeof window === 'undefined') return console.error('Texture constructor cannot be run inside of a worker');
     return expressions.image([], { texture: source });
 };
