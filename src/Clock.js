@@ -43,8 +43,8 @@ Clock.prototype.step = function step (time) {
  * @method  update
  * @chainable
  * 
- * @param  {Object} target Object having an `update` method
- * @return {[type]}        this
+ * @param  {Object} target  Object having an `update` method
+ * @return {Clock}          this
  */
 Clock.prototype.update = function update (target) {
     this._updates.push(target);

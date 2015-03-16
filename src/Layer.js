@@ -1,10 +1,10 @@
 'use strict';
 
 /**
- * Layer manages a set of components or renderables.
+ * Layers manage a set of components or renderables.
  * Components are expected to expose a `kill` method. Optionally they can
  * expose a clean method which will be called as soon as the layer they are
- * registered on is being cleaned and they are dirty.
+ * registered on is being cleaned and they are being dirty.
  *
  * @class  Layer
  * @constructor
