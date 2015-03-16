@@ -69,7 +69,7 @@ Node.prototype.removeChild = function removeChild (node) {
  * @return {Node}       this
  */
 Node.prototype.removeChildAtIndex = function removeChildAtIndex (index) {
-    var result = this._layoutNodes.splice(index, 1);
+    var result = this._children.splice(index, 1);
     if (result.length) result[0].kill();
     return this;
 };
