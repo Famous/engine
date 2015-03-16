@@ -454,19 +454,20 @@ function loadImage (img, callback) {
     return obj;
 }
 
-function handleTexture(texture) {
-    var source = texture.data;
-    var textureId = texture.id;
+function handleTexture(input) {
+    var source = input.data;
+    var textureId = input.id;
+    var options = input.options;
     var texture = this.textureRegistry[textureId];
 
     if (!texture) {
         if (Array.isArray(source)) {
-            texture = new Texture(this.gl);
+            texture = new Texture(this.gl, options);
             texture.setArray(source);
         }
 
         else if (window && source instanceof window.HTMLVideoElement) {
-            texture = new Texture(this.gl);
+            texture = new Texture(this.gl, options);
             texture.src = texture;
             texture.setImage(checkers);
             source.addEventListener('loadeddata', function(x) {
@@ -476,7 +477,7 @@ function handleTexture(texture) {
         }
 
         else if ('string' === typeof source) {
-            texture = new Texture(this.gl);
+            texture = new Texture(this.gl, options);
             texture.setImage(checkers);
             loadImage(source, function (img) {
                 texture.setImage(img);
