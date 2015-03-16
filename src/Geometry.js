@@ -1,8 +1,6 @@
 'use strict';
 
 var GeometryIds = 0;
-var TRIANGLES = 'TRIANGLES';
-var DEFAULT_BUFFER_SIZE = 3;
 
 var DRAW_TYPES = {
     POINTS: 0,
@@ -27,11 +25,12 @@ var DRAW_TYPES = {
 function Geometry(options) {
     this.id = GeometryIds++;
     this.options = options || {};
+    this.DEFAULT_BUFFER_SIZE = 3;
 
     this.spec = {
         id: this.id,
         dynamic: false,
-        type: DRAW_TYPES[(this.options.type ? this.options.type.toUpperCase() : TRIANGLES)],
+        type: DRAW_TYPES[(this.options.type ? this.options.type.toUpperCase() : 'TRIANGLES')],
         bufferNames: [],
         bufferValues: [],
         bufferSpacings: [],
@@ -43,7 +42,7 @@ function Geometry(options) {
         for (var i = 0; i < len;) {
             this.spec.bufferNames.push(this.options.buffers[i].name);
             this.spec.bufferValues.push(this.options.buffers[i].data);
-            this.spec.bufferSpacings.push(this.options.buffers[i].size || DEFAULT_BUFFER_SIZE);
+            this.spec.bufferSpacings.push(this.options.buffers[i].size || this.DEFAULT_BUFFER_SIZE);
             this.spec.invalidations.push(i++);
         }
     }
