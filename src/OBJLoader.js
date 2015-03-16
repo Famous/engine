@@ -7,7 +7,7 @@ var GeometryHelper = require('./GeometryHelper');
  * an argument to a callback function.
  *
  * @static
- * @class Engine
+ * @class OBJLoader
  */
 
 var OBJLoader = {
