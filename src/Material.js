@@ -24,7 +24,7 @@ var snippets = {
     add: {glsl: '%1 + %2;'},
     multiply: {glsl: '%1 * %2;'},
 
-    normal: {glsl:'v_Normal;'},
+    normal: {glsl:'(v_Normal + 1.0) * 0.5;'},
     uv: {glsl:'vec3(v_TextureCoordinate, 1);'},
     meshPosition: {glsl:'(v_Position + 1.0) * 0.5;'},
 
