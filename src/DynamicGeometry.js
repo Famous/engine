@@ -1,7 +1,6 @@
 'use strict';
 
 var Geometry = require('./Geometry');
-var TRIANGLES = 'TRIANGLES';
 
 /**
  * DynamicGeometry is a component that defines the data that should
@@ -68,7 +67,7 @@ DynamicGeometry.prototype.setVertexBuffer = function setVertexBuffer(bufferName,
     }
 
     this.spec.bufferValues[idx] = value || [];
-    this.spec.bufferSpacings[idx] = size || 3;
+    this.spec.bufferSpacings[idx] = size || this.DEFAULT_BUFFER_SIZE;
 
     if (this.spec.invalidations.indexOf(idx) === -1) {
         this.spec.invalidations.push(idx);
