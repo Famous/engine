@@ -8,9 +8,9 @@ void main() {
     bool lights = length(u_LightColor) > 0.0;
     vec3 color = lights && !flatShading ? applyLight(material) : material;
 
-    bool ambianceEnabled = length(u_AmbientLight) > 0.0;
-    vec3 ambience = u_AmbientLight * material;
-    vec3 finalColor = ambianceEnabled && !flatShading ? ambience + color : color;
+    bool ambience = length(u_AmbientLight) > 0.0;
+    vec3 ambientLight = u_AmbientLight * material;
+    vec3 finalColor = ambience && !flatShading ? ambientLight + color : color;
 
     gl_FragColor = vec4(finalColor, opacity);
 }
