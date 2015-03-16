@@ -577,27 +577,27 @@ var colorNames = {
 /**
  * Helper functions
  */
-Color.flattenArguments = function(options) {
+Color.flattenArguments = function flattenArguments(options) {
     return Array.prototype.concat.apply([], options);
 };
 
-Color.argsToArray = function(val) {
+Color.argsToArray = function argsToArray(val) {
     return Array.prototype.slice.call(val);
 };
 
-Color.isString = function(val) {
+Color.isString = function isString(val) {
     return (typeof val === 'string');
 };
 
-Color.isInt = function(val) {
+Color.isInt = function isInt(val) {
     return parseInt(val) === val;
 };
 
-Color.isFloat = function(val) {
+Color.isFloat = function isFloat(val) {
     return !Color.isInt(val);
 };
 
-Color.allFloats = function() {
+Color.allFloats = function allFloats() {
     var val = Color.argsToArray(arguments);
     for(var i = 0; i < val.length; i++) {
         if (!Color.isFloat(val[i])) return false;
@@ -605,11 +605,11 @@ Color.allFloats = function() {
     return true;
 };
 
-Color.allInts = function(val) {
+Color.allInts = function allInts(val) {
     return !Color.allFloats(val);
 };
 
-Color.allStrings = function() {
+Color.allStrings = function allStrings() {
     var values = Color.argsToArray(arguments);
     for(var i = 0; i < values.length; i++) {
         if (!Color.isString(values[i])) return false;
@@ -617,19 +617,19 @@ Color.allStrings = function() {
     return true;
 };
 
-Color.isPercentage = function(val) {
+Color.isPercentage = function isPercentage(val) {
     return /%/.test(val);
 };
 
-Color.isHex = function(val) {
+Color.isHex = function isHex(val) {
     return /#/.test(val);
 };
 
-Color.isType = function(type, value) {
+Color.isType = function isType(type, value) {
     return Color.allStrings(type, value) && type.toLowerCase() === value.toLowerCase();
 };
 
-Color.clamp = function(val, min, max) {
+Color.clamp = function clamp(val, min, max) {
     min = min || 0;
     max = max || 255;
     return Math.max(Math.min(val, max), min);
