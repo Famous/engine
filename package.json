@@ -4,7 +4,7 @@
   "description": "Famous Components",
   "main": "src/index.js",
   "scripts": {
-    "test": "node test/*.js | tap-spec",
+    "test": "tape test/*.js | tap-spec",
     "watch": "nodemon --ignore node_modules/ -e js,json --exec 'npm test'",
     "lint": "jshint --reporter node_modules/jshint-stylish/stylish.js src/"
   },
