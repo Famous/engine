@@ -8,6 +8,21 @@ var MessageQueue = require('./MessageQueue');
 
 var isWorker = self.window !== self;
 
+/**
+ * Famous is the toplevel object being exposed as a singleton inside the Web
+ * Worker. It holds a reference to a Clock, MessageQueue and triggers events
+ * on the GlobalDispatch. Incoming messages being sent from the Main Thread
+ * are defined by the following production rules (EBNF):
+ *
+ * message = { commmand }
+ * command = frame_command | with_command
+ * frame_command = "FRAME", unix_timestamp
+ * with_command = selector, { action }
+ * action = "TRIGGER", event_type, event_object
+ * 
+ * @class  Famous
+ * @constructor
+ */
 function Famous() {
     this._globalDispatch = new GlobalDispatch();
     this._clock = new Clock();
@@ -21,6 +36,18 @@ function Famous() {
     }
 }
 
+/**
+ * Updates the internal Clock and flushes (clears and sends) the MessageQueue
+ * to the Main Thread. step(time) is being called every time the Worker
+ * receives a FRAME command.
+ *
+ * @method  step
+ * @chainable
+ * @private
+ * 
+ * @param  {Number} time Unix timestamp
+ * @return {Famous}      this
+ */
 Famous.prototype.step = function step (time) {
     this._clock.step(time);
 
@@ -33,6 +60,19 @@ Famous.prototype.step = function step (time) {
     return this;
 };
 
+/**
+ * postMessage(message) is being called every time the Worker Thread receives a
+ * message from the Main Thread. `postMessage` is being used as a method name
+ * to expose the same API as an actual Worker would. This drastically reduces
+ * the complexity of maintaining a workerless build.
+ *
+ * @method  postMessage
+ * @chainable
+ * @private
+ * 
+ * @param  {Array} message  incoming message containing commands
+ * @return {Famous}         this
+ */
 Famous.prototype.postMessage = function postMessage (message) {
     while (message.length > 0) {
         var command = message.shift();
@@ -51,11 +91,33 @@ Famous.prototype.postMessage = function postMessage (message) {
     return this;
 };
 
+/**
+ * Handles the FRAME command by removing FRAME and the unix timstamp from the
+ * incoming message.
+ *
+ * @method handleFrame
+ * @chainable
+ * @private
+ * 
+ * @param  {Array} message  message as received as a Worker message
+ * @return {Famous}         this
+ */
 Famous.prototype.handleFrame = function handleFrame (message) {
     this.step(message.shift());
     return this;
 };
 
+/**
+ * Handles the WITH (and TRIGGER) command. Triggers the respective targeted
+ * callbacks of the internal GlobalDispatch.
+ *
+ * @method  handleWith
+ * @chainable
+ * @private
+ * 
+ * @param  {Array} message  message as received as a Worker message
+ * @return {Famous}         this
+ */
 Famous.prototype.handleWith = function handleWith (message) {
     var path = message.shift();
     var command = message.shift();
@@ -73,6 +135,16 @@ Famous.prototype.handleWith = function handleWith (message) {
     return this;
 };
 
+/**
+ * Intended to be overridden by the ThreadManager to maintain compatibility
+ * with the Web Worker API.
+ * 
+ * @method onmessage
+ * @override
+ * @private
+ * 
+ * @return {[type]} [description]
+ */
 Famous.prototype.onmessage = function onmessage () {};
 
 // Use this when deprecation of `new Context` pattern is complete
@@ -83,14 +155,38 @@ Famous.prototype.onmessage = function onmessage () {};
 //     return context;
 // };
 
+/**
+ * Returns the internal Clock, which can be used to schedule updates on a
+ * frame-by-frame basis.
+ * 
+ * @method getClock
+ * 
+ * @return {Clock} internal Clock
+ */
 Famous.prototype.getClock = function getClock () {
     return this._clock;
 };
 
+/**
+ * Returns the internal MessageQueue, which can be used to schedule messages
+ * to be sent on the next tick.
+ *
+ * @method  getMessageQueue
+ * 
+ * @return {MessageQueue} internal MessageQueue
+ */
 Famous.prototype.getMessageQueue = function getMessageQueue () {
     return this._messageQueue;
 };
 
+/**
+ * Returns the interal GlobalDispatch, which can be used to register event
+ * listeners for global (same depth) or targeted (same path) events.
+ *
+ * @method  getGlobalDispatch
+ * 
+ * @return {GlobalDispatch} internal GlobalDispatch
+ */
 Famous.prototype.getGlobalDispatch = function getGlobalDispatch () {
     return this._globalDispatch;
 };

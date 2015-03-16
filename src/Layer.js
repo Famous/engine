@@ -1,5 +1,11 @@
 'use strict';
 
+/**
+ * Layer manages a set of components.
+ *
+ * @class  Layer
+ * @constructor
+ */
 function Layer () {
     this._components = [];
     this._componentIsDirty = [];
