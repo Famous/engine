@@ -40,7 +40,7 @@ function WebGLRenderer(container) {
 
     this.meshRegistry = {};
     this.meshRegistryKeys = [];
-    this.ambientLight = [-1, -1, -1];
+    this.ambientLight = [0, 0, 0];
     this.lightRegistry = {};
     this.lightRegistryKeys = [];
     this.textureRegistry = [];
