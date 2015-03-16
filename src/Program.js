@@ -49,7 +49,8 @@ var uniformNames = [
     'positionOffset',
     'u_LightPosition',
     'u_LightColor',
-    'u_AmbientLight'
+    'u_AmbientLight',
+    'u_FlatShading'
 ];
 
 var uniformValues = [
@@ -68,7 +69,8 @@ var uniformValues = [
     [0, 0, 0],
     [0, 0, 0],
     [0, 0, 0],
-    [0, 0, 0]
+    [0, 0, 0],
+    0
 ];
 
 var attributeNames = ['pos', 'texCoord', 'normals'];
