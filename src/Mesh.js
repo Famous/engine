@@ -33,6 +33,7 @@ function Mesh (dispatch, options) {
     this._size = [];
     this._expressions = {};
     this._geometry;
+    this._flatShading = 0;
 
     init.call(this);
 
@@ -246,6 +247,25 @@ Mesh.prototype.setBaseColor = function setBaseColor() {
 Mesh.prototype.getBaseColor = function getBaseColor(option) {
     return this._expressions.baseColor || this._color.getColor(option);
 };
+
+
+/**
+ * Set whether the mesh is affected by light
+ */
+Mesh.prototype.setFlatShading = function setFlatShading(bool) {
+    this.dispatch.dirtyRenderable(this._id);
+    this._flatShading = bool ? 1 : 0;
+    this.queue.push('GL_UNIFORMS');
+    this.queue.push('u_FlatShading');
+    this.queue.push(this._flatShading);
+    return this;
+};
+
+
+Mesh.prototype.getFlatShading = function getFlatShading() {
+    return this._flatShading ? true : false;
+};
+
 
 /**
  * Defines a 3-element map which is used to provide significant physical detail to

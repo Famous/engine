@@ -17,8 +17,8 @@ var PointLight = function PointLight(dispatch) {
         position: 'GL_LIGHT_POSITION'
     };
 
-    this._receiveTransformChange(this.dispatch.getContext()._transform);
-    this.dispatch.onTransformChange(this._receiveTransformChange.bind(this));
+    this._receiveTransformChange(this._dispatch.getContext()._transform);
+    this._dispatch.onTransformChange(this._receiveTransformChange.bind(this));
 };
 
 PointLight.toString = function toString() {
@@ -29,7 +29,7 @@ PointLight.prototype = Object.create(Light.prototype);
 PointLight.prototype.constructor = PointLight;
 
 PointLight.prototype._receiveTransformChange = function _receiveTransformChange(transform) {
-    this.dispatch.dirtyComponent(this._id);
+    this._dispatch.dirtyComponent(this._id);
     this.queue.push(this.commands.position);
     this.queue.push(transform._matrix[12]);
     this.queue.push(transform._matrix[13]);
