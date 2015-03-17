@@ -2,6 +2,7 @@
 
 var CallbackStore = require('famous-utilities').CallbackStore;
 
+
 function UIEventHandler (dispatch, events) {
     this._events = new CallbackStore();
     var renderables = dispatch.getRenderables();
@@ -16,10 +17,10 @@ function UIEventHandler (dispatch, events) {
             dispatch.registerTargetedEvent(eventName, this.trigger.bind(this, eventName));
         }
 }
-
 UIEventHandler.toString = function toString() {
     return 'UIEventHandler';
 };
+
 
 UIEventHandler.prototype.trigger = function trigger (ev, payload) {
     this._events.trigger(ev, payload);

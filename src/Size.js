@@ -2,6 +2,12 @@
 
 var Transitionable = require('famous-transitions').Transitionable;
 
+/**
+ * @class Size
+ * @constructor
+ * @component
+ * @param {LocalDispatch} dispatch LocalDispatch to be retrieved from corresponding Render Node of the Size component
+ */
 function Size(dispatch) {
     this._dispatch = dispatch;
     this._id = dispatch.addComponent(this);
@@ -24,10 +30,12 @@ function Size(dispatch) {
     };
 }
 
+// Return the definition of the Component Class: 'Size'
 Size.toString = function toString() {
     return 'Size';
 };
 
+//Return object containing stringified constructor, x, y, z numeric size
 Size.prototype.getState = function getState() {
     if (this._absoluteMode) {
         return {
@@ -54,6 +62,8 @@ Size.prototype.getState = function getState() {
     };
 };
 
+// @param {object} state -- component: stringified constructor, x: number, y: number, z: number
+// If component deeply equals stringified constructor, sets position coordinates and returns boolean true, else returns false
 Size.prototype.setState = function setState(state) {
     if (state.component === this.constructor.toString()) {
         this._absoluteMode = state.type === 'absolute';
@@ -89,6 +99,7 @@ Size.prototype._cleanAbsoluteZ = function _cleanAbsoluteZ(prop) {
     } else return null;
 };
 
+// Returns boolean: if true, component is to be updated on next engine tick
 Size.prototype.clean = function clean () {
     var context = this._dispatch._context;
     if (this._absoluteMode) {
@@ -123,6 +134,12 @@ Size.prototype.clean = function clean () {
     }
 };
 
+// @param {number} x used to set x size
+// @param {number} y used to set y size
+// @param {number} z used to set z size
+// @param {object} options options hash
+// @param {function} callback function to execute after setting each size
+// @chainable
 Size.prototype.setAbsolute = function setAbsolute(x, y, z, options, callback) {
     this._dispatch.dirtyComponent(this._id);
     var abs = this._absolute;
@@ -181,6 +198,7 @@ Size.prototype.setDifferential = function setDifferential(x, y, z, options, call
     return this;
 };
 
+// Returns Size
 Size.prototype.get = function get () {
     return this._dispatch.getContext().getSize();
 };
