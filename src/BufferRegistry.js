@@ -2,9 +2,6 @@
 
 var INDICES = 'indices';
 
-var ELEMENT_ARRAY_BUFFER = 34963;
-var ARRAY_BUFFER = 34962;
-
 var Buffer = require('./Buffer');
 
 /**
@@ -37,8 +34,11 @@ function BufferRegistry(context) {
  *
  * @method allocate
  *
- * @param {Object} spec Object with all of the render information.
- * @param {Number} bufferIndex Index of target buffer within the spec.
+ * @param {Number} geometryId Id of the geometry instance that holds the buffers.
+ * @param {String} name Key of the input buffer in the geometry.
+ * @param {Array} value Flat array containing input data for buffer.
+ * @param {Number} spacing The spacing, or itemSize, of the input buffer.
+ * @param {Boolean} dynamic Boolean denoting whether a geometry is dynamic or static.
  * 
  */
 BufferRegistry.prototype.allocate = function allocate(geometryId, name, value, spacing, dynamic) {
@@ -79,7 +79,7 @@ BufferRegistry.prototype.allocate = function allocate(geometryId, name, value, s
 
             if (!bufferFound) {
                 buffer = new Buffer(
-                    isIndex ? ELEMENT_ARRAY_BUFFER : ARRAY_BUFFER,
+                    isIndex ? this.gl.ELEMENT_ARRAY_BUFFER : this.gl.ARRAY_BUFFER,
                     isIndex ? Uint16Array : Float32Array,
                     this.gl
                 );
@@ -92,7 +92,7 @@ BufferRegistry.prototype.allocate = function allocate(geometryId, name, value, s
             // For dynamic geometries, always create new buffer.
 
             buffer = new Buffer(
-                isIndex ? ELEMENT_ARRAY_BUFFER : ARRAY_BUFFER,
+                isIndex ? this.gl.ELEMENT_ARRAY_BUFFER : this.gl.ARRAY_BUFFER,
                 isIndex ? Uint16Array : Float32Array,
                 this.gl
             );

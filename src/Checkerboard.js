@@ -1,8 +1,5 @@
-/*
- Generates a checkerboard pattern to be used as a placeholder texture
- while an image loads over the network.
- 
- */
+// Generates a checkerboard pattern to be used as a placeholder texture
+// while an image loads over the network.
 
 module.exports = (function() {
     var context = document.createElement('canvas').getContext('2d');
