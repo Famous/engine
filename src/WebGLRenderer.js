@@ -67,7 +67,16 @@ function WebGLRenderer(container) {
     this.projectionTransform = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
 }
 
-
+/**
+ * Attempts to retreive the WebGLRenderer context using several
+ * accessors.  For browser compatability.  Throws on error.
+ *
+ * @method getWebGLContext
+ *
+ * @param {Object} canvas Canvas element from which the context is retreived.
+ *
+ * @return {Object} WebGLContext of canvas element.
+ */
 WebGLRenderer.prototype.getWebGLContext = function getWebGLContext(canvas) {
     var names = ['webgl', 'experimental-webgl', 'webkit-3d', 'moz-webgl'];
     var context = null;
@@ -86,7 +95,15 @@ WebGLRenderer.prototype.getWebGLContext = function getWebGLContext(canvas) {
     return context ? context : false;
 };
 
-
+/**
+ * Adds a new base spec to the light registry at a given path.
+ *
+ * @method createLight
+ *
+ * @param {String} path Path used as id of new light in lightRegistry.
+ *
+ * @return {Object} Newly create light spec.
+ */
 WebGLRenderer.prototype.createLight = function createLight(path) {
     this.lightRegistryKeys.push(path);
     return this.lightRegistry[path] = {
@@ -95,14 +112,21 @@ WebGLRenderer.prototype.createLight = function createLight(path) {
     };
 };
 
-
+/**
+ * Adds a new base spec to the mesh registry at a given path.
+ *
+ * @method createMesh
+ *
+ * @param {String} path Path used as id of new mesh in meshRegistry.
+ *
+ * @return {Object} Newly create mesh spec.
+ */
 WebGLRenderer.prototype.createMesh = function createMesh(path) {
     this.meshRegistryKeys.push(path);
     return this.meshRegistry[path] = {
         uniformKeys: ['opacity', 'transform', 'size', 'origin', 'baseColor', 'positionOffset', 'u_FlatShading'],
         uniformValues: [1, identity, [0, 0, 0], [0, 0, 0], [0.5, 0.5, 0.5], [0, 0, 0], 0],
         buffers: {},
-        options: {},
         geometry: null,
         drawType: null,
         texture: null
@@ -444,24 +468,35 @@ WebGLRenderer.prototype.updateSize = function updateSize() {
  */
 WebGLRenderer.prototype.handleOptions = function handleOptions(options) {
     var gl = this.gl;
-    if (! options) return;
+    if (!options) return;
     if (options.blending) gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
 };
 
 /**
- * Resets the state of the WebGL drawing context based on custom parameters
- * defined on a mesh.
+ * Resets the state of the WebGL drawing context to default values.
  *
- * @method handleOptions
+ * @method resetOptions
  * 
  * @param {Object} options Draw state options to be set to the context.
  */
-WebGLRenderer.prototype.resetOptions = function handleOptions(options) {
+WebGLRenderer.prototype.resetOptions = function resetOptions(options) {
     var gl = this.gl;
-    if (! options) return;
+    if (!options) return;
     if (options.blending) gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 };
 
+/**
+ * Loads an image from a string or Image object and executes a callback function.
+ *
+ * @method loadImage
+ * @private
+ *
+ * @param {Object | String} img The input image data to load as an asset.
+ * @param {Function} callback The callback function to be fired when
+ * the image has finished loading.
+ *
+ * @return {Object} Image object being loaded.
+ */
 function loadImage (img, callback) {
     var obj = (typeof img === 'string' ? new Image() : img) || {};
     obj.crossOrigin = 'anonymous';
@@ -471,6 +506,16 @@ function loadImage (img, callback) {
     return obj;
 }
 
+/**
+ * Handles loading of texture objects.
+ *
+ * @method handleTexture
+ * @private
+ *
+ * @param {Object} input The input texture object collected from mesh.
+ *
+ * @return {Object} Texture instance linked to input data.
+ */
 function handleTexture(input) {
     var source = input.data;
     var textureId = input.id;
