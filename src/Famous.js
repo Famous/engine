@@ -6,6 +6,7 @@ var Clock = require('./Clock');
 var GlobalDispatch = require('./GlobalDispatch');
 var MessageQueue = require('./MessageQueue');
 var ProxyRegistry = require('./ProxyRegistry');
+var Context = require('./Context');
 
 var isWorker = self.window !== self;
 
@@ -30,6 +31,7 @@ function Famous() {
     this._clock = new Clock();
     this._messageQueue = new MessageQueue();
     this._proxyRegistry = new ProxyRegistry(this._messageQueue);
+    this._contexts = [];
 
     var _this = this;
     if (isWorker) {
@@ -159,12 +161,11 @@ Famous.prototype.handleWith = function handleWith (message) {
 Famous.prototype.onmessage = function onmessage (message) {};
 
 // Use this when deprecation of `new Context` pattern is complete
-// Famous.prototype.createContext = function createContext (selector) {
-//     var context = new Context(selector, this._globalDispatch);
-//     this._contexts.push(context);
-//     this._clock.update(context);
-//     return context;
-// };
+Famous.prototype.createContext = function createContext (selector) {
+    var context = new Context(selector, this._messageQueue, this._globalDispatch, this._clock);
+    this._contexts.push(context);
+    return context;
+};
 
 /**
  * Returns the internal Clock, which can be used to schedule updates on a
