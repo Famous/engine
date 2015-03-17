@@ -4,19 +4,17 @@ var Geometry = require('../Geometry');
 var GeometryHelper = require('../GeometryHelper');
 
 /**
- * This class creates a new geometry instance and sets
- * its vertex positions, texture coordinates, normals,
- * and indices to based on the primitive.
+ * This function returns a new static geometry, which is passed
+ * custom buffer data.
  *
  * @class ParametricSphere
  * @constructor
  *
- * @param {Object} options that can alter the values
- * and amount of vertex buffers
+ * @param {Object} options Parameters that alter the
+ * vertex buffers of the generated geometry.
  * 
  * @return {Object} constructed geometry
  */
-
 function ParametricSphere (options) {
     options = options || {};
     var detail = options.detail || 10;
@@ -42,15 +40,14 @@ function ParametricSphere (options) {
 }
 
 /**
- * function used in iterative construction of parametric primitive.
+ * Function used in iterative construction of parametric primitive.
  *
  * @static
  * @method generator
  * @param {Number} u Longitudal progress from 0 to PI.
  * @param {Number} v Latitudal progress from 0 to PI.
- * @return {Array} x, y and z coordinate of geometry
+ * @return {Array} x, y and z coordinates of geometry
  */
-
 ParametricSphere.generator = function generator(u, v, pos) {
     var x = Math.sin(u) * Math.cos(v);
     var y = Math.cos(u);

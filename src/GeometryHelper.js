@@ -18,7 +18,6 @@ var outputs = [
  * @static
  * @class GeometryHelper
  */
-
 var GeometryHelper = {};
 
 /**
@@ -35,7 +34,6 @@ var GeometryHelper = {};
  * 
  * @return {Object} Object containing generated vertices and indices.
  */
-
 GeometryHelper.generateParametric = function generateParametric(detailX, detailY, func) {
     var vertices = [],
         i, theta, phi, result, j;
@@ -86,7 +84,6 @@ GeometryHelper.generateParametric = function generateParametric(detailX, detailY
  * 
  * @return {Array} Calculated face normals.
  */
-
 GeometryHelper.computeNormals = function computeNormals(vertices, indices, out) {
     var normals = out || [];
     var vertexThree;
@@ -142,7 +139,6 @@ GeometryHelper.computeNormals = function computeNormals(vertices, indices, out) 
  * @param {Array} texutureCoords Texture coordinates of all points on the geometry
  * 
  */
-
 GeometryHelper.subdivide = function subdivide(indices, vertices, textureCoords) {
     var triangleIndex = indices.length / 3,
         abc,
@@ -189,7 +185,6 @@ GeometryHelper.subdivide = function subdivide(indices, vertices, textureCoords) 
  * @param {Array} indices Indices declaring faces of geometry
  * 
  */
-
 GeometryHelper.getUniqueFaces = function getUniqueFaces(vertices, indices) {
     var triangleIndex = indices.length / 3,
         registered = [],
@@ -221,7 +216,6 @@ GeometryHelper.getUniqueFaces = function getUniqueFaces(vertices, indices) {
  * @param {Array} indices Indices declaring faces of geometry
  * 
  */
-
 GeometryHelper.subdivideSpheroid = function subdivideSpheroid(vertices, indices) {
     var triangleIndex = indices.length / 3,
         abc,
@@ -261,7 +255,6 @@ GeometryHelper.subdivideSpheroid = function subdivideSpheroid(vertices, indices)
  * 
  * @return {Array} new list of calculated normals.
  */
-
 GeometryHelper.getSpheroidNormals = function getSpheroidNormals(vertices, out) {
     var out = out || [];
     var length = vertices.length / 3;
@@ -294,7 +287,6 @@ GeometryHelper.getSpheroidNormals = function getSpheroidNormals(vertices, out) {
  * 
  * @return {Array} new list of calculated texture coordinates
  */
-
 GeometryHelper.getSpheroidUV = function getSpheroidUV(vertices, out) {
     var out = out || [];
     var length = vertices.length / 3;
@@ -322,7 +314,6 @@ GeometryHelper.getSpheroidUV = function getSpheroidUV(vertices, out) {
  * 
  * @return {Array} new list of normalized vertices
  */
-
 GeometryHelper.normalizeAll = function normalizeAll(vertices, out) {
     var out = out || [];
     var vertex;
@@ -373,7 +364,6 @@ GeometryHelper.getAltitude = function altitude(v) {
  * 
  * @return {Array} new list of line-formatted indices
  */
-
 GeometryHelper.trianglesToLines = function triangleToLines(indices, out) {
     var out = [];
     var face;
