@@ -43,7 +43,7 @@ function vendorPrefix(property) {
 var VENDOR_TRANSFORM = vendorPrefix(TRANSFORM);
 var VENDOR_TRANSFORM_ORIGIN = vendorPrefix(TRANSFORM_ORIGIN);
 
-function VirtualElement (target, path, renderer, parent, rootElement) {
+function VirtualElement (target, path, renderer, parent, rootElement, root) {
     this._path = path;
     this._target = target;
     this._renderer = renderer;
@@ -64,6 +64,8 @@ function VirtualElement (target, path, renderer, parent, rootElement) {
     this._rootElement = rootElement || this;
     this._finalTransform = new Float32Array(16);
     this._MV = new Float32Array(16);
+    this._perspectiveTransform = new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
+    this._isRoot = root ? root : false;
 }
 
 VirtualElement.prototype.getTarget = function getTarget () {
@@ -267,42 +269,32 @@ VirtualElement.prototype.draw = function draw(renderState) {
     var m = this._finalMatrix;
     var perspectiveTransform = renderState.perspectiveTransform;
 
-    var originShiftedPerspective = [
-        perspectiveTransform[0],
-        perspectiveTransform[1],
-        perspectiveTransform[2],
-        perspectiveTransform[3],
+    this._perspectiveTransform[8] = perspectiveTransform[11] * ((this._rootElement._size[0] * 0.5) - (this._size[0] * this._origin[0])),
+    this._perspectiveTransform[9] = perspectiveTransform[11] * ((this._rootElement._size[1] * 0.5) - (this._size[1] * this._origin[1]));
+    this._perspectiveTransform[11] = perspectiveTransform[11];
 
-        perspectiveTransform[4],
-        perspectiveTransform[5],
-        perspectiveTransform[6],
-        perspectiveTransform[7],
+    if (this._parent) {
+        invert(this._invertedParent, this._parent._receivedMatrix);
+        multiply(this._finalMatrix, this._invertedParent, this._receivedMatrix);
+    }
 
-        perspectiveTransform[11] * ((this._rootElement._size[0] * 0.5) - (this._size[0] * this._origin[0])),
-        perspectiveTransform[11] * ((this._rootElement._size[1] * 0.5) - (this._size[1] * this._origin[1])),
-        perspectiveTransform[10],
-        perspectiveTransform[11],
+    if (this._parent._isRoot) {
+        multiply(
+            this._MV,
+            renderState.viewTransform,
+            this._finalMatrix
+        );
 
-        perspectiveTransform[12],
-        perspectiveTransform[13],
-        perspectiveTransform[14],
-        perspectiveTransform[15]
-    ];
+        multiply(
+            this._finalTransform,
+            this._perspectiveTransform,
+            this._MV
+        );
+    }
 
-    this._MV = multiply(
-        this._MV,
-        renderState.viewTransform,
-        m[0], m[1], m[2], m[3], m[4], m[5], m[6], m[7], m[8], m[9], m[10], m[11], m[12], m[13], m[14], m[15]
-    );
+    var finalTransform = this._parent._isRoot ? this._finalTransform : this._finalMatrix;
 
-    var MV = this._MV;
-    this._finalTransform = multiply(
-        this._finalTransform,
-        originShiftedPerspective,
-        MV[0], MV[1], MV[2], MV[3], MV[4], MV[5], MV[6], MV[7], MV[8], MV[9], MV[10], MV[11], MV[12], MV[13], MV[14], MV[15]
-    );
-
-    this._target.style[VENDOR_TRANSFORM] = stringifyMatrix(this._finalTransform);
+    this._target.style[VENDOR_TRANSFORM] = stringifyMatrix(finalTransform);
 };
 
 VirtualElement.prototype.setMatrix = function setMatrix (m0, m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11, m12, m13, m14, m15) {
@@ -322,28 +314,23 @@ VirtualElement.prototype.setMatrix = function setMatrix (m0, m1, m2, m3, m4, m5,
     this._receivedMatrix[13] = m13;
     this._receivedMatrix[14] = m14;
     this._receivedMatrix[15] = m15;
-    if (this._parent) {
-        invert(this._invertedParent, this._parent._receivedMatrix);
-        multiply(this._finalMatrix, this._invertedParent, m0, m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11, m12, m13, m14, m15);
-    }
-    else {
-        this._finalMatrix[0] = m0;
-        this._finalMatrix[1] = m1;
-        this._finalMatrix[2] = m2;
-        this._finalMatrix[3] = m3;
-        this._finalMatrix[4] = m4;
-        this._finalMatrix[5] = m5;
-        this._finalMatrix[6] = m6;
-        this._finalMatrix[7] = m7;
-        this._finalMatrix[8] = m8;
-        this._finalMatrix[9] = m9;
-        this._finalMatrix[10] = m10;
-        this._finalMatrix[11] = m11;
-        this._finalMatrix[12] = m12;
-        this._finalMatrix[13] = m13;
-        this._finalMatrix[14] = m14;
-        this._finalMatrix[15] = m15;
-    }
+
+    this._finalMatrix[0] = m0;
+    this._finalMatrix[1] = m1;
+    this._finalMatrix[2] = m2;
+    this._finalMatrix[3] = m3;
+    this._finalMatrix[4] = m4;
+    this._finalMatrix[5] = m5;
+    this._finalMatrix[6] = m6;
+    this._finalMatrix[7] = m7;
+    this._finalMatrix[8] = m8;
+    this._finalMatrix[9] = m9;
+    this._finalMatrix[10] = m10;
+    this._finalMatrix[11] = m11;
+    this._finalMatrix[12] = m12;
+    this._finalMatrix[13] = m13;
+    this._finalMatrix[14] = m14;
+    this._finalMatrix[15] = m15;
 };
 
 VirtualElement.prototype.addClass = function addClass (className) {
@@ -474,13 +461,17 @@ function invert (out, a) {
     return out;
 }
 
-function multiply (out, a, b0, b1, b2, b3, b4, b5, b6, b7, b8, b9, b10, b11, b12, b13, b14, b15) {
+function multiply (out, a, b) {
     var a00 = a[0], a01 = a[1], a02 = a[2], a03 = a[3],
         a10 = a[4], a11 = a[5], a12 = a[6], a13 = a[7],
         a20 = a[8], a21 = a[9], a22 = a[10], a23 = a[11],
-        a30 = a[12], a31 = a[13], a32 = a[14], a33 = a[15];
+        a30 = a[12], a31 = a[13], a32 = a[14], a33 = a[15],
 
-    // Cache only the current line of the second matrix
+        b0 = b[0], b1 = b[1], b2 = b[2], b3 = b[3],
+        b4 = b[4], b5 = b[5], b6 = b[6], b7 = b[7],
+        b8 = b[8], b9 = b[9], b10 = b[10], b11 = b[11],
+        b12 = b[12], b13 = b[13], b14 = b[14], b15 = b[15];
+
     out[0] = b0*a00 + b1*a10 + b2*a20 + b3*a30;
     out[1] = b0*a01 + b1*a11 + b2*a21 + b3*a31;
     out[2] = b0*a02 + b1*a12 + b2*a22 + b3*a32;
@@ -503,6 +494,7 @@ function multiply (out, a, b0, b1, b2, b3, b4, b5, b6, b7, b8, b9, b10, b11, b12
     out[13] = b0*a01 + b1*a11 + b2*a21 + b3*a31;
     out[14] = b0*a02 + b1*a12 + b2*a22 + b3*a32;
     out[15] = b0*a03 + b1*a13 + b2*a23 + b3*a33;
+
     return out;
 }
 
