@@ -1,10 +1,6 @@
 'use strict';
 
-/**
- * Module dependencies
- */
 var Color = require('./Color');
-
 
 /**
  * @class Stores multiple palettes in a collection and provides methods for
@@ -20,19 +16,47 @@ var ColorPalette = function ColorPalette() {
     (options.length) ? this.makePalette(options) : this.setRandomPalette();
 };
 
+/**
+ * Returns the stored palette
+ *
+ * @method getPalette
+ * @returns Palette
+ */
 ColorPalette.prototype.getPalette = function getPalette() {
     return this._palette;
 };
 
+/**
+ * Returns the color at a given index within the palette
+ *
+ * @method getColor
+ * @param Index
+ * @returns {Color} Color
+ */
 ColorPalette.prototype.getColor = function getColor(i) {
     return this._palette[i];
 };
 
+/**
+ * Makes a Color from the given inputs
+ *
+ * @method makeColor
+ * @param Color values in RGB, HSL, Hex, or HSV
+ * @returns {Color} Color
+ */
 ColorPalette.prototype.makeColor = function makeColor() {
     var options = Color.flattenArguments(arguments);
     return new Color(options[0], options[1], options[2]);
 };
 
+/**
+ * Makes a palette from a given set of Colors
+ *
+ * @method makePalette
+ * @param Color inputs
+ * @chainable
+ * @returns Palette
+ */
 ColorPalette.prototype.makePalette = function makePalette() {
     var options = Color.flattenArguments(arguments);
     var palette = [];
@@ -44,12 +68,24 @@ ColorPalette.prototype.makePalette = function makePalette() {
     return this;
 };
 
+/**
+ * Sets the color palette from a given set of palettes
+ *
+ * @method setRandomPalette
+ * @returns Color palette
+ */
 ColorPalette.prototype.setRandomPalette = function setRandomPalette() {
     var index = Math.floor(Math.random() * rawPalettes.length);
     this.makePalette(rawPalettes[Math.floor(index)]);
     return this;
 };
 
+/**
+ * Returns the lightest color in the color palette
+ *
+ * @method getLighestColor
+ * @returns Lightest color
+ */
 ColorPalette.prototype.getLighestColor = function() {
     var lightestValue = 0, lightestRef;
 
@@ -63,6 +99,12 @@ ColorPalette.prototype.getLighestColor = function() {
     return lightestRef;
 };
 
+/**
+ * Returns the darkest color in the color palette
+ *
+ * @method getDarkestColor
+ * @returns Darkest color
+ */
 ColorPalette.prototype.getDarkestColor = function() {
     var darkestValue = 100, darkestRef;
 
@@ -76,13 +118,18 @@ ColorPalette.prototype.getDarkestColor = function() {
     return darkestRef;
 };
 
+/**
+ * Returns the number of colors inside of the palette
+ *
+ * @method getPaletteCount
+ * @returns {Integer} Palette color length
+ */
 ColorPalette.prototype.getPaletteCount = function getPaletteCount() {
     return this._palette.length;
 };
 
-
 /**
- * Palettes
+ * A set of defined color palettes
  */
 var rawPalettes = [
     [[53,92,125], [108,91,123], [192,108,132], [246,114,128], [248,177,149]],
@@ -294,8 +341,4 @@ var rawPalettes = [
     [[74,95,103], [92,55,75], [204,55,71], [209,92,87], [217,212,168]]
 ];
 
-
-/**
- * Expose
- */
-module.exports = ColorPalette;
+ module.exports = ColorPalette;

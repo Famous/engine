@@ -1,15 +1,12 @@
 'use strict';
 
-/**
- * Module dependencies
- */
 var Transitionable = require('famous-transitions').Transitionable;
 
-
 /**
- * Color
- * Accepts RGB, HSL, HEX and HSV with getters and setters.
- * If no options are provided, RGB is the default setter.
+ * @class Color
+ * @constructor
+ * @component
+ * @param Optional options for setting the color at instantiation.
  */
 var Color = function Color() {
     this._r = new Transitionable(0);
@@ -19,14 +16,34 @@ var Color = function Color() {
     if (options.length) this.set(options);
 };
 
+/**
+* Returns the definition of the Class: 'Color'
+*
+* @method toString
+* @return {string} definition
+*/
 Color.toString = function toString() {
     return 'Color';
 };
 
-
 /**
- * GENERAL
- */
+* Sets the color. It accepts an optional options parameter for tweening colors. Its default parameters are
+* in RGB, however, you can also specify different inputs.
+* set(r, g, b, option)
+* set('rgb', 0, 0, 0, option)
+* set('hsl', 0, 0, 0, option)
+* set('hsv', 0, 0, 0, option)
+* set('hex', '#000000', option)
+* set('#000000', option)
+* set('black', option)
+* set(Color)
+* @method set
+* @param {number} r Used to set the r value of Color
+* @param {number} g Used to set the g value of Color
+* @param {number} b Used to set the b value of Color
+* @param {object} options Optional options argument for tweening colors
+* @chainable
+*/
 Color.prototype.set = function set() {
     var options = Color.flattenArguments(arguments);
     var type = this.determineType(options[0]);
@@ -43,37 +60,82 @@ Color.prototype.set = function set() {
     return this;
 };
 
+/**
+ * Returns whether Color is still in an animating (tweening) state.
+ *
+ * @method isActive
+ * @returns {boolean} boolean
+ */
 Color.prototype.isActive = function isActive() {
     return this._r.isActive() || this._g.isActive() || this._b.isActive();
 };
 
+/**
+ * Tweens to another color values which can be set with
+ * various inputs: RGB, HSL, Hex, HSV or another Color instance.
+ *
+ * @method changeTo
+ * @param Color values
+ * @chainable
+ */
 Color.prototype.changeTo = function changeTo() {
     var options = Color.flattenArguments(arguments);
     if (options.length) this.set(options);
     return this;
 };
 
+/**
+ * Copies the color values from another Color instance
+ *
+ * @method copy
+ * @param Color instance
+ * @param Optional options arguments for animating
+ * @param Optional callback
+ * @chainable
+ */
 Color.prototype.copy = function copy() {
     var values = Color.flattenArguments(arguments);
-    var color = values[0], options = values[1];
+    var color = values[0], options = values[1], cb = values[2];
     if (this.isColorInstance(color)) {
-        this.setRGB(color.getRGB(), options);
+        this.setRGB(color.getRGB(), options, cb);
     }
     return this;
 };
 
+/**
+ * Clone another Color instance
+ *
+ * @method clone
+ * @returns {Color} Color Returns a new Color instance with the same values
+ */
 Color.prototype.clone = function clone() {
     var rgb = this.getRGB();
     return new Color('rgb', rgb[0], rgb[1], rgb[2]);
 };
 
+/**
+ * Sets the color based on static color names
+ *
+ * @method setColor
+ * @param Color name
+ * @param Optional options arguments for animating
+ * @param Optional callback
+ * @chainable
+ */
 Color.prototype.setColor = function setColor() {
     var values = Color.flattenArguments(arguments);
-    var color = values[0], options = values[1];
-    this.setHex(colorNames[color], options);
+    var color = values[0], options = values[1], cb = values[2];
+    this.setHex(colorNames[color], options, cb);
     return this;
 };
 
+/**
+ * Returns the color in either RGB or with the requested format.
+ *
+ * @method getColor
+ * @param Optional argument for determining which type of color to get (default is RGB)
+ * @returns Color in either RGB or specific value
+ */
 Color.prototype.getColor = function getColor(option) {
     option = option || 'undefined';
     switch (option.toLowerCase()) {
@@ -86,10 +148,24 @@ Color.prototype.getColor = function getColor(option) {
     }
 };
 
+/**
+ * Returns boolean whether the input is a Color instance
+ *
+ * @method isColorInstance
+ * @param Color instance
+ * @returns {Boolean} Boolean
+ */
 Color.prototype.isColorInstance = function isColorInstance(val) {
     return (val instanceof Color);
 };
 
+/**
+ * Parses the given input to the appropriate color configuration
+ *
+ * @method determineType
+ * @param Color type
+ * @returns {string} Appropriate color type
+ */
 Color.prototype.determineType = function determineType(val) {
     if (this.isColorInstance(val)) return 'instance';
     if (Color.isHex(val)) return 'hex';
@@ -100,50 +176,113 @@ Color.prototype.determineType = function determineType(val) {
     }
 };
 
+/**
+ * Sets the R of the Color's RGB
+ *
+ * @method setR
+ * @param R component of Color
+ * @param Optional options arguments for animating
+ * @param Optional callback
+ * @chainable
+ */
+Color.prototype.setR = function setR(r, options, cb) {
+    this._r.set(r, options, cb);
+    return this;
+};
 
 /**
- * RGB
+ * Sets the G of the Color's RGB
+ *
+ * @method setG
+ * @param G component of Color
+ * @param Optional options arguments for animating
+ * @param Optional callback
+ * @chainable
  */
-Color.prototype.setR = function setR(r, options) {
-    this._r.set(r, options);
+Color.prototype.setG = function setG(g, options, cb) {
+    this._g.set(g, options, cb);
     return this;
 };
 
-Color.prototype.setG = function setG(g, options) {
-    this._g.set(g, options);
+/**
+ * Sets the B of the Color's RGB
+ *
+ * @method setB
+ * @param B component of Color
+ * @param Optional options arguments for animating
+ * @param Optional callback
+ * @chainable
+ */
+Color.prototype.setB = function setB(b, options, cb) {
+    this._b.set(b, options, cb);
     return this;
 };
 
-Color.prototype.setB = function setB(b, options) {
-    this._b.set(b, options);
-    return this;
-};
-
+/**
+ * Sets RGB
+ *
+ * @method setRGB
+ * @param RGB component of Color
+ * @param Optional options arguments for animating
+ * @param Optional callback
+ * @chainable
+ */
 Color.prototype.setRGB = function setRGB() {
     var values = Color.flattenArguments(arguments);
     var options = values[3];
+    var cb = values[4];
     this.setR(values[0], options);
     this.setG(values[1], options);
-    this.setB(values[2], options);
+    this.setB(values[2], options, cb);
     return this;
 };
 
+/**
+ * Returns R of RGB
+ *
+ * @method getR
+ * @returns R of Color
+ */
 Color.prototype.getR = function getR() {
     return this._r.get();
 };
 
+/**
+ * Returns G of RGB
+ *
+ * @method getG
+ * @returns G of Color
+ */
 Color.prototype.getG = function getG() {
     return this._g.get();
 };
 
+/**
+ * Returns B of RGB
+ *
+ * @method getB
+ * @returns B of Color
+ */
 Color.prototype.getB = function getB() {
     return this._b.get();
 };
 
+/**
+ * Returns RGB
+ *
+ * @method getRGB
+ * @returns RGB
+ */
 Color.prototype.getRGB = function getRGB() {
     return [this.getR(), this.getG(), this.getB()];
 };
 
+/**
+ * Returns Normalized RGB
+ *
+ * @method getNormalizedRGB
+ * @returns Normalized RGB
+ */
 Color.prototype.getNormalizedRGB = function getNormalizedRGB() {
     var r = this.getR() / 255.0;
     var g = this.getG() / 255.0;
@@ -151,6 +290,12 @@ Color.prototype.getNormalizedRGB = function getNormalizedRGB() {
     return [r, g, b];
 };
 
+/**
+ * Returns the stringified RGB value
+ *
+ * @method getRGBString
+ * @returns Returns the stringified RGB value
+ */
 Color.prototype.getRGBString = function toRGBString() {
     var r = this.getR();
     var g = this.getG();
@@ -158,38 +303,81 @@ Color.prototype.getRGBString = function toRGBString() {
     return 'rgb('+ r +', '+ g +', '+ b +');';
 };
 
-Color.prototype.addRGB = function addRGB(r, g, b) {
+/**
+ * Adds the given RGB values to the current RGB.
+ *
+ * @method addRGB
+ * @param RGB values
+ * @param Optional options arguments for animating
+ * @param Optional callback
+ * @chainable
+ */
+Color.prototype.addRGB = function addRGB(r, g, b, options, cb) {
     var r = Color.clamp(this.getR() + r);
     var g = Color.clamp(this.getG() + g);
     var b = Color.clamp(this.getB() + b);
-    this.setRGB(r, g, b);
+    this.setRGB(r, g, b, options, cb);
     return this;
 };
 
-Color.prototype.addScalar = function addScalar(s) {
+/**
+ * Adds a scalar values with the current RGB.
+ *
+ * @method addScalar
+ * @param Scalar value
+ * @param Optional options arguments for animating
+ * @param Optional callback
+ * @chainable
+ */
+Color.prototype.addScalar = function addScalar(s, options, cb) {
     var r = Color.clamp(this.getR() + s);
     var g = Color.clamp(this.getG() + s);
     var b = Color.clamp(this.getB() + s);
-    this.setRGB(r, g, b);
+    this.setRGB(r, g, b, options, cb);
     return this;
 };
 
-Color.prototype.multiplyRGB = function multiplyRGB(r, g, b) {
+/**
+ * Multiplies RGB values with the current RGB.
+ *
+ * @method multiplyRGB
+ * @param RGB values
+ * @param Optional options arguments for animating
+ * @param Optional callback
+ * @chainable
+ */
+Color.prototype.multiplyRGB = function multiplyRGB(r, g, b, options, cb) {
     var r = Color.clamp(this.getR() * r);
     var g = Color.clamp(this.getG() * g);
     var b = Color.clamp(this.getB() * b);
-    this.setRGB(r, g, b);
+    this.setRGB(r, g, b, options, cb);
     return this;
 };
 
-Color.prototype.multiplyScalar = function multiplyScalar(s) {
+/**
+ * Multiplies a scalar values with the current RGB.
+ *
+ * @method multiplyScalar
+ * @param Scalar value
+ * @param Optional options arguments for animating
+ * @param Optional callback
+ * @chainable
+ */
+Color.prototype.multiplyScalar = function multiplyScalar(s, options, cb) {
     var r = Color.clamp(this.getR() * s);
     var g = Color.clamp(this.getG() * s);
     var b = Color.clamp(this.getB() * s);
-    this.setRGB(r, g, b);
+    this.setRGB(r, g, b, options, cb);
     return this;
 };
 
+/**
+ * Determines whether another Color instance equals the current one.
+ *
+ * @method equals
+ * @param Color instance
+ * @returns {Boolean}
+ */
 Color.prototype.equals = function equals(color) {
     if (this.isColorInstance(color)) {
         return  this.getR() === color.getR() &&
@@ -199,24 +387,49 @@ Color.prototype.equals = function equals(color) {
     return false;
 };
 
-Color.prototype.copyGammaToLinear = function copyGammaToLinear(color) {
+/**
+ * Copies the gamma values with the current RGB values
+ *
+ * @method copyGammaToLinear
+ * @param Color instance
+ * @param Optional options arguments for animating
+ * @param Optional callback
+ * @chainable
+ */
+Color.prototype.copyGammaToLinear = function copyGammaToLinear(color, options, cb) {
     if (this.isColorInstance(color)) {
         var r = color.getR();
         var g = color.getG();
         var b = color.getB();
-        this.setRGB(r*r, g*g, b*b);
+        this.setRGB(r*r, g*g, b*b, options, cb);
     }
     return this;
 };
 
-Color.prototype.convertGammaToLinear = function convertGammaToLinear() {
+/**
+ * Converts the gamma values of the current RGB values
+ *
+ * @method convertGammaToLinear
+ * @param Optional options arguments for animating
+ * @param Optional callback
+ * @chainable
+ */
+Color.prototype.convertGammaToLinear = function convertGammaToLinear(options, cb) {
     var r = this.getR();
     var g = this.getG();
     var b = this.getB();
-    this.setRGB(r*r, g*g, b*b);
+    this.setRGB(r*r, g*g, b*b, options, cb);
     return this;
 };
 
+/**
+ * Adds two different Color instances together and returns the RGB value
+ *
+ * @method addColors
+ * @param Color
+ * @param Color
+ * @returns RGB value of the added values
+ */
 Color.prototype.addColors = function addColors(color1, color2) {
     var r = color1.getR() + color2.getR();
     var g = color1.getG() + color2.getG();
@@ -224,15 +437,24 @@ Color.prototype.addColors = function addColors(color1, color2) {
     return [r, g, b];
 };
 
-
 /**
- * HEX
+ * Converts a number to a hex value
+ *
+ * @method toHex
+ * @param Number
+ * @returns Hex value
  */
 Color.prototype.toHex = function toHex(num) {
     var hex = num.toString(16);
     return hex.length === 1 ? '0' + hex : hex;
 };
 
+/**
+ * Returns the current color in Hex
+ *
+ * @method getHex
+ * @returns Hex value
+ */
 Color.prototype.getHex = function getHex() {
     var r = this.toHex(this.getR());
     var g = this.toHex(this.getG());
@@ -240,16 +462,26 @@ Color.prototype.getHex = function getHex() {
     return '#' + r + g + b;
 };
 
+/**
+ * Sets color using Hex
+ *
+ * @method setHex
+ * @param Hex value
+ * @param Optional options arguments for animating
+ * @param Optional callback
+ * @chainable
+ */
 Color.prototype.setHex = function setHex() {
     var values = Color.flattenArguments(arguments);
-    var hex, options;
+    var hex, options, cb;
 
     if (Color.isHex(values[0])) {
         hex = values[0];
         options = values[1];
+        cb = values[2];
     }
     else {
-        hex = values[1]; options = values[2];
+        hex = values[1]; options = values[2], cb = values[3];
     }
     hex = (hex.charAt(0) === '#') ? hex.substring(1, hex.length) : hex;
 
@@ -260,13 +492,15 @@ Color.prototype.setHex = function setHex() {
     var r = parseInt(hex.substring(0, 2), 16);
     var g = parseInt(hex.substring(2, 4), 16);
     var b = parseInt(hex.substring(4, 6), 16);
-    this.setRGB(r, g, b, options);
+    this.setRGB(r, g, b, options, cb);
     return this;
 };
 
-
 /**
- * HSL
+ * Converts Hue to RGB
+ *
+ * @method hueToRGB
+ * @returns Hue value
  */
 Color.prototype.hueToRGB = function hueToRGB(p, q, t) {
     if (t < 0) t += 1;
@@ -277,10 +511,19 @@ Color.prototype.hueToRGB = function hueToRGB(p, q, t) {
     return p;
 };
 
+/**
+ * Sets color using HSL
+ *
+ * @method setHSL
+ * @param HSL values
+ * @param Optional options arguments for animating
+ * @param Optional callback
+ * @chainable
+ */
 Color.prototype.setHSL = function setHSL() {
     var values = Color.flattenArguments(arguments);
     var h = values[0], s = values[1], l = values[2];
-    var options = values[3];
+    var options = values[3], cb = values[4];
     h /= 360.0;
     s /= 100.0;
     l /= 100.0;
@@ -298,10 +541,16 @@ Color.prototype.setHSL = function setHSL() {
     r = Math.round(r * 255);
     g = Math.round(g * 255);
     b = Math.round(b * 255);
-    this.setRGB(r, g, b, options);
+    this.setRGB(r, g, b, options, cb);
     return this;
 };
 
+/**
+ * Returns color in HSL
+ *
+ * @method getHSL
+ * @returns HSL value
+ */
 Color.prototype.getHSL = function getHSL() {
     var rgb = this.getNormalizedRGB();
     var r = rgb[0], g = rgb[1], b = rgb[2];
@@ -324,58 +573,109 @@ Color.prototype.getHSL = function getHSL() {
     return [h, s*100, l*100];
 };
 
+/**
+ * Returns hue
+ *
+ * @method getHue
+ * @returns Hue value
+ */
 Color.prototype.getHue = function getHue() {
     var hsl = this.getHSL();
     return hsl[0];
 };
 
-Color.prototype.setHue = function setHue(h, options) {
+/**
+ * Sets hue
+ *
+ * @method setHue
+ * @param Hue
+ * @param Optional options arguments for animating
+ * @param Optional callback
+ * @chainable
+ */
+Color.prototype.setHue = function setHue(h, options, cb) {
     var hsl = this.getHSL();
-    this.setHSL(h, hsl[1], hsl[2], options);
+    this.setHSL(h, hsl[1], hsl[2], options, cb);
     return this;
 };
 
+/**
+ * Returns saturation
+ *
+ * @method getSaturation
+ * @returns Saturation value
+ */
 Color.prototype.getSaturation = function getSaturation() {
     var hsl = this.getHSL();
     return hsl[1];
 };
 
-Color.prototype.setSaturation = function setSaturation(s, options) {
+/**
+ * Sets saturation
+ *
+ * @method setSaturation
+ * @param Saturation
+ * @param Optional options arguments for animating
+ * @param Optional callback
+ * @chainable
+ */
+Color.prototype.setSaturation = function setSaturation(s, options, cb) {
     var hsl = this.getHSL();
-    this.setHSL(hsl[0], s, hsl[2], options);
+    this.setHSL(hsl[0], s, hsl[2], options, cb);
     return this;
 };
 
+/**
+ * Returns brightness
+ *
+ * @method getBrightness
+ * @returns Brightness
+ */
 Color.prototype.getBrightness = function getBrightness() {
     var rgb = this.getNormalizedRGB();
     return Math.max(rgb[0], rgb[1], rgb[2]) * 100.0;
 };
 
+/**
+ * Returns Lightness
+ *
+ * @method getLightness
+ * @returns Lightness
+ */
 Color.prototype.getLightness = function getLightness() {
     var rgb = this.getNormalizedRGB();
     var r = rgb[0], g = rgb[1], b = rgb[2];
     return ((Math.max(r, g, b) + Math.min(r, g, b)) / 2.0) * 100.0;
 };
 
-Color.prototype.getLightness = function getLightness() {
+/**
+ * Sets lightness
+ *
+ * @method setLightness
+ * @param Lightness
+ * @param Optional options arguments for animating
+ * @param Optional callback
+ * @chainable
+ */
+Color.prototype.setLightness = function setLightness(l, options, cb) {
     var hsl = this.getHSL();
-    return hsl[2];
-};
-
-Color.prototype.setLightness = function setLightness(l, options) {
-    var hsl = this.getHSL();
-    this.setHSL(hsl[0], hsl[0], l, options);
+    this.setHSL(hsl[0], hsl[0], l, options, cb);
     return this;
 };
 
-
 /**
- * HSV
+ * Sets color using HSV
+ *
+ * @method setHSV
+ * @param HSV values
+ * @param Optional options arguments for animating
+ * @param Optional callback
+ * @chainable
  */
 Color.prototype.setHSV = function setHSV() {
     var values = Color.flattenArguments(arguments);
     var h = values[0], s = values[1], v = values[2];
-    var options = values[3];
+    var options = values[3], cb = values[4];
     var r, g, b;
     var i = Math.floor(h * 6);
     var f = h * 6 - i;
@@ -392,10 +692,16 @@ Color.prototype.setHSV = function setHSV() {
         case 5: r = v, g = p, b = q; break;
     }
 
-    this.setRGB(r*255, g*255, b*255, options);
+    this.setRGB(r*255, g*255, b*255, options, cb);
     return this;
 };
 
+/**
+ * Returns color in HSV
+ *
+ * @method getHSV
+ * @returns HSV values
+ */
 Color.prototype.getHSV = function getHSV() {
     var rgb = this.getNormalizedRGB();
     var r = rgb[0], g = rgb[1], b = rgb[2];
@@ -417,9 +723,8 @@ Color.prototype.getHSV = function getHSV() {
     return [h, s, v];
 };
 
-
 /**
- * Generic color names
+ * Common color names with their associated Hex values
  */
 var colorNames = {
     aliceblue: '#f0f8ff',
@@ -573,30 +878,66 @@ var colorNames = {
 };
 
 
-
 /**
- * Helper functions
+ * One level deep flattening of arguments
+ *
+ * @method flattenArguments
+ * @returns A flattened array
  */
 Color.flattenArguments = function flattenArguments(options) {
     return Array.prototype.concat.apply([], options);
 };
 
+/**
+ * Converts arguments into an array
+ *
+ * @method argsToArray
+ * @returns Array
+ */
 Color.argsToArray = function argsToArray(val) {
     return Array.prototype.slice.call(val);
 };
 
+/**
+ * Returns a boolean checking whether input is a 'String'
+ *
+ * @method isString
+ * @param Primitive
+ * @returns {Boolean} Boolean
+ */
 Color.isString = function isString(val) {
     return (typeof val === 'string');
 };
 
+/**
+ * Returns a boolean checking whether input is an 'Integer'
+ *
+ * @method isInt
+ * @param Primitive
+ * @returns {Boolean} Boolean
+ */
 Color.isInt = function isInt(val) {
     return parseInt(val) === val;
 };
 
+/**
+ * Returns a boolean checking whether input is a 'Float'
+ *
+ * @method isFloat
+ * @param Primitive
+ * @returns {Boolean} Boolean
+ */
 Color.isFloat = function isFloat(val) {
     return !Color.isInt(val);
 };
 
+/**
+ * Returns a boolean checking whether all inputs are of type 'Float'
+ *
+ * @method allFloats
+ * @param list
+ * @returns {Boolean} Boolean
+ */
 Color.allFloats = function allFloats() {
     var val = Color.argsToArray(arguments);
     for(var i = 0; i < val.length; i++) {
@@ -605,10 +946,24 @@ Color.allFloats = function allFloats() {
     return true;
 };
 
+/**
+ * Returns a boolean checking whether all inputs are of type 'Integer'
+ *
+ * @method allInts
+ * @param list
+ * @returns {Boolean} Boolean
+ */
 Color.allInts = function allInts(val) {
     return !Color.allFloats(val);
 };
 
+/**
+ * Returns a boolean checking whether all inputs are of type 'String'
+ *
+ * @method allStrings
+ * @param list
+ * @returns {Boolean} Boolean
+ */
 Color.allStrings = function allStrings() {
     var values = Color.argsToArray(arguments);
     for(var i = 0; i < values.length; i++) {
@@ -617,26 +972,53 @@ Color.allStrings = function allStrings() {
     return true;
 };
 
+/**
+ * Returns a boolean checking whether string input has a percentage symbol
+ *
+ * @method isPercentage
+ * @param String
+ * @returns {Boolean} Boolean
+ */
 Color.isPercentage = function isPercentage(val) {
     return /%/.test(val);
 };
 
+/**
+ * Returns a boolean checking whether string input has a hash (#) symbol
+ *
+ * @method isHex
+ * @param String
+ * @returns {Boolean} Boolean
+ */
 Color.isHex = function isHex(val) {
     return /#/.test(val);
 };
 
+/**
+ * Returns a boolean checking whether the value and type are same
+ *
+ * @method isType
+ * @param String
+ * @param String
+ * @returns {Boolean} Boolean
+ */
 Color.isType = function isType(type, value) {
     return Color.allStrings(type, value) && type.toLowerCase() === value.toLowerCase();
 };
 
+/**
+ * Clamps a value between a minimum and a maximum
+ *
+ * @method clamp
+ * @param Number input
+ * @param Minumum
+ * @param Maximum
+ * @returns Clamped value
+ */
 Color.clamp = function clamp(val, min, max) {
     min = min || 0;
     max = max || 255;
     return Math.max(Math.min(val, max), min);
 };
 
-
-/**
- * Expose
- */
 module.exports = Color;
