@@ -13,12 +13,7 @@ var TORQUE_REGISTER = new Vec3();
  * @param {Object} options options to set on drag
  */
 function RotationalDrag(targets, options) {
-    if (targets) {
-        if (targets instanceof Array) this.targets = targets;
-        else this.targets = [targets];
-    }
-    else this.targets = [];
-    Force.call(this, options);
+    Force.call(this, targets, options);
 }
 
 RotationalDrag.prototype = Object.create(Force.prototype);

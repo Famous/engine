@@ -14,12 +14,7 @@ var FORCE_REGISTER = new Vec3();
  * @param {Object} options
  */
 function Drag(targets, options) {
-    if (targets) {
-        if (targets instanceof Array) this.targets = targets;
-        else this.targets = [targets];
-    }
-    else this.targets = [];
-    Force.call(this, options);
+    Force.call(this, targets, options);
 }
 
 Drag.prototype = Object.create(Force.prototype);
@@ -75,7 +70,7 @@ Drag.prototype.update = function update(time, dt) {
     var force = FORCE_REGISTER;
 
     var max = this.max;
-    var strength = this.options.strength;
+    var strength = this.strength;
     for (var i = 0, len = targets.length; i < len; i++) {
         var target = targets[i];
         var velocity = target.velocity;

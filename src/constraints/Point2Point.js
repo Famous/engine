@@ -50,8 +50,6 @@ Point2Point.prototype.constructor = Point2Point;
 Point2Point.prototype.init = function(options) {
     var w = this.anchor;
 
-    this.debug = new Vec3()
-
     var a = this.a;
     var b = this.b;
 
@@ -91,7 +89,7 @@ Point2Point.prototype.update = function(time, dt) {
     var invEffInertia = Mat33.add(RIaRt, RIbRt, RIaRt);
 
     var worldA = Vec3.add(a.position, this.rA, this.anchor);
-    var worldB = Vec3.add(b.position, this.rB, this.debug);
+    var worldB = Vec3.add(b.position, this.rB, VEC2_REGISTER);
 
     Vec3.subtract(worldB, worldA, this.error);
     this.error.scale(0.2/dt);

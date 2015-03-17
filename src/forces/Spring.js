@@ -16,12 +16,7 @@ var DAMPING_REGISTER = new Vec3();
  */
 function Spring(source, targets, options) {
     this.source = source || null;
-    if (targets) {
-        if (targets instanceof Array) this.targets = targets;
-        else this.targets = [targets];
-    }
-    else this.targets = [];
-    Force.call(this, options);
+    Force.call(this, targets, options);
 }
 
 Spring.prototype = Object.create(Force.prototype);
@@ -82,7 +77,7 @@ Spring.prototype.init = function(options) {
         this.damping = 4 * PI * this.dampingRatio / this.period;
     }
     else {
-        this.period = 300;
+        this.period = 1;
         this.dampingRatio = 0;
 
         this.stiffness = 2 * PI / this.period;

@@ -4,7 +4,7 @@
   "description": "Famous Physics",
   "main": "src/index.js",
   "scripts": {
-    "test": "tape test/**/*.spec.js | tap-spec",
+    "test": "tape test/*.spec.js test/*/*.spec.js | tap-spec",
     "lint": "jshint --reporter node_modules/jshint-stylish/stylish.js src/"
   },
   "repository": {

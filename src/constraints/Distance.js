@@ -14,7 +14,6 @@ var PI = Math.PI;
 /**
  *  A constraint that keeps two bodies within a certain distance.
  *
- *
  *  @class Distance
  *  @extends Constraint
  *  @param {Particle} a One of the bodies.

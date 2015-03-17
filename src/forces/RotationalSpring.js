@@ -24,12 +24,7 @@ var PI = Math.PI;
  */
 function RotationalSpring(source, targets, options) {
     this.source = source || null;
-    if (targets) {
-        if (targets instanceof Array) this.targets = targets;
-        else this.targets = [targets];
-    }
-    else this.targets = [];
-    Force.call(this, options);
+    Force.call(this, targets, options);
 }
 
 RotationalSpring.prototype = Object.create(Force.prototype);
@@ -56,7 +51,7 @@ RotationalSpring.prototype.init = function init(options) {
         this.damping = 4 * PI * this.dampingRatio / this.period;
     }
     else {
-        this.period = 300;
+        this.period = 1;
         this.dampingRatio = 0;
 
         this.stiffness = 2 * PI / this.period, 2;
@@ -90,13 +85,13 @@ RotationalSpring.prototype.update = function update(time, dt) {
         var target = targets[i];
         var q = target.orientation;
         Quaternion.conjugate(q, deltaQ);
-        deltaQ.leftMultiply(anchor);
+        deltaQ.multiply(anchor);
 
-        var halftheta = deltaQ.w > 1 ? 0 : Math.acos(deltaQ.w);
-        var length = Math.sqrt(1-deltaQ.w*deltaQ.w);
-        if (Math.abs(length) < 1e-6) continue;
+        if (deltaQ.w >= 1) continue;
+        var halftheta = Math.acos(deltaQ.w);
+        var length = Math.sqrt(1 - deltaQ.w * deltaQ.w);
 
-        var deltaOmega = XYZ.copy(deltaQ).scale(2*halftheta/length);
+        var deltaOmega = XYZ.copy(deltaQ).scale(2 * halftheta / length);
 
         deltaOmega.scale(stiffness);
 
