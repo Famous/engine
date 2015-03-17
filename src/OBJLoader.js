@@ -27,7 +27,6 @@ var OBJLoader = {
  * @param {Boolean} optional paramater specificing whether or not Famo.us should
  * calculate the normals for each face
  */
-
 OBJLoader.load = function load(url, cb, computeNormals) {
     if (! this.cached[url]) {
         if(! this.requests[url]) {
@@ -60,7 +59,6 @@ OBJLoader.load = function load(url, cb, computeNormals) {
  * @param {Boolean} value determining whether or not to manually calculate normals
  * @param {String} content of the server response
  */
-
 function _onsuccess(url, computeNormals, text) {
     var buffers = format.call(this, text, computeNormals);
     this.cached[url] = buffers;
@@ -84,7 +82,6 @@ function _onsuccess(url, computeNormals, text) {
  *
  * @return {Object} vertex buffer data
  */
-
 function format(text, computeNormals) {
     text = sanitize(text);
 

@@ -4,15 +4,14 @@ var Geometry = require('../Geometry');
 var GeometryHelper = require('../GeometryHelper');
 
 /**
- * This class creates a new geometry instance and sets
- * its vertex positions, texture coordinates, normals,
- * and indices to based on the primitive.
+ * This function returns a new static geometry, which is passed
+ * custom buffer data.
  *
  * @class Torus
  * @constructor
  *
- * @param {Object} options that can alter the values
- * and amount of vertex buffers
+ * @param {Object} options Parameters that alter the
+ * vertex buffers of the generated geometry.
  * 
  * @return {Object} constructed geometry
  */
@@ -48,9 +47,8 @@ function Torus(options) {
  * @param {Number} a Radius of tube.
  * @param {Number} u Longitudal progress from 0 to PI.
  * @param {Number} v Latitudal progress from 0 to PI.
- * @return {Array} x, y and z coordinate of geometry.
+ * @return {Array} x, y and z coordinate of the vertex.
  */
-
 Torus.generator = function generator(c, a, u, v, pos) {
     pos[0] = (c + a * Math.cos(2 * v)) * Math.sin(2 * u);
     pos[1] = -(c + a * Math.cos(2 * v)) * Math.cos(2 * u);

@@ -25,7 +25,6 @@ var DRAW_TYPES = {
  * 
  * @param {Object} options Instantiation options.
  */
-
 function Geometry(options) {
     this.id = GeometryIds++;
     this.options = options || {};

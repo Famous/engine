@@ -3,19 +3,17 @@
 var Geometry       = require('../Geometry');
 
 /**
- * This class creates a new geometry instance and sets
- * its vertex positions, texture coordinates, normals,
- * and indices to based on the primitive.
+ * This function returns a new static geometry, which is passed
+ * custom buffer data.
  *
  * @class Circle
  * @constructor
  *
- * @param {Object} options that can alter the values
- * and amount of vertex buffers
+ * @param {Object} options Parameters that alter the
+ * vertex buffers of the generated geometry.
  * 
  * @return {Object} constructed geometry
  */
-
 function Circle (options) {
     var options  = options || {};
     var detail   = options.detail || 30;
@@ -37,12 +35,11 @@ function Circle (options) {
  *
  * @method getBuffers
  *
- * @param {Number} amount of detail that determines how many
+ * @param {Number} detail Amount of detail that determines how many
  * vertices are created and where they are placed
  * 
  * @return {Object} constructed geometry
  */
-
 function getBuffers(detail) {
     var theta = 0;
     var x;

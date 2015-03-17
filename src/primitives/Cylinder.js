@@ -10,11 +10,12 @@ var GeometryHelper = require('../GeometryHelper');
  *
  * @class Cylinder
  * @constructor
- * @param {Object} options that can alter the values
- * and amount of vertex buffers
+ * 
+ * @param {Object} options Parameters that alter the
+ * vertex buffers of the generated geometry.
+ *
  * @return {Object} constructed geometry
  */
-
 function Cylinder (options) {
     var options  = options || {};
     var radius   = options.radius || 1;
@@ -38,16 +39,16 @@ function Cylinder (options) {
 }
 
 /**
- * function used in iterative construction of parametric primitive.
+ * Function used in iterative construction of parametric primitive.
  *
  * @static
  * @method generator
  * @param {Number} r Cylinder radius.
  * @param {Number} u Longitudal progress from 0 to PI.
  * @param {Number} v Latitudal progress from 0 to PI.
+ *
  * @return {Array} x, y and z coordinate of geometry.
  */
-
 Cylinder.generator = function generator(r, u, v, pos) {
     pos[0] = r * Math.cos(v);
     pos[1] = r * (-1 + u / Math.PI * 2);
