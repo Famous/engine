@@ -1,13 +1,16 @@
 'use strict';
 
-/**
- * Module dependencies
- */
 var Light = require('./Light');
 
-
 /**
- * PointLight Component
+ * PointLight extends the functionality of Light. PointLight is a light source
+ * that emits light in all directions from a point in space.
+ *
+ * @class PointLight
+ * @constructor
+ * @component
+ * @param {LocalDispatch} dispatch LocalDispatch to be retrieved
+ * from the corresponding Render Node
  */
 var PointLight = function PointLight(dispatch) {
     Light.call(this, dispatch);
@@ -21,13 +24,31 @@ var PointLight = function PointLight(dispatch) {
     this._dispatch.onTransformChange(this._receiveTransformChange.bind(this));
 };
 
+/**
+* Returns the definition of the Class: 'PointLight'
+*
+* @method toString
+* @return {string} definition
+*/
 PointLight.toString = function toString() {
     return 'PointLight';
 };
 
+/**
+ * Extends Light constructor
+ */
 PointLight.prototype = Object.create(Light.prototype);
+
+/**
+ * Sets PointLight as the constructor
+ */
 PointLight.prototype.constructor = PointLight;
 
+/**
+ * Receives transform change updates from the scene graph.
+ *
+ * @private
+ */
 PointLight.prototype._receiveTransformChange = function _receiveTransformChange(transform) {
     this._dispatch.dirtyComponent(this._id);
     this.queue.push(this.commands.position);
@@ -36,8 +57,4 @@ PointLight.prototype._receiveTransformChange = function _receiveTransformChange(
     this.queue.push(transform._matrix[14]);
 };
 
-
-/**
- * Expose
- */
 module.exports = PointLight;
