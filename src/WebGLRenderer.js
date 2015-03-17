@@ -29,8 +29,9 @@ function WebGLRenderer(canvas) {
     gl.polygonOffset(0.1, 0.1);
     gl.enable(gl.POLYGON_OFFSET_FILL);
     gl.enable(gl.DEPTH_TEST);
-    gl.disable(gl.BLEND);
+    gl.enable(gl.BLEND);
     gl.depthFunc(gl.LEQUAL);
+    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
     this.meshRegistry = {};
     this.meshRegistryKeys = [];
@@ -285,6 +286,23 @@ WebGLRenderer.prototype.draw = function draw(renderState) {
     this.projectionTransform[11] = renderState.perspectiveTransform[11];
 
     this.program.setUniforms(['perspective', 'time', 'view'], [this.projectionTransform, Date.now()  % 100000 / 1000, renderState.viewTransform]);
+    var keys = this.meshRegistryKeys;
+    var registry = this.meshRegistry;
+    
+    this.meshRegistryKeys = keys.sort(function (a, b) {
+        var meshA = registry[a];
+        var meshB = registry[b];
+        var opacityA = meshA.uniformValues[0];
+        var opacityB = meshB.uniformValues[0];
+        var depthA = meshA.uniformValues[1][14];
+        var depthB = meshB.uniformValues[1][14];
+
+        //both trans: back to front
+        if (opacityA < 1 && opacityB < 1) 
+            return depthA - depthB;
+        else
+            return opacityB - opacityA;
+    });
 
     for (var i = 0, len = this.cutoutRegistryKeys.length; i < len; i++) {
         cutout = this.cutoutRegistry[this.cutoutRegistryKeys[i]];
@@ -299,6 +317,15 @@ WebGLRenderer.prototype.draw = function draw(renderState) {
     for(var i = 0; i < this.meshRegistryKeys.length; i++) {
         mesh = this.meshRegistry[this.meshRegistryKeys[i]];
         buffers = this.bufferRegistry.registry[mesh.geometry];
+
+        var gl = this.gl;
+        if (mesh.uniformValues[0] < 1) {
+            gl.disable(gl.DEPTH_TEST);
+            gl.enable(gl.BLEND);
+        } else {
+            gl.enable(gl.DEPTH_TEST);
+            gl.disable(gl.BLEND);
+        }
 
         if (!buffers) continue;
 
