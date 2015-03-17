@@ -7,7 +7,6 @@
  * corresponding render targets (e.g. DOM has blending by default).
  *
  * @class Opacity
- * @chainable
  * @private
  * @constructor
  */

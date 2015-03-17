@@ -4,6 +4,28 @@ var RenderContext = require('./RenderContext');
 var ComponentStore = require('./ComponentStore');
 var RenderProxy = require('./RenderProxy');
 
+/**
+ * As opposed to a Node, a LocalDispatch does not define hierarchical
+ * structures within the scene graph. Thus removing the need to manage
+ * children, but at the same time requiring the Node to delegate updates to its
+ * own LocalDispatch and all subsequent Nodes.
+ *
+ * The primary responsibilty of the LocalDispatch is to provide the ability to
+ * register events on a specific Node ("targeted events"), without inducing the
+ * complexity of determining the Nodes location within the scene graph.
+ *
+ * It also holds a reference to a RenderContext, therefore being required to
+ * delegate invocations of its update function to its RenderContext, which
+ * consequently mutates the actual 3D transform matrix associated with the
+ * Node.
+ *
+ * @class  LocalDispatch
+ * @constructor
+ * 
+ * @param {Node} node           Node being managed by the LocalDispatch.
+ * @param {RenderProxy} proxy   RenderProxy associated with the managed Node's
+ *                              parent.
+ */
 function LocalDispatch (node, proxy) {
     this._renderProxy = new RenderProxy(proxy);
     this._context = new RenderContext(this);
@@ -11,15 +33,38 @@ function LocalDispatch (node, proxy) {
     this._node = node;
 }
 
+/**
+ * Kills the componentstore of the LocalDispatchm therefore killing all
+ * Renderables and Components registered for the managed node.
+ *
+ * @method kill
+ * @chainable
+ * 
+ * @return {LocalDispatch} this
+ */
 LocalDispatch.prototype.kill = function kill () {
     this._componentStore.kill();
     return this;
 };
 
+/**
+ * Returns the managed Node.
+ *
+ * @method getNode
+ * 
+ * @return {Node} managed Node
+ */
 LocalDispatch.prototype.getNode = function getNode () {
     return this._node;
 };
 
+/**
+ * Retrieves the RenderContext managed by the LocalDispatch.
+ *
+ * @method getContext
+ * 
+ * @return {RenderContext}  RenderContext managed by the LocalDispatch
+ */
 LocalDispatch.prototype.getContext = function getContext () {
     return this._context;
 };
