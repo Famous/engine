@@ -6,9 +6,7 @@
  *
  * @class Texture
  * @constructor
- * 
  */
-
 function Texture(gl, options) {
     options = options || {};
     this.id = gl.createTexture();
@@ -37,39 +35,37 @@ function Texture(gl, options) {
     this.unbind();
 }
 
-function isPowerOfTwo(width, height) {
-    return (width & width - 1) === 0 
-        && (height & height - 1) === 0;
-};
-
 /**
- * Binds this texture as the selected target
+ * Binds this texture as the selected target.
  *
- * @method setOrigin
+ * @method bind
  * @chainable
  *
- * @param {Number} the texture slot in which to upload the data
+ * @param {Number} unit The texture slot in which to upload the data.
+ *
+ * @return {Object} Current texture instance.
  */
-
 Texture.prototype.bind = function bind(unit) {
     this.gl.activeTexture(this.gl.TEXTURE0 + (unit || 0));
     this.gl.bindTexture(this.gl.TEXTURE_2D, this.id);
+    return this;
 };
 
 /**
- * Erases the texture data in the given texture slot
+ * Erases the texture data in the given texture slot.
  *
  * @method unbind
  * @chainable
  *
- * @param {Number} the texture slot in which to clean the data
+ * @param {Number} unit The texture slot in which to clean the data.
+ * 
+ * @return {Object} Current texture instance.
  */
-
 Texture.prototype.unbind = function unbind(unit) {
     this.gl.activeTexture(this.gl.TEXTURE0 + (unit || 0));
     this.gl.bindTexture(this.gl.TEXTURE_2D, null);
+    return this;
 };
-
 
 /**
  * Replaces the image data in the texture with the given image.
@@ -77,9 +73,10 @@ Texture.prototype.unbind = function unbind(unit) {
  * @method setImage
  * @chainable
  *
- * @param {Image} the Img object to upload pixel data from
+ * @param {Image} img The image object to upload pixel data from.
+ *
+ * @return {Object} Current texture instance.
  */
-
 Texture.prototype.setImage = function setImage(img) {
     this.gl.bindTexture(this.gl.TEXTURE_2D, this.id);
     this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.format, this.format, this.type, img);
@@ -87,10 +84,19 @@ Texture.prototype.setImage = function setImage(img) {
     return this;
 };
 
-
-Texture.prototype.setArray = function setImage(img) {
+/**
+ * Replaces the image data in the texture with an array of arbitrary data.
+ *
+ * @method setArray
+ * @chainable
+ *
+ * @param {Array} input Array to be set as data to texture. 
+ *
+ * @return {Object} Current texture instance.
+ */
+Texture.prototype.setArray = function setArray(input) {
     this.gl.bindTexture(this.gl.TEXTURE_2D, this.id);
-    this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.format, 1, 1, 0, this.format, this.type, new Uint8Array(img));
+    this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.format, 1, 1, 0, this.format, this.type, new Uint8Array(input));
     this.gl.bindTexture(this.gl.TEXTURE_2D, null);
     return this;
 };
@@ -105,8 +111,9 @@ Texture.prototype.setArray = function setImage(img) {
  * @param {Number} y-offset between texture coordinates and snapshot
  * @param {Number} x-depth of the snapshot
  * @param {Number} y-depth of the snapshot
+ * 
+ * @return {Array} An array of the pixels contained in the snapshot.
  */
-
 Texture.prototype.readBack = function readBack(x, y, width, height) {
     var gl = this.gl;
     var pixels;
@@ -122,6 +129,23 @@ Texture.prototype.readBack = function readBack(x, y, width, height) {
         gl.readPixels(x, y, width, height, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
     }
     return pixels;
+};
+
+/*
+ * Determines whether both input values are power-of-two numbers.
+ *
+ * @method isPowerOfTwo
+ * @private
+ *
+ * @param {Number} width Number representing texture width.
+ * @param {Number} height Number representing texture height.
+ *
+ * @return {Boolean} Boolean denoting whether the input dimensions
+ * are both power-of-two values.
+ */
+function isPowerOfTwo(width, height) {
+    return (width & width - 1) === 0 
+        && (height & height - 1) === 0;
 };
 
 module.exports = Texture;

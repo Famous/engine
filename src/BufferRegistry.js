@@ -12,7 +12,6 @@ var Buffer = require('./Buffer');
  * @constructor
  * 
  * @param {WebGLContext} context WebGL drawing context to be passed to buffers.
- * 
  */
 function BufferRegistry(context) {
     this.gl = context;
@@ -39,7 +38,6 @@ function BufferRegistry(context) {
  * @param {Array} value Flat array containing input data for buffer.
  * @param {Number} spacing The spacing, or itemSize, of the input buffer.
  * @param {Boolean} dynamic Boolean denoting whether a geometry is dynamic or static.
- * 
  */
 BufferRegistry.prototype.allocate = function allocate(geometryId, name, value, spacing, dynamic) {
     var vertexBuffers = this.registry[geometryId] || (this.registry[geometryId] = { keys: [], values: [], spacing: [], offset: [], length: [] });
