@@ -7,6 +7,7 @@
  *
  * @class  MessageQueue
  * @constructor
+ * @private
  */
 function MessageQueue() {
     this._messages = [];

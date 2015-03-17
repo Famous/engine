@@ -10,6 +10,7 @@ var CallbackStore = require('famous-utilities').CallbackStore;
  *
  * @class  GlobalDispatch
  * @constructor
+ * @private
  */
 function GlobalDispatch () {
     this._targetedCallbacks = {};

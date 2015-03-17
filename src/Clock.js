@@ -6,6 +6,7 @@
  *
  * @class  Clock
  * @constructor
+ * @private
  */
 function Clock () {
     this._updates = [];

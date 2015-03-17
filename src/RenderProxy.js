@@ -11,6 +11,7 @@ var SLASH = '/';
  * 
  * @class  RenderProxy
  * @constructor
+ * @private
  * 
  * @param {RenderProxy|Context} parent parent used for recursively obtaining
  *                                     the path to the corresponding node
@@ -22,6 +23,8 @@ function RenderProxy (parent) {
 
 /**
  * Retrieves the renderpath
+ *
+ * @method getRenderPath
  * 
  * @return {String} render path
  */

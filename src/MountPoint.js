@@ -6,6 +6,7 @@ var Align = require('./Align');
  * @class MountPoint
  * @extends {Align}
  * @constructor
+ * @private
  */
 function MountPoint () {
     Align.call(this);
