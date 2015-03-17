@@ -1,3 +1,34 @@
+'use strict';
+
+/**
+ * The ThreadManager is being updated by an Engine by consecutively calling its
+ * `update` method. It can either manage a real Web-Worker or the global
+ * Famous core singleton.
+ *
+ * @example
+ * var compositor = new Compositor();
+ * 
+ * // Using a Web Worker
+ * var worker = new Worker('worker.bundle.js');
+ * var threadmanger = new ThreadManager(worker, compositor);
+ * 
+ * // Without using a Web Worker
+ * var threadmanger = new ThreadManager(Famous, compositor);
+ * 
+ * @class  ThreadManager
+ * @constructor
+ * 
+ * @param {Famous|Worker} thread        The thread being used to receive
+ *                                      messages from and post messages to.
+ *                                      Expected to expose a WebWorker-like
+ *                                      API, which means providing a way to
+ *                                      listen for updates by setting its
+ *                                      `onmessage` property and sending
+ *                                      updates using `postMessage`.
+ * @param {Compositor} compositor       an instance of Compositor used to
+ *                                      extract enqueued draw commands from to
+ *                                      be sent to the thread
+ */
 function ThreadManager (thread, compositor) {
 	this._thread = thread;
 	this._compositor = compositor;
@@ -11,6 +42,16 @@ function ThreadManager (thread, compositor) {
     };
 }
 
+/**
+ * Update method being invoked by the Engine on every `requestAnimationFrame`.
+ * Used for updating the notion of time within the managed thread by sending
+ * a FRAME command and sending messages to 
+ * 
+ * @method update
+ * 
+ * @param  {Number} time unix timestamp to be passed down to the worker as a
+ *                       FRAME command
+ */
 ThreadManager.prototype.update = function update (time) {
     this._thread.postMessage(['FRAME', time]);
     var threadMessages = this._compositor.drawCommands();

@@ -5,6 +5,13 @@ var WebGLRenderer = require('famous-webgl-renderers').WebGLRenderer;
 var Camera = require('famous-components').Camera;
 var VirtualWindow = require('./VirtualWindow');
 
+/**
+ * Instantiates a new Compositor, used for routing commands received from the
+ * WebWorker to the WebGL and DOM renderer.
+ * 
+ * @class Compositor
+ * @constructor
+ */
 function Compositor() {
     this._contexts = {};
     this._outCommands = [];
@@ -20,6 +27,12 @@ function Compositor() {
     this._virtualWindow = new VirtualWindow(this);
 }
 
+/**
+ * Exposes a key-value-mapping of commands to the renderer they should be
+ * routed to.
+ * 
+ * @type {Object}
+ */
 Compositor.CommandsToOutput = {
     CHANGE_TRANSFORM_ORIGIN: 'DOM',
     CHANGE_TRANSFORM: 'DOM',
@@ -44,11 +57,32 @@ Compositor.CommandsToOutput = {
     MATERIAL_INPUT: 'GL'
 };
 
+/**
+ * Schedules an event to be sent to the WebWorker the next time the out command
+ * queue is being flushed.
+ *
+ * @method sendEvent
+ * @private
+ * 
+ * @param  {String} path    render path to the node the event should be
+ *                          triggered on (*targeted event*)
+ * @param  {String} ev      event type
+ * @param  {Object} payload event object (serializable using structured
+ *                          cloning algorithm)
+ */
 Compositor.prototype.sendEvent = function sendEvent(path, ev, payload) {
     this._outCommands.push('WITH', path, 'TRIGGER', ev, payload);
 };
 
-
+/**
+ * Internal helper method used by `drawCommands`.
+ * 
+ * @method handleWith
+ * @private
+ * 
+ * @param  {Array} commands     remaining message queue received from the
+ *                              WebWorker, used to shift single messages from
+ */
 Compositor.prototype.handleWith = function handleWith (commands) {
     var path = commands.shift();
     var pathArr = path.split('/');
@@ -89,6 +123,21 @@ Compositor.prototype.handleWith = function handleWith (commands) {
     }
 };
 
+/**
+ * Retrieves the top-level VirtualElement attached to the passed in document
+ * selector.
+ * If no such element exists, one will be instantiated, therefore representing
+ * the equivalent of a Context in the Main Thread.
+ *
+ * @method getOrSetContext
+ * @private
+ * 
+ * @param  {String} selector            document query selector used for
+ *                                      retrieving the DOM node the
+ *                                      VirtualElement should be attached to
+ * @return {Object} result              
+ * @return {VirtualElement} result.DOM  final VirtualElement
+ */
 Compositor.prototype.getOrSetContext = function getOrSetContext(selector) {
     if (this._contexts[selector]) return this._contexts[selector];
     var result = {
@@ -99,6 +148,15 @@ Compositor.prototype.getOrSetContext = function getOrSetContext(selector) {
     return result;
 };
 
+/**
+ * Internal helper method used by `drawCommands`.
+ *
+ * @method giveSizeFor
+ * @private
+ * 
+ * @param  {Array} commands     remaining message queue received from the
+ *                              WebWorker, used to shift single messages from
+ */
 Compositor.prototype.giveSizeFor = function giveSizeFor(commands) {
     var selector = commands.shift();
     var size = this.getOrSetContext(selector).DOM._getSize();
@@ -110,15 +168,34 @@ Compositor.prototype.giveSizeFor = function giveSizeFor(commands) {
                 _this.sendResize(selector, _this.getOrSetContext(selector).DOM._getSize());
             }
         });
-    return this;
 };
 
+/**
+ * Internal helper method used for notifying the WebWorker about externally
+ * resized contexts (e.g. by resizing the browser window).
+ *
+ * @method sendResize
+ * @private
+ *
+ * @param  {String} selector    render path to the node (context) that should
+ *                              be resized
+ * @param  {Array} size         new context size
+ */
 Compositor.prototype.sendResize = function sendResize (selector, size) {
     this._outCommands.push('WITH', selector, 'TRIGGER', 'resize', size);
     this._sentResize = true;
-    return this;
 };
 
+/**
+ * Processes the previously via `receiveCommands` updated incoming "in"
+ * command queue.
+ * Called by ThreadManager.
+ *
+ * @method drawCommands
+ *
+ * @return {Array} outCommands  set of commands to be sent back to the
+ *                              WebWorker
+ */
 Compositor.prototype.drawCommands = function drawCommands() {
     var commands = this._inCommands;
     var command;
@@ -173,6 +250,13 @@ Compositor.prototype.drawCommands = function drawCommands() {
     return this._outCommands;
 };
 
+/**
+ * Used by ThreadManager to update the interal queue of incoming commands.
+ * Receiving commands does not immediately start the rederning process.
+ * 
+ * @param  {Array} commands     command queue to be processed by the
+ *                              compositor's `drawCommands` method
+ */
 Compositor.prototype.receiveCommands = function receiveCommands(commands) {
     var len = commands.length;
     for (var i = 0; i < len; i++) {
@@ -180,6 +264,12 @@ Compositor.prototype.receiveCommands = function receiveCommands(commands) {
     }
 };
 
+/**
+ * Flushes the queue of outgoing "out" commands.
+ * Called by ThreadManager.
+ *
+ * @method clearCommands
+ */
 Compositor.prototype.clearCommands = function clearCommands() {
     this._outCommands.length = 0;
     this._sentResize = false;
