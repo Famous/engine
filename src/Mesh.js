@@ -1,8 +1,5 @@
 'use strict';
 
-/**
- * Module dependencies
- */
 var Transitionable = require('famous-transitions').Transitionable;
 var Color = require('famous-utilities').Color;
 var Geometry = require('famous-webgl-geometries');
@@ -14,14 +11,14 @@ var Geometry = require('famous-webgl-geometries');
  *
  * @class Mesh
  * @constructor
- * @param {RenderNode} RenderNode to which the instance of Mesh will be a component of
+ * @renderable
+ * @param {LocalDispatch} dispatch LocalDispatch to be retrieved
+ * @param {object} Options Optional params for configuring Mesh
  */
 function Mesh (dispatch, options) {
     this.dispatch = dispatch;
     this.queue = [];
     this._id = dispatch.addRenderable(this);
-
-    // Inputs
 
     this._color = new Color();
     this._glossiness = new Transitionable(0);
@@ -40,12 +37,21 @@ function Mesh (dispatch, options) {
     if (options) this.setOptions(options);
 }
 
-
-Mesh.toString = function toString () {
+/**
+* Returns the definition of the Class: 'Mesh'
+*
+* @method toString
+* @return {string} definition
+*/
+Mesh.toString = function toString() {
     return 'Mesh';
 };
 
-
+/**
+ * Init function for setting up listeners for changes from the scene graph.
+ *
+ * @private
+ */
 function init() {
     var dispatch = this.dispatch;
     dispatch.onTransformChange(this._receiveTransformChange.bind(this));
@@ -54,10 +60,13 @@ function init() {
     dispatch.onOriginChange(this._receiveOriginChange.bind(this));
     this._receiveTransformChange(dispatch.getContext()._transform);
     this._receiveOriginChange(dispatch.getContext()._origin);
-    return this;
 };
 
-
+/**
+ * Receives transform change updates from the scene graph.
+ *
+ * @private
+ */
 Mesh.prototype._receiveTransformChange = function _receiveTransformChange(transform) {
     this.dispatch.dirtyRenderable(this._id);
     this.queue.push('GL_UNIFORMS');
@@ -65,7 +74,11 @@ Mesh.prototype._receiveTransformChange = function _receiveTransformChange(transf
     this.queue.push(transform._matrix);
 };
 
-
+/**
+ * Receives size change updates from the scene graph.
+ *
+ * @private
+ */
 Mesh.prototype._receiveSizeChange = function _receiveSizeChange(size) {
     var size = size.getTopDownSize();
     this.dispatch.dirtyRenderable(this._id);
@@ -79,7 +92,11 @@ Mesh.prototype._receiveSizeChange = function _receiveSizeChange(size) {
     this.queue.push(size);
 };
 
-
+/**
+ * Receives origin change updates from the scene graph.
+ *
+ * @private
+ */
 Mesh.prototype._receiveOriginChange = function _receiveOriginChange(origin) {
     this.dispatch.dirtyRenderable(this._id);
     this.queue.push('GL_UNIFORMS');
@@ -90,7 +107,11 @@ Mesh.prototype._receiveOriginChange = function _receiveOriginChange(origin) {
     this.queue.push(this._origin);
 };
 
-
+/**
+ * Receives opacity change updates from the scene graph.
+ *
+ * @private
+ */
 Mesh.prototype._receiveOpacityChange = function _receiveOpacityChange(opacity) {
     this.dispatch.dirtyRenderable(this._id);
     this.queue.push('GL_UNIFORMS');
@@ -98,20 +119,27 @@ Mesh.prototype._receiveOpacityChange = function _receiveOpacityChange(opacity) {
     this.queue.push(opacity.value);
 };
 
-
+/**
+ * Returns the size of Mesh.
+ *
+ * @method getSize
+ * @returns {array} Size Returns size
+ */
 Mesh.prototype.getSize = function getSize() {
     return this._size;
 };
 
 /**
- * Set the geometry of a mesh
+ * Set the geometry of a mesh.
  *
  * @method setGeometry
  * @chainable
  *
  * @param {Geometry} geometry instance to be associated with the mesh
+ * @param {Object} Options Various configurations for geometries.
+ * @chainable
  */
-Mesh.prototype.setGeometry = function (geometry, options) {
+Mesh.prototype.setGeometry = function setGeometry(geometry, options) {
     var i;
     var key;
     var buffers;
@@ -134,18 +162,23 @@ Mesh.prototype.setGeometry = function (geometry, options) {
     return this;
 };
 
-
-Mesh.prototype.getGeometry = function () {
+/**
+ * Get the geometry of a mesh.
+ *
+ * @method getGeometry
+ * @returns {Geometry} geometry Geometry of mesh
+ */
+Mesh.prototype.getGeometry = function getGeometry() {
     return this._geometry;
 };
 
 /**
- * Empties the command queue
- *
- * @method clean
- * @chainable
- *
- */
+* Returns boolean: if true, renderable is to be updated on next engine tick
+*
+* @private
+* @method clean
+* @returns {boolean} Boolean
+*/
 Mesh.prototype.clean = function clean() {
     var path = this.dispatch.getRenderPath();
 
@@ -209,16 +242,28 @@ Mesh.prototype.clean = function clean() {
     return this.queue.length;
 };
 
-
 /**
- * Defines a 3-element map that provides the overall color of the mesh.
- *
- * @method setBaseColor
- * @chainable
- *
- * @param {Object, Array} Material, image, or vec3
- * @return {Element} current Mesh
- */
+* Changes the color of Mesh, passing either a material expression or a basic
+* color using 'Color' as its helper. If no material expression is passed in,
+* then the Color accepts various inputs and an optional options parameter for
+* tweening colors. Its default parameters are in RGB, however, you can also
+* specify different inputs.
+* setBaseColor(r, g, b, option)
+* setBaseColor('rgb', 0, 0, 0, option)
+* setBaseColor('hsl', 0, 0, 0, option)
+* setBaseColor('hsv', 0, 0, 0, option)
+* setBaseColor('hex', '#000000', option)
+* setBaseColor('#000000', option)
+* setBaseColor('black', option)
+* setBaseColor(Color)
+* @method setBaseColor
+* @param {Object, Array} Material, image, or vec3
+* @param {number} r Used to set the r value of Color
+* @param {number} r Used to set the g value of Color
+* @param {number} r Used to set the b value of Color
+* @param {object} options Optional options argument for tweening colors
+* @chainable
+*/
 Mesh.prototype.setBaseColor = function setBaseColor() {
     this.dispatch.dirtyRenderable(this._id);
     var materialExpression = Array.prototype.concat.apply([], arguments);
@@ -244,13 +289,23 @@ Mesh.prototype.setBaseColor = function setBaseColor() {
     return this;
 };
 
+
+/**
+ * Returns either the material expression or the color of Mesh.
+ *
+ * @method getBaseColor
+ * @returns {MaterialExpress|Color}
+ */
 Mesh.prototype.getBaseColor = function getBaseColor(option) {
     return this._expressions.baseColor || this._color.getColor(option);
 };
 
-
 /**
- * Set whether the mesh is affected by light
+ * Change whether the Mesh is affected by light. Default is true.
+ *
+ * @method setFlatShading
+ * @param {boolean} Boolean
+ * @chainable
  */
 Mesh.prototype.setFlatShading = function setFlatShading(bool) {
     this.dispatch.dirtyRenderable(this._id);
@@ -261,15 +316,21 @@ Mesh.prototype.setFlatShading = function setFlatShading(bool) {
     return this;
 };
 
-
+/**
+ * Returns a boolean for whether Mesh is affected by light.
+ *
+ * @method getFlatShading
+ * @returns {boolean} Boolean
+ */
 Mesh.prototype.getFlatShading = function getFlatShading() {
     return this._flatShading ? true : false;
 };
 
 
 /**
- * Defines a 3-element map which is used to provide significant physical detail to
- * the surface by perturbing the facing direction of each individual pixel.
+ * Defines a 3-element map which is used to provide significant physical
+ * detail to the surface by perturbing the facing direction of each individual
+ * pixel.
  *
  * @method normal
  * @chainable
@@ -277,7 +338,7 @@ Mesh.prototype.getFlatShading = function getFlatShading() {
  * @param {Object, Array} Material, Image or vec3
  * @return {Element} current Mesh
  */
-Mesh.prototype.setNormals = function (materialExpression) {
+Mesh.prototype.setNormals = function setNormals(materialExpression) {
     this.dispatch.dirtyRenderable(this._id);
     if (materialExpression._compile) materialExpression = materialExpression._compile();
     this.queue.push(typeof materialExpression === 'number' ? 'UNIFORM_INPUT' : 'MATERIAL_INPUT');
@@ -286,20 +347,27 @@ Mesh.prototype.setNormals = function (materialExpression) {
     return this;
 };
 
-Mesh.prototype.getNormals = function (materialExpression) {
-    return;
+/**
+ * Returns the Normals expression of Mesh (work in progress)
+ *
+ * @method getNormals
+ * @returns The normals expression for Mesh
+ */
+Mesh.prototype.getNormals = function getNormals(materialExpression) {
+    return null;
 };
 
 /**
- * Defines 1 element map which is used to normalize the specular and diffuseness of a surface.
+ * Defines the glossiness of the mesh from either a material expression or a
+ * scalar value
  *
- * @method glossiness
+ * @method setGlossiness
+ * @param {MaterialExpression|Number}
+ * @param {Object} Options Optional paramter to be passed with scalar
+ * glossiness for tweening.
  * @chainable
- *
- * @param {Object} Material or Image
- * @return {Element} current Mesh
  */
-Mesh.prototype.setGlossiness = function(materialExpression) {
+Mesh.prototype.setGlossiness = function setGlossiness() {
     this.dispatch.dirtyRenderable(this._id);
     var materialExpression = Array.prototype.concat.apply([], arguments);
 
@@ -320,12 +388,19 @@ Mesh.prototype.setGlossiness = function(materialExpression) {
     return this;
 };
 
-Mesh.prototype.getGlossiness = function(materialExpression) {
+/**
+ * Returns material expression or scalar value for glossiness.
+ *
+ * @method getGlossiness
+ * @returns {MaterialExpress|Number}
+ */
+Mesh.prototype.getGlossiness = function getGlossiness(materialExpression) {
     return this._expressions.glossiness || this._glossiness.get();
 };
 
 /**
- * Defines 1 element map which describes the electrical conductivity of a material.
+ * Defines 1 element map which describes the electrical conductivity of a
+ * material.
  *
  * @method metallic
  * @chainable
@@ -342,18 +417,25 @@ Mesh.prototype.setMetallness = function setMetallness(materialExpression) {
     return this;
 };
 
+/**
+ * Returns material expression for metallness.
+ *
+ * @method getMetallness
+ * @returns {MaterialExpress}
+ */
 Mesh.prototype.getMetallness = function getMetallness() {
     return this._expressions.metallness || this._metallness.get();
 };
 
 /**
- * Defines 3 element map which displaces the position of each vertex in world space.
+ * Defines 3 element map which displaces the position of each vertex in world
+ * space.
  *
- * @method metallic
+ * @method setPositionOffset
  * @chainable
  *
- * @param {Object} Material or Image
- * @return {Element} current Mesh
+ * @param {Object} Material Expression
+ * @chainable
  */
 Mesh.prototype.setPositionOffset = function positionOffset(materialExpression) {
     this.dispatch.dirtyRenderable(this._id);
@@ -376,17 +458,25 @@ Mesh.prototype.setPositionOffset = function positionOffset(materialExpression) {
     return this;
 };
 
+/**
+ * Returns position offset.
+ *
+ * @method getPositionOffset
+ * @returns {MaterialExpress|Number}
+ */
 Mesh.prototype.getPositionOffset = function getPositionOffset(materialExpression) {
     return this._expressions.positionOffset || this._positionOffset.get();
 };
+
 /**
- * Defines 3 element map which displaces the position of each vertex in world space.
+ * Defines 3 element map which displaces the position of each vertex in world
+ * space.
  *
- * @method metallic
+ * @method setOptions
  * @chainable
  *
- * @param {Object} Material or Image
- * @return {Element} current Mesh
+ * @param {Object} Options
+ * @chainable
  */
 Mesh.prototype.setOptions = function setOptions(options) {
     this.queue.push('GL_SET_DRAW_OPTIONS');
@@ -394,8 +484,4 @@ Mesh.prototype.setOptions = function setOptions(options) {
     return this;
 };
 
-
-/**
- * Expose
- */
 module.exports = Mesh;
