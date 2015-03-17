@@ -259,8 +259,8 @@ Mesh.prototype.clean = function clean() {
 * @method setBaseColor
 * @param {Object, Array} Material, image, or vec3
 * @param {number} r Used to set the r value of Color
-* @param {number} r Used to set the g value of Color
-* @param {number} r Used to set the b value of Color
+* @param {number} g Used to set the g value of Color
+* @param {number} b Used to set the b value of Color
 * @param {object} options Optional options argument for tweening colors
 * @chainable
 */
