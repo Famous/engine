@@ -271,6 +271,7 @@ VirtualElement.prototype.draw = function draw(renderState) {
 
     this._perspectiveTransform[8] = perspectiveTransform[11] * ((this._rootElement._size[0] * 0.5) - (this._size[0] * this._origin[0])),
     this._perspectiveTransform[9] = perspectiveTransform[11] * ((this._rootElement._size[1] * 0.5) - (this._size[1] * this._origin[1]));
+    this._perspectiveTransform[11] = perspectiveTransform[11];
 
     if (this._parent) {
         invert(this._invertedParent, this._parent._receivedMatrix);
