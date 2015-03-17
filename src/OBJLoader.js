@@ -83,7 +83,7 @@ function _onsuccess(url, computeNormals, text) {
  * @return {Object} vertex buffer data
  */
 function format(text, computeNormals) {
-    text = sanitize(text);
+    var text = sanitize(text);
 
     var lines = text.split('\n');
 
@@ -96,7 +96,6 @@ function format(text, computeNormals) {
     var vertices = [];
 
     var i1, i2, i3, i4;
-    var normal;
     var split;
     var line;
 
@@ -331,30 +330,32 @@ function cacheVertices(v, n, t, fv, fn, ft) {
     var texCoordIndex;
 
     var currentIndex = 0;
-    var numFaces = fv.length;
+    var fvLength = fv.length;
+    var fnLength = fn.length;
+    var ftLength = ft.length;
     var faceLength;
     var index;
 
-    for (var i = 0; i < numFaces; i++) {
+    for (var i = 0; i < fvLength; i++) {
         outIndices[i] = [];
         faceLength = fv[i].length;
 
         for (var j = 0; j < faceLength; j++) {
-            if (ft.length) texCoordIndex = ft[i][j];
-            if (fn.length) normalIndex   = fn[i][j];
-                           positionIndex = fv[i][j];
+            if (ftLength) texCoordIndex = ft[i][j];
+            if (fnLength) normalIndex   = fn[i][j];
+                          positionIndex = fv[i][j];
 
-            // index = vertexCache[positionIndex + ',' + normalIndex + ',' + texCoordIndex];
+            index = vertexCache[positionIndex + ',' + normalIndex + ',' + texCoordIndex];
 
-            // if(index === undefined) {
+            if(index === undefined) {
                 index = currentIndex++;
 
-                                      outPos.push(v[positionIndex]);
-                if (n[normalIndex])   outNormals.push(n[normalIndex]);
-                if (t[texCoordIndex]) outTexCoord.push(t[texCoordIndex]);
+                              outPos.push(v[positionIndex]);
+                if (fnLength) outNormals.push(n[normalIndex]);
+                if (ftLength) outTexCoord.push(t[texCoordIndex]);
 
                 vertexCache[positionIndex + ',' + normalIndex + ',' + texCoordIndex] = index;
-            // }
+            }
 
             outIndices[i].push(index);
         }
@@ -380,10 +381,12 @@ function cacheVertices(v, n, t, fv, fn, ft) {
  * @return {Array} Flattened version of input array.
  */
 function flatten(arr) {
-    var i = arr.length;
+    var len = arr.length;
     var out = [];
 
-    while (i--) out.push.apply(out, arr[i]);
+    for (var i = 0; i < len; i++) {
+        out.push.apply(out, arr[i]);
+    }
 
     return out;
 }
