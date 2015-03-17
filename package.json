@@ -1,0 +1,15 @@
+{
+  "name": "oasis",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.famo.us/platform/oasis.git"
+  },
+  "author": "Famous",
+  "license": "All rights reserved"
+}
