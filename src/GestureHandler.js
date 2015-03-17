@@ -6,13 +6,22 @@ var Vec2 = require('famous-math').Vec2;
 var VEC_REGISTER = new Vec2();
 
 var gestures = {drag: true, tap: true, rotate: true, pinch: true};
-var progressbacks = [processPointerStart, processPointerMove, processPointerEnd];
+var progressbacks = [_processPointerStart, _processPointerMove, _processPointerEnd];
 
 var touchEvents = ['touchstart', 'touchmove', 'touchend'];
 var mouseEvents = ['mousedown', 'mousemove', 'mouseup'];
 var methods = ['preventDefault'];
 var touchProperties = [{targetTouches: {0: ['pageX', 'pageY', 'identifier'], 1: ['pageX', 'pageY', 'identifier']}}];
 var mouseProperties = ['pageX', 'pageY'];
+
+/**
+ * Component to manage gesture events. Will track 'pinch', 'rotate', 'tap', and 'drag' events, on an
+ * as-requested basis.
+ *
+ * @class GestureHandler
+ * @param {LocalDispatch} dispatch The dispatch with which to register the handler.
+ * @param {Object[]} events An array of event objects specifying .event and .callback properties.
+ */
 
 function GestureHandler (dispatch, events) {
     this.dispatch = dispatch;
@@ -89,14 +98,26 @@ function GestureHandler (dispatch, events) {
             dispatch.registerTargetedEvent(mouseEvent, progressbacks[j].bind(this));
         }
         if (renderables[i].on) renderables[i].on('mouseleave', methods, mouseProperties);
-        dispatch.registerTargetedEvent('mouseleave', processMouseLeave.bind(this));
+        dispatch.registerTargetedEvent('mouseleave', _processMouseLeave.bind(this));
     }
 }
 
+/**
+ * Returns the name of GestureHandler as a string.
+ *
+ * @method toString
+ * @static
+ * @return {String} 'GestureHandler'
+ */
 GestureHandler.toString = function toString() {
     return 'GestureHandler';
 };
 
+/**
+ * Trigger gestures in the order they were requested, if they occured.
+ *
+ * @method triggerGestures
+ */
 GestureHandler.prototype.triggerGestures = function() {
     var payload = this.event;
     for (var i = 0, len = this.gestures.length; i < len; i++) {
@@ -122,11 +143,25 @@ GestureHandler.prototype.triggerGestures = function() {
     }
 };
 
+/**
+ * Trigger the callback associated with an event, passing in a payload.
+ *
+ * @method trigger
+ * @param {String} ev The event name.
+ * @param {Object} payload The event payload.
+ */
 GestureHandler.prototype.trigger = function trigger (ev, payload) {
     this._events.trigger(ev, payload);
 };
 
-function processPointerStart(e) {
+/**
+ * Process up to the first two touch/mouse move events. Exit out if the first two points are already being tracked.
+ *
+ * @method _processPointerStart
+ * @private
+ * @param {Object} e The event object.
+ */
+function _processPointerStart(e) {
     var t;
     if (!e.targetTouches) {
         this.mice[0] = e;
@@ -212,7 +247,14 @@ function processPointerStart(e) {
     this.triggerGestures();
 }
 
-function processPointerMove(e) {
+/**
+ * Process up to the first two touch/mouse move events.
+ *
+ * @method _processPointerMove
+ * @private
+ * @param {Object} e The event object.
+ */
+function _processPointerMove(e) {
     var t;
     if (!e.targetTouches) {
         if (!this.event.current) return;
@@ -293,7 +335,14 @@ function processPointerMove(e) {
     this.triggerGestures();
 }
 
-function processPointerEnd(e) {
+/**
+ * Process up to the first two touch/mouse end events. Exit out if the two points being tracked are still active.
+ *
+ * @method _processPointerEnd
+ * @private
+ * @param {Object} e The event object.
+ */
+function _processPointerEnd(e) {
     var t;
     if (!e.targetTouches) {
         if (!this.event.current) return;
@@ -351,7 +400,14 @@ function processPointerEnd(e) {
     }
 }
 
-function processMouseLeave(e) {
+/**
+ * Treats a mouseleave event as a gesture end.
+ *
+ * @method _processMouseLeave
+ * @private
+ * @param {Object} e The event object.
+ */
+function _processMouseLeave(e) {
     if (this.event.current) {
         this.event.status = 'end';
         this.event.current = 0;

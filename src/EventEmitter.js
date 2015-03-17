@@ -1,36 +1,33 @@
 'use strict';
 
 /**
+ * Component to manage general event emission.
+ *
  * @class EventEmitter
- * @constructor
- * @component
- * @param {LocalDispatch} dispatch  LocalDispatch to be retrieved from corresponding 
- * Render Node of the EventEmitter component
+ * @param {LocalDispatch} dispatch The dispatch with which to register the handler.
  */
 function EventEmitter(dispatch) {
     this.dispatch = dispatch;
 }
 
 /**
-*
-* stringifies EventEmitter
-*
-* @method
-* @return {String} the name of the Component Class: 'EventEmitter'
-*/
+ * Returns the name of EventEmitter as a string.
+ *
+ * @method toString
+ * @static
+ * @return {String} 'EventEmitter'
+ */
 EventEmitter.toString = function toString() {
     return 'EventEmitter';
 };
 
 /**
-*
-* EventEmitter relays event and payload to Global Dispatch through Local Dispatch of the corresponding Render Node
-*
-* @method
-* @param {String} event event name
-* @param {Object} payload see 'UIEventHandler' component for further information
-* @chainable
-*/
+ * Emit an event with a payload.
+ *
+ * @method emit
+ * @param {Object} event The event name.
+ * @param {Object} payload The event payload.
+ */
 EventEmitter.prototype.emit = function emit(event, payload) {
     this.dispatch.emit(event, payload);
     return this;
