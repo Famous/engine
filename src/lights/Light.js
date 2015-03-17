@@ -43,8 +43,8 @@ Light.toString = function toString() {
 * setColor(Color)
 * @method setColor
 * @param {number} r Used to set the r value of Color
-* @param {number} r Used to set the g value of Color
-* @param {number} r Used to set the b value of Color
+* @param {number} g Used to set the g value of Color
+* @param {number} b Used to set the b value of Color
 * @param {object} options Optional options argument for tweening colors
 * @chainable
 */
