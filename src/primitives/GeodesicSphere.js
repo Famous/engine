@@ -4,19 +4,17 @@ var Geometry       = require('../Geometry');
 var GeometryHelper = require('../GeometryHelper');
 
 /**
- * This class creates a new geometry instance and sets
- * its vertex positions, texture coordinates, normals,
- * and indices to based on the primitive.
+ * This function returns a new static geometry, which is passed
+ * custom buffer data.
  *
  * @class GeodesicSphere
  * @constructor
  *
- * @param {Object} options that can alter the values
- * and amount of vertex buffers
+ * @param {Object} options Parameters that alter the
+ * vertex buffers of the generated geometry.
  * 
  * @return {Object} constructed geometry
  */
-
 function GeodesicSphere (options) {
     var t = (1 + Math.sqrt(5)) * 0.5;
 
