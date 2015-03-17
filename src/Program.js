@@ -117,7 +117,10 @@ function Program(gl) {
  *
  * @method registerMaterial
  *
- * @param {Object} material Material being verified.
+ * @param {String} name Name of target input of material.
+ * @param {Object} material Compiled material object being verified.
+ * 
+ * @return {Object} Current program.
  */
 
 Program.prototype.registerMaterial = function registerMaterial(name, material) {
@@ -168,7 +171,7 @@ Program.prototype.registerMaterial = function registerMaterial(name, material) {
         this.applicationVert.push('if (int(abs(ID.x)) == ' + material._id + ') return fa_' + material._id + '();');
     }
 
-    this.resetProgram();
+    return this.resetProgram();
 };
 
 /**
@@ -180,10 +183,8 @@ Program.prototype.registerMaterial = function registerMaterial(name, material) {
  *
  * @method resetProgram
  *
- * @return {Program} this
- *
+ * @return {Program} Current program.
  */
-
 Program.prototype.resetProgram = function resetProgram() {
     var vsChunkDefines = [];
     var vsChunkApplies = [];
@@ -282,13 +283,11 @@ Program.prototype.resetProgram = function resetProgram() {
  *
  * @method uniformIsCached
  *
- * @param {String} targetName Key of uniform spec being evaluated
- * @param {Number | Array} value Value of uniform spec being evaluated
+ * @param {String} targetName Key of uniform spec being evaluated.
+ * @param {Number | Array} value Value of uniform spec being evaluated.
  * @return {Boolean} Value indicating whether the uniform being set
  * is cached.
- *
  */
-
 Program.prototype.uniformIsCached = function (targetName, value) {
     if(this.cachedUniforms[targetName] == null) {
         if (value.length) {
@@ -328,12 +327,11 @@ Program.prototype.uniformIsCached = function (targetName, value) {
  *
  * @method setUniforms
  *
- * @param {Object} entityUniforms Key-value pairs of all uniforms from incoming spec
- * @param {Array} shaderChunks Program chunks registered to incoming spec
- * @return {Program} this
+ * @param {Array} uniformNames Array containing the keys of all uniforms to be set.
+ * @param {Array} uniformValue Array containing the values of all uniforms to be set.
  *
+ * @return {Program} Current program.
  */
-
 Program.prototype.setUniforms = function (uniformNames, uniformValue) {
     var gl = this.gl;
     var location;
@@ -349,6 +347,7 @@ Program.prototype.setUniforms = function (uniformNames, uniformValue) {
     for (i = 0; i < len; i++) {
         name = uniformNames[i];
         value = uniformValue[i];
+
         // Retreive the cached location of the uniform,
         // requesting a new location from the WebGL context
         // if it does not yet exist.
@@ -365,6 +364,7 @@ Program.prototype.setUniforms = function (uniformNames, uniformValue) {
 
         // Determine the correct function and pass the uniform
         // value to WebGL.
+
         if (Array.isArray(value) || value instanceof Float32Array) {
             switch (value.length) {
                 case 4:  gl.uniform4fv(location, value); break;
@@ -392,12 +392,11 @@ Program.prototype.setUniforms = function (uniformNames, uniformValue) {
  *
  * @method compileShader
  *
- * @param {WebGL Program} shader Program to be compiled
- * @param {String} source Source to be used in the shader
+ * @param {Object} shader Program to be compiled.
+ * @param {String} source Source to be used in the shader.
  *
- * @return {WebGL Program} compiled shader
+ * @return {Object} Compiled shader.
  */
-
 Program.prototype.compileShader = function compileShader(shader, source) {
     var i = 1;
 
