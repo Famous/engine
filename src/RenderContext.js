@@ -89,8 +89,6 @@ RenderContext.prototype.offTransformChange = function offTransformChange (cb) {
     return this;
 };
 
-// TODO
-
 /**
  * Registers a callback function to be invoked whenever the size of the
  * RenderContext changes.

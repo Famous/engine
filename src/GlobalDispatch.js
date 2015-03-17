@@ -6,7 +6,7 @@ var CallbackStore = require('famous-utilities').CallbackStore;
  * GlobalDispatch is being used in order to manage scene graph events. It
  * routes and manages events being registered on specific nodes, but also
  * provides the possibility to globally register event listeners on the
- * whole scne graph.
+ * whole scene graph.
  *
  * @class  GlobalDispatch
  * @constructor
