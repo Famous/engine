@@ -2,18 +2,17 @@
 
 /**
  * Buffer is a private class that wraps the vertex data that defines
- * the the points of the triangles that webgl draws. Each 
- * buffer maps to one attribute of a mesh.
+ * the the points of the triangles that webgl draws. Each buffer 
+ * maps to one attribute of a mesh.
  * 
  * @class Buffer
  * @constructor
  * 
- * @param {target} the bind target of the buffer to update: ARRAY_BUFFER or ELEMENT_ARRAY_BUFFER
- * @param {type} The offset in bytes where data replacement begins. Must be greater than or equal to 0.
- * @param {gl} the gl context that the buffer is hosted by
+ * @param {Number} target The bind target of the buffer to update: ARRAY_BUFFER or ELEMENT_ARRAY_BUFFER
+ * @param {Object} type Array type to be used in calls to gl.bufferData.
+ * @param {WebGLContext} gl The WebGL context that the buffer is hosted by.
  * 
  */
-
 function Buffer(target, type, gl) {
     this.buffer = null;
     this.target = target;
