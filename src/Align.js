@@ -13,7 +13,10 @@ function Align(dispatch) {
     Position.call(this, dispatch);
 }
 
-// Return the definition of the Component Class: 'Align'
+/**
+* @method
+* Return the definition of the Component Class: 'Align'
+*/
 Align.toString = function toString() {
     return 'Align';
 };
@@ -21,7 +24,10 @@ Align.toString = function toString() {
 Align.prototype = Object.create(Position.prototype);
 Align.prototype.constructor = Align;
 
-// Returns boolean: if true, component is to be updated on next engine tick
+/**
+* @method
+* Returns boolean: if true, component is to be updated on next engine tick
+*/
 Align.prototype.clean = function clean() {
     var context = this._dispatch._context;
     context.setAlign(this._x.get(), this._y.get(), this._z.get());

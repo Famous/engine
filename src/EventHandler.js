@@ -23,29 +23,42 @@ function EventHandler (dispatch, events) {
     }
 }
 
-// Return the definition of the Component Class: 'EventHandler'
+/** 
+* @method
+* Return the definition of the Component Class: 'EventHandler'
+*/
+
 EventHandler.toString = function toString() {
     return 'EventHandler';
 };
 
-//@param {string} ev Value of a single 'event' key in events argument of constructor
-//@param {function} callback value of 'callback' key in events argument of constructor
-//Uses LocalDispatch of corresponding Render Node to register event
+/** 
+* @method
+* @param {string} ev Value of a single 'event' key in events argument of constructor
+* @param {function} callback value of 'callback' key in events argument of constructor
+* Uses LocalDispatch of corresponding Render Node to register event
+*/
 EventHandler.prototype.on = function on (ev, cb) {
     this._events.on(ev, cb);
     this.dispatch.registerGlobalEvent(ev, this.trigger.bind(this, ev));
 };
 
-//@param {string} ev value of a single 'event' key in events argument of constructor
-//@param {function} callback value of 'callback' key in events argument of constructor
-//Uses LocalDispatch of corresponding Render Node to deregister event
+/**
+* @method 
+* @param {string} ev value of a single 'event' key in events argument of constructor
+* @param {function} callback value of 'callback' key in events argument of constructor
+* Uses LocalDispatch of corresponding Render Node to deregister event
+*/
 EventHandler.prototype.off = function off (ev, cb) {
     this._events.off(ev, cb);
     this.dispatch.deregisterGlobalEvent(ev, this.trigger.bind(this, ev))
 };
 
-//@param {string} ev event name
-//@param {object} payload event response
+/** 
+* @method
+* @param {string} ev event name
+* @param {object} payload event response
+*/
 EventHandler.prototype.trigger = function trigger (ev, payload) {
     this._events.trigger(ev, payload);
 };

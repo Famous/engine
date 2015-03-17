@@ -12,7 +12,10 @@ function Rotation(dispatch) {
     Position.call(this, dispatch);
 }
 
-// Return the definition of the Component Class: 'Rotation'
+/**
+* @method
+* Return the definition of the Component Class: 'Rotation'
+*/
 Rotation.toString = function toString() {
     return 'Rotation';
 };
@@ -20,7 +23,10 @@ Rotation.toString = function toString() {
 Rotation.prototype = Object.create(Position.prototype);
 Rotation.prototype.constructor = Rotation;
 
-// Returns boolean: if true, component is to be updated on next engine tick
+/**
+* @method
+* Returns boolean: if true, component is to be updated on next engine tick
+*/
 Rotation.prototype.clean = function clean() {
     var context = this._dispatch._context;
     context.setRotation(this._x.get(), this._y.get(), this._z.get());
