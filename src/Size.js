@@ -2,6 +2,12 @@
 
 var Transitionable = require('famous-transitions').Transitionable;
 
+/**
+ * @class Size
+ * @constructor
+ * @component
+ * @param {LocalDispatch} dispatch LocalDispatch to be retrieved from corresponding Render Node of the Size component
+ */
 function Size(dispatch) {
     this._dispatch = dispatch;
     this._id = dispatch.addComponent(this);
@@ -24,10 +30,23 @@ function Size(dispatch) {
     };
 }
 
+/** 
+* stringifies Size
+*
+* @method
+* @return {String} the name of the Component Class: 'Align' 
+*/
 Size.toString = function toString() {
     return 'Size';
 };
 
+/**
+*
+* Returns state object
+*
+* @method 
+* @return {Object} containing stringified constructor, x, y, z numeric size
+*/
 Size.prototype.getState = function getState() {
     if (this._absoluteMode) {
         return {
@@ -54,6 +73,14 @@ Size.prototype.getState = function getState() {
     };
 };
 
+/**
+* 
+* Sets state of size
+*
+* @method
+* @param {Object} state -- component: stringified constructor, x: number, y: number, z: number
+* @return {Boolean} true if component deeply equals stringified constructor, sets position coordinates, else returns false
+*/
 Size.prototype.setState = function setState(state) {
     if (state.component === this.constructor.toString()) {
         this._absoluteMode = state.type === 'absolute';
@@ -89,6 +116,13 @@ Size.prototype._cleanAbsoluteZ = function _cleanAbsoluteZ(prop) {
     } else return null;
 };
 
+/**
+*
+* If true, component is to be updated on next engine tick
+*
+* @method
+* @return {Boolean} 
+*/
 Size.prototype.clean = function clean () {
     var context = this._dispatch._context;
     if (this._absoluteMode) {
@@ -123,6 +157,18 @@ Size.prototype.clean = function clean () {
     }
 };
 
+/**
+*
+* Sets absolute Size
+*
+* @method
+* @param {Number} x used to set x size
+* @param {Number} y used to set y size
+* @param {Number} z used to set z size
+* @param {Object} options options hash
+* @param {Function} callback function to execute after setting each size
+* @chainable
+*/
 Size.prototype.setAbsolute = function setAbsolute(x, y, z, options, callback) {
     this._dispatch.dirtyComponent(this._id);
     var abs = this._absolute;
@@ -181,6 +227,13 @@ Size.prototype.setDifferential = function setDifferential(x, y, z, options, call
     return this;
 };
 
+/**
+*
+* Size getter method
+*
+* @method
+* @return {Array} size
+*/
 Size.prototype.get = function get () {
     return this._dispatch.getContext().getSize();
 };
