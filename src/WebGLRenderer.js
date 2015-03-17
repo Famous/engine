@@ -321,11 +321,9 @@ WebGLRenderer.prototype.draw = function draw(renderState) {
 
         var gl = this.gl;
         if (mesh.uniformValues[0] < 1) {
-            //gl.disable(gl.DEPTH_TEST);
             gl.depthMask(false);
             gl.enable(gl.BLEND);
         } else {
-            //gl.enable(gl.DEPTH_TEST);
             gl.depthMask(true);
             gl.disable(gl.BLEND);
         }
@@ -437,9 +435,6 @@ WebGLRenderer.prototype.drawBuffers = function drawBuffers(vertexBuffers, mode, 
                 this.state.boundElementBuffer = buffer;
             }
 
-            gl.cullFace(gl.BACK);
-            gl.drawElements(mode, length, gl.UNSIGNED_SHORT, 2 * offset);
-            gl.cullFace(gl.FRONT);
             gl.drawElements(mode, length, gl.UNSIGNED_SHORT, 2 * offset);
         }
         else {
