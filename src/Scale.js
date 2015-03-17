@@ -17,8 +17,11 @@ function Scale(dispatch) {
 }
 
 /**
+*
+* stringifies Scale constructor deinition
+*
 * @method 
-* Return the definition of the Component Class: 'Scale'
+* @return string the definition of the Component Class: 'Scale'
 */
 Scale.toString = function toString() {
     return 'Scale';
@@ -28,8 +31,11 @@ Scale.prototype = Object.create(Position.prototype);
 Scale.prototype.constructor = Scale;
 
 /**
+*
+* If true, component is to be updated on next engine tick
+*
 * @method
-* Returns boolean: if true, component is to be updated on next engine tick
+* @return boolean
 */
 Scale.prototype.clean = function clean() {
     var context = this._dispatch._context;

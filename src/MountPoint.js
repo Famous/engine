@@ -13,8 +13,11 @@ function MountPoint(dispatch) {
 }
 
 /**
+*
+* Stringifies MountPoint constructor
+*
 * @method
-* Return the definition of the Component Class: 'MountPoint'
+* @return string the definition of the Component Class: 'MountPoint'
 */
 MountPoint.toString = function toString() {
     return 'MountPoint';
@@ -24,8 +27,11 @@ MountPoint.prototype = Object.create(Position.prototype);
 MountPoint.prototype.constructor = MountPoint;
 
 /**
+*
+* If true, component is to be updated on next engine tick
+*
 * @method
-* Returns boolean: if true, component is to be updated on next engine tick
+* @return boolean 
 */
 MountPoint.prototype.clean = function clean() {
     var context = this._dispatch._context;

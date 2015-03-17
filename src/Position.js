@@ -17,16 +17,22 @@ function Position(dispatch) {
 }
 
 /** 
+*
+* stringifies Position constructor
+*
 * @method
-* Return the definition of the Component Class: 'Position'
+* @return string the definition of the Component Class: 'Position'
 */
 Position.toString = function toString() {
     return 'Position';
 };
 
 /**
+*
+* Gets object containing stringified constructor, x, y, z coordinates
+*
 * @method
-* Return object containing stringified constructor, x, y, z coordinates
+* @return object
 */
 Position.prototype.getState = function getState() {
     return {
@@ -38,9 +44,12 @@ Position.prototype.getState = function getState() {
 };
 
 /**
+*
+* Setter for position coordinates
+*
 * @method
 * @param {object} state Object -- component: stringified constructor, x: number, y: number, z: number
-* If component deeply equals stringified constructor, sets position coordinates and returns boolean true, else returns false
+* @return boolean true on success
 */
 Position.prototype.setState = function setState(state) {
     if (state.component === this.constructor.toString()) {
@@ -51,40 +60,55 @@ Position.prototype.setState = function setState(state) {
 };
 
 /**
+*
+* Getter for X position
+*
 * @method
-* Returns numeric x position
+* @return number
 */
 Position.prototype.getX = function getX() {
     return this._x.get();
 };
 
 /**
+*
+* Getter for Y position
+*
 * @method
-* Returns numeric y position
+* @return number
 */
 Position.prototype.getY = function getY() {
     return this._y.get();
 };
 
 /**
+*
+* Getter for Z position
+*
 * @method
-* Returns numeric z position
+* @return number
 */
 Position.prototype.getZ = function getZ() {
     return this._z.get();
 };
 
 /**
+*
+* Getter for any active coordinates
+*
 * @method
-* Returns boolean true if any coordinate is active else returns false
+* @return boolean
 */
 Position.prototype.isActive = function isActive() {
     return this._x.isActive() || this._y.isActive() || this._z.isActive();
 };
 
 /** 
+*
+* If true, component is to be updated on next engine tick
+*
 * @method
-* Returns boolean: if true, component is to be updated on next engine tick
+* @return boolean
 */
 Position.prototype.clean = function clean() {
     var context = this._dispatch.getContext();
@@ -92,7 +116,10 @@ Position.prototype.clean = function clean() {
     return this.isActive();
 };
 
-/**
+/** 
+*
+* Setter for X position
+*
 * @method
 * @param {number} val used to set x coordinate
 * @param {object} options options hash
@@ -105,7 +132,10 @@ Position.prototype.setX = function setX(val, options, callback) {
     return this;
 };
 
-/**
+/** 
+*
+* Setter for Y position
+*
 * @method
 * @param {number} val used to set y coordinate
 * @param {object} options options hash
@@ -118,7 +148,10 @@ Position.prototype.setY = function setY(val, options, callback) {
     return this;
 };
 
-/**
+/** 
+*
+* Setter for Z position
+*
 * @method
 * @param {number} val used to set z coordinate
 * @param {object} options options hash
@@ -133,6 +166,9 @@ Position.prototype.setZ = function setZ(val, options, callback) {
 
 
 /**
+*
+* Setter for XYZ position with callback
+*
 * @method
 * @param {number} x used to set x coordinate
 * @param {number} y used to set y coordinate
@@ -150,8 +186,11 @@ Position.prototype.set = function set(x, y, z, options, callback) {
 };
 
 /**
-* @method
+*
 * Stops transition of Position component
+*
+* @method
+* @chainable
 */
 Position.prototype.halt = function halt() {
     this._x.halt();

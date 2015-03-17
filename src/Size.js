@@ -31,16 +31,20 @@ function Size(dispatch) {
 }
 
 /** 
-* @method 
 * Return the definition of the Component Class: 'Size'
+*
+* @method 
 */
 Size.toString = function toString() {
     return 'Size';
 };
 
 /**
+*
+* Returns state object
+*
 * @method 
-* Return object containing stringified constructor, x, y, z numeric size
+* @return object containing stringified constructor, x, y, z numeric size
 */
 Size.prototype.getState = function getState() {
     if (this._absoluteMode) {
@@ -69,9 +73,12 @@ Size.prototype.getState = function getState() {
 };
 
 /**
+* 
+* Sets state of size
+*
 * @method
 * @param {object} state -- component: stringified constructor, x: number, y: number, z: number
-* If component deeply equals stringified constructor, sets position coordinates and returns boolean true, else returns false
+* @return boolean true if component deeply equals stringified constructor, sets position coordinates, else returns false
 */
 Size.prototype.setState = function setState(state) {
     if (state.component === this.constructor.toString()) {
@@ -109,8 +116,11 @@ Size.prototype._cleanAbsoluteZ = function _cleanAbsoluteZ(prop) {
 };
 
 /**
+*
+* If true, component is to be updated on next engine tick
+*
 * @method
-* Returns boolean: if true, component is to be updated on next engine tick
+* @return boolean 
 */
 Size.prototype.clean = function clean () {
     var context = this._dispatch._context;
@@ -147,6 +157,9 @@ Size.prototype.clean = function clean () {
 };
 
 /**
+*
+* Sets absolute Size
+*
 * @method
 * @param {number} x used to set x size
 * @param {number} y used to set y size
@@ -214,8 +227,11 @@ Size.prototype.setDifferential = function setDifferential(x, y, z, options, call
 };
 
 /**
+*
+* Size getter method
+*
 * @method
-* Returns Size
+* @return array size
 */
 Size.prototype.get = function get () {
     return this._dispatch.getContext().getSize();

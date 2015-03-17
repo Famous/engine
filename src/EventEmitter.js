@@ -11,19 +11,24 @@ function EventEmitter(dispatch) {
 }
 
 /**
+*
+* stringifies EventEmitter constructor
+*
 * @method
-* Return the definition of the Component Class: 'EventEmitter'
+* @return string the definition of the Component Class: 'EventEmitter'
 */
 EventEmitter.toString = function toString() {
     return 'EventEmitter';
 };
 
 /**
+*
+* EventEmitter relays event and payload to Global Dispatch through Local Dispatch of the corresponding Render Node
+*
 * @method
-* @chainable
 * @param {string} event event name
 * @param {object} payload see 'UIEventHandler' component for further information
-* EventEmitter relays event and payload to Global Dispatch through Local Dispatch of the corresponding Render Node
+* @chainable
 */
 EventEmitter.prototype.emit = function emit(event, payload) {
     this.dispatch.emit(event, payload);

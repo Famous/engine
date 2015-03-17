@@ -33,21 +33,25 @@ EventHandler.toString = function toString() {
 };
 
 /** 
+*
+* Registers event using LocalDispatch of corresponding Render Node
+*
 * @method
 * @param {string} ev Value of a single 'event' key in events argument of constructor
 * @param {function} callback value of 'callback' key in events argument of constructor
-* Uses LocalDispatch of corresponding Render Node to register event
 */
 EventHandler.prototype.on = function on (ev, cb) {
     this._events.on(ev, cb);
     this.dispatch.registerGlobalEvent(ev, this.trigger.bind(this, ev));
 };
 
-/**
-* @method 
-* @param {string} ev value of a single 'event' key in events argument of constructor
+/** 
+*
+* Deregisters event using LocalDispatch of corresponding Render Node
+*
+* @method
+* @param {string} ev Value of a single 'event' key in events argument of constructor
 * @param {function} callback value of 'callback' key in events argument of constructor
-* Uses LocalDispatch of corresponding Render Node to deregister event
 */
 EventHandler.prototype.off = function off (ev, cb) {
     this._events.off(ev, cb);
@@ -55,6 +59,9 @@ EventHandler.prototype.off = function off (ev, cb) {
 };
 
 /** 
+*
+* Triggers event
+*
 * @method
 * @param {string} ev event name
 * @param {object} payload event response

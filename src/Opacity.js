@@ -16,16 +16,22 @@ function Opacity(dispatch) {
 }
 
 /**
+*
+* returns stringified constructor
+*
 * @method
-* Return the definition of the Component Class: 'Opacity'
+* @return string the definition of the Component Class: 'Opacity'
 */
 Opacity.toString = function toString() {
     return 'Opacity';
 };
 
 /**
+*
+* Retrieves state of Opacity
+*
 * @method
-* Returns object containing a component key which holds the stringified constructor, and a value key which contains the numeric value
+* @return object containins  component key which holds the stringified constructor, and value key which contains the numeric value
 */
 Opacity.prototype.getState = function getState() {
     return {
@@ -34,10 +40,13 @@ Opacity.prototype.getState = function getState() {
     };
 };
 
-/** 
+/**
+*
+* Setter for Opacity state
+*
 * @method
 * @param {object} state contains component key, which holds stringified constructor, and a value key, which contains a numeric value used to set opacity if the constructor value matches
-* Returns boolean true if set is successful, false otherwise
+* @return boolean true if set is successful, false otherwise
 */
 Opacity.prototype.setState = function setState(state) {
     if (this.constructor.toString() === state.component) {
@@ -48,8 +57,11 @@ Opacity.prototype.setState = function setState(state) {
 };
 
 /**
+*
+* If true, component is to be updated on next engine tick
+*
 * @method
-* Returns boolean: if true, component is to be updated on next engine tick
+* @return boolean
 */
 Opacity.prototype.clean = function clean() {
     var context = this._dispatch._context;
@@ -58,6 +70,9 @@ Opacity.prototype.clean = function clean() {
 };
 
 /**
+*
+* Setter for Opacity with callback
+*
 * @method
 * @param {number} value value used to set Opacity
 * @param {object} options options hash
@@ -71,16 +86,21 @@ Opacity.prototype.set = function set(value, options, callback) {
 };
 
 /**
+*
+* Getter for Opacity
+*
 * @method
-* Returns numeric opacity value
+* @return number
 */
 Opacity.prototype.get = function get() {
     return this._value.get();
 };
 
 /**
-* @method
+*
 * Stops Opacity transition
+*
+* @method
 * @chainable
 */
 Opacity.prototype.halt = function halt() {

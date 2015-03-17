@@ -14,8 +14,11 @@ function Origin(dispatch) {
 
 
 /**
+*
+* returns stringified constructor
+*
 * @method
-* Return the definition of the Component Class: 'Origin'
+* @return string the definition of the Component Class: 'Origin'
 */
 Origin.toString = function toString() {
     return 'Origin';
@@ -25,8 +28,11 @@ Origin.prototype = Object.create(Position.prototype);
 Origin.prototype.constructor = Origin;
 
 /**
+*
+* If true, component is to be updated on next engine tick
+*
 * @method
-* Returns boolean: if true, component is to be updated on next engine tick
+* @return boolean
 */
 Origin.prototype.clean = function clean() {
     var context = this._dispatch._context;
