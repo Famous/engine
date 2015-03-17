@@ -17,11 +17,13 @@
     "url": "https://github.com/Famous/utilities/issues"
   },
   "homepage": "https://github.com/Famous/utilities",
+  "dependencies": {
+      "famous-transitions": "git+ssh://git@github.famo.us/platform/transitions#master"
+  },
   "devDependencies": {
     "jshint": "^2.5.11",
     "jshint-stylish": "^1.0.0",
     "tap-spec": "^2.2.0",
-    "tape": "^3.0.3",
-    "famous-transitions": "git+ssh://git@github.famo.us/platform/transitions#master"
+    "tape": "^3.0.3"
   }
 }
