@@ -8,6 +8,7 @@
  *
  * @class  Layer
  * @constructor
+ * @private
  */
 function Layer () {
     this._components = [];

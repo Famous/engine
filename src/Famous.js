@@ -22,6 +22,7 @@ var isWorker = self.window !== self;
  * 
  * @class  Famous
  * @constructor
+ * @private
  */
 function Famous() {
     this._globalDispatch = new GlobalDispatch();
@@ -68,7 +69,7 @@ Famous.prototype.step = function step (time) {
  *
  * @method  postMessage
  * @chainable
- * @private
+ * @public
  * 
  * @param  {Array} message  incoming message containing commands
  * @return {Famous}         this
@@ -141,7 +142,7 @@ Famous.prototype.handleWith = function handleWith (message) {
  * 
  * @method onmessage
  * @override
- * @private
+ * @public
  */
 Famous.prototype.onmessage = function onmessage (message) {};
 
@@ -158,6 +159,7 @@ Famous.prototype.onmessage = function onmessage (message) {};
  * frame-by-frame basis.
  * 
  * @method getClock
+ * @public
  * 
  * @return {Clock} internal Clock
  */
@@ -170,6 +172,7 @@ Famous.prototype.getClock = function getClock () {
  * to be sent on the next tick.
  *
  * @method  getMessageQueue
+ * @public
  * 
  * @return {MessageQueue} internal MessageQueue
  */
@@ -182,6 +185,7 @@ Famous.prototype.getMessageQueue = function getMessageQueue () {
  * listeners for global (same depth) or targeted (same path) events.
  *
  * @method  getGlobalDispatch
+ * @public
  * 
  * @return {GlobalDispatch} internal GlobalDispatch
  */

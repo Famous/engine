@@ -29,6 +29,7 @@ var OPACITY = 'opacity';
  * 
  * @class RenderContext
  * @constructor
+ * @private
  * 
  * @param {LocalDisaptch} dispatch
  */

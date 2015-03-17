@@ -10,6 +10,7 @@ var Layer = require('./Layer');
  *
  * @class ComponentStore
  * @constructor
+ * @private
  */
 function ComponentStore () {
     this._components = new Layer();
