@@ -55,6 +55,12 @@ function PhysicsEngine(options) {
     this.prestep = [];
     this.poststep = [];
 
+    this.buffer = {
+        position: [0, 0, 0],
+        rotation: [0, 0, 0],
+        size: [0, 0, 0]
+    };
+
     this.frameDependent = options.frameDependent || false;
 }
 
@@ -312,7 +318,7 @@ PhysicsEngine.prototype.update = function update(time) {
  * @method getTransform
  * @return {Transform}
  */
-PhysicsEngine.prototype.getTransform = function getTransform(body, position, rotation) {
+PhysicsEngine.prototype.getTransform = function getTransform(body) {
     var o = this.origin;
     var oq = this.orientation;
 
@@ -326,8 +332,16 @@ PhysicsEngine.prototype.getTransform = function getTransform(body, position, rot
         loc = oq.rotateVector(p, VEC_REGISTER);
     }
     var XYZ = rot.toEulerXYZ(XYZ_REGISTER);
-    position && position.set(o.x+loc.x, o.y+loc.y, o.z+loc.z);
-    rotation && rotation.set(XYZ.x, XYZ.y, XYZ.z);
+
+    this.buffer.position[0] = o.x+loc.x;
+    this.buffer.position[1] = o.y+loc.y;
+    this.buffer.position[2] = o.z+loc.z;
+
+    this.buffer.rotation[0] = XYZ.x;
+    this.buffer.rotation[1] = XYZ.y;
+    this.buffer.rotation[2] = XYZ.z;
+
+    return this.buffer;
 };
 
 /**
