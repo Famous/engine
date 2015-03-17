@@ -14,10 +14,10 @@ function Rotation(dispatch) {
 
 /**
 *
-* stringifies Rotation constructor
+* stringifies Rotation
 *
 * @method
-* @return string the definition of the Component Class: 'Rotation'
+* @return {String} the name of the Component Class: 'Rotation'
 */
 Rotation.toString = function toString() {
     return 'Rotation';
@@ -31,7 +31,7 @@ Rotation.prototype.constructor = Rotation;
 * If true, component is to be updated on next engine tick
 *
 * @method
-* @return boolean
+* @return {Boolean}
 */
 Rotation.prototype.clean = function clean() {
     var context = this._dispatch._context;

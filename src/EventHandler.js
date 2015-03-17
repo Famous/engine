@@ -7,7 +7,8 @@ var CallbackStore = require('famous-utilities').CallbackStore;
  * @constructor
  * @component
  * @param {LocalDispatch}  Local Dispatch to be retrieved from corresponding Render Node of the EventHandler component
- * @param {array} events array of event objects, each of which will have a listener registered on the corresponding Render Node of the Event Handler.  Objects should be of the form {event: "eventname", callback: function}
+ * @param {Array} events array of event objects, each of which will have a listener registered on the corresponding Render Node of the Event Handler.  
+ * Objects should be of the form {event: "eventname", callback: function}
  */
 function EventHandler (dispatch, events) {
     this.dispatch = dispatch;
@@ -24,8 +25,11 @@ function EventHandler (dispatch, events) {
 }
 
 /** 
+*
+* stringifies EventHandler
+*
 * @method
-* Return the definition of the Component Class: 'EventHandler'
+* @return {String} the name of the Component Class: 'EventHandler'
 */
 
 EventHandler.toString = function toString() {
@@ -37,8 +41,8 @@ EventHandler.toString = function toString() {
 * Registers event using LocalDispatch of corresponding Render Node
 *
 * @method
-* @param {string} ev Value of a single 'event' key in events argument of constructor
-* @param {function} callback value of 'callback' key in events argument of constructor
+* @param {String} ev Value of a single 'event' key in events argument of constructor
+* @param {Function} callback value of 'callback' key in events argument of constructor
 */
 EventHandler.prototype.on = function on (ev, cb) {
     this._events.on(ev, cb);
@@ -50,8 +54,8 @@ EventHandler.prototype.on = function on (ev, cb) {
 * Deregisters event using LocalDispatch of corresponding Render Node
 *
 * @method
-* @param {string} ev Value of a single 'event' key in events argument of constructor
-* @param {function} callback value of 'callback' key in events argument of constructor
+* @param {String} ev Value of a single 'event' key in events argument of constructor
+* @param {Function} callback value of 'callback' key in events argument of constructor
 */
 EventHandler.prototype.off = function off (ev, cb) {
     this._events.off(ev, cb);
@@ -63,8 +67,8 @@ EventHandler.prototype.off = function off (ev, cb) {
 * Triggers event
 *
 * @method
-* @param {string} ev event name
-* @param {object} payload event response
+* @param {String} ev event name
+* @param {Object} payload event response
 */
 EventHandler.prototype.trigger = function trigger (ev, payload) {
     this._events.trigger(ev, payload);

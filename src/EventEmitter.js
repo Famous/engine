@@ -4,7 +4,8 @@
  * @class EventEmitter
  * @constructor
  * @component
- * @param {LocalDispatch} dispatch  LocalDispatch to be retrieved from corresponding Render Node of the EventEmitter component
+ * @param {LocalDispatch} dispatch  LocalDispatch to be retrieved from corresponding 
+ * Render Node of the EventEmitter component
  */
 function EventEmitter(dispatch) {
     this.dispatch = dispatch;
@@ -12,10 +13,10 @@ function EventEmitter(dispatch) {
 
 /**
 *
-* stringifies EventEmitter constructor
+* stringifies EventEmitter
 *
 * @method
-* @return string the definition of the Component Class: 'EventEmitter'
+* @return {String} the name of the Component Class: 'EventEmitter'
 */
 EventEmitter.toString = function toString() {
     return 'EventEmitter';
@@ -26,8 +27,8 @@ EventEmitter.toString = function toString() {
 * EventEmitter relays event and payload to Global Dispatch through Local Dispatch of the corresponding Render Node
 *
 * @method
-* @param {string} event event name
-* @param {object} payload see 'UIEventHandler' component for further information
+* @param {String} event event name
+* @param {Object} payload see 'UIEventHandler' component for further information
 * @chainable
 */
 EventEmitter.prototype.emit = function emit(event, payload) {

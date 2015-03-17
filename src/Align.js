@@ -15,13 +15,13 @@ function Align(dispatch) {
 
 /**
 *
-* stringifies Align constructor
+* stringifies Align
 *
 * @method
-* @return string the definition of the Component Class: 'Align'
+* @return {String} the name of the Component Class: 'Align'
 */
 Align.toString = function toString() {
-    return 'Align';
+    return Align.toString;
 };
 
 Align.prototype = Object.create(Position.prototype);
@@ -32,7 +32,7 @@ Align.prototype.constructor = Align;
 * If true, component is to be updated on next engine tick
 *
 * @method
-* @return boolean
+* @return {Boolean}
 */
 Align.prototype.clean = function clean() {
     var context = this._dispatch._context;

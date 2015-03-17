@@ -17,10 +17,10 @@ function Opacity(dispatch) {
 
 /**
 *
-* returns stringified constructor
+* returns stringified Opacity
 *
 * @method
-* @return string the definition of the Component Class: 'Opacity'
+* @return {String} the name of the Component Class: 'Opacity'
 */
 Opacity.toString = function toString() {
     return 'Opacity';
@@ -31,7 +31,8 @@ Opacity.toString = function toString() {
 * Retrieves state of Opacity
 *
 * @method
-* @return object containins  component key which holds the stringified constructor, and value key which contains the numeric value
+* @return {Object} contains component key which holds the stringified constructor 
+* and value key which contains the numeric value
 */
 Opacity.prototype.getState = function getState() {
     return {
@@ -45,8 +46,8 @@ Opacity.prototype.getState = function getState() {
 * Setter for Opacity state
 *
 * @method
-* @param {object} state contains component key, which holds stringified constructor, and a value key, which contains a numeric value used to set opacity if the constructor value matches
-* @return boolean true if set is successful, false otherwise
+* @param {Object} state contains component key, which holds stringified constructor, and a value key, which contains a numeric value used to set opacity if the constructor value matches
+* @return {Boolean} true if set is successful, false otherwise
 */
 Opacity.prototype.setState = function setState(state) {
     if (this.constructor.toString() === state.component) {
@@ -61,7 +62,7 @@ Opacity.prototype.setState = function setState(state) {
 * If true, component is to be updated on next engine tick
 *
 * @method
-* @return boolean
+* @return {Boolean}
 */
 Opacity.prototype.clean = function clean() {
     var context = this._dispatch._context;
@@ -74,9 +75,9 @@ Opacity.prototype.clean = function clean() {
 * Setter for Opacity with callback
 *
 * @method
-* @param {number} value value used to set Opacity
-* @param {object} options options hash
-* @param {function} callback to be called following Opacity set
+* @param {Number} value value used to set Opacity
+* @param {Object} options options hash
+* @param {Function} callback to be called following Opacity set
 * @chainable
 */
 Opacity.prototype.set = function set(value, options, callback) {
@@ -90,7 +91,7 @@ Opacity.prototype.set = function set(value, options, callback) {
 * Getter for Opacity
 *
 * @method
-* @return number
+* @return {Number}
 */
 Opacity.prototype.get = function get() {
     return this._value.get();

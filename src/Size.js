@@ -31,9 +31,10 @@ function Size(dispatch) {
 }
 
 /** 
-* Return the definition of the Component Class: 'Size'
+* stringifies Size
 *
-* @method 
+* @method
+* @return {String} the name of the Component Class: 'Align' 
 */
 Size.toString = function toString() {
     return 'Size';
@@ -44,7 +45,7 @@ Size.toString = function toString() {
 * Returns state object
 *
 * @method 
-* @return object containing stringified constructor, x, y, z numeric size
+* @return {Object} containing stringified constructor, x, y, z numeric size
 */
 Size.prototype.getState = function getState() {
     if (this._absoluteMode) {
@@ -77,8 +78,8 @@ Size.prototype.getState = function getState() {
 * Sets state of size
 *
 * @method
-* @param {object} state -- component: stringified constructor, x: number, y: number, z: number
-* @return boolean true if component deeply equals stringified constructor, sets position coordinates, else returns false
+* @param {Object} state -- component: stringified constructor, x: number, y: number, z: number
+* @return {Boolean} true if component deeply equals stringified constructor, sets position coordinates, else returns false
 */
 Size.prototype.setState = function setState(state) {
     if (state.component === this.constructor.toString()) {
@@ -120,7 +121,7 @@ Size.prototype._cleanAbsoluteZ = function _cleanAbsoluteZ(prop) {
 * If true, component is to be updated on next engine tick
 *
 * @method
-* @return boolean 
+* @return {Boolean} 
 */
 Size.prototype.clean = function clean () {
     var context = this._dispatch._context;
@@ -161,11 +162,11 @@ Size.prototype.clean = function clean () {
 * Sets absolute Size
 *
 * @method
-* @param {number} x used to set x size
-* @param {number} y used to set y size
-* @param {number} z used to set z size
-* @param {object} options options hash
-* @param {function} callback function to execute after setting each size
+* @param {Number} x used to set x size
+* @param {Number} y used to set y size
+* @param {Number} z used to set z size
+* @param {Object} options options hash
+* @param {Function} callback function to execute after setting each size
 * @chainable
 */
 Size.prototype.setAbsolute = function setAbsolute(x, y, z, options, callback) {
@@ -231,7 +232,7 @@ Size.prototype.setDifferential = function setDifferential(x, y, z, options, call
 * Size getter method
 *
 * @method
-* @return array size
+* @return {Array} size
 */
 Size.prototype.get = function get () {
     return this._dispatch.getContext().getSize();

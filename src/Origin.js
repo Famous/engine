@@ -15,10 +15,10 @@ function Origin(dispatch) {
 
 /**
 *
-* returns stringified constructor
+* returns stringified Origin
 *
 * @method
-* @return string the definition of the Component Class: 'Origin'
+* @return {String} the name of the Component Class: 'Origin'
 */
 Origin.toString = function toString() {
     return 'Origin';
@@ -32,7 +32,7 @@ Origin.prototype.constructor = Origin;
 * If true, component is to be updated on next engine tick
 *
 * @method
-* @return boolean
+* @return {Boolean}
 */
 Origin.prototype.clean = function clean() {
     var context = this._dispatch._context;
