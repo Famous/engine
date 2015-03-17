@@ -9,8 +9,10 @@ var checkers = require('./Checkerboard');
 var identity = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
 
 /**
- * WebGLRenderer is a private class that reads commands from a Mesh
- * and converts them into webGL api calls.
+ * WebGLRenderer is a private class that manages all interactions with the WebGL
+ * API.  Each frame it receives commands from the compositor and updates its registries 
+ * accordingly.  Subsequently, the draw function is called and the WebGLRenderer
+ * issues draw calls for all meshes in its registry.
  *
  * @class WebGLRenderer
  * @constructor
@@ -109,13 +111,13 @@ WebGLRenderer.prototype.createMesh = function createMesh(path) {
 
 
 /**
- * Draws a mesh onto the screen
+ * Receives updates to meshes and other famous renderables, and updates
+ * registries accordingly.
  *
- * @method render
+ * @method receive
  *
- * @param {Context} object with local transform data and mesh
- *
- * @chainable
+ * @param {String} path Path to given famous renderable used as key in registry.
+ * @param {Array} commands Array of commands used to update a renderable.
  */
 WebGLRenderer.prototype.receive = function receive(path, commands) {
     var bufferName, bufferValue, bufferSpacing, uniformName, uniformValue, geometryId;
@@ -193,6 +195,15 @@ WebGLRenderer.prototype.receive = function receive(path, commands) {
     }
 };
 
+/**
+ * Triggers the 'draw' phase of the WebGLRenderer.  Iterates through registries
+ * to set uniforms, set attributes and issue draw commands for renderables.
+ *
+ * @method draw
+ *
+ * @param {Object} renderState Parameters provided by the compositor, that
+ * affect the rendering of all renderables.
+ */
 WebGLRenderer.prototype.draw = function draw(renderState) {
     var mesh;
     var buffers;
@@ -234,13 +245,13 @@ WebGLRenderer.prototype.draw = function draw(renderState) {
 
 
 /**
- * Loads the buffers and issues the draw command for a geometry
+ * Loads the buffers and issues the draw command for a geometry.
  *
  * @method drawBuffers
  *
- * @param {Object} Map of vertex buffers keyed by attribute identifier
- * @param {Number} Enumerator defining what primitive to draw
- *
+ * @param {Object} vertexBuffers All buffers used to draw the geometry.
+ * @param {Number} mode Enumerator defining what primitive to draw
+ * @param {Number} id ID of geometry being drawn.
  */
 WebGLRenderer.prototype.drawBuffers = function drawBuffers(vertexBuffers, mode, id) {
     var gl = this.gl;
@@ -341,11 +352,9 @@ WebGLRenderer.prototype.drawBuffers = function drawBuffers(vertexBuffers, mode, 
  *
  * @method renderOffscreen
  *
- * @param {Function} The render function to be called after setup and before cleanup
- * @param {spec} The object containing mesh data
- * @param {context} The object containing global render information
- * @param {Texture} The location where the render data is stored
- *
+ * @param {Function} callback The render function to be called after setup and before cleanup.
+ * @param {Array} size Size of framebuffer being drawn to.
+ * @param {Object} texture Location where the render data is stored.
  */
 function renderOffscreen(callback, size, texture) {
     var gl = this.gl;
@@ -374,12 +383,11 @@ function renderOffscreen(callback, size, texture) {
 };
 
 /**
- * Diagonose the failed intialization of an FBO
+ * Diagnoses the failed intialization of an FBO.
  *
  * @method checkFrameBufferStatus
  *
- * @param {Object} the glContext that owns this FBO
- *
+ * @param {Object} the WebGLContext that owns this FBO.
  */
 function checkFrameBufferStatus(gl) {
     var status = gl.checkFramebufferStatus(gl.FRAMEBUFFER);
@@ -403,14 +411,9 @@ function checkFrameBufferStatus(gl) {
 /**
  * Updates the width and height of parent canvas, sets the viewport size on
  * the WebGL context and updates the resolution uniform for the shader program.
- * If no size is passed in this function will update using the cached size.
+ * Size is retreived from the container object of the renderer.
  *
  * @method updateSize
- *
- * @param {Number} width Updated width of the drawing context.
- * @param {Number} height Updated height of the drawing context.
- * @param {Number} depth Updated depth of the drawing context.
- *
  */
 WebGLRenderer.prototype.updateSize = function updateSize() {
     var newSize = this.container._getSize();
@@ -431,14 +434,28 @@ WebGLRenderer.prototype.updateSize = function updateSize() {
     this.program.setUniforms(this.resolutionName, this.resolutionValues);
 };
 
-module.exports = WebGLRenderer;
-
+/**
+ * Updates the state of the WebGL drawing context based on custom parameters
+ * defined on a mesh.
+ *
+ * @method handleOptions
+ * 
+ * @param {Object} options Draw state options to be set to the context.
+ */
 WebGLRenderer.prototype.handleOptions = function handleOptions(options) {
     var gl = this.gl;
     if (! options) return;
     if (options.blending) gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
 };
 
+/**
+ * Resets the state of the WebGL drawing context based on custom parameters
+ * defined on a mesh.
+ *
+ * @method handleOptions
+ * 
+ * @param {Object} options Draw state options to be set to the context.
+ */
 WebGLRenderer.prototype.resetOptions = function handleOptions(options) {
     var gl = this.gl;
     if (! options) return;
@@ -489,3 +506,5 @@ function handleTexture(input) {
 
     return texture;
 }
+
+module.exports = WebGLRenderer;
