@@ -6,6 +6,8 @@ var Vec3 = require('famous-math').Vec3;
 var Geometry = require('../Geometry');
 var ConvexHull = Geometry.ConvexHull;
 
+var TEMP_REGISTER = new Vec3();
+
 /**
  * Returns a constructor for a physical body reflecting the shape defined by input ConvexHull or Vec3 array.
  *
@@ -19,44 +21,63 @@ function ConvexBodyFactory(hull) {
         else hull = new ConvexHull(hull);
     }
 
-    var _polyhedralProperties = hull.polyhedralProperties;
-    var _vertices = hull.vertices;
-    var _vertexGraph = hull.graph;
-
     function ConvexBody(options) {
         Particle.call(this, options);
 
-        var originalSize = _polyhedralProperties.size;
+        var originalSize = hull.polyhedralProperties.size;
         var size = options.size || originalSize;
 
-        var scaleX = size[0]/originalSize[0];
-        var scaleY = size[1]/originalSize[1];
-        var scaleZ = size[2]/originalSize[2];
+        var scaleX = size[0] / originalSize[0];
+        var scaleY = size[1] / originalSize[1];
+        var scaleZ = size[2] / originalSize[2];
+
+        this._scale = [scaleX, scaleY, scaleZ];
 
         var T = new Mat33([scaleX, 0, 0, 0, scaleY, 0, 0, 0, scaleZ]);
 
-        var properties = _computeInertiaProperties(_polyhedralProperties, options, T);
-
-        this.mass = properties.mass;
-        this.inverseMass = 1 / this.mass;
-        this.inertia = new Mat33(properties.inertia);
-        this.inverseInertia = Mat33.inverse(this.inertia, new Mat33());
-
-        this._bodyVertices = [];
-        for (var i = 0, len = _vertices.length; i < len; i++) {
-            this._bodyVertices.push(T.vectorMultiply(_vertices[i], new Vec3()));
-        }
-        this.vertices = [];
-        for (var i = 0, len = this._bodyVertices.length; i < len; i++) {
-            this.vertices.push(Vec3.clone(this._bodyVertices[i]));
-        }
-
-        this.vertexGraph = _vertexGraph;
         this.hull = hull;
+
+        this.vertices = [];
+        for (var i = 0, len = hull.vertices.length; i < len; i++) {
+            this.vertices.push(T.vectorMultiply(hull.vertices[i], new Vec3()));
+        }
+
+        _computeInertiaProperties.call(this, T);
     }
 
     ConvexBody.prototype = Object.create(Particle.prototype);
     ConvexBody.prototype.constructor = ConvexBody;
+
+    ConvexBody.prototype.setSize = function setSize(x,y,z) {
+        var originalSize = hull.polyhedralProperties.size;
+
+        this.size[0] = x;
+        this.size[1] = y;
+        this.size[2] = z;
+
+        var scaleX = x / originalSize[0];
+        var scaleY = y / originalSize[1];
+        var scaleZ = z / originalSize[2];
+
+        this._scale = [scaleX, scaleY, scaleZ];
+
+        var T = new Mat33([scaleX, 0, 0, 0, scaleY, 0, 0, 0, scaleZ]);
+
+        var vertices = this.vertices;
+        for (var i = 0, len = hull.vertices.length; i < len; i++) {
+            T.vectorMultiply(hull.vertices[i], vertices[i]);
+        }
+    };
+
+    ConvexBody.prototype.updateInertia = function updateInertia() {
+        var scaleX = this._scale[0];
+        var scaleY = this._scale[1];
+        var scaleZ = this._scale[2];
+
+        var T = new Mat33([scaleX, 0, 0, 0, scaleY, 0, 0, 0, scaleZ]);
+
+        _computeInertiaProperties.call(this, T);
+    };
 
     ConvexBody.prototype.support = function support(direction) {
         var vertices = this.vertices;
@@ -75,9 +96,19 @@ function ConvexBodyFactory(hull) {
     ConvexBody.prototype.updateShape = function updateShape() {
         var vertices = this.vertices;
         var q = this.orientation;
-        var bodyVertices = this._bodyVertices;
+        var modelVertices = this.hull.vertices;
+
+        var scaleX = this._scale[0];
+        var scaleY = this._scale[1];
+        var scaleZ = this._scale[2];
+
+        var t = TEMP_REGISTER;
         for (var i = 0, len = vertices.length; i < len; i++) {
-            Vec3.applyRotation(bodyVertices[i], q, vertices[i]);
+            t.copy(modelVertices[i]);
+            t.x *= scaleX;
+            t.y *= scaleY;
+            t.z *= scaleZ;
+            Vec3.applyRotation(t, q, vertices[i]);
         }
     };
 
@@ -94,7 +125,8 @@ function ConvexBodyFactory(hull) {
  * @param {Mat33} T
  * @return {Object}
  */
-function _computeInertiaProperties(polyhedralProperties, options, T) {
+function _computeInertiaProperties(T) {
+    var polyhedralProperties = this.hull.polyhedralProperties;
     var T_values = T.get();
     var detT = T_values[0] * T_values[4] * T_values[8];
 
@@ -113,16 +145,8 @@ function _computeInertiaProperties(polyhedralProperties, options, T) {
     var Exz = E_values[2];
 
     var newVolume = polyhedralProperties.volume * detT;
-    var density = 1;
-    var mass = newVolume;
-
-    if (options.mass) {
-        mass = options.mass;
-        density = mass / newVolume;
-    } else if (options.density) {
-        density = options.density;
-        mass *= options.density;
-    }
+    var mass = this.mass;
+    var density = mass / newVolume;
 
     var Ixx = Eyy + Ezz;
     var Iyy = Exx + Ezz;
@@ -153,10 +177,8 @@ function _computeInertiaProperties(polyhedralProperties, options, T) {
         Ixz, Iyz, Izz
     ];
 
-    return {
-        mass: mass,
-        inertia: inertia
-    };
+    this.inertia.set(inertia);
+    Mat33.inverse(this.inertia, this.inverseInertia);
 }
 
 module.exports = ConvexBodyFactory;

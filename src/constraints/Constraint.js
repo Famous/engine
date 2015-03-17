@@ -9,7 +9,7 @@ var _ID = 0;
  * @class Constraint
  */
 function Constraint(options) {
-    this.options = options = options || {};
+    options = options || {};
     this.setOptions(options);
 
     this._ID = _ID++;

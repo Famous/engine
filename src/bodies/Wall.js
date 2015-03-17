@@ -54,8 +54,6 @@ function Wall(options) {
 
     this.mass = Infinity;
     this.inverseMass = 0;
-    this.inertia = new Mat33([0,0,0,0,0,0,0,0,0]);
-    this.inverseInertia = new Mat33([0,0,0,0,0,0,0,0,0]);
 
     this.type = 1 << 3;
 }

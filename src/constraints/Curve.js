@@ -15,9 +15,6 @@ var PI = Math.PI;
 /**
  *  A constraint that keeps a physics body on a given implicit curve.
  *
- *    A curve constraint is two surface constraints in disguise, as a curve is
- *    the intersection of two surfaces, and is essentially constrained to both.
- *
  *  @class Curve
  *  @constructor
  *  @extends Constraint

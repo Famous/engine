@@ -7,8 +7,9 @@ var _ID = 0;
  * @virtual
  * @class Force
  */
-function Force(options) {
-    this.options = options = options || {};
+function Force(targets, options) {
+    this.targets = [].concat(targets);
+    options = options || {};
     this.setOptions(options);
 
     this._ID = _ID++;

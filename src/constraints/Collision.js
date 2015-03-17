@@ -111,6 +111,9 @@ Collision.prototype.init = function(options) {
  Collision.prototype.update = function update(time, dt) {
     this.contactManifoldTable.update(dt);
     if (this.targets.length === 0) return;
+    for (var i = 0, len = this.targets.length; i < len; i++) {
+        this.targets[i].updateShape();
+    }
     var potentialCollisions = this.broadPhase.update();
     var pair;
     for (var i = 0, len = potentialCollisions.length; i < len; i++) {
@@ -148,10 +151,10 @@ Collision.prototype.addTarget = function addTarget(target) {
  * @param {Object | Object[]}
  */
 Collision.prototype.removeTarget = function removeTarget(target) {
-        var index = this.targets.indexOf(target);
-        if (index < 0) return;
-        this.targets.splice(index, 1);
-        this.broadPhase.remove(target);
+    var index = this.targets.indexOf(target);
+    if (index < 0) return;
+    this.targets.splice(index, 1);
+    this.broadPhase.remove(target);
 };
 
 

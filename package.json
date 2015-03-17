@@ -4,8 +4,7 @@
   "description": "Famous Physics",
   "main": "src/index.js",
   "scripts": {
-    "test": "testling '' | tap-spec",
-    "watch": "nodemon --ignore node_modules/ -e js,json --exec 'npm test'",
+    "test": "tape test/*.spec.js test/*/*.spec.js | tap-spec",
     "lint": "jshint --reporter node_modules/jshint-stylish/stylish.js src/"
   },
   "repository": {

@@ -14,12 +14,7 @@ var FORCE_REGISTER = new Vec3();
  */
 function Gravity3D(source, targets, options) {
     this.source = source || null;
-    if (targets) {
-        if (targets instanceof Array) this.targets = targets;
-        else this.targets = [targets];
-    }
-    else this.targets = [];
-    Force.call(this, options);
+    Force.call(this, targets, options);
 }
 
 Gravity3D.prototype = Object.create(Force.prototype);
