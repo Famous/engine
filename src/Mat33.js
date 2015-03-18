@@ -251,7 +251,7 @@ Mat33.inverse = function inverse(matrix, output) {
             - M1*(M3*M8 - M5*M6)
             + M2*(M3*M7 - M4*M6);
 
-    if (Math.abs(det) < 1e-18) return null;
+    if (Math.abs(det) < 1e-40) return null;
 
     det = 1 / det;
 
