@@ -60,8 +60,8 @@ Drag.prototype.init = function(options) {
  * Apply the force.
  *
  * @method update
- * @param {Number} time
- * @param {Number} dt
+ * @param {Number} time The current time in the physics engine.
+ * @param {Number} dt The physics engine frame delta.
  */
 Drag.prototype.update = function update(time, dt) {
     var targets = this.targets;

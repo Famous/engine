@@ -38,7 +38,7 @@ Gravity1D.BACKWARD = 5;
  */
 Gravity1D.prototype.init = function(options) {
     this.max = this.max || Infinity;
-    if (this.acceleration) {
+    if (options.acceleration) {
         this.strength = this.acceleration.length();
         this.direction = -1;
         return;
@@ -74,8 +74,8 @@ Gravity1D.prototype.init = function(options) {
  * Apply the force.
  *
  * @method update
- * @param {Number} time
- * @param {Number} dt
+ * @param {Number} time The current time in the physics engine.
+ * @param {Number} dt The physics engine frame delta.
  */
 Gravity1D.prototype.update = function(time, dt) {
     var targets = this.targets;

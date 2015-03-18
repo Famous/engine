@@ -10,8 +10,6 @@ var DAMPING_REGISTER = new Vec3();
 var XYZ_REGISTER = new Vec3();
 var MAT_REGISTER = new Mat33();
 
-/** @const ZERO_MAT */
-var ZERO_MAT = new Mat33([0,0,0,0,0,0,0,0,0]);
 /** @const PI */
 var PI = Math.PI;
 
@@ -38,23 +36,17 @@ RotationalSpring.prototype.constructor = RotationalSpring;
  */
 RotationalSpring.prototype.init = function init(options) {
     if (!this.source) this.anchor = this.anchor ? this.anchor.normalize() : new Quaternion(1,0,0,0);
-    if (options.stiffness) {
+    if (options.stiffness || options.damping) {
+        this.stiffness = this.stiffness || 100;
         this.damping = this.damping || 0;
         this.period = null;
         this.dampingRatio = null;
     }
-    else if (options.period || options.dampingRatio) {
-        this.stiffness = 2 * PI / this.period;
-        this.stiffness *= this.stiffness;
-
-        this.dampingRatio = this.dampingRatio || 0;
-        this.damping = 4 * PI * this.dampingRatio / this.period;
-    }
     else {
-        this.period = 1;
-        this.dampingRatio = 0;
+        this.period = this.period || 1;
+        this.dampingRatio = this.dampingRatio || 0;
 
-        this.stiffness = 2 * PI / this.period, 2;
+        this.stiffness = 2 * PI / this.period;
         this.stiffness *= this.stiffness;
         this.damping = 4 * PI * this.dampingRatio / this.period;
     }
@@ -64,8 +56,8 @@ RotationalSpring.prototype.init = function init(options) {
  * Adds a torque force to a physics body's torque accumulator.
  *
  * @method update
- * @param {Number} time
- * @param {Number} dt
+ * @param {Number} time The current time in the physics engine.
+ * @param {Number} dt The physics engine frame delta.
  */
 RotationalSpring.prototype.update = function update(time, dt) {
     var source = this.source;
@@ -80,7 +72,7 @@ RotationalSpring.prototype.update = function update(time, dt) {
     var stiffness = this.stiffness;
     var damping = this.damping;
     var anchor = this.anchor || source.orientation;
-    var invSourceInertia = this.anchor ? ZERO_MAT : source.inverseInertia;
+    var invSourceInertia = this.anchor ? null : source.inverseInertia;
     for (var i = 0, len = targets.length; i < len; i++) {
         var target = targets[i];
         var q = target.orientation;
@@ -95,9 +87,13 @@ RotationalSpring.prototype.update = function update(time, dt) {
 
         deltaOmega.scale(stiffness);
 
-        Mat33.add(invSourceInertia, target.inverseInertia, effInertia).inverse();
+        if (invSourceInertia !== null) {
+            Mat33.add(invSourceInertia, target.inverseInertia, effInertia).inverse();
+        } else {
+            Mat33.inverse(target.inverseInertia, effInertia);
+        }
 
-        if (damping) {
+        if (damping !== 0) {
             if (source) {
                 deltaOmega.add(Vec3.subtract(target.angularVelocity, source.angularVelocity, dampingTorque).scale(-damping));
             }

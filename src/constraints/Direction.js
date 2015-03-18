@@ -58,8 +58,8 @@ Direction.prototype.init = function(options) {
  * Warmstart the constraint and prepare calculations used in .resolve.
  *
  * @method update
- * @param {Number} time
- * @param {Number} dt
+ * @param {Number} time The current time in the physics engine.
+ * @param {Number} dt The physics engine frame delta.
  */
 Direction.prototype.update = function update(time, dt) {
     var a = this.a;
@@ -125,8 +125,8 @@ Direction.prototype.update = function update(time, dt) {
  * Adds an impulse to a physics body's velocity due to the constraint
  *
  * @method resolve
- * @param {Number} time
- * @param {Number} dt
+ * @param {Number} time The current time in the physics engine.
+ * @param {Number} dt The physics engine frame delta.
  */
 Direction.prototype.resolve = function update(time, dt) {
     var a = this.a;

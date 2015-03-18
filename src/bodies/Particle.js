@@ -6,6 +6,9 @@ var Mat33 = require('famous-math').Mat33;
 
 var ZERO_VECTOR = new Vec3();
 
+var MAT1_REGISTER = new Mat33();
+var QUAT_REGISTER = new Mat33();
+
 var _ID = 0;
 /**
  * Fundamental physical body. Maintains translational and angular momentum, position and orientation, and other properties
@@ -36,8 +39,10 @@ function Particle(options) {
     this.restitution = options.restitution != null ? options.restitution : 0.4;
     this.friction = options.friction != null ? options.friction : 0.2;
 
-    this.inertia = new Mat33([0,0,0,0,0,0,0,0,0]);
     this.inverseInertia = new Mat33([0,0,0,0,0,0,0,0,0]);
+
+    this.localInertia = new Mat33([0,0,0,0,0,0,0,0,0]);
+    this.localInverseInertia = new Mat33([0,0,0,0,0,0,0,0,0]);
 
     this.size = options.size || [0, 0, 0];
 
@@ -132,14 +137,33 @@ Particle.prototype.getInverseMass = function() {
 };
 
 /**
- * Infers the inertia tensor. Will also compute and set the inverse inertia.
+ * Resets the inertia tensor and its inverse to reflect the current shape.
  *
- * @method updateInertia
+ * @method updateLocalInertia
+ * @chainable
  * @param {Mat33} Mat33
  */
+Particle.prototype.updateLocalInertia = function updateLocalInertia() {
+    this.localInertia.set([0,0,0,0,0,0,0,0,0]);
+    this.localInverseInertia.set([0,0,0,0,0,0,0,0,0]);
+    return this;
+};
+
+/**
+ * Updates the world inverse inertia tensor.
+ *
+ * @method updateInertia
+ * @chainable
+ */
 Particle.prototype.updateInertia = function updateInertia() {
-    this.inertia = new Mat33([0,0,0,0,0,0,0,0,0]);
-    this.inverseInertia = new Mat33([0,0,0,0,0,0,0,0,0]);
+    var localInvI = this.localInverseInertia;
+    var q = this.orientation;
+    if (localInvI[0] === localInvI[4] && localInvI[4] === localInvI[8]) return;
+    if (q.w === 1) return;
+    var R = q.toMatrix(MAT1_REGISTER);
+    Mat33.multiply(R, this.inverseInertia, this.inverseInertia);
+    Mat33.multiply(this.localInverseInertia, R.transpose(), this.inverseInertia);
+    return this;
 };
 
 /**
@@ -239,6 +263,7 @@ Particle.prototype.getOrientation = function getOrientation() {
  */
 Particle.prototype.setOrientation = function setOrientation(w,x,y,z) {
     this.orientation.set(w,x,y,z).normalize();
+    this.updateInertia();
     return this;
 };
 
@@ -262,7 +287,7 @@ Particle.prototype.getAngularVelocity = function getAngularVelocity() {
  */
 Particle.prototype.setAngularVelocity = function setAngularVelocity(x,y,z) {
     this.angularVelocity.set(x,y,z);
-    this.inertia.vectorMultiply(this.angularVelocity, this.angularMomentum);
+    Mat33.inverse(this.inverseInertia, MAT1_REGISTER).vectorMultiply(this.angularVelocity, this.angularMomentum);
     return this;
 };
 

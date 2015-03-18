@@ -43,6 +43,7 @@ function ConvexBodyFactory(hull) {
         }
 
         _computeInertiaProperties.call(this, T);
+        this.inverseInertia.copy(this.localInverseInertia);
     }
 
     ConvexBody.prototype = Object.create(Particle.prototype);
@@ -69,7 +70,7 @@ function ConvexBodyFactory(hull) {
         }
     };
 
-    ConvexBody.prototype.updateInertia = function updateInertia() {
+    ConvexBody.prototype.updateLocalInertia = function updateInertia() {
         var scaleX = this._scale[0];
         var scaleY = this._scale[1];
         var scaleZ = this._scale[2];
@@ -177,8 +178,8 @@ function _computeInertiaProperties(T) {
         Ixz, Iyz, Izz
     ];
 
-    this.inertia.set(inertia);
-    Mat33.inverse(this.inertia, this.inverseInertia);
+    this.localInertia.set(inertia);
+    Mat33.inverse(this.localInertia, this.localInverseInertia);
 }
 
 module.exports = ConvexBodyFactory;

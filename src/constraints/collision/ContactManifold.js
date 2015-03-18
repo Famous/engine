@@ -93,7 +93,7 @@ ContactManifoldTable.prototype.removeManifold = function removeManifold(manifold
 };
 
 /**
- * Update each of the manifolds, removing those which no longer contain contact points.
+ * Update each of the manifolds, removing those that no longer contain contact points.
  *
  * @method update
  * @param {Number} dt
@@ -119,6 +119,8 @@ ContactManifoldTable.prototype.prepContacts = function prepContacts(dt) {
     for (var i = 0, len = manifolds.length; i < len; i++) {
         var manifold = manifolds[i];
         if (!manifold) continue;
+        var a = manifold.bodyA;
+        var b = manifold.bodyB;
         var contacts = manifold.contacts;
         for (var j = 0, lenj = contacts.length; j < lenj; j++) {
             var contact = contacts[j];

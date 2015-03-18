@@ -67,8 +67,8 @@ Point2Point.prototype.init = function(options) {
  * Detect violations of the constraint. Warm start the constraint, if possible.
  *
  * @method update
- * @param {Number} time
- * @param {Number} dt delta time
+ * @param {Number} time The current time in the physics engine.
+ * @param {Number} dt The physics engine frame delta.
  */
 Point2Point.prototype.update = function(time, dt) {
     var a = this.a;
@@ -121,8 +121,8 @@ Point2Point.prototype.update = function(time, dt) {
  * Apply impulses to resolve the constraint.
  *
  * @method resolve
- * @param {Number} time
- * @param {Number} dt delta time
+ * @param {Number} time The current time in the physics engine.
+ * @param {Number} dt The physics engine frame delta.
  */
 Point2Point.prototype.resolve = function resolve(time, dt) {
     var a = this.a;

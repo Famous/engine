@@ -105,8 +105,8 @@ Collision.prototype.init = function(options) {
  * and prepares necesssary calculations for the resolution.
  *
  * @method update
- * @param {Number} time
- * @param {Number} dt
+ * @param {Number} time The current time in the physics engine.
+ * @param {Number} dt The physics engine frame delta.
  */
  Collision.prototype.update = function update(time, dt) {
     this.contactManifoldTable.update(dt);
@@ -126,8 +126,8 @@ Collision.prototype.init = function(options) {
  * Apply impulses to resolve all Contact constraints.
  *
  * @method resolve
- * @param {Number} time
- * @param {Number} dt
+ * @param {Number} time The current time in the physics engine.
+ * @param {Number} dt The physics engine frame delta.
  */
 Collision.prototype.resolve = function resolve(time, dt) {
     this.contactManifoldTable.resolveManifolds(dt);
@@ -137,7 +137,7 @@ Collision.prototype.resolve = function resolve(time, dt) {
  * Add a target or targets to the collision system.
  *
  * @method addTarget
- * @param {Object | Object[]}
+ * @param {Particle}
  */
 Collision.prototype.addTarget = function addTarget(target) {
     this.targets.push(target);
@@ -148,7 +148,7 @@ Collision.prototype.addTarget = function addTarget(target) {
  * Remove a target or targets from the collision system.
  *
  * @method addTarget
- * @param {Object | Object[]}
+ * @param {Particle}
  */
 Collision.prototype.removeTarget = function removeTarget(target) {
     var index = this.targets.indexOf(target);
