@@ -27,7 +27,7 @@ var OBJLoader = {
  * @param {Boolean} optional paramater specificing whether or not Famo.us should
  * calculate the normals for each face
  */
-OBJLoader.load = function load(url, cb, computeNormals) {
+OBJLoader.load = function load(url, cb, options) {
     if (! this.cached[url]) {
         if(! this.requests[url]) {
             this.requests[url] = [cb];
@@ -36,7 +36,7 @@ OBJLoader.load = function load(url, cb, computeNormals) {
                 _onsuccess.bind(
                     this,
                     url,
-                    computeNormals
+                    options
                 )
             );
         } else {
@@ -59,8 +59,8 @@ OBJLoader.load = function load(url, cb, computeNormals) {
  * @param {Boolean} value determining whether or not to manually calculate normals
  * @param {String} content of the server response
  */
-function _onsuccess(url, computeNormals, text) {
-    var buffers = format.call(this, text, computeNormals);
+function _onsuccess(url, options, text) {
+    var buffers = format.call(this, text, options || {});
     this.cached[url] = buffers;
 
     for (var i = 0; i < this.requests[url].length; i++) {
@@ -82,7 +82,7 @@ function _onsuccess(url, computeNormals, text) {
  *
  * @return {Object} vertex buffer data
  */
-function format(text, computeNormals) {
+function format(text, options) {
     var text = sanitize(text);
 
     var lines = text.split('\n');
@@ -270,7 +270,18 @@ function format(text, computeNormals) {
         faceTexCoords
     );
 
-    if (computeNormals) {
+    cached.vertices = flatten(cached.vertices);
+    cached.normals = flatten(cached.normals);
+    cached.texCoords = flatten(cached.texCoords);
+    cached.indices = flatten(cached.indices);
+
+    if (options.normalize) {
+        cached.vertices = GeometryHelper.normalizeVertices(
+            cached.vertices
+        );
+    }
+
+    if (options.computeNormals) {
         cached.normals = GeometryHelper.computeNormals(
             cached.indices,
             cached.vertices
@@ -278,10 +289,10 @@ function format(text, computeNormals) {
     }
 
     return {
-        vertices: flatten(cached.vertices),
-        normals: flatten(cached.normals),
-        textureCoords: flatten(cached.texCoords),
-        indices: flatten(cached.indices)
+        vertices: cached.vertices,
+        normals: cached.normals,
+        textureCoords: cached.texCoords,
+        indices: cached.indices
     };
 };
 
