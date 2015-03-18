@@ -50,7 +50,8 @@ var uniformNames = [
     'u_LightPosition',
     'u_LightColor',
     'u_AmbientLight',
-    'u_FlatShading'
+    'u_FlatShading',
+    'u_NumLights'
 ];
 
 var uniformValues = [
@@ -67,9 +68,10 @@ var uniformValues = [
     [1, 1, 1],
     [1, 1, 1],
     [0, 0, 0],
+    identityMatrix,
+    identityMatrix,
     [0, 0, 0],
-    [0, 0, 0],
-    [0, 0, 0],
+    0,
     0
 ];
 
@@ -119,7 +121,7 @@ function Program(gl) {
  *
  * @param {String} name Name of target input of material.
  * @param {Object} material Compiled material object being verified.
- * 
+ *
  * @return {Object} Current program.
  */
 
