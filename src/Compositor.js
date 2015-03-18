@@ -141,7 +141,7 @@ Compositor.prototype.handleWith = function handleWith (commands) {
 Compositor.prototype.getOrSetContext = function getOrSetContext(selector) {
     if (this._contexts[selector]) return this._contexts[selector];
     var result = {
-        DOM: new VirtualElement(document.querySelector(selector), selector, this)
+        DOM: new VirtualElement(document.querySelector(selector), selector, this, undefined, undefined, true)
     };
     result.DOM.setMatrix(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
     this._contexts[selector] = result;
