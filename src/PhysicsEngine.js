@@ -55,6 +55,11 @@ function PhysicsEngine(options) {
     this.prestep = [];
     this.poststep = [];
 
+    this.transformBuffer = {
+        position: [0, 0, 0],
+        rotation: [0, 0, 0]
+    };
+
     this.frameDependent = options.frameDependent || false;
 }
 
@@ -312,22 +317,31 @@ PhysicsEngine.prototype.update = function update(time) {
  * @method getTransform
  * @return {Transform}
  */
-PhysicsEngine.prototype.getTransform = function getTransform(body, position, rotation) {
+PhysicsEngine.prototype.getTransform = function getTransform(body) {
     var o = this.origin;
     var oq = this.orientation;
-
     var p = body.position;
-    var s = body.size;
     var q = body.orientation;
     var rot = q;
     var loc = p;
+    var XYZ;
+
     if (oq.w !== 1) {
         rot = Quaternion.multiply(q, oq, QUAT_REGISTER)
         loc = oq.rotateVector(p, VEC_REGISTER);
     }
-    var XYZ = rot.toEulerXYZ(XYZ_REGISTER);
-    position && position.set(o.x+loc.x, o.y+loc.y, o.z+loc.z);
-    rotation && rotation.set(XYZ.x, XYZ.y, XYZ.z);
+    
+    XYZ = rot.toEulerXYZ(XYZ_REGISTER);
+
+    this.transformBuffer.position[0] = o.x+loc.x;
+    this.transformBuffer.position[1] = o.y+loc.y;
+    this.transformBuffer.position[2] = o.z+loc.z;
+
+    this.transformBuffer.rotation[0] = XYZ.x;
+    this.transformBuffer.rotation[1] = XYZ.y;
+    this.transformBuffer.rotation[2] = XYZ.z;
+
+    return this.transformBuffer;
 };
 
 /**
