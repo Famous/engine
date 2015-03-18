@@ -76,4 +76,21 @@ test('Clock', function(t) {
         clock.step(1996);
         t.equal(clock.getTime(), 1996);
     });
+
+    t.test('nextStep method', function(t) {
+        t.plan(2);
+
+        var clock = new Clock();
+        t.equal(typeof clock.nextStep, 'function', 'clock.nextStep should be a function');
+
+        clock.nextStep({
+            update: function(time) {
+                t.equal(time, 1234, 'clock.nextStep should invoke passed in function once on next step');
+            }
+        });
+
+        clock.step(1234);
+        clock.step(1235);
+        clock.step(1236);
+    });
 });

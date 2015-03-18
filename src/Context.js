@@ -5,43 +5,112 @@ var RenderProxy = require('./RenderProxy');
 
 var Famous = require('./Famous');
 
+/**
+ * Context is the top-level node in the scene graph (= tree node).
+ * As such, it populates the internal MessageQueue with commands received by
+ * subsequent child-nodes. The Context is being updated by the Clock on every
+ * FRAME and therefore recursively updates the scene grpah.
+ *
+ * @class  Context
+ * @constructor
+ * 
+ * @param {String} selector     query selector used to 
+ */
 function Context (selector) {
+    this._messageQueue = Famous.getMessageQueue();
     this._globalDispatch = Famous.getGlobalDispatch();
-    Famous.getClock().update(this);
+    this._clock = Famous.getClock();
+
+    this._clock.update(this);
+
     this.proxy = new RenderProxy(this);
     this.node = new Node(this.proxy, this._globalDispatch);
     this.selector = selector;
     this.dirty = true;
     this.dirtyQueue = [];
 
-    this._globalDispatch.message('NEED_SIZE_FOR').message(selector);
+    this._messageQueue.enqueue('NEED_SIZE_FOR').enqueue(selector);
     this._globalDispatch.targetedOn(selector, 'resize', this._receiveContextSize.bind(this));
 }
 
+/**
+ * Adds a child to the internal list of child-nodes.
+ *
+ * @method addChild
+ * @chainable
+ *
+ * @return {Context}    this
+ */
 Context.prototype.addChild = function addChild () {
     return this.node.addChild();
 };
 
+/**
+ * Removes a node returned by `addChild` from the Context's immediate children.
+ *
+ * @method  removeChild
+ * @chainable
+ * 
+ * @param  {Node} node   node to be removed
+ * @return {Context}     this
+ */
 Context.prototype.removeChild = function removeChild (node) {
     this.node.removeChild(node);
     return this;
 };
 
+/**
+ * Recursively updates all children.
+ *
+ * @method  update
+ * @chainable
+ * 
+ * @return {Context}    this
+ */
 Context.prototype.update = function update () {
     this.node.update();
     return this;
 };
 
+/**
+ * Returns the selector the Context is attached to. Terminates recursive
+ * `getRenderPath` scheduled by `RenderProxy`.
+ *
+ * @method  getRenderPath
+ * @private
+ * 
+ * @return {String} selector
+ */
 Context.prototype.getRenderPath = function getRenderPath () {
     return this.selector;
 };
 
+/**
+ * Appends the passed in command to the internal MessageQueue, thus scheduling
+ * it to be sent to the Main Thread on the next FRAME.
+ *
+ * @method  receive
+ * @chainable
+ * 
+ * @param  {Object} command command to be enqueued
+ * @return {Context}        Context
+ */
 Context.prototype.receive = function receive (command) {
     if (this.dirty) this.dirtyQueue.push(command);
-    else this._globalDispatch.message(command);
+    else this._messageQueue.enqueue(command);
     return this;
 };
 
+/**
+ * Method being executed whenever the context size changes.
+ *
+ * @method  _receiveContextSize
+ * @chainable
+ * @private
+ * 
+ * @param  {Array} size  new context size in the format `[width, height]`
+ * @return {Context}     this
+ */
 Context.prototype._receiveContextSize = function _receiveContextSize (size) {
     this.node
         .getDispatch()

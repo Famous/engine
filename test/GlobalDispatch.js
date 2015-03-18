@@ -15,24 +15,6 @@ test('GlobalDispatch', function(t) {
         });
     });
 
-    t.test('receiveCommands method', function(t) {
-        t.plan(1);
-        var globalDispatch = new GlobalDispatch();
-        t.equal(typeof globalDispatch.receiveCommands, 'function', 'globalDispatch.receiveCommands should be a function');
-    });
-
-    t.test('handleMessage method', function(t) {
-        t.plan(3);
-        var globalDispatch = new GlobalDispatch();
-        t.equal(typeof globalDispatch.handleMessage, 'function', 'globalDispatch.handleMessage should be a function');
-
-        globalDispatch.targetedOn('chicken/egg', 'eventname', function (ev) {
-            t.equal(ev, 'event');
-        });
-
-        t.equal(globalDispatch.handleMessage(['chicken/egg', 'TRIGGER', 'eventname', 'event']), globalDispatch, 'globalDispatch.handleMessage should be chainable');
-    });
-
     t.test('targetedOn method', function(t) {
         t.plan(1);
         var globalDispatch = new GlobalDispatch();
@@ -79,24 +61,5 @@ test('GlobalDispatch', function(t) {
 
         var testEvent = {};
         t.equal(globalDispatch.emit('testEvent', testEvent), globalDispatch, 'globalDispatch.emit should be chainable');
-    });
-
-    t.test('message method', function(t) {
-        t.plan(1);
-        var globalDispatch = new GlobalDispatch();
-        t.equal(typeof globalDispatch.message, 'function', 'globalDispatch.message should be a function');
-    });
-
-    t.test('getMessages method', function(t) {
-        t.plan(2);
-        var globalDispatch = new GlobalDispatch();
-        t.equal(typeof globalDispatch.getMessages, 'function', 'globalDispatch.getMessages should be a function');
-
-        var messages = ['this', 'is', 'a', 'test'];
-        messages.forEach(function(message) {
-            globalDispatch.message(message);
-        });
-
-        t.deepEqual(globalDispatch.getMessages(), messages);
     });
 });
