@@ -42,10 +42,17 @@ function WebGLRenderer(container) {
 
     this.meshRegistry = {};
     this.meshRegistryKeys = [];
+
+    /**
+     * Lights
+     */
     this.numLights = 0;
     this.ambientLight = [0, 0, 0];
     this.lightRegistry = {};
     this.lightRegistryKeys = [];
+    this.lightPositions = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+    this.lightColors = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+
     this.textureRegistry = [];
     this.texCache = {};
     this.bufferRegistry = new BufferRegistry(gl);
@@ -231,29 +238,31 @@ WebGLRenderer.prototype.receive = function receive(path, commands) {
  * affect the rendering of all renderables.
  */
 WebGLRenderer.prototype.draw = function draw(renderState) {
-    var mesh, buffers, size, light, stride;
+    var mesh;
+    var buffers;
+    var size;
+    var light;
+    var stride;
 
     /**
      * Update lights
      */
-    var lightPositions = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-    var lightColors = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-    this.program.setUniforms(['u_NumLights'], [this.numLights]);
-    this.program.setUniforms(['u_AmbientLight'], [this.ambientLight]);
     for(var i = 0; i < this.lightRegistryKeys.length; i++) {
         light = this.lightRegistry[this.lightRegistryKeys[i]];
         stride = i * 4;
         // Build the light positions' 4x4 matrix
-        lightPositions[0 + stride] = light.position[0];
-        lightPositions[1 + stride] = light.position[1];
-        lightPositions[2 + stride] = light.position[2];
+        this.lightPositions[0 + stride] = light.position[0];
+        this.lightPositions[1 + stride] = light.position[1];
+        this.lightPositions[2 + stride] = light.position[2];
         // Build the light colors' 4x4 matrix
-        lightColors[0 + stride] = light.color[0];
-        lightColors[1 + stride] = light.color[1];
-        lightColors[2 + stride] = light.color[2];
+        this.lightColors[0 + stride] = light.color[0];
+        this.lightColors[1 + stride] = light.color[1];
+        this.lightColors[2 + stride] = light.color[2];
     }
-    this.program.setUniforms(['u_LightPosition'], [lightPositions]);
-    this.program.setUniforms(['u_LightColor'], [lightColors]);
+    this.program.setUniforms(['u_NumLights'], [this.numLights]);
+    this.program.setUniforms(['u_AmbientLight'], [this.ambientLight]);
+    this.program.setUniforms(['u_LightPosition'], [this.lightPositions]);
+    this.program.setUniforms(['u_LightColor'], [this.lightColors]);
 
     this.projectionTransform[11] = renderState.perspectiveTransform[11];
 
