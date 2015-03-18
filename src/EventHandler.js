@@ -3,12 +3,11 @@
 var CallbackStore = require('famous-utilities').CallbackStore;
 
 /**
+ * Component to handle general events.
+ *
  * @class EventHandler
- * @constructor
- * @component
- * @param {LocalDispatch}  Local Dispatch to be retrieved from corresponding Render Node of the EventHandler component
- * @param {Array} events array of event objects, each of which will have a listener registered on the corresponding Render Node of the Event Handler.  
- * Objects should be of the form {event: "eventname", callback: function}
+ * @param {LocalDispatch} dispatch The dispatch with which to register the handler.
+ * @param {Object[]} events An array of event objects specifying .event and .callback properties.
  */
 function EventHandler (dispatch, events) {
     this.dispatch = dispatch;
@@ -24,52 +23,48 @@ function EventHandler (dispatch, events) {
     }
 }
 
-/** 
-*
-* stringifies EventHandler
-*
-* @method
-* @return {String} the name of the Component Class: 'EventHandler'
-*/
-
+/**
+ * Returns the name of EventHandler as a string.
+ *
+ * @method toString
+ * @static
+ * @return {String} 'EventHandler'
+ */
 EventHandler.toString = function toString() {
     return 'EventHandler';
 };
 
-/** 
-*
-* Registers event using LocalDispatch of corresponding Render Node
-*
-* @method
-* @param {String} ev Value of a single 'event' key in events argument of constructor
-* @param {Function} callback value of 'callback' key in events argument of constructor
-*/
+/**
+ * Register a callback to be invoked on an event.
+ *
+ * @method on
+ * @param {String} ev The event name.
+ * @param {Function} cb The callback.
+ */
 EventHandler.prototype.on = function on (ev, cb) {
     this._events.on(ev, cb);
     this.dispatch.registerGlobalEvent(ev, this.trigger.bind(this, ev));
 };
 
-/** 
-*
-* Deregisters event using LocalDispatch of corresponding Render Node
-*
-* @method
-* @param {String} ev Value of a single 'event' key in events argument of constructor
-* @param {Function} callback value of 'callback' key in events argument of constructor
-*/
+/**
+ * Deregister a callback from an event.
+ *
+ * @method on
+ * @param {String} ev The event name.
+ * @param {Function} cb The callback.
+ */
 EventHandler.prototype.off = function off (ev, cb) {
     this._events.off(ev, cb);
     this.dispatch.deregisterGlobalEvent(ev, this.trigger.bind(this, ev))
 };
 
-/** 
-*
-* Triggers event
-*
-* @method
-* @param {String} ev event name
-* @param {Object} payload event response
-*/
+/**
+ * Trigger the callback associated with an event, passing in a payload.
+ *
+ * @method trigger
+ * @param {String} ev The event name.
+ * @param {Object} payload The event payload.
+ */
 EventHandler.prototype.trigger = function trigger (ev, payload) {
     this._events.trigger(ev, payload);
 };
