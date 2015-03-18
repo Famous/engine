@@ -43,6 +43,7 @@ function ConvexBodyFactory(hull) {
         }
 
         _computeInertiaProperties.call(this, T);
+        this.inverseInertia.copy(this.localInverseInertia);
         this.updateInertia();
     }
 
