@@ -22,10 +22,10 @@ var OBJLoader = {
  *
  * @method load
  *
- * @param {String} URL of desired obj
- * @param {Function} function to be fired upon successful formatting of obj
- * @param {Boolean} optional paramater specificing whether or not Famo.us should
- * calculate the normals for each face
+ * @param {String} url URL of desired obj
+ * @param {Function} cb Function to be fired upon successful formatting of obj
+ * @param {Object} options Options hash to that can affect the output of the OBJ
+ * vertices.
  */
 OBJLoader.load = function load(url, cb, options) {
     if (! this.cached[url]) {
