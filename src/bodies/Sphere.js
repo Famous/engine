@@ -19,7 +19,7 @@ function Sphere(options) {
     this.radius = r;
     this.size = [2*r, 2*r, 2*r];
     this.updateLocalInertia();
-    this.inverseInertia.copy(this.localInverseInertia);
+    this.updateInertia();
 
     this.type = 1 << 2;
 }

@@ -43,7 +43,7 @@ function ConvexBodyFactory(hull) {
         }
 
         _computeInertiaProperties.call(this, T);
-        this.inverseInertia.copy(this.localInverseInertia);
+        this.updateInertia();
     }
 
     ConvexBody.prototype = Object.create(Particle.prototype);
