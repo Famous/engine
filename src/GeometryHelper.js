@@ -326,6 +326,17 @@ GeometryHelper.normalizeAll = function normalizeAll(vertices, out) {
     return out;
 };
 
+/**
+ * Normalizes a set of vertices to model space.
+ *
+ * @static
+ * @method normalizeVertices
+ *
+ * @param {Array} vertices Vertices of all points on the geometry
+ * @param {Array} out Optional array to be filled with model space position vectors.
+ * 
+ * @return {Array} Output vertices.
+ */
 GeometryHelper.normalizeVertices = function normalizeVertices(vertices, out) {
     var out = out || [];
     var len = vertices.length / 3;
@@ -374,10 +385,32 @@ GeometryHelper.normalizeVertices = function normalizeVertices(vertices, out) {
     return out;
 };
 
+/**
+ * Determines translation amount for a given axis to normalize model coordinates.
+ *
+ * @method getTranslationFactor
+ * @private
+ *
+ * @param {Number} max Maximum position value of given axis on the model.
+ * @param {Number} min Minimum position value of given axis on the model.
+ *
+ * @return {Number} Number by which the given axis should be translated for all vertices.
+ */
 function getTranslationFactor(max, min) {
     return -(min + (max - min) / 2);
 }
 
+/**
+ * Determines scale amount for a given axis to normalize model coordinates.
+ *
+ * @method getScaleFactor
+ * @private
+ *
+ * @param {Number} max Maximum scale value of given axis on the model.
+ * @param {Number} min Minimum scale value of given axis on the model.
+ *
+ * @return {Number} Number by which the given axis should be scaled for all vertices.
+ */
 function getScaleFactor(max, min) {
     return 1 / ((max - min) / 2);
 }
