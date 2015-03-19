@@ -8,7 +8,7 @@ var Transitionable = require('famous-transitions').Transitionable;
  * @component
  * @param Optional options for setting the color at instantiation.
  */
-var Color = function Color() {
+function Color() {
     this._r = new Transitionable(0);
     this._g = new Transitionable(0);
     this._b = new Transitionable(0);
