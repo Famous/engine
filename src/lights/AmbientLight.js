@@ -14,7 +14,7 @@ var Light = require('./Light');
  * @param {LocalDispatch} dispatch LocalDispatch to be retrieved
  * from the corresponding Render Node
  */
-var AmbientLight = function AmbientLight(dispatch) {
+function AmbientLight(dispatch) {
     Light.call(this, dispatch);
 
     this.commands = {
