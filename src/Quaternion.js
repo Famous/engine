@@ -302,17 +302,17 @@ Quaternion.prototype.dot = function dot(q) {
 /**
  * Get the Mat33 matrix corresponding to the current Quaternion.
  *
- * @method getMatrix
+ * @method toMatrix
  * @return {Transform}
  */
-Quaternion.prototype.getMatrix = function getMatrix() {
+Quaternion.prototype.toMatrix = function toMatrix(output) {
     var w = this.w;
     var x = this.x;
     var y = this.y;
     var z = this.z;
 
     //LHC system flattened to row major
-    return new Matrix([
+    return output.set([
             1 - 2*y*y - 2*z*z, 2*x*y + 2*z*w, 2*x*z - 2*y*w,
             2*x*y - 2*z*w,1 - 2*x*x - 2*z*z, 2*y*z + 2*x*w,
             2*x*z + 2*y*w, 2*y*z - 2*x*w, 1 - 2*x*x - 2*y*y
