@@ -113,7 +113,7 @@ Transform.prototype._isIdentity = function _isIdentity() {
 };
 
 Transform.prototype._copyParent = function _copyParent(parentReport, parentMatrix) {
-    var report = parentReport;
+    var report = this._invalidated;
     if (parentReport) {
         this._previouslyInvalidated = parentReport;
         var counter = 0;
@@ -123,7 +123,8 @@ Transform.prototype._copyParent = function _copyParent(parentReport, parentMatri
             report >>>= 1;
         }
     }
-    return parentReport;
+    
+    return report;
 };
 
 /**
@@ -141,9 +142,9 @@ Transform.prototype._update = function _update(parentReport, parentMatrix) {
         this._previouslyInvalidated = 0;
         return 0;
     }
-    if (this._isIdentity()) return this._copyParent(parentReport, parentMatrix);
     if (parentReport) this._invalidateFromParent(parentReport);
     if (!parentMatrix) parentMatrix = IDENTITY;
+    if (this._isIdentity()) return this._copyParent(parentReport, parentMatrix);
     var update;
     var counter = 0;
     var invalidated = this._invalidated;
