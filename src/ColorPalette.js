@@ -10,7 +10,7 @@ var Color = require('./Color');
  * @name ColorPalettes
  * @constructor
  */
-var ColorPalette = function ColorPalette() {
+function ColorPalette() {
     this._palette = [];
     var options = Color.flattenArguments(arguments);
     (options.length) ? this.makePalette(options) : this.setRandomPalette();
