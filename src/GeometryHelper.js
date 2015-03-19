@@ -327,6 +327,95 @@ GeometryHelper.normalizeAll = function normalizeAll(vertices, out) {
 };
 
 /**
+ * Normalizes a set of vertices to model space.
+ *
+ * @static
+ * @method normalizeVertices
+ *
+ * @param {Array} vertices Vertices of all points on the geometry
+ * @param {Array} out Optional array to be filled with model space position vectors.
+ * 
+ * @return {Array} Output vertices.
+ */
+GeometryHelper.normalizeVertices = function normalizeVertices(vertices, out) {
+    var out = out || [];
+    var len = vertices.length / 3;
+    var vectors = [];
+    var minX;
+    var maxX;
+    var minY;
+    var maxY;
+    var minZ;
+    var maxZ;
+    var v;
+
+    for (var i = 0; i < len; i++) {
+        v = vectors[i] = new Vec3(
+            vertices[i * 3],
+            vertices[i * 3 + 1],
+            vertices[i * 3 + 2]
+        );
+
+        if (minX == null || v.x < minX) minX = v.x;
+        if (maxX == null || v.x > maxX) maxX = v.x;
+
+        if (minY == null || v.y < minY) minY = v.y;
+        if (maxY == null || v.y > maxY) maxY = v.y;
+
+        if (minZ == null || v.z < minZ) minZ = v.z;
+        if (maxZ == null || v.z > maxZ) maxZ = v.z;
+    };
+
+    var translation = new Vec3(
+        getTranslationFactor(maxX, minX),
+        getTranslationFactor(maxY, minY),
+        getTranslationFactor(maxZ, minZ)
+    );
+
+    var scale = Math.min(
+        getScaleFactor(maxX + translation.x, minX + translation.x),
+        getScaleFactor(maxY + translation.y, minY + translation.y),
+        getScaleFactor(maxZ + translation.z, minZ + translation.z)
+    );
+
+    for (var i = 0; i < vectors.length; i++) {
+        out.push.apply(out, vectors[i].add(translation).scale(scale).toArray());
+    }
+
+    return out;
+};
+
+/**
+ * Determines translation amount for a given axis to normalize model coordinates.
+ *
+ * @method getTranslationFactor
+ * @private
+ *
+ * @param {Number} max Maximum position value of given axis on the model.
+ * @param {Number} min Minimum position value of given axis on the model.
+ *
+ * @return {Number} Number by which the given axis should be translated for all vertices.
+ */
+function getTranslationFactor(max, min) {
+    return -(min + (max - min) / 2);
+}
+
+/**
+ * Determines scale amount for a given axis to normalize model coordinates.
+ *
+ * @method getScaleFactor
+ * @private
+ *
+ * @param {Number} max Maximum scale value of given axis on the model.
+ * @param {Number} min Minimum scale value of given axis on the model.
+ *
+ * @return {Number} Number by which the given axis should be scaled for all vertices.
+ */
+function getScaleFactor(max, min) {
+    return 1 / ((max - min) / 2);
+}
+
+/**
  * Finds the azimuth, or angle above the XY plane, of a given vector.
  *
  * @static
