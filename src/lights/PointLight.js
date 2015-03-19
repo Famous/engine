@@ -12,7 +12,7 @@ var Light = require('./Light');
  * @param {LocalDispatch} dispatch LocalDispatch to be retrieved
  * from the corresponding Render Node
  */
-var PointLight = function PointLight(dispatch) {
+function PointLight(dispatch) {
     Light.call(this, dispatch);
 
     this.commands = {
