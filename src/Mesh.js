@@ -249,8 +249,9 @@ Mesh.prototype.clean = function clean() {
 * setBaseColor('#000000', option)
 * setBaseColor('black', option)
 * setBaseColor(Color)
+*
 * @method setBaseColor
-* @param {Object, Array} Material, image, or vec3
+* @param {Object|Array} Material, image, or vec3
 * @param {number} r Used to set the r value of Color
 * @param {number} g Used to set the g value of Color
 * @param {number} b Used to set the b value of Color
@@ -328,7 +329,7 @@ Mesh.prototype.getFlatShading = function getFlatShading() {
  * @method normal
  * @chainable
  *
- * @param {Object, Array} Material, Image or vec3
+ * @param {Object|Array} Material, Image or vec3
  * @return {Element} current Mesh
  */
 Mesh.prototype.setNormals = function setNormals(materialExpression) {
