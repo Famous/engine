@@ -423,9 +423,6 @@ WebGLRenderer.prototype.drawBuffers = function drawBuffers(vertexBuffers, mode, 
                 this.state.boundElementBuffer = buffer;
             }
 
-            gl.cullFace(gl.FRONT);
-            gl.drawElements(mode, length, gl.UNSIGNED_SHORT, 2 * offset);
-            gl.cullFace(gl.BACK);
             gl.drawElements(mode, length, gl.UNSIGNED_SHORT, 2 * offset);
         }
         else {
