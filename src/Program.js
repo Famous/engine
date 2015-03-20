@@ -92,7 +92,7 @@ var header = 'precision mediump float;\n';
  * @class Program
  * @constructor
  *
- * @param {WebGL Context} gl Context to be used to create the shader program.
+ * @param {WebGL_Context} gl Context to be used to create the shader program.
  */
 
 function Program(gl) {
@@ -286,7 +286,7 @@ Program.prototype.resetProgram = function resetProgram() {
  * @method uniformIsCached
  *
  * @param {String} targetName Key of uniform spec being evaluated.
- * @param {Number | Array} value Value of uniform spec being evaluated.
+ * @param {Number|Array} value Value of uniform spec being evaluated.
  * @return {Boolean} Value indicating whether the uniform being set
  * is cached.
  */
