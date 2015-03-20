@@ -16,7 +16,7 @@ function Constraint(options) {
 };
 
 /**
- * Decorates the Constraint with the options object. Sets source and targets if applicable.
+ * Decorates the Constraint with the options object.
  *
  * @method setOptions
  * @param {Object} Options
@@ -38,8 +38,8 @@ Constraint.prototype.init = function init(options) {};
  * Detect violations of the constraint. Warm start the constraint, if possible.
  *
  * @method update
- * @param {Number} time
- * @param {Number} dt delta time
+ * @param {Number} time The current time in the physics engine.
+ * @param {Number} dt The physics engine frame delta.
  */
 Constraint.prototype.update = function update(time, dt) {}
 
@@ -47,8 +47,8 @@ Constraint.prototype.update = function update(time, dt) {}
  * Apply impulses to resolve the constraint.
  *
  * @method resolve
- * @param {Number} time
- * @param {Number} dt delta time
+ * @param {Number} time The current time in the physics engine.
+ * @param {Number} dt The physics engine frame delta.
  */
 Constraint.prototype.resolve = function resolve(time, dt) {}
 

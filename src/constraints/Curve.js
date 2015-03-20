@@ -61,8 +61,8 @@ Curve.prototype.init = function(options) {
  * Warmstart the constraint and prepare calculations used in the .resolve step.
  *
  * @method update
- * @param dt {Number} time
- * @param dt {Number} dt
+ * @param {Number} time The current time in the physics engine.
+ * @param {Number} dt The physics engine frame delta.
  */
 Curve.prototype.update = function update(time, dt) {
     var targets = this.targets;
@@ -142,8 +142,8 @@ Curve.prototype.update = function update(time, dt) {
  * Adds a curve impulse to a physics body.
  *
  * @method resolve
- * @param dt {Number} time
- * @param dt {Number} dt
+ * @param {Number} time The current time in the physics engine.
+ * @param {Number} dt The physics engine frame delta.
  */
 Curve.prototype.resolve = function resolve(time, dt) {
     var targets = this.targets;

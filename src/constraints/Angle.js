@@ -47,8 +47,8 @@ Angle.prototype.init = function(options) {
  * Warmstart the constraint and prepare calculations used in .resolve.
  *
  * @method update
- * @param {Number} time
- * @param {Number} dt
+ * @param {Number} time The current time in the physics engine.
+ * @param {Number} dt The physics engine frame delta.
  */
 Angle.prototype.update = function update(time, dt) {
     var a = this.a;
@@ -76,8 +76,8 @@ Angle.prototype.update = function update(time, dt) {
  * Adds an angular impulse to a physics body's angular velocity.
  *
  * @method resolve
- * @param {Number} time
- * @param {Number} dt
+ * @param {Number} time The current time in the physics engine.
+ * @param {Number} dt The physics engine frame delta.
  */
 Angle.prototype.resolve = function update(time, dt) {
     var a = this.a;

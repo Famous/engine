@@ -55,12 +55,12 @@ function PhysicsEngine(options) {
     this.prestep = [];
     this.poststep = [];
 
-    this.transformBuffer = {
+    this.frameDependent = options.frameDependent || false;
+
+    this.transformBuffers = {
         position: [0, 0, 0],
         rotation: [0, 0, 0]
     };
-
-    this.frameDependent = options.frameDependent || false;
 }
 
 /**
@@ -315,11 +315,14 @@ PhysicsEngine.prototype.update = function update(time) {
  * Get the transform equivalent to the Particle's position and orientation.
  *
  * @method getTransform
- * @return {Transform}
+ * @return {Object} Position and rotation of the boy, taking into account
+ * the origin and orientation of the world.
  */
 PhysicsEngine.prototype.getTransform = function getTransform(body) {
     var o = this.origin;
     var oq = this.orientation;
+    var transform = this.transformBuffers;
+
     var p = body.position;
     var q = body.orientation;
     var rot = q;
@@ -330,18 +333,17 @@ PhysicsEngine.prototype.getTransform = function getTransform(body) {
         rot = Quaternion.multiply(q, oq, QUAT_REGISTER)
         loc = oq.rotateVector(p, VEC_REGISTER);
     }
-    
-    XYZ = rot.toEulerXYZ(XYZ_REGISTER);
+    var XYZ = rot.toEulerXYZ(XYZ_REGISTER);
 
-    this.transformBuffer.position[0] = o.x+loc.x;
-    this.transformBuffer.position[1] = o.y+loc.y;
-    this.transformBuffer.position[2] = o.z+loc.z;
+    transform.position[0] = o.x+loc.x;
+    transform.position[1] = o.y+loc.y;
+    transform.position[2] = o.z+loc.z;
 
-    this.transformBuffer.rotation[0] = XYZ.x;
-    this.transformBuffer.rotation[1] = XYZ.y;
-    this.transformBuffer.rotation[2] = XYZ.z;
+    transform.rotation[0] = XYZ.x;
+    transform.rotation[1] = XYZ.y;
+    transform.rotation[2] = XYZ.z;
 
-    return this.transformBuffer;
+    return transform;
 };
 
 /**
@@ -386,8 +388,8 @@ function _integratePose(body, dt) {
         if (restrictions & 2) ay = 0;
         if (restrictions & 1) az = 0;
 
-        body.setVelocity(x,y,z);
-        body.setAngularVelocity(ax, ay, az);
+        if (x !== null || y !== null || z !== null) body.setVelocity(x,y,z);
+        if (ax !== null || ay !== null || az !== null) body.setAngularVelocity(ax, ay, az);
     }
 
     body.position.add(Vec3.scale(body.velocity, dt, DELTA_REGISTER));
@@ -410,6 +412,8 @@ function _integratePose(body, dt) {
     q.z += (wz * qw + wx * qy - wy * qx) * hdt;
 
     q.normalize();
+
+    body.updateInertia();
 };
 
 module.exports = PhysicsEngine;

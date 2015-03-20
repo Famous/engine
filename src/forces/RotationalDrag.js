@@ -59,8 +59,8 @@ RotationalDrag.prototype.init = function init(options) {
  * Adds a rotational drag force to a physics body's torque accumulator.
  *
  * @method update
- * @param {Number} time
- * @param {Number} dt
+ * @param {Number} time The current time in the physics engine.
+ * @param {Number} dt The physics engine frame delta.
  */
 RotationalDrag.prototype.update = function update(time, dt) {
     var targets = this.targets;
@@ -75,7 +75,6 @@ RotationalDrag.prototype.update = function update(time, dt) {
         var omega = target.angularVelocity;
         var magnitude = -strength * type(omega);
         Vec3.scale(omega, magnitude < -max ? -max : magnitude, torque);
-        torque.applyMatrix(target.inertia);
         target.applyTorque(torque);
     }
 };

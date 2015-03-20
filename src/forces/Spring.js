@@ -63,22 +63,15 @@ Spring.prototype.init = function(options) {
     this.length = this.length || 0;
     this.type = this.type || Spring.HOOKE;
     this.maxLength = this.maxLength || Infinity;
-
-    if (options.stiffness) {
+    if (options.stiffness || options.damping) {
+        this.stiffness = this.stiffness || 100;
         this.damping = this.damping || 0;
         this.period = null;
         this.dampingRatio = null;
     }
-    else if (options.period || options.dampingRatio) {
-        this.dampingRatio = this.dampingRatio || 0;
-
-        this.stiffness = 2 * PI / this.period;
-        this.stiffness *= this.stiffness;
-        this.damping = 4 * PI * this.dampingRatio / this.period;
-    }
     else {
-        this.period = 1;
-        this.dampingRatio = 0;
+        this.period = this.period || 1;
+        this.dampingRatio = this.dampingRatio || 0;
 
         this.stiffness = 2 * PI / this.period;
         this.stiffness *= this.stiffness;
@@ -90,8 +83,8 @@ Spring.prototype.init = function(options) {
  * Apply the force.
  *
  * @method update
- * @param {Number} time
- * @param {Number} dt
+ * @param {Number} time The current time in the physics engine.
+ * @param {Number} dt The physics engine frame delta.
  */
 Spring.prototype.update = function(time, dt) {
     var source = this.source;
@@ -118,14 +111,14 @@ Spring.prototype.update = function(time, dt) {
         if (Math.abs(stretch) < 1e-6) continue;
 
         var effMass = 1 / (target.inverseMass + invSourceMass);
-        if (this.period) {
+        if (this.period !== null) {
             stiffness *= effMass;
             damping *= effMass;
         }
 
         force.scale(stiffness * type(stretch, maxLength) / stretch);
 
-        if (damping) {
+        if (damping !== 0) {
             if (source) {
                 force.add(Vec3.subtract(target.velocity, source.velocity, dampingForce).scale(-damping));
             }

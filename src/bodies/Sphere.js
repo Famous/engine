@@ -18,7 +18,8 @@ function Sphere(options) {
     var r  = options.radius || 1;
     this.radius = r;
     this.size = [2*r, 2*r, 2*r];
-    this.updateInertia();
+    this.updateLocalInertia();
+    this.inverseInertia.copy(this.localInverseInertia);
 
     this.type = 1 << 2;
 }
@@ -55,19 +56,19 @@ Sphere.prototype.setRadius = function setRadius(radius) {
  * @override
  * @method updateInertia
  */
-Sphere.prototype.updateInertia = function updateInertia() {
+Sphere.prototype.updateLocalInertia = function updateInertia() {
     var m = this.mass;
     var r = this.radius;
 
     var mrr = m * r * r;
 
-    this.inertia.set([
+    this.localInertia.set([
         0.4 * mrr, 0, 0,
         0, 0.4 * mrr, 0,
         0, 0, 0.4 * mrr
     ]);
 
-    this.inverseInertia.set([
+    this.localInverseInertia.set([
         2.5 / mrr, 0, 0,
         0, 2.5 / mrr, 0,
         0, 0, 2.5 / mrr
