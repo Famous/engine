@@ -1,6 +1,6 @@
 {
   "name": "famous-transitions",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Famous Transitions",
   "main": "src/index.js",
   "scripts": {
