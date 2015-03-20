@@ -128,7 +128,7 @@ GestureHandler.prototype.triggerGestures = function() {
                 if (payload.points === 2) this.trigger(gesture, payload);
                 break;
             case 'tap':
-                if (payload.status !== 'move') {
+                if (payload.status === 'start') {
                     if (this.options['tap']) {
                         var pts = this.options['tap'].points || 1;
                         if(this.multiTap >= pts && payload.points >= pts) this.trigger(gesture, payload);
