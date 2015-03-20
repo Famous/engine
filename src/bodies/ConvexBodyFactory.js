@@ -13,7 +13,7 @@ var TEMP_REGISTER = new Vec3();
  *
  * @method ConvexBodyFactory
  * @param {ConvexHull | Vec3[]} hull
- * @return {Function}
+ * @return {Function} The constructor.
  */
 function ConvexBodyFactory(hull) {
     if (!(hull instanceof ConvexHull)) {
@@ -21,6 +21,12 @@ function ConvexBodyFactory(hull) {
         else hull = new ConvexHull(hull);
     }
 
+    /**
+     * The body class with inertia and vertices inferred from the input ConvexHull or Vec3 array.
+     *
+     * @class ConvexBody
+     * @param {Object} options The options hash.
+     */
     function ConvexBody(options) {
         Particle.call(this, options);
 
@@ -50,6 +56,15 @@ function ConvexBodyFactory(hull) {
     ConvexBody.prototype = Object.create(Particle.prototype);
     ConvexBody.prototype.constructor = ConvexBody;
 
+    /**
+     * Set the size and recalculate
+     *
+     * @method setSize
+     * @chainable
+     * @param {Number} x The x span.
+     * @param {Number} y The y span.
+     * @param {Number} z The z span.
+     */
     ConvexBody.prototype.setSize = function setSize(x,y,z) {
         var originalSize = hull.polyhedralProperties.size;
 
@@ -69,8 +84,16 @@ function ConvexBodyFactory(hull) {
         for (var i = 0, len = hull.vertices.length; i < len; i++) {
             T.vectorMultiply(hull.vertices[i], vertices[i]);
         }
+
+        return this;
     };
 
+    /**
+     * Update the local inertia and inverse inertia to reflect the current size.
+     *
+     * @method updateLocalInertia
+     * @chainable
+     */
     ConvexBody.prototype.updateLocalInertia = function updateInertia() {
         var scaleX = this._scale[0];
         var scaleY = this._scale[1];
@@ -79,8 +102,16 @@ function ConvexBodyFactory(hull) {
         var T = new Mat33([scaleX, 0, 0, 0, scaleY, 0, 0, 0, scaleZ]);
 
         _computeInertiaProperties.call(this, T);
+
+        return this;
     };
 
+    /**
+     * Retrieve the vertex furthest in a direction. Used internally for collision detection.
+     *
+     * @method support
+     * @return {Vec3} The furthest vertex.
+     */
     ConvexBody.prototype.support = function support(direction) {
         var vertices = this.vertices;
         var max = -Infinity;
@@ -95,6 +126,12 @@ function ConvexBodyFactory(hull) {
         return furthest;
     };
 
+    /**
+     * Update vertices to reflect current orientation.
+     *
+     * @method updateShape
+     * @chainable
+     */
     ConvexBody.prototype.updateShape = function updateShape() {
         var vertices = this.vertices;
         var q = this.orientation;
@@ -112,6 +149,8 @@ function ConvexBodyFactory(hull) {
             t.z *= scaleZ;
             Vec3.applyRotation(t, q, vertices[i]);
         }
+
+        return this;
     };
 
     return ConvexBody;
@@ -122,10 +161,7 @@ function ConvexBodyFactory(hull) {
  *
  * @method _computeInertiaProperties
  * @private
- * @param {Object} polyhedralProperties
- * @param {Object} options
- * @param {Mat33} T
- * @return {Object}
+ * @param {Mat33} T The matrix transforming the intial set of vertices to a set reflecting the body size.
  */
 function _computeInertiaProperties(T) {
     var polyhedralProperties = this.hull.polyhedralProperties;
