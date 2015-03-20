@@ -2,10 +2,9 @@
 
 var Channel = require('./Channel');
 
-function Spec () {
-    this._backing = {
-        changes: []
-    };
+function Spec (schema) {
+    this._backing = schema ? schema : {};
+    this._hasSchema = !!schema;
 };
 
 Spec.EMPTY = {};

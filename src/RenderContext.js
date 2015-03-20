@@ -8,6 +8,8 @@ var Opacity = require('./Opacity');
 var CallbackStore = require('famous-utilities').CallbackStore;
 var Size = require('./Size');
 
+var Spec = require('./RenderSpec');
+
 var CHANGE = 'change';
 var TRANSFORM = 'transform';
 var SIZE = 'size';
@@ -15,6 +17,11 @@ var ORIGIN = 'origin';
 var OPACITY = 'opacity';
 
 function RenderContext (dispatch) {
+    this._internalSpec = new Spec.Internal();
+    this._internalReport = new Spec.Internal.Report();
+    this._externalSpec = new Spec.External();
+    this._externalReport = new Spec.External.Report();
+
     this._origin = new Origin(this);
     this._opacity = new Opacity(this);
     this._mountPoint = new MountPoint(this);
@@ -76,6 +83,110 @@ RenderContext.prototype.onOpacityChange = function onOpacityChange (cb) {
 RenderContext.prototype.offOpacityChange = function offOpacityChange (cb) {
     this._events.off(OPACITY, cb);
     return this;
+};
+
+//
+
+RenderContext.prototype.mount = function mount () {
+    this._internalSpec.mounted = true;
+};
+
+RenderContext.prototype.dismount = function dismount () {
+    this._internalSpec.mounted = false;
+};
+
+RenderContext.prototype.setOpacity = function setOpacity (val) {
+    if (val > 1) this._internalSpec.opacity = 1;
+    else if (val < 0) this._internalSpec.opacity = 0;
+    else this._internalSpec.opacity = val;
+};
+
+RenderContext.prototype.setAlign = function setAlign (x, y, z) {
+    if (!this._internalSpec.location.align)
+        this._internalSpec.location.align = [0, 0, 0];
+    if (x != null) {
+        if (x > 1) this._internalSpec.location.align[0] = 1;
+        else if (x < 0) this._internalSpec.location.align[0] = 0;
+        else this._internalSpec.location.align[0] = x;
+    }
+    if (y != null) {
+        if (y > 1) this._internalSpec.location.align[1] = 1;
+        else if (y < 0) this._internalSpec.location.align[1] = 0;
+        else this._internalSpec.location.align[1] = y;
+    }
+    if (z != null) {
+        if (z > 1) this._internalSpec.location.align[2] = 1;
+        else if (z < 0) this._internalSpec.location.align[2] = 0;
+        else this._internalSpec.location.align[2] = z;
+    }
+};
+
+RenderContext.prototype.setMountPoint = function setMountPoint (x, y, z) {
+    if (!this._internalSpec.location.mountPoint) 
+        this._internalSpec.location.mountPoint = [0, 0, 0];
+    if (x != null) {
+        if (x > 1) this._internalSpec.location.mountPoint[0] = 1;
+        else if (x < 0) this._internalSpec.location.mountPoint[0] = 0;
+        else this._internalSpec.location.mountPoint[0] = x;
+    }
+    if (y != null) {
+        if (y > 1) this._internalSpec.location.mountPoint[1] = 1;
+        else if (y < 0) this._internalSpec.location.mountPoint[1] = 0;
+        else this._internalSpec.location.mountPoint[1] = y;
+    }
+    if (z != null) {
+        if (z > 1) this._internalSpec.location.mountPoint[2] = 1;
+        else if (z < 0) this._internalSpec.location.mountPoint[2] = 0;
+        else this._internalSpec.location.mountPoint[2] = z;
+    }
+};
+
+RenderContext.prototype.setPosition = function setPosition (x, y, z) {
+    if (x != null) this._internalSpec.location.position[0] = x;
+    if (y != null) this._internalSpec.location.position[1] = y;
+    if (z != null) this._internalSpec.location.position[2] = z;
+};
+
+RenderContext.prototype.setRotation = function setRotation (x, y, z) {
+    if (x != null) this._internalSpec.location.rotation[0] = x;
+    if (y != null) this._internalSpec.location.rotation[1] = y;
+    if (z != null) this._internalSpec.location.rotation[2] = z;
+};
+
+RenderContext.prototype.setScale = function setScale (x, y, z) {
+    if (x != null) this._internalSpec.location.scale[0] = x;
+    if (y != null) this._internalSpec.location.scale[1] = y;
+    if (z != null) this._internalSpec.location.scale[2] = z;
+};
+
+RenderContext.prototype.setProportionalSize = function setProportionalSize (x, y, z) {
+    if (x != null) {
+        if (x > 1) this._internalSpec.size.proportional[0] = 1;
+        else if (x < 0) this._internalSpec.size.proportional[0] = 0;
+        else this._internalSpec.size.proportional[0] = x;
+    }
+    if (y != null) {
+        if (y > 1) this._internalSpec.size.proportional[1] = 1;
+        else if (y < 0) this._internalSpec.size.proportional[1] = 0;
+        else this._internalSpec.size.proportional[1] = y;
+    }
+    if (z != null) {
+        if (z > 1) this._internalSpec.size.proportional[2] = 1;
+        else if (z < 0) this._internalSpec.size.proportional[2] = 0;
+        else this._internalSpec.size.proportional[2] = z;
+    }
+};
+
+RenderContext.prototype.setDifferentialSize = function setDifferentialSize (x, y, z) {
+    if (x != null) this._internalSpec.size.differential[0] = x;
+    if (y != null) this._internalSpec.size.differential[1] = y;
+    if (z != null) this._internalSpec.size.differential[2] = z;
+};
+
+RenderContext.prototype.setAbsoluteSize = function setAbsoluteSize (x, y, z) {
+    if (x != null) this._internalSpec.size.absolute[0] = x;
+    if (y != null) this._internalSpec.size.absolute[1] = y;
+    if (z != null) this._internalSpec.size.absolute[2] = z;
 };
 
 RenderContext.prototype.setOpacity = function setOpacity (opacity) {
@@ -141,6 +252,10 @@ var identSize = new Float32Array([0, 0, 0]);
 var identTrans = new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
 
 RenderContext.prototype.update = function update (parentContext) {
+
+
+
+
     var sizeInvalidations;
 
     if (this._recalcAll || (!this._noParent && !parentContext)) {
@@ -212,5 +327,15 @@ RenderContext.prototype.update = function update (parentContext) {
 
     return this;
 };
+
+
+
+function update (parentReport, parentContext) {
+    var parentMountChanged = parentMountState(parentReport);
+    if (parentMountChanged)
+
+
+}
+
 
 module.exports = RenderContext;
