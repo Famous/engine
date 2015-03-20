@@ -249,7 +249,7 @@ HTMLElement.prototype.id = function id(value) {
  * @method content
  * @chainable
  *
- * @param {String | DOM element | Document Fragment} value content to be inserted into the DOM element
+ * @param {String|DOMElement|DocumentFragment} value content to be inserted into the DOM element
  * @return {HTMLElement} current HTMLElement
  */
 HTMLElement.prototype.content = function content(value) {
