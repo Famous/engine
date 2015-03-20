@@ -5,7 +5,7 @@
  * literal.
  *
  * @method strip
- * 
+ * @memberof Utilities
  * @param  {any}        primitive or (non-)serializable object without
  *                      circular references
  * @return {any}        primitive or (nested) object only containing primitive
