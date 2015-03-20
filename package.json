@@ -1,6 +1,6 @@
 {
   "name": "famous-webgl-renderables",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Famous WebGL renderables",
   "main": "src/index.js",
   "scripts": {
@@ -35,7 +35,7 @@
     "watchify": "^2.1.1"
   },
   "dependencies": {
-    "famous-utilities": "git+ssh://git@github.famo.us/platform/utilities#master",
-    "famous-webgl-geometries": "git+ssh://git@github.famo.us/platform/webgl-geometries#master"
+    "famous-utilities": "git+ssh://git@github.famo.us/platform/utilities#v0.1.0",
+    "famous-webgl-geometries": "git+ssh://git@github.famo.us/platform/webgl-geometries#v0.1.0"
   }
 }
