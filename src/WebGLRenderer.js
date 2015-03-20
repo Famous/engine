@@ -6,6 +6,7 @@ var Buffer = require('./Buffer');
 var BufferRegistry = require('./BufferRegistry');
 var checkers = require('./Checkerboard');
 var Plane = require('famous-webgl-geometries').Plane;
+var sorter = require('./radixSort');
 
 var identity = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
 
@@ -289,21 +290,8 @@ WebGLRenderer.prototype.draw = function draw(renderState) {
     this.program.setUniforms(['perspective', 'time', 'view'], [this.projectionTransform, Date.now()  % 100000 / 1000, renderState.viewTransform]);
     var keys = this.meshRegistryKeys;
     var registry = this.meshRegistry;
-    
-    this.meshRegistryKeys = keys.sort(function (a, b) {
-        var meshA = registry[a];
-        var meshB = registry[b];
-        var opacityA = meshA.uniformValues[0];
-        var opacityB = meshB.uniformValues[0];
-        var depthA = meshA.uniformValues[1][14];
-        var depthB = meshB.uniformValues[1][14];
 
-        //both trans: back to front
-        if (opacityA < 1 && opacityB < 1) 
-            return depthA - depthB;
-        else
-            return opacityB - opacityA;
-    });
+    this.meshRegistryKeys = sorter(keys, registry);
 
     for (var i = 0, len = this.cutoutRegistryKeys.length; i < len; i++) {
         cutout = this.cutoutRegistry[this.cutoutRegistryKeys[i]];
@@ -435,6 +423,9 @@ WebGLRenderer.prototype.drawBuffers = function drawBuffers(vertexBuffers, mode, 
                 this.state.boundElementBuffer = buffer;
             }
 
+            gl.cullFace(gl.FRONT);
+            gl.drawElements(mode, length, gl.UNSIGNED_SHORT, 2 * offset);
+            gl.cullFace(gl.BACK);
             gl.drawElements(mode, length, gl.UNSIGNED_SHORT, 2 * offset);
         }
         else {
