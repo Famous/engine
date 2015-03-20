@@ -16,7 +16,7 @@ else {
 if (typeof document !== 'undefined') {
     var VENDOR_HIDDEN, VENDOR_VISIBILITY_CHANGE;
 
-    if (typeof document.hidden !== 'undefined') { // Opera 12.10 and Firefox 18 and later support 
+    if (typeof document.hidden !== 'undefined') { // Opera 12.10 and Firefox 18 and later support
         VENDOR_HIDDEN = 'hidden';
         VENDOR_VISIBILITY_CHANGE = 'visibilitychange';
     }
@@ -44,6 +44,7 @@ function Engine() {
     this._sleep = 0;
     this._startOnVisibilityChange = true;
     this.start();
+    rAF(this.looper);
 
     if (typeof document !== 'undefined') {
         var _this = this;
@@ -66,7 +67,6 @@ Engine.prototype.start = function start() {
     this._startOnVisibilityChange = true;
     this._running = true;
     this._sleep += _now() - this._stoppedAt;
-    rAF(this.looper);
     return this;
 };
 
