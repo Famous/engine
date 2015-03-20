@@ -1,6 +1,6 @@
 {
   "name": "famous-utilities",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Famous Utilities",
   "main": "src/index.js",
   "scripts": {
@@ -18,7 +18,7 @@
   },
   "homepage": "https://github.com/Famous/utilities",
   "dependencies": {
-      "famous-transitions": "git+ssh://git@github.famo.us/platform/transitions#master"
+      "famous-transitions": "git+ssh://git@github.famo.us/platform/transitions#v0.1.0"
   },
   "devDependencies": {
     "jshint": "^2.5.11",
