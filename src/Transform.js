@@ -36,13 +36,14 @@ var DEPENDENTS = {
 };
 
 /**
- * Transform is a component that is part of every Entity.  It is
- *   responsible for updating it's own notion of position in space and
- *   incorporating that with parent information.
+ * Transform is an object that is part of every RenderContext, Align and its
+ * derivatives Origin and MountPoint.
+ * It is responsible for updating its own notion of position in space and
+ * incorporating its parent information.
  *
  * @class Transform
- * @component
  * @constructor
+ * @private
  */
 function Transform() {
     this._matrix = new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
@@ -55,9 +56,9 @@ function Transform() {
     this._invalidated = 0;
     this._previouslyInvalidated = 0;
 
-    //precalculated values for validators
+    // precalculated values for validators
     this._precalculated = new Float32Array(9);
-    //track what transformations were applied: [scale x, scale y, scale z, rotation x, rotaion y, rotation z]
+    // track what transformations were applied: [scale x, scale y, scale z, rotation x, rotaion y, rotation z]
     this._tracktransforms = [false, false, false, false, false, false];
 }
 
@@ -67,7 +68,8 @@ function Transform() {
  *
  * @method getGlobalMatrix
  *
- * @return {Float32 Array} representation of this Transform being applied to it's parent
+ * @return {Float32Array}   representation of this Transform being applied to
+ *                          it's parent
  */
 Transform.prototype.getGlobalMatrix = function getGlobalMatrix() {
     return this._matrix;
@@ -111,7 +113,7 @@ Transform.prototype._isIdentity = function _isIdentity() {
 };
 
 Transform.prototype._copyParent = function _copyParent(parentReport, parentMatrix) {
-    var report = parentReport;
+    var report = this._invalidated;
     if (parentReport) {
         this._previouslyInvalidated = parentReport;
         var counter = 0;
@@ -121,7 +123,8 @@ Transform.prototype._copyParent = function _copyParent(parentReport, parentMatri
             report >>>= 1;
         }
     }
-    return parentReport;
+    
+    return report;
 };
 
 /**
@@ -139,9 +142,9 @@ Transform.prototype._update = function _update(parentReport, parentMatrix) {
         this._previouslyInvalidated = 0;
         return 0;
     }
-    if (this._isIdentity()) return this._copyParent(parentReport, parentMatrix);
     if (parentReport) this._invalidateFromParent(parentReport);
     if (!parentMatrix) parentMatrix = IDENTITY;
+    if (this._isIdentity()) return this._copyParent(parentReport, parentMatrix);
     var update;
     var counter = 0;
     var invalidated = this._invalidated;
@@ -181,7 +184,6 @@ Transform.prototype._update = function _update(parentReport, parentMatrix) {
 Transform.prototype.translate = function translate(x, y, z) {
     var translation = this._vectors.translation;
     var dirty = false;
-    var size;
 
     if (x) {
         translation[0] += x;
@@ -265,7 +267,6 @@ Transform.prototype.scale = function scale(x, y, z) {
 Transform.prototype.setTranslation = function setTranslation(x, y, z) {
     var translation = this._vectors.translation;
     var dirty = false;
-    var size;
 
     if (x !== translation[0] && x != null) {
         translation[0] = x;
@@ -471,7 +472,6 @@ Transform.prototype._precalculatedSetDefault = function _precalculatedSetDefault
 };
 
 Transform.prototype._precalculateTrMatrix = function _precalculateTrMatrix() {
-
     var tracktransforms = this._tracktransforms;
     
     //rotation should go before scale checks

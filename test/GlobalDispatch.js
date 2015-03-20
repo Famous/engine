@@ -62,23 +62,4 @@ test('GlobalDispatch', function(t) {
         var testEvent = {};
         t.equal(globalDispatch.emit('testEvent', testEvent), globalDispatch, 'globalDispatch.emit should be chainable');
     });
-
-    t.test('message method', function(t) {
-        t.plan(1);
-        var globalDispatch = new GlobalDispatch();
-        t.equal(typeof globalDispatch.message, 'function', 'globalDispatch.message should be a function');
-    });
-
-    t.test('getMessages method', function(t) {
-        t.plan(2);
-        var globalDispatch = new GlobalDispatch();
-        t.equal(typeof globalDispatch.getMessages, 'function', 'globalDispatch.getMessages should be a function');
-
-        var messages = ['this', 'is', 'a', 'test'];
-        messages.forEach(function(message) {
-            globalDispatch.message(message);
-        });
-
-        t.deepEqual(globalDispatch.getMessages(), messages);
-    });
 });
