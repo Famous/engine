@@ -60,6 +60,7 @@ Transitionable.prototype._loadNext = function _loadNext() {
         var callback = this._callback;
         this._callback = null;
         callback();
+        return;
     }
     if (this._transitionQueue.length === 0) {
         this.set(this.get()); // no update required
