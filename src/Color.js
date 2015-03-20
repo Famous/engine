@@ -885,12 +885,7 @@ var colorNames = {
  * @returns A flattened array
  */
 Color.flattenArguments = function flattenArguments(options) {
-    var result = [];
-    function flatten(item) {
-        return Array.isArray(item) ? item.forEach(flatten) : result.push(item);
-    }
-    options.forEach(flatten);
-    return result;
+    return Array.prototype.concat.apply([], options);
 };
 
 /**
