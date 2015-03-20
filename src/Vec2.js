@@ -1,10 +1,7 @@
 'use strict';
 
-/** @alias */
 var sin = Math.sin;
-/** @alias */
 var cos = Math.cos;
-/** @alias */
 var sqrt = Math.sqrt;
 
 /**

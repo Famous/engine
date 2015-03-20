@@ -2,13 +2,9 @@
 
 var Matrix = require('./Mat33');
 
-/** @alias */
 var sin = Math.sin;
-/** @alias */
 var cos = Math.cos;
-/** @alias */
 var atan2 = Math.atan2;
-/** @alias */
 var sqrt = Math.sqrt;
 
 /**
