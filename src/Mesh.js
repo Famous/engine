@@ -32,7 +32,15 @@ function Mesh (dispatch, options) {
     this._geometry;
     this._flatShading = 0;
 
-    init.call(this);
+    this.dispatch.onTransformChange(this._receiveTransformChange.bind(this));
+    this.dispatch.onSizeChange(this._receiveSizeChange.bind(this));
+    this.dispatch.onOpacityChange(this._receiveOpacityChange.bind(this));
+    this.dispatch.onOriginChange(this._receiveOriginChange.bind(this));
+    
+    this._receiveTransformChange(this.dispatch.getContext()._transform);
+    this._receiveSizeChange(this.dispatch.getContext()._size);
+    this._receiveOriginChange(this.dispatch.getContext()._origin);
+    this._receiveOpacityChange(this.dispatch.getContext()._opacity);
 
     if (options) this.setOptions(options);
 }
@@ -45,21 +53,6 @@ function Mesh (dispatch, options) {
 */
 Mesh.toString = function toString() {
     return 'Mesh';
-};
-
-/**
- * Init function for setting up listeners for changes from the scene graph.
- *
- * @private
- */
-function init() {
-    var dispatch = this.dispatch;
-    dispatch.onTransformChange(this._receiveTransformChange.bind(this));
-    dispatch.onSizeChange(this._receiveSizeChange.bind(this));
-    dispatch.onOpacityChange(this._receiveOpacityChange.bind(this));
-    dispatch.onOriginChange(this._receiveOriginChange.bind(this));
-    this._receiveTransformChange(dispatch.getContext()._transform);
-    this._receiveOriginChange(dispatch.getContext()._origin);
 };
 
 /**
@@ -82,7 +75,7 @@ Mesh.prototype._receiveTransformChange = function _receiveTransformChange(transf
 Mesh.prototype._receiveSizeChange = function _receiveSizeChange(size) {
     var size = size.getTopDownSize();
     this.dispatch.dirtyRenderable(this._id);
-
+   
     this._size[0] = size[0];
     this._size[1] = size[1];
     this._size[2] = size[2];
@@ -90,7 +83,7 @@ Mesh.prototype._receiveSizeChange = function _receiveSizeChange(size) {
     this.queue.push('GL_UNIFORMS');
     this.queue.push('size');
     this.queue.push(size);
-};
+ };
 
 /**
  * Receives origin change updates from the scene graph.
