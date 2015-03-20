@@ -6,7 +6,7 @@ var Color = require('./Color');
  * @class Stores multiple palettes in a collection and provides methods for
  *        accessing, adding, and retrieving a random palette from a pre-set
  *        collection.
- * @description
+ *
  * @name ColorPalettes
  * @constructor
  */
