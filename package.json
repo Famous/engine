@@ -1,6 +1,6 @@
 {
   "name": "famous-stylesheets",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Famous Stylesheets",
   "main": "src/index.js",
   "repository": {
