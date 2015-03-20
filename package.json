@@ -1,6 +1,6 @@
 {
   "name": "famous-math",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Famous Math",
   "main": "src/index.js",
   "scripts": {
