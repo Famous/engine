@@ -1,6 +1,6 @@
 {
   "name": "famous-webgl-materials",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Famous WebGL renderables",
   "main": "src/index.js",
   "scripts": {
@@ -33,7 +33,5 @@
     "tape": "^3.0.3",
     "testling": "^1.7.1",
     "watchify": "^2.1.1"
-  },
-  "dependencies": {
   }
 }
