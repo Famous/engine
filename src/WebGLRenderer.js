@@ -133,8 +133,8 @@ WebGLRenderer.prototype.createLight = function createLight(path) {
 WebGLRenderer.prototype.createMesh = function createMesh(path) {
     this.meshRegistryKeys.push(path);
     return this.meshRegistry[path] = {
-        uniformKeys: ['opacity', 'transform', 'size', 'origin', 'baseColor', 'positionOffset', 'u_FlatShading'],
-        uniformValues: [1, identity, [0, 0, 0], [0, 0, 0], [0.5, 0.5, 0.5], [0, 0, 0], 0],
+        uniformKeys: ['opacity', 'transform', 'size', 'baseColor', 'positionOffset', 'u_FlatShading'],
+        uniformValues: [1, identity, [0, 0, 0], [0.5, 0.5, 0.5], [0, 0, 0], 0],
         buffers: {},
         geometry: null,
         drawType: null,
@@ -189,7 +189,7 @@ WebGLRenderer.prototype.receive = function receive(path, commands) {
             if (!mesh) mesh = this.createMesh(path);
             var name = commands.shift();
             var mat = commands.shift();
-            mesh.uniformValues[name === 'baseColor' ? 4 : 5][0] = -mat._id;
+            mesh.uniformValues[name === 'baseColor' ? 3 : 4][0] = -mat._id;
             if (mat.texture) mesh.texture = handleTexture.call(this, mat.texture);
             this.program.registerMaterial(name, mat);
             this.updateSize();
