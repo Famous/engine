@@ -45,7 +45,7 @@ Compositor.CommandsToOutput = {
     EVENT_PROPERTIES:'DOM',
     EVENT_END:'DOM',
     CHANGE_ATTRIBUTE:'DOM',
-    CHANGE_TAG:'DOM',
+    INIT_DOM:'DOM',
     RECALL: 'DOM',
     GL_UNIFORMS: 'GL',
     GL_BUFFER_DATA: 'GL',
@@ -102,14 +102,13 @@ Compositor.prototype.handleWith = function handleWith (commands) {
         var commandOutput = Compositor.CommandsToOutput[commands[0]];
         switch (commandOutput) {
             case 'DOM':
-                var element = parent.getOrSetElement(path, index, context.DOM);
+                var element = parent.getOrSetElement(path, index, commands);
                 element.receive(commands);
                 if (!pointer.DOM) {
                     pointer.DOM = element;
                     this._renderers.push(element);
                 }
                 break;
-
             case 'GL':
                 if (!context.GL) {
                     var webglrenderer = new WebGLRenderer(context.DOM);
