@@ -9,7 +9,6 @@ module.exports = {
     MethodStore: require('./MethodStore'),
     ObjectManager: require('./ObjectManager'),
     Color: require('./Color'),
-    ColorPalette: require('./ColorPalette'),
     strip: require('./strip')
 };
 
