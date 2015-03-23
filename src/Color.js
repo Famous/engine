@@ -973,6 +973,29 @@ Color.isPercentage = function isPercentage(val) {
 };
 
 /**
+ * Returns a random set of RGB values
+ *
+ * @method getRandomRGB
+ * @returns Array of random RGB values
+ */
+Color.getRandomRGB = function getRandomRGB() {
+    var r = Math.random() * 255;
+    var g = Math.random() * 255;
+    var b = Math.random() * 255;
+    return [r, g, b];
+}
+
+/**
+ * Returns a random color
+ *
+ * @method getRandomColor
+ * @returns {Color}
+ */
+Color.getRandomColor = function getRandomColor() {
+    return new Color('rgb', Color.getRandomRGB());
+};
+
+/**
  * Returns a boolean checking whether string input has a hash (#) symbol
  *
  * @method isHex
