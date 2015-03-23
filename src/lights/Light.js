@@ -52,7 +52,7 @@ Light.prototype.setColor = function setColor() {
     this._dispatch.dirtyComponent(this._id);
     var values = Color.flattenArguments(arguments);
 
-    if (values[0] instanceof Color) {
+    if (Color.isColorInstance(values[0])) {
         this._color = values[0];
     }
 
