@@ -91,7 +91,7 @@ VirtualElement.prototype.changeTag = function changeTag (tagName) {
     for (key in this._attributes) {
         newTarget.setAttribute(key, this._attributes[key]);
     }
-    
+
     var i;
     for (key in this._eventListeners) {
         for (i = 0; i < this._eventListeners[key].length; i++) {
@@ -107,7 +107,7 @@ VirtualElement.prototype.changeTag = function changeTag (tagName) {
     for (key in this._children) {
         this._target.appendChild(this._children[key].getTarget());
     }
-    
+
     var parentNode = oldTarget.parentNode;
     parentNode.insertBefore(newTarget, oldTarget);
     parentNode.removeChild(oldTarget);
@@ -144,27 +144,22 @@ VirtualElement.prototype.receive = function receive (commands) {
                 commands.shift()
             );
             break;
-        case CHANGE_TRANSFORM_ORIGIN:
-            this._origin[0] = commands[0];
-            this._origin[1] = commands[1];
-            this.setProperty(VENDOR_TRANSFORM_ORIGIN, stringifyTransformOrigin(commands));
+        case CHANGE_SIZE:
+            var width = commands.shift();
+            var height = commands.shift();
+            this._size[0] = width;
+            this._size[1] = height;
+            if (width !== true) {
+                this.setProperty('width', width + 'px');
+            } else {
+                this.setProperty('width', '');
+            }
+            if (height !== true) {
+                this.setProperty('height', height + 'px');
+            } else {
+                this.setProperty('height', '');
+            }
             break;
-            case CHANGE_SIZE:
-                var width = commands.shift();
-                var height = commands.shift();
-                this._size[0] = width;
-                this._size[1] = height;
-                if (width !== true) {
-                    this.setProperty('width', width + 'px');
-                } else {
-                    this.setProperty('width', '');
-                }
-                if (height !== true) {
-                    this.setProperty('height', height + 'px');
-                } else {
-                    this.setProperty('height', '');
-                }
-                break;
         case CHANGE_PROPERTY:
             this.setProperty(commands.shift(), commands.shift());
             break;
@@ -496,10 +491,6 @@ function multiply (out, a, b) {
     out[15] = b0*a03 + b1*a13 + b2*a23 + b3*a33;
 
     return out;
-}
-
-function stringifyTransformOrigin(commands) {
-    return (commands.shift() * 100) + PERCENT_SPACE + (commands.shift() * 100) + PERCENT;
 }
 
 module.exports = VirtualElement;
