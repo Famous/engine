@@ -13,7 +13,6 @@ var EVENT_PROPERTIES = 'EVENT_PROPERTIES';
 var EVENT_END = 'EVENT_END';
 var RECALL = 'RECALL';
 var CHANGE_SIZE = 'CHANGE_SIZE';
-var CHANGE_TAG = 'CHANGE_TAG';
 var CHANGE_ATTRIBUTE = 'CHANGE_ATTRIBUTE';
 
 var DIV = 'div';
@@ -72,49 +71,10 @@ VirtualElement.prototype.getTarget = function getTarget () {
     return this._target;
 };
 
-VirtualElement.prototype.changeTag = function changeTag (tagName) {
-    this._tagName = tagName;
-    var oldTarget = this._target;
-    var newTarget = document.createElement(tagName);
-    this._allocator.setContainer(newTarget);
-
-    this._target = newTarget;
-
-    this.setMatrix.apply(this, this._finalMatrix);
-    newTarget.classList.add(FA_SURFACE);
-
-    var key;
-    for (key in this._properties) {
-        newTarget.style[key] = this._properties[key];
-    }
-
-    for (key in this._attributes) {
-        newTarget.setAttribute(key, this._attributes[key]);
-    }
-
-    var i;
-    for (key in this._eventListeners) {
-        for (i = 0; i < this._eventListeners[key].length; i++) {
-            newTarget.addEventListener(key, this._eventListeners[key]);
-
-            // prevent possible memory leaks in IE
-            oldTarget.removeEventListener(key, this._eventListeners[key]);
-        }
-    }
-
-    this.setContent(this._content);
-
-    for (key in this._children) {
-        this._target.appendChild(this._children[key].getTarget());
-    }
-
-    var parentNode = oldTarget.parentNode;
-    parentNode.insertBefore(newTarget, oldTarget);
-    parentNode.removeChild(oldTarget);
-};
-
-VirtualElement.prototype.getOrSetElement = function getOrSetElement (path, index) {
+VirtualElement.prototype.getOrSetElement = function getOrSetElement (path, index, commands) {
     if (this._children[index]) return this._children[index];
+    commands.shift();
+    this._tagName = commands.shift();
     var div = this._allocator.allocate(this._tagName);
     var child = new VirtualElement(div, path, this._renderer, this, this._rootElement);
     this._children[index] = child;
@@ -162,9 +122,6 @@ VirtualElement.prototype.receive = function receive (commands) {
             break;
         case CHANGE_PROPERTY:
             this.setProperty(commands.shift(), commands.shift());
-            break;
-        case CHANGE_TAG:
-            this.changeTag(commands.shift());
             break;
         case CHANGE_CONTENT:
             this.setContent(commands.shift());
