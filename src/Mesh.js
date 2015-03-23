@@ -36,7 +36,7 @@ function Mesh (dispatch, options) {
     this.dispatch.onSizeChange(this._receiveSizeChange.bind(this));
     this.dispatch.onOpacityChange(this._receiveOpacityChange.bind(this));
     this.dispatch.onOriginChange(this._receiveOriginChange.bind(this));
-    
+
     this._receiveTransformChange(this.dispatch.getContext()._transform);
     this._receiveSizeChange(this.dispatch.getContext()._size);
     this._receiveOriginChange(this.dispatch.getContext()._origin);
@@ -75,7 +75,7 @@ Mesh.prototype._receiveTransformChange = function _receiveTransformChange(transf
 Mesh.prototype._receiveSizeChange = function _receiveSizeChange(size) {
     var size = size.getTopDownSize();
     this.dispatch.dirtyRenderable(this._id);
-   
+
     this._size[0] = size[0];
     this._size[1] = size[1];
     this._size[2] = size[2];
@@ -270,7 +270,7 @@ Mesh.prototype.setBaseColor = function setBaseColor() {
     else {
         this.queue.push('GL_UNIFORMS');
         if (this._expressions.baseColor) this._expressions.baseColor = null;
-        if (materialExpression[0] instanceof Color) {
+        if (Color.isColor(materialExpression[0])) {
             this._color = materialExpression[0];
         }
         else {
