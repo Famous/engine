@@ -193,7 +193,6 @@ RenderContext.prototype.offOpacityChange = function offOpacityChange (cb) {
     return this;
 };
 
-<<<<<<< HEAD
 //
 
 RenderContext.prototype.mount = function mount () {
@@ -298,7 +297,6 @@ RenderContext.prototype.setAbsoluteSize = function setAbsoluteSize (x, y, z) {
     if (z != null) this._internalSpec.size.absolute[2] = z;
 };
 
-=======
 /**
  * Sets the opacity of the RenderContext.
  *
@@ -308,7 +306,6 @@ RenderContext.prototype.setAbsoluteSize = function setAbsoluteSize (x, y, z) {
  * @param {Number} opacity  opacity to be set on the RenderContext
  * @return {RenderContext}  this
  */
->>>>>>> develop
 RenderContext.prototype.setOpacity = function setOpacity (opacity) {
     this._opacity.set(opacity);
     return this;
