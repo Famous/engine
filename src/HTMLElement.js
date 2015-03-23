@@ -9,7 +9,7 @@ var WITH = 'WITH';
 var CHANGE_TRANSFORM = 'CHANGE_TRANSFORM';
 var CHANGE_TRANSFORM_ORIGIN = 'CHANGE_TRANSFORM_ORIGIN';
 var CHANGE_PROPERTY = 'CHANGE_PROPERTY';
-var CHANGE_TAG = 'CHANGE_TAG';
+var INIT_DOM = 'INIT_DOM';
 var CHANGE_ATTRIBUTE = 'CHANGE_ATTRIBUTE';
 var ADD_CLASS = 'ADD_CLASS';
 var REMOVE_CLASS = 'REMOVE_CLASS';
@@ -30,12 +30,16 @@ var RECALL = 'RECALL';
  * @component
  * @param {RenderNode} RenderNode to which the instance of Element will be a component of
  */
-function HTMLElement(dispatch) {
+function HTMLElement(dispatch, tagName) {
     this._dispatch = dispatch;
     this._id = dispatch.addRenderable(this);
     this._trueSized = [false, false];
     this._size = [0, 0, 0];
     this._queue = [];
+
+    this._queue.push(INIT_DOM);
+    this._queue.push(tagName ? tagName : 'div');
+
     this._callbacks = new CallbackStore();
     this._dispatch.onTransformChange(this._receiveTransformChange.bind(this));
     this._dispatch.onSizeChange(this._receiveSizeChange.bind(this));
@@ -158,22 +162,6 @@ HTMLElement.prototype.trueSize = function trueSize(trueWidth, trueHeight) {
     }
     this._trueSized[0] = trueWidth;
     this._trueSized[1] = trueHeight;
-    return this;
-};
-
-/**
- * Set the tag name of the element
- *
- * @method tagName
- * @chainable
- *
- * @param {String} value type of HTML tag
- * @return {HTMLElement} current HTMLElement
- */
-HTMLElement.prototype.tagName = function tagName(value) {
-    this._dispatch.dirtyRenderable(this._id);
-    this._queue.push(CHANGE_TAG);
-    this._queue.push(value);
     return this;
 };
 
