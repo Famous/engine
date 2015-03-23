@@ -270,7 +270,7 @@ Mesh.prototype.setBaseColor = function setBaseColor() {
     else {
         this.queue.push('GL_UNIFORMS');
         if (this._expressions.baseColor) this._expressions.baseColor = null;
-        if (Color.isColor(materialExpression[0])) {
+        if (Color.isColorInstance(materialExpression[0])) {
             this._color = materialExpression[0];
         }
         else {
