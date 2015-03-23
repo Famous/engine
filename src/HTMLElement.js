@@ -60,7 +60,7 @@ HTMLElement.prototype.clean = function clean() {
     	for (var i = 0 ; i < len ; i++)
     	    this._dispatch.sendDrawCommand(this._queue.shift());
     }
-    return true;
+    return false;
 };
 
 HTMLElement.prototype._receiveTransformChange = function _receiveTransformChange(transform) {
