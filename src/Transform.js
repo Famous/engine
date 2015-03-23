@@ -123,7 +123,7 @@ Transform.prototype._copyParent = function _copyParent(parentReport, parentMatri
             report >>>= 1;
         }
     }
-    
+
     return report;
 };
 
@@ -473,7 +473,7 @@ Transform.prototype._precalculatedSetDefault = function _precalculatedSetDefault
 
 Transform.prototype._precalculateTrMatrix = function _precalculateTrMatrix() {
     var tracktransforms = this._tracktransforms;
-    
+
     //rotation should go before scale checks
     if(tracktransforms[3] || tracktransforms[4] || tracktransforms[5]){ // is rotate by x or y or z
         this._precalculateAddRotation(tracktransforms[3], tracktransforms[4], tracktransforms[5]);

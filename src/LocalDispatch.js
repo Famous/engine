@@ -21,7 +21,7 @@ var RenderProxy = require('./RenderProxy');
  *
  * @class  LocalDispatch
  * @constructor
- * 
+ *
  * @param {Node} node           Node being managed by the LocalDispatch.
  * @param {RenderProxy} proxy   RenderProxy associated with the managed Node's
  *                              parent.
@@ -39,7 +39,7 @@ function LocalDispatch (node, proxy) {
  *
  * @method kill
  * @chainable
- * 
+ *
  * @return {LocalDispatch} this
  */
 LocalDispatch.prototype.kill = function kill () {
@@ -51,7 +51,7 @@ LocalDispatch.prototype.kill = function kill () {
  * Returns the managed Node.
  *
  * @method getNode
- * 
+ *
  * @return {Node} managed Node
  */
 LocalDispatch.prototype.getNode = function getNode () {
@@ -62,7 +62,7 @@ LocalDispatch.prototype.getNode = function getNode () {
  * Retrieves the RenderContext managed by the LocalDispatch.
  *
  * @method getContext
- * 
+ *
  * @return {RenderContext}  RenderContext managed by the LocalDispatch
  */
 LocalDispatch.prototype.getContext = function getContext () {
@@ -74,7 +74,7 @@ LocalDispatch.prototype.getContext = function getContext () {
  * LocalDispatch in the scene graph.
  *
  * @method getRenderPath
- * 
+ *
  * @return {String} RenderPath encoded as a string (e.g. "body/1/2/3")
  */
 LocalDispatch.prototype.getRenderPath = function getRenderPath () {
@@ -85,7 +85,7 @@ LocalDispatch.prototype.getRenderPath = function getRenderPath () {
  * Returns the RenderProxy managed by the LocalDispatch.
  *
  * @method getRenderProxy
- * 
+ *
  * @return {RenderProxy} RenderProxy managed by the LocalDispatch.
  */
 LocalDispatch.prototype.getRenderProxy = function getRenderProxy () {
@@ -99,7 +99,7 @@ LocalDispatch.prototype.getRenderProxy = function getRenderProxy () {
  *
  * @method registerTargetedEvent
  * @chainable
- * 
+ *
  * @param  {String}   event event type to listen on
  * @param  {Function} cb    event listener to be invoked whenever the event
  *                          is being triggered
@@ -115,10 +115,10 @@ LocalDispatch.prototype.registerTargetedEvent = function registerTargetedEvent (
  * specified event is being triggered. Global in the context of events being
  * emitted in the scene graph means events being emitted on the same depth as
  * the Node.
- * 
+ *
  * @method registerGlobalEvent
  * @chainable
- * 
+ *
  * @param  {String}   event event type to listen on
  * @param  {Function} cb    event listener to be invoked whenever the event
  *                          is being triggered
@@ -135,7 +135,7 @@ LocalDispatch.prototype.registerGlobalEvent = function registerGlobalEvent (even
  *
  * @method deregisterGlobalEvent
  * @chainable
- * 
+ *
  * @param  {String}   event event type to listen on
  * @param  {Function} cb    event listener to be invoked whenever the event
  *                          is being triggered
@@ -150,7 +150,7 @@ LocalDispatch.prototype.deregisterGlobalEvent = function deregisterGlobalEvent (
  * Triggers an event on the Node attached to the LocalDispatch. Events are
  * being managed by the GlobalDispatch.
  *
- * 
+ *
  * @param  {String} event   event type to listen on
  * @param  {Object} payload event payload object to be passed in to every
  *                          callback function attached to the specified event
@@ -167,7 +167,7 @@ LocalDispatch.prototype.emit = function emit (event, payload) {
  *
  * @method cleanCompoents
  * @chainable
- * 
+ *
  * @return {LocalDispatch} this
  */
 LocalDispatch.prototype.cleanComponents = function cleanComponents () {
@@ -180,7 +180,7 @@ LocalDispatch.prototype.cleanComponents = function cleanComponents () {
  *
  * @method cleanRenderContext
  * @chainable
- * 
+ *
  * @param  {RenderContext} parentNode   parent RenderContext
  * @return {LocalDispatch}              this
  */
@@ -195,7 +195,7 @@ LocalDispatch.prototype.cleanRenderContext = function cleanRenderContext (parent
  *
  * @method cleanRenderables
  * @chainable
- * 
+ *
  * @return {LocalDispatch}  this
  */
 LocalDispatch.prototype.cleanRenderables = function cleanRenderables () {
@@ -208,7 +208,7 @@ LocalDispatch.prototype.cleanRenderables = function cleanRenderables () {
  *
  * @method addComponent
  * @chainable
- * 
+ *
  * @param {Component} component component to be added
  * @return {Number} id          id the component has been registered at on the
  *                              underlying ComponentStore
@@ -227,7 +227,7 @@ LocalDispatch.prototype.addComponent = function addComponent (component) {
  *
  * @method dirtyComponent
  * @chainable
- * 
+ *
  * @param  {Number} id      id obtained via `addComponent`
  * @return {LocalDispatch}  this
  */
@@ -241,7 +241,7 @@ LocalDispatch.prototype.dirtyComponent = function dirtyComponent (id) {
  *
  * @method addRenderable
  * @chainable
- * 
+ *
  * @param {Renderable} renderable   renderable to be added
  * @return {Number} id              id the component has been registered at on the
  *                                  underlying ComponentStore
@@ -258,7 +258,7 @@ LocalDispatch.prototype.addRenderable = function addRenderable (renderable) {
  *
  * @method dirtyRenderable
  * @chainable
- * 
+ *
  * @param  {Number} id      id obtained via `addRenderable`
  * @return {LocalDispatch}  this
  */
@@ -276,11 +276,6 @@ LocalDispatch.prototype.onTransformChange = function onTransformChange (cb) {
 
 LocalDispatch.prototype.onSizeChange = function onSizeChange (cb) {
     this._context.onSizeChange(cb);
-    return this;
-};
-
-LocalDispatch.prototype.onOriginChange = function onOriginChange (cb) {
-    this._context.onOriginChange(cb);
     return this;
 };
 
