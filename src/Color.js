@@ -96,7 +96,7 @@ Color.prototype.changeTo = function changeTo() {
 Color.prototype.copy = function copy() {
     var values = Color.flattenArguments(arguments);
     var color = values[0], options = values[1], cb = values[2];
-    if (this.isColorInstance(color)) {
+    if (Color.isColorInstance(color)) {
         this.setRGB(color.getRGB(), options, cb);
     }
     return this;
@@ -149,17 +149,6 @@ Color.prototype.getColor = function getColor(option) {
 };
 
 /**
- * Returns boolean whether the input is a Color instance
- *
- * @method isColorInstance
- * @param Color instance
- * @returns {Boolean} Boolean
- */
-Color.prototype.isColorInstance = function isColorInstance(val) {
-    return (val instanceof Color);
-};
-
-/**
  * Parses the given input to the appropriate color configuration
  *
  * @method determineType
@@ -167,7 +156,7 @@ Color.prototype.isColorInstance = function isColorInstance(val) {
  * @returns {string} Appropriate color type
  */
 Color.prototype.determineType = function determineType(val) {
-    if (this.isColorInstance(val)) return 'instance';
+    if (Color.isColorInstance(val)) return 'instance';
     if (Color.isHex(val)) return 'hex';
     if (colorNames[val]) return 'color';
     var types = ['rgb', 'hsl', 'hex', 'hsv'];
@@ -379,7 +368,7 @@ Color.prototype.multiplyScalar = function multiplyScalar(s, options, cb) {
  * @returns {Boolean}
  */
 Color.prototype.equals = function equals(color) {
-    if (this.isColorInstance(color)) {
+    if (Color.isColorInstance(color)) {
         return  this.getR() === color.getR() &&
                 this.getG() === color.getG() &&
                 this.getB() === color.getB();
@@ -397,7 +386,7 @@ Color.prototype.equals = function equals(color) {
  * @chainable
  */
 Color.prototype.copyGammaToLinear = function copyGammaToLinear(color, options, cb) {
-    if (this.isColorInstance(color)) {
+    if (Color.isColorInstance(color)) {
         var r = color.getR();
         var g = color.getG();
         var b = color.getB();
@@ -1019,6 +1008,17 @@ Color.clamp = function clamp(val, min, max) {
     min = min || 0;
     max = max || 255;
     return Math.max(Math.min(val, max), min);
+};
+
+/**
+ * Returns boolean whether the input is a Color instance
+ *
+ * @method isColorInstance
+ * @param Color instance
+ * @returns {Boolean} Boolean
+ */
+Color.isColorInstance = function isColorInstance(val) {
+    return !!val.getColor;
 };
 
 module.exports = Color;
