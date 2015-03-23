@@ -7,7 +7,6 @@ var ID = 'id';
 var OPACITY = 'opacity';
 var WITH = 'WITH';
 var CHANGE_TRANSFORM = 'CHANGE_TRANSFORM';
-var CHANGE_TRANSFORM_ORIGIN = 'CHANGE_TRANSFORM_ORIGIN';
 var CHANGE_PROPERTY = 'CHANGE_PROPERTY';
 var CHANGE_TAG = 'CHANGE_TAG';
 var CHANGE_ATTRIBUTE = 'CHANGE_ATTRIBUTE';
@@ -40,10 +39,8 @@ function HTMLElement(dispatch) {
     this._dispatch.onTransformChange(this._receiveTransformChange.bind(this));
     this._dispatch.onSizeChange(this._receiveSizeChange.bind(this));
     this._dispatch.onOpacityChange(this._receiveOpacityChange.bind(this));
-    this._dispatch.onOriginChange(this._receiveOriginChange.bind(this));
     this._receiveTransformChange(this._dispatch.getContext()._transform);
     this._receiveSizeChange(this._dispatch.getContext()._size);
-    this._receiveOriginChange(this._dispatch.getContext()._origin);
     this._receiveOpacityChange(this._dispatch.getContext()._opacity);
 }
 
@@ -94,13 +91,6 @@ HTMLElement.prototype._receiveSizeChange = function _receiveSizeChange(size) {
     this._queue.push(height);
     this._size[0] = width;
     this._size[1] = height;
-};
-
-HTMLElement.prototype._receiveOriginChange = function _receiveOriginChange(origin) {
-    this._dispatch.dirtyRenderable(this._id);
-    this._queue.push(CHANGE_TRANSFORM_ORIGIN);
-    this._queue.push(origin.x);
-    this._queue.push(origin.y);
 };
 
 HTMLElement.prototype._receiveOpacityChange = function _receiveOpacityChange(opacity) {
