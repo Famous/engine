@@ -162,6 +162,37 @@ test('Transitionable', function(t) {
         t.equal(transitionable.get(), 0.5, 'transitionable state should not change after transition has been halted');
     });
 
+    t.test('callback', function(t) {
+        t.plan(1);
+        time = 0;
+        var transitionable = new Transitionable(0);
+        var test = false;
+        transitionable.set(1, {curve: 'linear', duration: 500}, function() {
+            test = true;
+        });
+
+        time = 501;
+        transitionable.get();
+        t.ok(test);
+    });
+
+    // t.test('setting a value inside of a callback', function(t) {
+    //     t.plan(1);
+    //     time = 0;
+    //     var transitionable = new Transitionable(0);
+    //     var test = false;
+    //     transitionable.set(1, {curve: 'linear', duration: 500}, function() {
+    //         transitionable.set(2);
+    //         transitionable.set(3, {curve: 'linear', duration: 500}, function() {
+    //             test = true;
+    //         });
+    //     });
+
+    //     time = 1000;
+    //     console.log(transitionable.get());
+    //     t.ok(test);
+    // });
+
     t.test('tear down', function(t) {
         Date.now = _now;
         t.end();
