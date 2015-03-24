@@ -40,9 +40,9 @@ ElementAllocator.prototype.allocate = function allocate(type) {
     else {
         result = document.createElement(type);
         this._container.appendChild(result);
-        this._allocatedNodes[type] = this._allocatedNodes[type] ? this._allocatedNodes[type] : [];
-        this._allocatedNodes[type].push(result);
     }
+    this._allocatedNodes[type] = this._allocatedNodes[type] ? this._allocatedNodes[type] : [];
+    this._allocatedNodes[type].push(result);
     this._nodeCount++;
     result.style.display = '';
     return result;
