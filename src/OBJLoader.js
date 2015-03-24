@@ -270,6 +270,7 @@ function format(text, options) {
         faceTexCoords
     );
 
+
     cached.vertices = flatten(cached.vertices);
     cached.normals = flatten(cached.normals);
     cached.texCoords = flatten(cached.texCoords);
@@ -283,8 +284,8 @@ function format(text, options) {
 
     if (options.computeNormals) {
         cached.normals = GeometryHelper.computeNormals(
-            cached.indices,
-            cached.vertices
+            cached.vertices,
+            cached.indices
         );
     }
 
