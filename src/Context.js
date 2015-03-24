@@ -14,7 +14,8 @@ var Famous = require('./Famous');
  * @class  Context
  * @constructor
  * 
- * @param {String} selector     query selector used to 
+ * @param {String} [selector=body]  query selector used as container for
+ *                                  context
  */
 function Context (selector) {
     this._messageQueue = Famous.getMessageQueue();
@@ -25,12 +26,12 @@ function Context (selector) {
 
     this.proxy = new RenderProxy(this);
     this.node = new Node(this.proxy, this._globalDispatch);
-    this.selector = selector;
+    this.selector = selector || 'body';
     this.dirty = true;
     this.dirtyQueue = [];
 
-    this._messageQueue.enqueue('NEED_SIZE_FOR').enqueue(selector);
-    this._globalDispatch.targetedOn(selector, 'resize', this._receiveContextSize.bind(this));
+    this._messageQueue.enqueue('NEED_SIZE_FOR').enqueue(this.selector);
+    this._globalDispatch.targetedOn(this.selector, 'resize', this._receiveContextSize.bind(this));
 }
 
 /**
