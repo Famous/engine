@@ -35,7 +35,7 @@ test('Transitionable', function(t) {
     });
 
     t.test('set method', function(t) {
-        t.plan(5);
+        t.plan(6);
         var transitionable = new Transitionable();
         t.equal(typeof transitionable.set, 'function', 'transitionable.set should be a function');
 
@@ -176,22 +176,52 @@ test('Transitionable', function(t) {
         t.ok(test);
     });
 
-    // t.test('setting a value inside of a callback', function(t) {
-    //     t.plan(1);
-    //     time = 0;
-    //     var transitionable = new Transitionable(0);
-    //     var test = false;
-    //     transitionable.set(1, {curve: 'linear', duration: 500}, function() {
-    //         transitionable.set(2);
-    //         transitionable.set(3, {curve: 'linear', duration: 500}, function() {
-    //             test = true;
-    //         });
-    //     });
+    t.test('setting a value inside of a callback', function(t) {
+        t.plan(2);
+        time = 0;
+        var transitionable = new Transitionable(0);
+        var test1 = false;
+        var test2 = false;
+        transitionable.set(1, {curve: 'linear', duration: 500}, function() {
+            test1 = true;
+            transitionable.set(2);
+            transitionable.set(3, {curve: 'linear', duration: 500}, function() {
+                test2 = true;
+            });
+        });
 
-    //     time = 1000;
-    //     console.log(transitionable.get());
-    //     t.ok(test);
-    // });
+        time = 500;
+        transitionable.get();
+        t.ok(test1)
+        time = 1000;
+        transitionable.get();
+        t.ok(test2);
+    });
+
+    t.test('setting a value multiple times', function(t) {
+        t.plan(1);
+        time = 0;
+        var transitionable = new Transitionable(0);
+        var test1 = false;
+        var test2 = false;
+
+        function testFunction() {
+            transitionable.set(1, {curve: 'linear', duration: 500}, function() {
+                transitionable.set(0, {curve: 'linear', duration: 500});
+            });    
+        }
+        
+        testFunction();
+        time = 500;
+        transitionable.get(); // To call the callback
+        time = 1000;
+        testFunction();
+        time = 1500;
+        transitionable.get(); // To call the callback
+        time = 2000;
+        t.ok(transitionable.get() === 0);
+
+    });
 
     t.test('tear down', function(t) {
         Date.now = _now;
