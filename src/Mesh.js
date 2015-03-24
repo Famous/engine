@@ -241,28 +241,25 @@ Mesh.prototype.clean = function clean() {
 * @param {object} options Optional options argument for tweening colors
 * @chainable
 */
-Mesh.prototype.setBaseColor = function setBaseColor() {
+Mesh.prototype.setBaseColor = function setBaseColor(type, a, b, c, options, cb) {
     this.dispatch.dirtyRenderable(this._id);
-    var materialExpression = Array.prototype.concat.apply([], arguments);
 
-    if (materialExpression[0]._compile) {
+    // If a material expression
+    if (type._compile) {
         this.queue.push('MATERIAL_INPUT');
-        this._expressions.baseColor = materialExpression[0];
-        materialExpression = materialExpression[0]._compile();
+        this._expressions.baseColor = type;
+        type = type._compile();
     }
+    // A color component
     else {
         this.queue.push('GL_UNIFORMS');
         if (this._expressions.baseColor) this._expressions.baseColor = null;
-        if (Color.isColorInstance(materialExpression[0])) {
-            this._color = materialExpression[0];
-        }
-        else {
-            this._color.set(materialExpression);
-        }
-        materialExpression = this._color.getNormalizedRGB();
+        this._color.set(type, a, b, c, options, cb);
+        type = this._color.getNormalizedRGB();
     }
+
     this.queue.push('baseColor');
-    this.queue.push(materialExpression);
+    this.queue.push(type);
     return this;
 };
 

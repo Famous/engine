@@ -48,15 +48,9 @@ Light.toString = function toString() {
 * @param {object} options Optional options argument for tweening colors
 * @chainable
 */
-Light.prototype.setColor = function setColor() {
+Light.prototype.setColor = function setColor(type, a, b, c, options, cb) {
     this._dispatch.dirtyComponent(this._id);
-    var values = Color.flattenArguments(arguments);
-
-    if (Color.isColorInstance(values[0])) {
-        this._color = values[0];
-    }
-
-    this._color.set(values);
+    this._color.set(type, a, b, c, options, cb);
     this.queue.push(this.commands.color);
     var color = this._color.getNormalizedRGB();
     this.queue.push(color[0]);
