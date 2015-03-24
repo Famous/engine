@@ -3,10 +3,13 @@ var radixBits = 11,
     radixMask = maxRadix - 1,
     buckets = new Array(maxRadix * Math.ceil(64 / radixBits)),
     msbMask = 1 << ((32 - 1) % radixBits),
-    lastMask = (msbMask << 1) - 1;
+    lastMask = (msbMask << 1) - 1,
+    passCount = ((32 / radixBits) + 0.999999999999999) | 0,
+    maxOffset = maxRadix * (passCount - 1);
 
-var floatView = new Float32Array(1);
-var intView = new Int32Array(floatView.buffer, 0, 1);
+var buffer = new ArrayBuffer(4);
+var floatView = new Float32Array(buffer, 0, 1);
+var intView = new Int32Array(buffer, 0, 1);
 
 function floatToInt (k) {
     floatView[0] = k;
@@ -19,12 +22,12 @@ function intToFloat(k) {
 }
 
 function sort(list, registry) {
-    var passCount = Math.ceil(32 / radixBits),
-        maxOffset = maxRadix * (passCount - 1),
-        pass = 0;
+    var pass = 0;
+    var out = [];
 
     var i, j, k, n, div, offset, swap, id, sum, tsum, size;
-    var spares = [];
+
+    passCount = ((32 / radixBits) + 0.999999999999999) | 0;
 
     for (i = 0, n = maxRadix * passCount; i < n; i++) buckets[i] = 0;
 
@@ -47,24 +50,24 @@ function sort(list, registry) {
     if (--passCount) {
         for (i = 0, n = list.length; i < n; i++) {
             div = floatToInt(comp(i));
-            spares[++buckets[div & radixMask]] = mutator(i, div ^= div >> 31 | 0x80000000);
+            out[++buckets[div & radixMask]] = mutator(i, div ^= div >> 31 | 0x80000000);
         }
-        swap = spares, spares = list, list = swap;
+        swap = out, out = list, list = swap;
         while (++pass < passCount) {
             for (i = 0, n = list.length, offset = pass * maxRadix, size = pass * radixBits; i < n; i++) {
                 div = floatToInt(            comp(i));
-                spares[++buckets[offset + (div >>> size & radixMask)]] = list[i];
+                out[++buckets[offset + (div >>> size & radixMask)]] = list[i];
             }
-            swap = spares, spares = list, list = swap;
+            swap = out, out = list, list = swap;
         }
     }
 
     for (i = 0, n = list.length, offset = pass * maxRadix, size = pass * radixBits; i < n; i++) {
         div = floatToInt(comp(i));
-        spares[++buckets[offset + (div >>> size & lastMask)]] = mutator(i, div ^ (~div >> 31 | 0x80000000));
+        out[++buckets[offset + (div >>> size & lastMask)]] = mutator(i, div ^ (~div >> 31 | 0x80000000));
     }
 
-    return spares;
+    return out;
 
     function comp (i) {
         var key = list[i];
