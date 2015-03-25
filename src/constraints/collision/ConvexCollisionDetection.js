@@ -1,8 +1,8 @@
 'use strict';
 
-var Vec3 = require('famous-math').Vec3;
+var Vec3 = require('famous-math/src/Vec3');
 var Geometry = require('../../Geometry');
-var ObjectManager = require('famous-utilities').ObjectManager;
+var ObjectManager = require('famous-utilities/src/ObjectManager');
 
 ObjectManager.register('GJK_EPASupportPoint', GJK_EPASupportPoint);
 var OMRequestGJK_EPASupportPoint = ObjectManager.requestGJK_EPASupportPoint;

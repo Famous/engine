@@ -10,7 +10,12 @@ var _ID = 0;
  * @param {Object} options The options hash.
  */
 function Force(targets, options) {
-    this.targets = [].concat(targets);
+    if (targets) {
+        if (targets instanceof Array) this.targets = targets;
+        else this.targets = [targets];
+    }
+    else this.targets = [];
+
     options = options || {};
     this.setOptions(options);
 

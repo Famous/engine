@@ -4,8 +4,8 @@ var Particle = require('./bodies/Particle');
 var Constraint = require('./constraints/Constraint');
 var Force = require('./forces/Force');
 
-var Vec3 = require('famous-math').Vec3;
-var Quaternion = require('famous-math').Quaternion;
+var Vec3 = require('famous-math/src/Vec3');
+var Quaternion = require('famous-math/src/Quaternion');
 
 var VEC_REGISTER = new Vec3();
 var XYZ_REGISTER = new Vec3();
@@ -144,6 +144,7 @@ PhysicsEngine.prototype.add = function add() {
                 this.add(e);
             }
         } else {
+            console.log(entity.constructor.name)
             if (entity instanceof Particle) this.addBody(entity);
             else if (entity instanceof Constraint) this.addConstraint(entity);
             else if (entity instanceof Force) this.addForce(entity);

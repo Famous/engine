@@ -1,8 +1,10 @@
 'use strict';
 
-var Vec3 = require('famous-math').Vec3;
-var Quaternion = require('famous-math').Quaternion;
-var Mat33 = require('famous-math').Mat33;
+var Vec3 = require('famous-math/src/Vec3');
+var Quaternion = require('famous-math/src/Quaternion');
+var Mat33 = require('famous-math/src/Mat33');
+
+var CallbackStore = require('famous-utilities/src/CallbackStore');
 
 var ZERO_VECTOR = new Vec3();
 
@@ -21,6 +23,8 @@ var _ID = 0;
  */
 function Particle(options) {
     options = options || {};
+
+    this.events = new CallbackStore();
 
     this.position = options.position || new Vec3();
     this.orientation = options.orientation || new Quaternion();
@@ -287,7 +291,9 @@ Particle.prototype.getAngularVelocity = function getAngularVelocity() {
  */
 Particle.prototype.setAngularVelocity = function setAngularVelocity(x,y,z) {
     this.angularVelocity.set(x,y,z);
-    Mat33.inverse(this.inverseInertia, MAT1_REGISTER).vectorMultiply(this.angularVelocity, this.angularMomentum);
+    var I = Mat33.inverse(this.inverseInertia, MAT1_REGISTER)
+    if (I) I.vectorMultiply(this.angularVelocity, this.angularMomentum);
+    else this.angularMomentum.clear();
     return this;
 };
 

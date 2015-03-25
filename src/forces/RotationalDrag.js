@@ -1,7 +1,7 @@
 'use strict';
 
 var Force = require('./Force');
-var Vec3 = require('famous-math').Vec3;
+var Vec3 = require('famous-math/src/Vec3');
 
 var TORQUE_REGISTER = new Vec3();
 

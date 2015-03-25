@@ -1,8 +1,8 @@
 'use strict';
 
 var Particle = require('./Particle');
-var Mat33 = require('famous-math').Mat33;
-var Vec3 = require('famous-math').Vec3;
+var Mat33 = require('famous-math/src/Mat33');
+var Vec3 = require('famous-math/src/Vec3');
 
 /**
  * @enum directions
