@@ -42,7 +42,7 @@ test('Famous', function(t) {
         });
     });
 
-    t.test('FRAME comamnd using postMessage', function(t) {
+    t.test('FRAME command using postMessage', function(t) {
         t.plan(1);
         Famous.postMessage(['FRAME', 123]);
         t.equal(Famous.getClock().getTime(), 123, 'FRAME command should update clock');

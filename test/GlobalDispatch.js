@@ -16,15 +16,39 @@ test('GlobalDispatch', function(t) {
     });
 
     t.test('targetedOn method', function(t) {
-        t.plan(1);
+        t.plan(3);
         var globalDispatch = new GlobalDispatch();
         t.equal(typeof globalDispatch.targetedOn, 'function', 'globalDispatch.targetedOn should be a function');
+
+        globalDispatch.targetedOn('this/is/a/right-path', 'wrong-key', function(ev) {
+            t.fail('globalDispatch.targetedOn attached listener to right path, but wrong key');
+        });
+
+        globalDispatch.targetedOn('this/is/a/wrong-path', 'right-key', function(ev) {
+            t.fail('globalDispatch.targetedOn attached listener to wrong path, but correct key');
+        });
+
+        globalDispatch.targetedOn('this/is/a/right-path', 'right-key', function(actualEvent) {
+            t.pass('globalDispatch.targetedOn attached listener to right path and right key');
+            t.equal(actualEvent, expectedEvent);
+        });
+
+        var expectedEvent = {};
+        globalDispatch.targetedTrigger('this/is/a/right-path', 'right-key', expectedEvent);
     });
 
     t.test('targetedOff method', function(t) {
         t.plan(1);
         var globalDispatch = new GlobalDispatch();
         t.equal(typeof globalDispatch.targetedOff, 'function', 'globalDispatch.targetedOff should be a function');
+
+        var listener = function(ev) {
+            t.fail('globalDispatch.targetedOff did not remove event listener attached to path foo/bar/foo and key foo');
+        };
+        globalDispatch.targetedOn('foo/bar/foo', 'foo', listener);
+        globalDispatch.targetedOff('foo/bar/foo', 'foo', listener);
+
+        globalDispatch.targetedTrigger('foo/bar/foo', 'foo', {});
     });
 
     t.test('globalOn method', function(t) {

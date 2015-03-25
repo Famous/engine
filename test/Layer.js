@@ -109,9 +109,32 @@ test('Layer', function(t) {
     });
 
     t.test('clean method', function(t) {
-        t.plan(1);
+        t.plan(6);
         var layer = new Layer();
         t.equal(typeof layer.clean, 'function', 'layer.clean should be a function');
+
+        var cleaned = 0;
+        var componentId = layer.requestId();
+        var component = {
+            clean: function() {
+                t.pass('layer.clean should clean component as long as component.clean returns true');
+                return ++cleaned < 5;
+            }
+        };
+        layer.registerAt(componentId, component);
+        layer.dirtyAt(componentId);
+
+        // Clean layer more than five times
+        layer.clean();
+        layer.clean();
+        layer.clean();
+        layer.clean();
+        layer.clean();
+        layer.clean();
+        layer.clean();
+        layer.clean();
+        layer.clean();
+        layer.clean();
     });
 
     t.test('getAt method', function(t) {
