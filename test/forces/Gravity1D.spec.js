@@ -2,7 +2,7 @@
 
 var Gravity1D = require('../../src/forces/Gravity1D');
 var Force = require('../../src/forces/Force');
-var Vec3 = require('famous-math').Vec3;
+var Vec3 = require('famous-math/src/Vec3');
 var test = require('tape');
 
 test('Gravity1D', function(t) {

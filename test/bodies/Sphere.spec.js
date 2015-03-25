@@ -2,7 +2,7 @@
 
 var Particle = require('../../src/bodies/Particle');
 var Sphere = require('../../src/bodies/Sphere');
-var Vec3 = require('famous-math').Vec3;
+var Vec3 = require('famous-math/src/Vec3');
 var test = require('tape');
 
 function arraysAreEqual(a, b) {
@@ -29,7 +29,7 @@ test('Sphere', function(t) {
 
     t.test('properties should respond to radius', function(t) {
         t.assert(s.size[0] === 10 && s.size[1] === 10 && s.size[2] === 10, 'should initialize with the correct .size');
-        var i = s.inertia.get();
+        var i = s.localInertia.get();
         t.assert(arraysAreEqual(i, [20,0,0,0,20,0,0,0,20]), 'should initialize with the correct .inertia');
 
         t.assert(s.getRadius() === s.radius && s.radius === 5, '.getRadius should be a correct radius getter method');

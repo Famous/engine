@@ -2,7 +2,7 @@
 
 var test = require('tape');
 var ConvexBodyFactory = require('../../src/bodies/ConvexBodyFactory');
-var Vec3 = require('famous-math').Vec3;
+var Vec3 = require('famous-math/src/Vec3');
 
 function arraysAreApproximatelyEqual(a, b, tolerance) {
     for (var i = 0, len = a.length; i < len; i++) {
@@ -91,9 +91,9 @@ test('ConvexBodyFactory', function(t) {
         var ellipsoid = new CustomSphere({mass: 10, size: [40,80,50]});
         var box = new CustomBox({mass: 10, size: [50,75,30]});
 
-        var sphereInertia = sphere.inertia.get();
-        var ellipsoidInertia = ellipsoid.inertia.get();
-        var boxInertia = box.inertia.get();
+        var sphereInertia = sphere.localInertia.get();
+        var ellipsoidInertia = ellipsoid.localInertia.get();
+        var boxInertia = box.localInertia.get();
 
         var exactSphereInertia = [10*20*20*2/5,0,0,0,10*20*20*2/5,0,0,0,10*20*20*2/5];
         var exactEllipsoidInertia = [10*(40*40+25*25)/5,0,0,0,10*(20*20+25*25)/5,0,0,0,10*(20*20+40*40)/5];

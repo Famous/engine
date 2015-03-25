@@ -3,7 +3,7 @@
 var RotationalDrag = require('../../src/forces/RotationalDrag');
 var Force = require('../../src/forces/Force');
 var Box = require('../../src/bodies/Box');
-var Vec3 = require('famous-math').Vec3;
+var Vec3 = require('famous-math/src/Vec3');
 var test = require('tape');
 
 function vec3sAreEqual(a,b) {
@@ -36,8 +36,6 @@ test('RotationalDrag', function(t) {
 
         var v = Vec3.clone(p1.angularVelocity);
         v.scale(-d.strength);
-
-        v.applyMatrix(p1.inertia);
 
         d.update();
 

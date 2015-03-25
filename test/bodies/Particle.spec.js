@@ -1,9 +1,9 @@
 'use strict';
 
 var Particle = require('../../src/bodies/Particle');
-var Vec3 = require('famous-math').Vec3;
-var Quaternion = require('famous-math').Quaternion;
-var Mat33 = require('famous-math').Mat33;
+var Vec3 = require('famous-math/src/Vec3');
+var Quaternion = require('famous-math/src/Quaternion');
+var Mat33 = require('famous-math/src/Mat33');
 var test = require('tape');
 
 test('Particle', function(t) {
@@ -103,14 +103,15 @@ test('Particle', function(t) {
         t.assert(p.getAngularVelocity instanceof Function, '.getAngularVelocity should be a function');
         t.assert(p.setAngularVelocity instanceof Function, '.setAngularVelocity should be a function');
 
-        p.inertia = new Mat33([1,2,3,2,5,51,3,51,9]);
+        var I = new Mat33([1,2,3,2,5,51,3,51,9]);
+        p.inverseInertia = Mat33.inverse(I, new Mat33());
         var w = p.angularVelocity;
         p.setAngularVelocity(15,-20,35);
         t.assert(p.getAngularVelocity() === w, '.getAngularVelocity should return the angular velocity vector');
         t.assert(w.x === 15 && w.y === -20 && w.z === 35, '.setAngularVelocity should correctly set the angular velocity');
         var L = p.angularMomentum;
-        var e = p.inertia.vectorMultiply(p.angularVelocity, new Vec3());
-        t.assert(L.x === e.x && L.y === e.y && L.z === e.z, '.setAngularVelocity should update angular momentum');
+        var e = I.vectorMultiply(p.angularVelocity, new Vec3());
+        t.assert(Math.abs(L.x - e.x) < 0.001 && Math.abs(L.y - e.y) < 0.001 && Math.abs(L.z - e.z) < 0.001, '.setAngularVelocity should update angular momentum');
 
         t.end();
     });
@@ -119,8 +120,8 @@ test('Particle', function(t) {
         t.assert(p.getAngularMomentum instanceof Function, '.getAngularMomentum should be a function');
         t.assert(p.setAngularMomentum instanceof Function, '.setAngularMomentum should be a function');
 
-        p.inertia = new Mat33([1,2,3,2,5,51,3,51,9]);
-        p.inverseInertia = Mat33.inverse(p.inertia, new Mat33());
+        var I = new Mat33([1,2,3,2,5,51,3,51,9]);
+        p.inverseInertia = Mat33.inverse(I, new Mat33());
         var L = p.angularMomentum;
         p.setAngularMomentum(13,-21,37);
         t.assert(p.getAngularMomentum() === L, '.getAngularMomentum should return the angular momentum vector');
@@ -155,8 +156,8 @@ test('Particle', function(t) {
         t.assert(p.applyImpulse instanceof Function, '.applyImpulse should be a function');
         t.assert(p.applyAngularImpulse instanceof Function, '.applyAngularImpulse should be a function');
 
-        p.inertia = new Mat33([1,2,4,2,5,11,4,11,9]);
-        p.inverseInertia = Mat33.inverse(p.inertia, new Mat33());
+        var I = new Mat33([1,2,4,2,5,11,4,11,9]);
+        p.inverseInertia = Mat33.inverse(I, new Mat33());
 
         p.setVelocity(1,2,3);
         var M = p.mass;
@@ -167,7 +168,7 @@ test('Particle', function(t) {
         t.assert(v.x === 1+13/M && v.y === 2+17/M && v.z === 3+19/M, '.applyImpulse should update velocity correctly');
 
         p.setAngularVelocity(2,3,1);
-        var l = p.inertia.vectorMultiply(p.angularVelocity, new Vec3());
+        var l = I.vectorMultiply(p.angularVelocity, new Vec3());
         var ngimpulse = new Vec3(15,6,8)
         var e = p.inverseInertia.vectorMultiply(ngimpulse, new Vec3());
         p.applyAngularImpulse(ngimpulse);

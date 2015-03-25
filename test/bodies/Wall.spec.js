@@ -2,7 +2,7 @@
 
 var Particle = require('../../src/bodies/Particle');
 var Wall = require('../../src/bodies/Wall');
-var Vec3 = require('famous-math').Vec3;
+var Vec3 = require('famous-math/src/Vec3');
 var test = require('tape');
 
 test('Wall', function(t) {
