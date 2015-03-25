@@ -26,11 +26,11 @@ var OPACITY = 'opacity';
  * its children. While the scene graph is being traversed recursively, the RenderContext
  * does not have a notion of children. Instead, the Node recursively updates
  * its LocalDispatch (and therefore its RenderContext) and all its children.
- * 
+ *
  * @class RenderContext
  * @constructor
  * @private
- * 
+ *
  * @param {LocalDisaptch} dispatch
  */
 function RenderContext (dispatch) {
@@ -64,7 +64,7 @@ RenderContext.prototype.offChange = function offChange (cb) {
  *
  * @method  onTransformChange
  * @chainable
- * 
+ *
  * @param  {Function} cb    callback function to be invoked whenever the transform
  *                          attached to the RenderContext changes
  * @return {RenderContext}  this
@@ -80,7 +80,7 @@ RenderContext.prototype.onTransformChange = function onTransformChange (cb) {
  *
  * @method  offTransformChange
  * @chainable
- * 
+ *
  * @param  {Function} cb    callback function previously attached to the `transform`
  *                          event using `onTransformChange`
  * @return {RenderContext}  this
@@ -96,7 +96,7 @@ RenderContext.prototype.offTransformChange = function offTransformChange (cb) {
  *
  * @method  onSizeChange
  * @chainable
- * 
+ *
  * @param  {Function} cb    callback function to be invoked whenever the size
  *                          of the RenderContext changes
  * @return {RenderContext}  this
@@ -112,7 +112,7 @@ RenderContext.prototype.onSizeChange = function onSizeChange (cb) {
  *
  * @method  offSizeChange
  * @chainable
- * 
+ *
  * @param  {Function} cb    callback function previously attached to the `size`
  *                          event using `onSizeChange`
  * @return {RenderContext}  this
@@ -123,44 +123,12 @@ RenderContext.prototype.offSizeChange = function offSizeChange (cb) {
 };
 
 /**
- * Registers a callback function to be invoked whenever the origin of the
- * RenderContext changes.
- *
- * @method  onOriginChange
- * @chainable
- * 
- * @param  {Function} cb    callback function to be invoked whenever the
- *                          origin of the RenderContext changes
- * @return {RenderContext}  this
- */
-RenderContext.prototype.onOriginChange = function onOriginChange (cb) {
-    this._events.on(ORIGIN, cb);
-    return this;
-};
-
-/**
- * Deregisters a callback function previously attached to the `transform`
- * event using `onTransformChange`.
- *
- * @method  offTransformChange
- * @chainable
- * 
- * @param  {Function} cb    callback function previously attached to the 
- *                          transform` event using `onTransformChange`
- * @return {RenderContext}  this
- */
-RenderContext.prototype.offOriginChange = function offOriginChange (cb) {
-    this._events.off(ORIGIN, cb);
-    return this;
-};
-
-/**
  * Registers a callback function to be invoked whenever the transform attached
  * to the RenderContext changes.
  *
  * @method  onTransformChange
  * @chainable
- * 
+ *
  * @param  {Function} cb    callback function to be invoked whenever the transform
  *                          attached to the RenderContext changed
  * @return {RenderContext}  this
@@ -176,7 +144,7 @@ RenderContext.prototype.onOpacityChange = function onOpacityChange (cb) {
  *
  * @method  offTransformChange
  * @chainable
- * 
+ *
  * @param  {Function} cb    callback function previously attached to the `transform`
  *                          event using `onTransformChange`
  * @return {RenderContext}  this
@@ -191,7 +159,7 @@ RenderContext.prototype.offOpacityChange = function offOpacityChange (cb) {
  *
  * @method  setOpacity
  * @chainable
- * 
+ *
  * @param {Number} opacity  opacity to be set on the RenderContext
  * @return {RenderContext}  this
  */
@@ -205,7 +173,7 @@ RenderContext.prototype.setOpacity = function setOpacity (opacity) {
  *
  * @method setPosition
  * @chainable
- * 
+ *
  * @param {Number} x        x position
  * @param {Number} y        y position
  * @param {Number} z        z position
@@ -221,7 +189,7 @@ RenderContext.prototype.setPosition = function setPosition (x, y, z) {
  *
  * @method setAbsolute
  * @chainable
- * 
+ *
  * @param {Number} x        absolute allocated pixel space in x direction
  *                          (absolute width)
  * @param {Number} y        absolute allocated pixel space in y direction
@@ -240,7 +208,7 @@ RenderContext.prototype.setAbsolute = function setAbsolute (x, y, z) {
  *
  * @method  getSize
  * @chainable
- * 
+ *
  * @return {Number[]} 3D absolute **pixel** size
  */
 RenderContext.prototype.getSize = function getSize () {
@@ -252,7 +220,7 @@ RenderContext.prototype.getSize = function getSize () {
  *
  * @method  setProportions
  * @chainable
- * 
+ *
  * @param {Number} x        proportional allocated relative space in x direction (relative width)
  * @param {Number} y        proportional allocated relative space in y direction (relative height)
  * @param {Number} z        proportional allocated relative space in z direction (relative depth)
@@ -269,7 +237,7 @@ RenderContext.prototype.setProportions = function setProportions (x, y, z) {
  *
  * @method  setDifferntial
  * @chainable
- * 
+ *
  * @param {Number} x        absolute pixel size to be added in x direction
  *                          (additional width)
  * @param {Number} y        absolute pixel size to be added in y direction
@@ -288,7 +256,7 @@ RenderContext.prototype.setDifferential = function setDifferentials (x, y, z) {
  *
  * @method  setRotation
  * @chainable
- * 
+ *
  * @param {RenderContext} x     x rotation
  * @param {RenderContext} y     y rotation
  * @param {RenderContext} z     z rotation
@@ -304,11 +272,11 @@ RenderContext.prototype.setRotation = function setRotation (x, y, z) {
  *
  * @method  setScale
  * @chainable
- * 
+ *
  * @param {Number} x        x scale
  * @param {Number} y        y scale
  * @param {Number} z        z scale
- * @return {RenderContext}  this 
+ * @return {RenderContext}  this
  */
 RenderContext.prototype.setScale = function setScale (x, y, z) {
     this._transform.setScale(x, y, z);
@@ -320,7 +288,7 @@ RenderContext.prototype.setScale = function setScale (x, y, z) {
  *
  * @method  setAlign
  * @chainable
- * 
+ *
  * @param {Number} x        x align
  * @param {Number} y        y align
  * @param {Number} z        z align
@@ -336,7 +304,7 @@ RenderContext.prototype.setAlign = function setAlign (x, y, z) {
  *
  * @method  setOrigin
  * @chainable
- * 
+ *
  * @param {Number} x        x origin
  * @param {Number} y        y origin
  * @param {Number} z        z origin
@@ -353,7 +321,7 @@ RenderContext.prototype.setOrigin = function setOrigin (x, y, z) {
  *
  * @method  setMountPoint
  * @chainable
- * 
+ *
  * @param {Number} x        mount point in x direction
  * @param {Number} y        mount point in y direction
  * @param {Number} z        mount point in z direction
@@ -377,10 +345,10 @@ var identTrans = new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 
  * corresponding change events. Takes into account the parentContext's size
  * invalidations in order to maintain high throughput while still updating the
  * entire scene graph on every FRAME command.
- * 
+ *
  * @method  update
  * @chainable
- * 
+ *
  * @param  {RenderContext} parentContext    parent context passed down recrusively by
  *                                          the Node through the LocalDispatch
  * @return {RenderContext}                  this
@@ -401,29 +369,27 @@ RenderContext.prototype.update = function update (parentContext) {
         parentContext ? parentContext._size.getTopDownSize() : identSize
     );
 
-    if (!this._origin.isActive) 
-        this._origin._setWithoutActivating(
-            parentContext ? parentContext._origin.x : 0,
-            parentContext ? parentContext._origin.y : 0,
-            parentContext ? parentContext._origin.z : 0);
     var mySize = this._size.get();
     var parentSize = parentContext ? parentContext._size.get() : identSize;
     this._align.update(parentSize);
     this._mountPoint.update(mySize);
+    this._origin.update(mySize);
 
     var alignInvalidations;
 
     if (this._recalcAll || (!this._noParent && !parentContext)) {
         alignInvalidations = (1 << 16) - 1;
-    } else if (this._noParent && !parentContext) {
+    }
+    else if (this._noParent && !parentContext) {
         alignInvalidations = 0;
-    } else {
-        alignInvalidations = parentContext._transform._previouslyInvalidated;
+    }
+    else {
+        alignInvalidations = parentContext._origin.toOriginTransform._previouslyInvalidated;
     }
 
     this._align.transform._update(
         alignInvalidations,
-        parentContext ? parentContext._transform._matrix : identTrans
+        parentContext ? parentContext._origin.toOriginTransform._matrix : identTrans
     );
 
     this._mountPoint.transform._update(
@@ -431,17 +397,25 @@ RenderContext.prototype.update = function update (parentContext) {
         this._align.transform._matrix
     );
 
-    this._transform._update(
+    this._origin.fromOriginTransform._update(
         this._mountPoint.transform._previouslyInvalidated,
         this._mountPoint.transform._matrix
     );
 
-    if (this._transform._previouslyInvalidated)
-       this._events.trigger(TRANSFORM, this._transform);
+    this._transform._update(
+        this._origin.fromOriginTransform._previouslyInvalidated,
+        this._origin.fromOriginTransform._matrix
+    );
 
-    if (this._origin.dirty) {
-        this._events.trigger(ORIGIN, this._origin);
-        this._origin.clean();
+    this._origin.toOriginTransform._update(
+        this._transform._previouslyInvalidated,
+        this._transform._matrix
+    );
+
+    var worldTransform = this._origin.toOriginTransform;
+
+    if (worldTransform._previouslyInvalidated) {
+       this._events.trigger(TRANSFORM, worldTransform);
     }
 
     if (this._size._previouslyInvalidated)
