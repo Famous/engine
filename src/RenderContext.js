@@ -86,7 +86,7 @@ RenderContext.prototype.onTransformChange = function onTransformChange (cb) {
  * @return {RenderContext}  this
  */
 RenderContext.prototype.offTransformChange = function offTransformChange (cb) {
-    this._events.on(TRANSFORM, cb);
+    this._events.off(TRANSFORM, cb);
     return this;
 };
 
