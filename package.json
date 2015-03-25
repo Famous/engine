@@ -35,6 +35,6 @@
   "dependencies": {
     "famous-dom-renderers": "git+ssh://git@github.famo.us/platform/dom-renderers#v0.2.0",
     "famous-webgl-renderers": "git+ssh://git@github.famo.us/platform/webgl-renderers#v0.1.1",
-    "famous-utilities": "git+ssh://git@github.famo.us/platform/utilities#master#v0.2.0"
+    "famous-utilities": "git+ssh://git@github.famo.us/platform/utilities#v0.2.0"
   }
 }
