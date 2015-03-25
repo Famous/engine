@@ -69,7 +69,7 @@ GlobalDispatch.prototype.targetedOn = function targetedOn (path, key, cb) {
  * @return {GlobalDispatch} this
  */
 GlobalDispatch.prototype.targetedOff = function targetedOff (path, key, cb) {
-    if (!this._targetedCallbacks[path]) this._targetedCallbacks[path].off(key, cb);
+    if (this._targetedCallbacks[path]) this._targetedCallbacks[path].off(key, cb);
     return this;
 };
 
