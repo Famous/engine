@@ -3,7 +3,8 @@
 var VirtualElement = require('famous-dom-renderers').VirtualElement;
 var WebGLRenderer = require('famous-webgl-renderers').WebGLRenderer;
 var Camera = require('famous-components').Camera;
-var VirtualWindow = require('./VirtualWindow');
+var strip = require('famous-utilities').strip;
+var flatClone = require('famous-utilities').flatClone;
 
 /**
  * Instantiates a new Compositor, used for routing commands received from the
@@ -23,8 +24,6 @@ function Compositor() {
         perspectiveTransform: new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]),
         viewTransform: new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1])
     };
-
-    this._virtualWindow = new VirtualWindow(this);
 }
 
 /**
@@ -184,6 +183,32 @@ Compositor.prototype.sendResize = function sendResize (selector, size) {
     this._sentResize = true;
 };
 
+Compositor.prototype._wrapProxyFunction = function _wrapProxyFunction(id) {
+    var _this = this;
+    return function() {
+        var i;
+
+        for (i = 0; i < arguments.length; i++) {
+            if (typeof arguments[i] === 'object') {
+                arguments[i] = strip(flatClone(arguments[i]));
+            }
+        }
+        _this._outCommands.push('INVOKE', id, Array.prototype.slice.call(arguments));
+    };
+};
+
+Compositor.prototype.invoke = function invoke (target, methodName, args, functionArgs) {
+    var targetObject = window[target];
+
+    for (var i = 0; i < args.length; i++) {
+        if (functionArgs[i] != null) {
+            args[i] = this._wrapProxyFunction(functionArgs[i]);
+        }
+    }
+
+    targetObject[methodName].apply(targetObject, args);
+};
+
 /**
  * Processes the previously via `receiveCommands` updated incoming "in"
  * command queue.
@@ -203,8 +228,8 @@ Compositor.prototype.drawCommands = function drawCommands() {
             case 'WITH':
                 this.handleWith(commands);
                 break;
-            case 'PROXY':
-                this._virtualWindow.listen(commands.shift(), commands.shift());
+            case 'INVOKE':
+                this.invoke(commands.shift(), commands.shift(), commands.shift(), commands.shift());
                 break;
             case 'NEED_SIZE_FOR':
                 this.giveSizeFor(commands);
