@@ -56,12 +56,6 @@ Transitionable.unregisterMethod = function unregisterMethod(name) {
 };
 
 Transitionable.prototype._loadNext = function _loadNext() {
-    if (this._callback) {
-        var callback = this._callback;
-        this._callback = null;
-        callback();
-        return;
-    }
     if (this._transitionQueue.length === 0) {
         this.set(this.get()); // no update required
         return;
@@ -93,6 +87,13 @@ Transitionable.prototype._loadNext = function _loadNext() {
     if (this.velocity !== undefined) this._currentTransition.velocity = this.velocity;
 
     this._engineInstance.set(this._currentEndState, this._currentTransition, this._boundLoadNext);
+
+    if (this._callback) {
+        var callback = this._callback;
+        this._callback = null;
+        callback();
+        return;
+    }
 };
 
 

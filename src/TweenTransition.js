@@ -204,7 +204,7 @@ TweenTransition.prototype.get = function get(timestamp) {
 function _calculateVelocity(current, start, curve, duration, t) {
     var velocity;
     var eps = 1e-7;
-    var speed = (curve(t) - curve(t - eps)) / eps;
+    var speed =  !curve ? 0 : (curve(t) - curve(t - eps)) / eps;
     if (current instanceof Array) {
         velocity = [];
         for (var i = 0; i < current.length; i++){
@@ -245,15 +245,6 @@ function _calculateState(start, end, t) {
  *    time. If omitted, use current time. (Unix epoch time)
  */
 TweenTransition.prototype.update = function update(timestamp) {
-    if (!this._active) {
-        if (this._callback) {
-            var callback = this._callback;
-            this._callback = undefined;
-            callback();
-        }
-        return;
-    }
-
     if (!timestamp) timestamp = TweenTransition.now();
     if (this._updateTime >= timestamp) return;
     this._updateTime = timestamp;
@@ -272,6 +263,15 @@ TweenTransition.prototype.update = function update(timestamp) {
         var t = timeSinceStart / this._duration;
         this.state = _calculateState(this._startValue, this._endValue, this._curve(t));
         this.velocity = _calculateVelocity(this.state, this._startValue, this._curve, this._duration, t);
+    }
+
+    if (!this._active) {
+        if (this._callback) {
+            var callback = this._callback;
+            this._callback = undefined;
+            callback();
+        }
+        return;
     }
 };
 
