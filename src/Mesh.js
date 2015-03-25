@@ -26,7 +26,6 @@ function Mesh (dispatch, options) {
     this._metallness = new Transitionable(0);
     this._normals = new Transitionable([0, 0, 0]);
 
-    this._origin = new Float32Array([0, 0, 0]);
     this._size = [];
     this._expressions = {};
     this._geometry;
@@ -35,11 +34,9 @@ function Mesh (dispatch, options) {
     this.dispatch.onTransformChange(this._receiveTransformChange.bind(this));
     this.dispatch.onSizeChange(this._receiveSizeChange.bind(this));
     this.dispatch.onOpacityChange(this._receiveOpacityChange.bind(this));
-    this.dispatch.onOriginChange(this._receiveOriginChange.bind(this));
 
     this._receiveTransformChange(this.dispatch.getContext()._transform);
     this._receiveSizeChange(this.dispatch.getContext()._size);
-    this._receiveOriginChange(this.dispatch.getContext()._origin);
     this._receiveOpacityChange(this.dispatch.getContext()._opacity);
 
     if (options) this.setOptions(options);
@@ -84,21 +81,6 @@ Mesh.prototype._receiveSizeChange = function _receiveSizeChange(size) {
     this.queue.push('size');
     this.queue.push(size);
  };
-
-/**
- * Receives origin change updates from the scene graph.
- *
- * @private
- */
-Mesh.prototype._receiveOriginChange = function _receiveOriginChange(origin) {
-    this.dispatch.dirtyRenderable(this._id);
-    this.queue.push('GL_UNIFORMS');
-    this.queue.push('origin');
-    this._origin[0] = origin.x;
-    this._origin[1] = origin.y;
-    this._origin[2] = origin.z;
-    this.queue.push(this._origin);
-};
 
 /**
  * Receives opacity change updates from the scene graph.
