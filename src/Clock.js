@@ -11,7 +11,7 @@
 function Clock () {
     this._updates = [];
     this._nextStepUpdates = [];
-    this._time = null;
+    this._time = 0;
 }
 
 /**
@@ -20,14 +20,16 @@ function Clock () {
  * @method  step
  * @chainable
  * 
- * @param  {Number} time unix timstamp
+ * @param  {Number} time high resolution timstamp used for invoking the
+ *                       `update` method on all registered objects
  * @return {Clock}       this
  */
 Clock.prototype.step = function step (time) {
     this._time = time;
 
-    for (var i = 0, len = this._updates.length ; i < len ; i++)
+    for (var i = 0, len = this._updates.length; i < len; i++) {
         this._updates[i].update(time);
+    }
 
     while (this._nextStepUpdates.length > 0) {
         this._nextStepUpdates.shift().update(time);
@@ -38,17 +40,19 @@ Clock.prototype.step = function step (time) {
 
 /**
  * Registers an object to be updated on every frame.
- * targets are expected to implement the `Updateable` interface, which means
- * they need an update method, which will be called with the new internal time.
  *
  * @method  update
  * @chainable
  * 
- * @param  {Object} target  Object having an `update` method
- * @return {Clock}          this
+ * @param {Object}      updateable          Object having an `update` method
+ * @param {Function}    updateable.update   update method to be called on every
+ *                                          step
+ * @return {Clock}                          this
  */
-Clock.prototype.update = function update (target) {
-    this._updates.push(target);
+Clock.prototype.update = function update (updateable) {
+    if (this._updates.indexOf(updateable) === -1) {
+        this._updates.push(updateable);
+    }
     return this;
 };
 
@@ -59,13 +63,15 @@ Clock.prototype.update = function update (target) {
  * @method  noLongerUpdate
  * @chainable
  * 
- * @param  {Object} target Object previously registerd using the `update` method
- * @return {Clock}         this
+ * @param  {Object} updateable  Object previously registered using the `update`
+ *                              method
+ * @return {Clock}              this
  */
-Clock.prototype.noLongerUpdate = function noLongerUpdate(target) {
-    var index = this._updates.indexOf(target);
-    if (index > -1)
+Clock.prototype.noLongerUpdate = function noLongerUpdate(updateable) {
+    var index = this._updates.indexOf(updateable);
+    if (index > -1) {
         this._updates.splice(index, 1);
+    }
     return this;
 };
 
@@ -74,25 +80,28 @@ Clock.prototype.noLongerUpdate = function noLongerUpdate(target) {
  *
  * @method  getTime
  * 
- * @return {Number} Unix timestamp
+ * @param  {Number} time high resolution timstamp used for invoking the
+ *                       `update` method on all registered objects
  */
-Clock.prototype.getTime = function getTime () {
+Clock.prototype.getTime = function getTime() {
     return this._time;
 };
 
 /**
- * Registers object to be updated **once** on the next step. Regsitered
- * targets are not guaranteed to be unique, therefore multiple updates per
- * frame per object are possible.
+ * Registers object to be updated **once** on the next step. Registered
+ * updateables are not guaranteed to be unique, therefore multiple updates per
+ * step per object are possible.
  *
  * @method nextStep
  * @chainable
  * 
- * @param  {Object} target  Object having an `update` method.
- * @return {Clock}          this
+ * @param {Object}      updateable          Object having an `update` method
+ * @param {Function}    updateable.update   update method to be called on the
+ *                                          next step
+ * @return {Clock}                          this
  */
-Clock.prototype.nextStep = function nextStep (target) {
-    this._nextStepUpdates.push(target);
+Clock.prototype.nextStep = function nextStep(updateable) {
+    this._nextStepUpdates.push(updateable);
     return this;
 };
 
