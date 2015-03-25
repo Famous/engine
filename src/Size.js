@@ -96,24 +96,21 @@ Size.prototype.setState = function setState(state) {
 };
 
 Size.prototype._cleanAbsoluteX = function _cleanAbsoluteX(prop) {
-    if (prop.dirtyX) {
+    if (prop.dirtyX)
         prop.dirtyX = prop.x.isActive();
-        return prop.x.get();
-    } else return null;
+    return prop.x.get();
 };
 
 Size.prototype._cleanAbsoluteY = function _cleanAbsoluteY(prop) {
-    if (prop.dirtyY) {
+    if (prop.dirtyY)
         prop.dirtyY = prop.y.isActive();
-        return prop.y.get();
-    } else return null;
+    return prop.y.get();
 };
 
 Size.prototype._cleanAbsoluteZ = function _cleanAbsoluteZ(prop) {
-    if (prop.dirtyZ) {
+    if (prop.dirtyZ)
         prop.dirtyZ = prop.z.isActive();
-        return prop.z.get();
-    } else return null;
+    return prop.z.get();
 };
 
 /**
