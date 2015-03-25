@@ -8,7 +8,7 @@ var VirtualWindow = require('./VirtualWindow');
 /**
  * Instantiates a new Compositor, used for routing commands received from the
  * WebWorker to the WebGL and DOM renderer.
- * 
+ *
  * @class Compositor
  * @constructor
  */
@@ -30,11 +30,10 @@ function Compositor() {
 /**
  * Exposes a key-value-mapping of commands to the renderer they should be
  * routed to.
- * 
+ *
  * @type {Object}
  */
 Compositor.CommandsToOutput = {
-    CHANGE_TRANSFORM_ORIGIN: 'DOM',
     CHANGE_TRANSFORM: 'DOM',
     CHANGE_PROPERTY: 'DOM',
     CHANGE_CONTENT: 'DOM',
@@ -63,7 +62,7 @@ Compositor.CommandsToOutput = {
  *
  * @method sendEvent
  * @private
- * 
+ *
  * @param  {String} path    render path to the node the event should be
  *                          triggered on (*targeted event*)
  * @param  {String} ev      event type
@@ -76,10 +75,10 @@ Compositor.prototype.sendEvent = function sendEvent(path, ev, payload) {
 
 /**
  * Internal helper method used by `drawCommands`.
- * 
+ *
  * @method handleWith
  * @private
- * 
+ *
  * @param  {Array} commands     remaining message queue received from the
  *                              WebWorker, used to shift single messages from
  */
@@ -131,11 +130,11 @@ Compositor.prototype.handleWith = function handleWith (commands) {
  *
  * @method getOrSetContext
  * @private
- * 
+ *
  * @param  {String} selector            document query selector used for
  *                                      retrieving the DOM node the
  *                                      VirtualElement should be attached to
- * @return {Object} result              
+ * @return {Object} result
  * @return {VirtualElement} result.DOM  final VirtualElement
  */
 Compositor.prototype.getOrSetContext = function getOrSetContext(selector) {
@@ -153,7 +152,7 @@ Compositor.prototype.getOrSetContext = function getOrSetContext(selector) {
  *
  * @method giveSizeFor
  * @private
- * 
+ *
  * @param  {Array} commands     remaining message queue received from the
  *                              WebWorker, used to shift single messages from
  */
@@ -253,7 +252,7 @@ Compositor.prototype.drawCommands = function drawCommands() {
 /**
  * Used by ThreadManager to update the interal queue of incoming commands.
  * Receiving commands does not immediately start the rederning process.
- * 
+ *
  * @param  {Array} commands     command queue to be processed by the
  *                              compositor's `drawCommands` method
  */
