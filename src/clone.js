@@ -2,6 +2,7 @@
 
 /**
  *  Deep clone an object.
+ *  @memberof Utilities
  *  @param b {Object} Object to clone
  *  @return a {Object} Cloned object.
  */

@@ -4,7 +4,7 @@
  * Load a URL and return its contents in a callback
  *
  * @method loadURL
- *
+ * @memberof Utilities
  * @param {string} url URL of object
  * @param {function} callback callback to dispatch with content
  */
