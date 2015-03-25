@@ -52,7 +52,7 @@ body {
     transform-origin: 0% 0%;
     -webkit-backface-visibility: visible;
     backface-visibility: visible;
-    -webkit-transform-style: flat;
+    -webkit-transform-style: preserve-3d;
     transform-style: preserve-3d; /* performance */
     -webkit-tap-highlight-color: transparent;
     pointer-events: auto;
