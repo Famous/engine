@@ -5,6 +5,7 @@ var Program = require('./Program');
 var Buffer = require('./Buffer');
 var BufferRegistry = require('./BufferRegistry');
 var checkers = require('./Checkerboard');
+var Plane = require('famous-webgl-geometries').Plane;
 
 var identity = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
 
@@ -20,16 +21,8 @@ var identity = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
  * @param {DOMElement} canvas The dom element that GL will paint itself onto.
  *
  */
-function WebGLRenderer(container) {
-    this.container = container;
-    this.canvas = document.createElement('canvas');
-
-    if (this.container === document.body) {
-        window.addEventListener('resize', this.updateSize.bind(this));
-    }
-
-    this.container.appendChild(this.canvas);
-    this.canvas.className = 'famous-webgl';
+function WebGLRenderer(canvas) {
+    this.canvas = canvas;
 
     var gl = this.gl = this.getWebGLContext(this.canvas);
 
@@ -41,6 +34,10 @@ function WebGLRenderer(container) {
 
     this.meshRegistry = {};
     this.meshRegistryKeys = [];
+
+    this.cutoutRegistry = {};
+    this.cutoutRegistryKeys = [];
+    this.cutoutGeometry;
 
     /**
      * Lights
@@ -70,7 +67,6 @@ function WebGLRenderer(container) {
     this.resolutionValues = [];
 
     this.cachedSize = [];
-    this.updateSize();
 
     this.projectionTransform = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
 }
@@ -141,6 +137,42 @@ WebGLRenderer.prototype.createMesh = function createMesh(path) {
         texture: null
     };
 };
+
+WebGLRenderer.prototype.getOrSetCutout = function getOrSetCutout(path) {
+    var geometry;
+
+    if (this.cutoutRegistry[path]) {
+        return this.cutoutRegistry[path];
+    }
+    else {
+        if (!this.cutoutGeometry) {
+            geometry = this.cutoutGeometry = Plane();
+
+            this.bufferRegistry.allocate(geometry.id, 'pos', geometry.spec.bufferValues[0], 3);
+            this.bufferRegistry.allocate(geometry.id, 'texCoord', geometry.spec.bufferValues[1], 2);
+            this.bufferRegistry.allocate(geometry.id, 'normals', geometry.spec.bufferValues[2], 3);
+            this.bufferRegistry.allocate(geometry.id, 'indices', geometry.spec.bufferValues[3], 1);
+        }
+
+        this.cutoutRegistryKeys.push(path);
+
+        return this.cutoutRegistry[path] = {
+            uniformKeys: ['transform', 'size', 'origin', 'baseColor', 'opacity'],
+            uniformValues: [identity, [0, 0, 0], [0, 0, 0], [0, 0, 0], 0],
+            geometry: this.cutoutGeometry.id,
+            drawType: 4
+        };
+    }
+
+};
+
+WebGLRenderer.prototype.setCutoutUniform = function setCutoutUniform(path, uniformName, uniformValue) {
+    var cutout = this.getOrSetCutout(path);
+
+    var index = cutout.uniformKeys.indexOf(uniformName);
+
+    cutout.uniformValues[index] = uniformValue;
+}
 
 WebGLRenderer.prototype.setMeshOptions = function(path, options) {
     var mesh = this.meshRegistry[path] || this.createMesh(path);
@@ -228,6 +260,7 @@ WebGLRenderer.prototype.draw = function draw(renderState) {
     var size;
     var light;
     var stride;
+    var cutout;
 
     /**
      * Update lights
@@ -252,6 +285,16 @@ WebGLRenderer.prototype.draw = function draw(renderState) {
     this.projectionTransform[11] = renderState.perspectiveTransform[11];
 
     this.program.setUniforms(['perspective', 'time', 'view'], [this.projectionTransform, Date.now()  % 100000 / 1000, renderState.viewTransform]);
+
+    for (var i = 0, len = this.cutoutRegistryKeys.length; i < len; i++) {
+        cutout = this.cutoutRegistry[this.cutoutRegistryKeys[i]];
+        buffers = this.bufferRegistry.registry[cutout.geometry];
+
+        this.gl.enable(this.gl.BLEND);
+        this.program.setUniforms(cutout.uniformKeys, cutout.uniformValues);
+        this.drawBuffers(buffers, cutout.drawType, cutout.geometry);
+        this.gl.disable(this.gl.BLEND);
+    }
 
     for(var i = 0; i < this.meshRegistryKeys.length; i++) {
         mesh = this.meshRegistry[this.meshRegistryKeys[i]];
@@ -442,16 +485,12 @@ function checkFrameBufferStatus(gl) {
  *
  * @method updateSize
  */
-WebGLRenderer.prototype.updateSize = function updateSize() {
-    var width = this.container.offsetWidth;
-    var height = this.container.offsetHeight;
-
-    this.cachedSize[0] = width;
-    this.cachedSize[1] = height;
-    this.cachedSize[2] = (width > height) ? width : height;
-
-    this.canvas.width  = width;
-    this.canvas.height = height;
+WebGLRenderer.prototype.updateSize = function updateSize(size) {
+    if (size) {
+        this.cachedSize[0] = size[0];
+        this.cachedSize[1] = size[1];
+        this.cachedSize[2] = (size[0] > size[1]) ? size[0] : size[1];
+    }
 
     this.gl.viewport(0, 0, this.cachedSize[0], this.cachedSize[1]);
 
