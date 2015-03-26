@@ -3,10 +3,16 @@
 var Transitionable = require('famous-transitions').Transitionable;
 
 /**
+ * Size component used for managing the size of the underlying RenderContext.
+ * Supports absolute and relative (proportional and differential) sizing.
+ * 
  * @class Size
  * @constructor
  * @component
- * @param {LocalDispatch} dispatch LocalDispatch to be retrieved from corresponding Render Node of the Size component
+ * 
+ * @param {LocalDispatch} dispatch LocalDispatch to be retrieved from
+ *                                 corresponding RenderNode of the Size
+ *                                 component
  */
 function Size(dispatch) {
     this._dispatch = dispatch;
@@ -31,21 +37,47 @@ function Size(dispatch) {
 }
 
 /** 
-* stringifies Size
+* Stringifies Size.
 *
-* @method
-* @return {String} the name of the Component Class: 'Align' 
+* @method toString
+* 
+* @return {String} `Size`
 */
 Size.toString = function toString() {
     return 'Size';
 };
 
 /**
+ * @typedef absoluteSizeState
+ * @type {Object}
+ * @property {String} type current type of sizing being applied ('absolute')
+ * @property {String} component component name ('Size')
+ * @property {number} x
+ * @property {number} y
+ * @property {number} z
+ */
+
+/**
+ * @typedef relativeSizeState
+ * @type {Object}
+ * @property {String} type current type of sizing being applied ('relative')
+ * @property {String} component component name ('Size')
+ * @property {Object} differential
+ * @property {number} differential.x
+ * @property {number} differential.y
+ * @property {number} differential.z
+ * @property {Object} proportional
+ * @property {number} proportional.x
+ * @property {number} proportional.y
+ * @property {number} proportional.z
+ */
+
+/**
+* Returns serialized state of the component.
 *
-* Returns state object
-*
-* @method 
-* @return {Object} containing stringified constructor, x, y, z numeric size
+* @method getState
+* 
+* @return {absoluteSizeState|relativeSizeState}
 */
 Size.prototype.getState = function getState() {
     if (this._absoluteMode) {
@@ -74,12 +106,16 @@ Size.prototype.getState = function getState() {
 };
 
 /**
-* 
-* Sets state of size
+* Updates state of component.
 *
-* @method
-* @param {Object} state -- component: stringified constructor, x: number, y: number, z: number
-* @return {Boolean} true if component deeply equals stringified constructor, sets position coordinates, else returns false
+* @method setState
+* 
+* @param {absoluteSizeState|relativeSizeState} state state encoded in same
+*                                                    format as state retrieved
+*                                                    through `getState`
+* @return {Boolean}                                  boolean indicating
+*                                                    whether the new state has
+*                                                    been applied
 */
 Size.prototype.setState = function setState(state) {
     if (state.component === this.constructor.toString()) {
@@ -117,8 +153,9 @@ Size.prototype._cleanAbsoluteZ = function _cleanAbsoluteZ(prop) {
 *
 * If true, component is to be updated on next engine tick
 *
-* @method
-* @return {Boolean} 
+* @method clean
+* 
+* @return {Boolean} boolean indicating whether the component is still dirty
 */
 Size.prototype.clean = function clean () {
     var context = this._dispatch._context;
@@ -155,16 +192,18 @@ Size.prototype.clean = function clean () {
 };
 
 /**
+* Applies absolute size.
 *
-* Sets absolute Size
-*
-* @method
-* @param {Number} x used to set x size
-* @param {Number} y used to set y size
-* @param {Number} z used to set z size
-* @param {Object} options options hash
-* @param {Function} callback function to execute after setting each size
+* @method setAbsolute
 * @chainable
+* 
+* @param {Number} x used to set absolute size in x-direction (width)
+* @param {Number} y used to set absolute size in y-direction (height)
+* @param {Number} z used to set absolute size in z-direction (depth)
+* @param {Object} options options hash
+* @param {Function} callback callback function to be executed after the
+*                            transitions have been completed
+* @return {Size} this
 */
 Size.prototype.setAbsolute = function setAbsolute(x, y, z, options, callback) {
     this._dispatch.dirtyComponent(this._id);
@@ -185,6 +224,20 @@ Size.prototype.setAbsolute = function setAbsolute(x, y, z, options, callback) {
     return this;
 };
 
+/**
+* Applies proportional size.
+*
+* @method setProportional
+* @chainable
+* 
+* @param {Number} x used to set proportional size in x-direction (width)
+* @param {Number} y used to set proportional size in y-direction (height)
+* @param {Number} z used to set proportional size in z-direction (depth)
+* @param {Object} options options hash
+* @param {Function} callback callback function to be executed after the
+*                            transitions have been completed
+* @return {Size} this
+*/
 Size.prototype.setProportional = function setProportional(x, y, z, options, callback) {
     this._dispatch.dirtyComponent(this._id);
     this._needsDEBUG = true;
@@ -205,6 +258,19 @@ Size.prototype.setProportional = function setProportional(x, y, z, options, call
     return this;
 };
 
+/**
+* Applies differential size to Size component.
+*
+* @method setDifferential
+* @chainable
+* 
+* @param {Number} x used to set differential size in x-direction (width)
+* @param {Number} y used to set differential size in y-direction (height)
+* @param {Number} z used to set differential size in z-direction (depth)
+* @param {Object} options options hash
+* @param {Function} callback callback function to be executed after the
+*                            transitions have been completed
+*/
 Size.prototype.setDifferential = function setDifferential(x, y, z, options, callback) {
     this._dispatch.dirtyComponent(this._id);
     var prop = this._differential;
@@ -225,14 +291,35 @@ Size.prototype.setDifferential = function setDifferential(x, y, z, options, call
 };
 
 /**
+* Retrieves the computed size applied to the underlying RenderContext.
 *
-* Size getter method
-*
-* @method
-* @return {Array} size
+* @method get
+* 
+* @return {Number[]} size three dimensional computed size
 */
 Size.prototype.get = function get () {
     return this._dispatch.getContext().getSize();
+};
+
+/**
+ * Halts all currently active size transitions.
+ * 
+ * @method halt
+ * @chainable
+ * 
+ * @return {Size} this
+ */
+Size.prototype.halt = function halt () {
+    this._proportional.x.halt();
+    this._proportional.y.halt();
+    this._proportional.z.halt();
+    this._differential.x.halt();
+    this._differential.y.halt();
+    this._differential.z.halt();
+    this._absolute.x.halt();
+    this._absolute.y.halt();
+    this._absolute.z.halt();
+    return this;
 };
 
 module.exports = Size;
