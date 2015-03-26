@@ -5,6 +5,7 @@ var Program = require('./Program');
 var Buffer = require('./Buffer');
 var BufferRegistry = require('./BufferRegistry');
 var checkers = require('./Checkerboard');
+var Plane = require('famous-webgl-geometries').Plane;
 
 var identity = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
 
@@ -20,19 +21,10 @@ var identity = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
  * @param {DOMElement} canvas The dom element that GL will paint itself onto.
  *
  */
-function WebGLRenderer(container) {
-    this.container = container;
-    this.canvas = document.createElement('canvas');
-
-    if (this.container.getTarget() === document.body) {
-        window.addEventListener('resize', this.updateSize.bind(this));
-    }
-
-    this.container.getTarget().appendChild(this.canvas);
-    this.canvas.className = 'famous-webgl GL';
+function WebGLRenderer(canvas) {
+    this.canvas = canvas;
 
     var gl = this.gl = this.getWebGLContext(this.canvas);
-    var containerSize = this.container._getSize();
 
     gl.polygonOffset(0.1, 0.1);
     gl.enable(gl.POLYGON_OFFSET_FILL);
@@ -43,11 +35,16 @@ function WebGLRenderer(container) {
     this.meshRegistry = {};
     this.meshRegistryKeys = [];
 
+    this.cutoutRegistry = {};
+    this.cutoutRegistryKeys = [];
+    this.cutoutGeometry;
+
     /**
      * Lights
      */
+
     this.numLights = 0;
-    this.ambientLight = [0, 0, 0];
+    this.ambientLightColor = [0, 0, 0];
     this.lightRegistry = {};
     this.lightRegistryKeys = [];
     this.lightPositions = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
@@ -70,7 +67,6 @@ function WebGLRenderer(container) {
     this.resolutionValues = [];
 
     this.cachedSize = [];
-    this.updateSize();
 
     this.projectionTransform = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
 }
@@ -142,90 +138,111 @@ WebGLRenderer.prototype.createMesh = function createMesh(path) {
     };
 };
 
+WebGLRenderer.prototype.getOrSetCutout = function getOrSetCutout(path) {
+    var geometry;
 
-/**
- * Receives updates to meshes and other famous renderables, and updates
- * registries accordingly.
- *
- * @method receive
- *
- * @param {String} path Path to given famous renderable used as key in registry.
- * @param {Array} commands Array of commands used to update a renderable.
- */
-WebGLRenderer.prototype.receive = function receive(path, commands) {
-    var bufferName, bufferValue, bufferSpacing, uniformName, uniformValue, geometryId;
-    var mesh = this.meshRegistry[path];
-    var light = this.lightRegistry[path];
-
-    var command = commands.shift();
-    switch (command) {
-
-        case 'GL_SET_DRAW_OPTIONS':
-            if (!mesh) mesh = this.createMesh(path);
-            mesh.options = commands.shift();
-            break;
-
-        case 'GL_AMBIENT_LIGHT':
-            this.ambientLight[0] = commands.shift();
-            this.ambientLight[1] = commands.shift();
-            this.ambientLight[2] = commands.shift();
-            break;
-
-        case 'GL_LIGHT_POSITION':
-            if (!light) light = this.createLight(path);
-            light.position[0] = commands.shift();
-            light.position[1] = commands.shift();
-            light.position[2] = commands.shift();
-            break;
-
-        case 'GL_LIGHT_COLOR':
-            if (!light) light = this.createLight(path);
-            light.color[0] = commands.shift();
-            light.color[1] = commands.shift();
-            light.color[2] = commands.shift();
-            break;
-
-        case 'MATERIAL_INPUT':
-            if (!mesh) mesh = this.createMesh(path);
-            var name = commands.shift();
-            var mat = commands.shift();
-            mesh.uniformValues[name === 'baseColor' ? 3 : 4][0] = -mat._id;
-            if (mat.texture) mesh.texture = handleTexture.call(this, mat.texture);
-            this.program.registerMaterial(name, mat);
-            this.updateSize();
-            break;
-
-        case 'GL_SET_GEOMETRY':
-            if (!mesh) mesh = this.createMesh(path);
-            mesh.geometry = commands.shift();
-            mesh.drawType = commands.shift();
-            mesh.dynamic = commands.shift();
-            break;
-
-        case 'GL_UNIFORMS':
-            if (!mesh) mesh = this.createMesh(path);
-            uniformName = commands.shift();
-            uniformValue = commands.shift();
-            var index = mesh.uniformKeys.indexOf(uniformName);
-            if (index === -1) {
-                mesh.uniformKeys.push(uniformName);
-                mesh.uniformValues.push(uniformValue);
-            }
-            else {
-                mesh.uniformValues[index] = uniformValue;
-            }
-            break;
-
-        case 'GL_BUFFER_DATA':
-            geometryId = commands.shift();
-            bufferName = commands.shift();
-            bufferValue = commands.shift();
-            bufferSpacing = commands.shift();
-            this.bufferRegistry.allocate(geometryId, bufferName, bufferValue, bufferSpacing);
-            break;
-
-        case 'WITH': commands.unshift(command); return;
+    if (this.cutoutRegistry[path]) {
+        return this.cutoutRegistry[path];
     }
+    else {
+        if (!this.cutoutGeometry) {
+            geometry = this.cutoutGeometry = Plane();
+
+            this.bufferRegistry.allocate(geometry.id, 'pos', geometry.spec.bufferValues[0], 3);
+            this.bufferRegistry.allocate(geometry.id, 'texCoord', geometry.spec.bufferValues[1], 2);
+            this.bufferRegistry.allocate(geometry.id, 'normals', geometry.spec.bufferValues[2], 3);
+            this.bufferRegistry.allocate(geometry.id, 'indices', geometry.spec.bufferValues[3], 1);
+        }
+
+        this.cutoutRegistryKeys.push(path);
+
+        return this.cutoutRegistry[path] = {
+            uniformKeys: ['transform', 'size', 'origin', 'baseColor', 'opacity'],
+            uniformValues: [identity, [0, 0, 0], [0, 0, 0], [0, 0, 0], 0],
+            geometry: this.cutoutGeometry.id,
+            drawType: 4
+        };
+    }
+
+};
+
+WebGLRenderer.prototype.setCutoutUniform = function setCutoutUniform(path, uniformName, uniformValue) {
+    var cutout = this.getOrSetCutout(path);
+
+    var index = cutout.uniformKeys.indexOf(uniformName);
+
+    cutout.uniformValues[index] = uniformValue;
+}
+
+WebGLRenderer.prototype.setMeshOptions = function(path, options) {
+    var mesh = this.meshRegistry[path] || this.createMesh(path);
+
+    mesh.options = options;
+    return this;
+};
+
+WebGLRenderer.prototype.setAmbientLightColor = function setAmbientLightColor(path, color) {
+    this.ambientLightColor[0] = color[0];
+    this.ambientLightColor[1] = color[1];
+    this.ambientLightColor[2] = color[2];
+    return this;
+};
+
+WebGLRenderer.prototype.setLightPosition = function setLightPosition(path, position) {
+    var light = this.lightRegistry[path] || this.createLight(path);
+
+    light.position[0] = position[0];
+    light.position[1] = position[1];
+    light.position[2] = position[2];
+    return this;
+};
+
+WebGLRenderer.prototype.setLightColor = function setLightColor(path, color) {
+    var light = this.lightRegistry[path] || this.createLight(path);
+
+    light.color[0] = color[0];
+    light.color[1] = color[1];
+    light.color[2] = color[2];
+    return this;
+};
+
+WebGLRenderer.prototype.handleMaterialInput = function handleMaterialInput(path, name, material) {
+    var mesh = this.meshRegistry[path] || this.createMesh(path);
+
+    mesh.uniformValues[name === 'baseColor' ? 3 : 4][0] = - material._id;
+    if (material.texture) mesh.texture = handleTexture.call(this, material.texture);
+    this.program.registerMaterial(name, material);
+    return this.updateSize();
+};
+
+WebGLRenderer.prototype.setGeometry = function setGeometry(path, geometry, drawType, dynamic) {
+    var mesh = this.meshRegistry[path] || this.createMesh(path);
+
+    mesh.geometry = geometry;
+    mesh.drawType = drawType;
+    mesh.dynamic = dynamic;
+
+    return this;
+}
+
+WebGLRenderer.prototype.setMeshUniform = function setMeshUniform(path, uniformName, uniformValue) {
+    var mesh = this.meshRegistry[path] || this.createMesh(path);
+
+    var index = mesh.uniformKeys.indexOf(uniformName);
+
+    if (index === -1) {
+        mesh.uniformKeys.push(uniformName);
+        mesh.uniformValues.push(uniformValue);
+    }
+    else {
+        mesh.uniformValues[index] = uniformValue;
+    }
+}
+
+WebGLRenderer.prototype.bufferData = function bufferData(path, geometryId, bufferName, bufferValue, bufferSpacing) {
+    this.bufferRegistry.allocate(geometryId, bufferName, bufferValue, bufferSpacing);
+
+    return this;
 };
 
 /**
@@ -243,6 +260,7 @@ WebGLRenderer.prototype.draw = function draw(renderState) {
     var size;
     var light;
     var stride;
+    var cutout;
 
     /**
      * Update lights
@@ -260,13 +278,23 @@ WebGLRenderer.prototype.draw = function draw(renderState) {
         this.lightColors[2 + stride] = light.color[2];
     }
     this.program.setUniforms(['u_NumLights'], [this.numLights]);
-    this.program.setUniforms(['u_AmbientLight'], [this.ambientLight]);
+    this.program.setUniforms(['u_AmbientLight'], [this.ambientLightColor]);
     this.program.setUniforms(['u_LightPosition'], [this.lightPositions]);
     this.program.setUniforms(['u_LightColor'], [this.lightColors]);
 
     this.projectionTransform[11] = renderState.perspectiveTransform[11];
 
     this.program.setUniforms(['perspective', 'time', 'view'], [this.projectionTransform, Date.now()  % 100000 / 1000, renderState.viewTransform]);
+
+    for (var i = 0, len = this.cutoutRegistryKeys.length; i < len; i++) {
+        cutout = this.cutoutRegistry[this.cutoutRegistryKeys[i]];
+        buffers = this.bufferRegistry.registry[cutout.geometry];
+
+        this.gl.enable(this.gl.BLEND);
+        this.program.setUniforms(cutout.uniformKeys, cutout.uniformValues);
+        this.drawBuffers(buffers, cutout.drawType, cutout.geometry);
+        this.gl.disable(this.gl.BLEND);
+    }
 
     for(var i = 0; i < this.meshRegistryKeys.length; i++) {
         mesh = this.meshRegistry[this.meshRegistryKeys[i]];
@@ -457,23 +485,19 @@ function checkFrameBufferStatus(gl) {
  *
  * @method updateSize
  */
-WebGLRenderer.prototype.updateSize = function updateSize() {
-    var newSize = this.container._getSize();
-
-    var width = newSize[0];
-    var height = newSize[1];
-
-    this.cachedSize[0] = width;
-    this.cachedSize[1] = height;
-    this.cachedSize[2] = (width > height) ? width : height;
-
-    this.canvas.width  = width;
-    this.canvas.height = height;
+WebGLRenderer.prototype.updateSize = function updateSize(size) {
+    if (size) {
+        this.cachedSize[0] = size[0];
+        this.cachedSize[1] = size[1];
+        this.cachedSize[2] = (size[0] > size[1]) ? size[0] : size[1];
+    }
 
     this.gl.viewport(0, 0, this.cachedSize[0], this.cachedSize[1]);
 
     this.resolutionValues[0] = this.cachedSize;
     this.program.setUniforms(this.resolutionName, this.resolutionValues);
+
+    return this;
 };
 
 /**
