@@ -8,8 +8,8 @@ function Context(selector, compositor) {
 	this._rootEl = document.querySelector(selector);
 	this._rootEl.appendChild(DOMLayerEl);
 
-	this._DOMRenderer = new VirtualElement(DOMLayerEl, selector, compositor);
-	this._DOMRenderer.setMatrix(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+	this.DOMRenderer = new VirtualElement(DOMLayerEl, selector, compositor);
+	this.DOMRenderer.setMatrix(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
 
 	this.WebGLRenderer;
 
@@ -41,7 +41,7 @@ Context.prototype.receive = function receive(pathArr, path, commands) {
     var pointer = this._children;
     var index = pathArr.shift();
     var renderTag = commands.shift();
-    var parentEl = this._DOMRenderer;
+    var parentEl = this.DOMRenderer;
 
     var element;
 
@@ -53,7 +53,6 @@ Context.prototype.receive = function receive(pathArr, path, commands) {
 		        index = pathArr.shift();
 		    }
 		    pointer = pointer[index] = pointer[index] || {};
-
 	        element = parentEl.getOrSetElement(path, index, commands);
             if (!pointer.DOM) this._renderers.push((pointer.DOM = element));
             break;
@@ -72,7 +71,6 @@ Context.prototype.receive = function receive(pathArr, path, commands) {
         var command = commands.shift();
 
 	    switch (command) {
-
 			case 'CHANGE_TRANSFORM':
 	            element.setMatrix(
 	                commands.shift(),
