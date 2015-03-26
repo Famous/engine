@@ -3,15 +3,23 @@ var WebGLRenderer = require('famous-webgl-renderers').WebGLRenderer;
 var Camera = require('famous-components').Camera;
 
 function Context(selector, compositor) {
-	var DOMLayerEl = document.createElement('div');
-
 	this._rootEl = document.querySelector(selector);
+
+	if (this._rootEl === document.body) {
+		window.addEventListener('resize', this.updateSize.bind(this));
+	}
+
+	var DOMLayerEl = document.createElement('div');
+	DOMLayerEl.style.width = '100%';
+	DOMLayerEl.style.height = '100%';
 	this._rootEl.appendChild(DOMLayerEl);
-
-	this.DOMRenderer = new VirtualElement(DOMLayerEl, selector, compositor);
+	this.DOMRenderer = new VirtualElement(DOMLayerEl, selector, compositor, undefined, undefined, true);
 	this.DOMRenderer.setMatrix(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
-
+	
 	this.WebGLRenderer;
+    this.canvas = document.createElement('canvas');
+    this.canvas.className = 'famous-webgl';
+	this._rootEl.appendChild(this.canvas);
 
 	this._renderState = {
         projectionType: Camera.ORTHOGRAPHIC_PROJECTION,
@@ -22,6 +30,26 @@ function Context(selector, compositor) {
 	this._size = [];
 	this._renderers = [];
 	this._children = {};
+
+    this.updateSize();
+}
+
+Context.prototype.updateSize = function () {
+	var newSize = this.DOMRenderer._getSize();
+
+    var width = newSize[0];
+    var height = newSize[1];
+
+    this._size[0] = width;
+    this._size[1] = height;
+    this._size[2] = (width > height) ? width : height;
+
+    this.canvas.width  = width;
+    this.canvas.height = height;
+
+    if (this.WebGLRenderer) this.WebGLRenderer.updateSize(this._size);
+
+    return this;
 }
 
 Context.prototype.draw = function draw() {
@@ -31,9 +59,6 @@ Context.prototype.draw = function draw() {
 };
 
 Context.prototype.getRootSize = function getRootSize() {
-	this._size[0] = this._rootEl.offsetWidth;
-	this._size[1] = this._rootEl.offsetHeight;
-
 	return this._size;
 }
 
@@ -60,9 +85,11 @@ Context.prototype.receive = function receive(pathArr, path, commands) {
         case 'WEBGL':
             if (!this.WebGLRenderer) {
                 this._renderers.push(
-                	(this.WebGLRenderer = new WebGLRenderer(this._rootEl))
+                	(this.WebGLRenderer = new WebGLRenderer(this.canvas))
                 );
+                this.WebGLRenderer.updateSize(this._size);
             }
+            break;
 
         default: break;
     }
@@ -72,7 +99,7 @@ Context.prototype.receive = function receive(pathArr, path, commands) {
 
 	    switch (command) {
 			case 'CHANGE_TRANSFORM':
-	            element.setMatrix(
+				var matrix = [
 	                commands.shift(),
 	                commands.shift(),
 	                commands.shift(),
@@ -89,47 +116,53 @@ Context.prototype.receive = function receive(pathArr, path, commands) {
 	                commands.shift(),
 	                commands.shift(),
 	                commands.shift()
+	            ];
+
+	            element.setMatrix.apply(
+	            	element,
+	            	matrix
 	            );
+
+	           	if (this.WebGLRenderer) this.WebGLRenderer.setCutoutUniform(path, 'transform', matrix);
+
 	            break;
 
 	        case 'CHANGE_SIZE':
 	            var width = commands.shift();
 	            var height = commands.shift();
-	            element._size[0] = width;
-	            element._size[1] = height;
-	            if (width !== true) {
-	                element.setProperty('width', width + 'px');
-	            } else {
-	                element.setProperty('width', '');
-	            }
-	            if (height !== true) {
-	                element.setProperty('height', height + 'px');
-	            } else {
-	                element.setProperty('height', '');
-	            }
+	            element.changeSize(width, height);
+
+	            // TODO: switch from array to list of arguments here
+	        	if (this.WebGLRenderer) this.WebGLRenderer.setCutoutUniform(path, 'size', [width, height, 0]);
 	            break;
 
 	        case 'CHANGE_PROPERTY':
+	        	if (this.WebGLRenderer) this.WebGLRenderer.getOrSetCutout(path);
 	            element.setProperty(commands.shift(), commands.shift());
 	            break;
 
 	        case 'CHANGE_CONTENT':
+	        	if (this.WebGLRenderer) this.WebGLRenderer.getOrSetCutout(path);
 	            element.setContent(commands.shift());
 	            break;
 
 	        case 'CHANGE_ATTRIBUTE':
+	        	if (this.WebGLRenderer) this.WebGLRenderer.getOrSetCutout(path);
 	            element.setAttribute(commands.shift(), commands.shift());
 	            break;
 
 	        case 'ADD_CLASS':
+	        	if (this.WebGLRenderer) this.WebGLRenderer.getOrSetCutout(path);
 	            element.addClass(commands.shift());
 	            break;
 
 	        case 'REMOVE_CLASS':
+	        	if (this.WebGLRenderer) this.WebGLRenderer.getOrSetCutout(path);
 	            element.removeClass(commands.shift());
 	            break;
 
 	        case 'ADD_EVENT_LISTENER':
+	        	if (this.WebGLRenderer) this.WebGLRenderer.getOrSetCutout(path);
 	            var ev = commands.shift();
 	            var methods;
 	            var properties;
@@ -195,7 +228,6 @@ Context.prototype.receive = function receive(pathArr, path, commands) {
 	            break;
 
 	        case 'GL_UNIFORMS':
-
 	            this.WebGLRenderer.setMeshUniform(
 	            	path,
 	            	commands.shift(),
@@ -213,37 +245,37 @@ Context.prototype.receive = function receive(pathArr, path, commands) {
 	            );
 	            break;
 
-        	case 'PINHOLE_PROJECTION':
-			    this._renderState.projectionType = Camera.PINHOLE_PROJECTION;
-			    this._renderState.perspectiveTransform[11] = -1/commands.shift();
-			    break;
+			case 'PINHOLE_PROJECTION':
+                this._renderState.projectionType = Camera.PINHOLE_PROJECTION;
+                this._renderState.perspectiveTransform[11] = -1 / commands.shift();
+                break;
 
-			case 'ORTHOGRAPHIC_PROJECTION':
-			    this._renderState.projectionType = Camera.ORTHOGRAPHIC_PROJECTION;
-			    this._renderState.perspectiveTransform[11] = 0;
-			    break;
+            case 'ORTHOGRAPHIC_PROJECTION':
+                this._renderState.projectionType = Camera.ORTHOGRAPHIC_PROJECTION;
+                this._renderState.perspectiveTransform[11] = 0;
+                break;
 
-			case 'CHANGE_VIEW_TRANSFORM':
-			    this._renderState.viewTransform[0] = commands.shift();
-			    this._renderState.viewTransform[1] = commands.shift();
-			    this._renderState.viewTransform[2] = commands.shift();
-			    this._renderState.viewTransform[3] = commands.shift();
+            case 'CHANGE_VIEW_TRANSFORM':
+                this._renderState.viewTransform[0] = commands.shift();
+                this._renderState.viewTransform[1] = commands.shift();
+                this._renderState.viewTransform[2] = commands.shift();
+                this._renderState.viewTransform[3] = commands.shift();
 
-			    this._renderState.viewTransform[4] = commands.shift();
-			    this._renderState.viewTransform[5] = commands.shift();
-			    this._renderState.viewTransform[6] = commands.shift();
-			    this._renderState.viewTransform[7] = commands.shift();
+                this._renderState.viewTransform[4] = commands.shift();
+                this._renderState.viewTransform[5] = commands.shift();
+                this._renderState.viewTransform[6] = commands.shift();
+                this._renderState.viewTransform[7] = commands.shift();
 
-			    this._renderState.viewTransform[8] = commands.shift();
-			    this._renderState.viewTransform[9] = commands.shift();
-			    this._renderState.viewTransform[10] = commands.shift();
-			    this._renderState.viewTransform[11] = commands.shift();
+                this._renderState.viewTransform[8] = commands.shift();
+                this._renderState.viewTransform[9] = commands.shift();
+                this._renderState.viewTransform[10] = commands.shift();
+                this._renderState.viewTransform[11] = commands.shift();
 
-			    this._renderState.viewTransform[12] = commands.shift();
-			    this._renderState.viewTransform[13] = commands.shift();
-			    this._renderState.viewTransform[14] = commands.shift();
-			    this._renderState.viewTransform[15] = commands.shift();
-			    break;
+                this._renderState.viewTransform[12] = commands.shift();
+                this._renderState.viewTransform[13] = commands.shift();
+                this._renderState.viewTransform[14] = commands.shift();
+                this._renderState.viewTransform[15] = commands.shift();
+                break;
 
 	        case 'WITH': return commands.unshift(command); break;
 	    }

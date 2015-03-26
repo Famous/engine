@@ -91,7 +91,7 @@ Compositor.prototype.giveSizeFor = function giveSizeFor(commands) {
     if (selector === 'body')
         window.addEventListener('resize', function() {
             if (!_this._sentResize) {
-                _this.sendResize(selector, _this.getOrSetContext(selector)._DOMRenderer._getSize());
+                _this.sendResize(selector, _this.getOrSetContext(selector).getRootSize());
             }
         });
 };
