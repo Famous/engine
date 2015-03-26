@@ -88,6 +88,13 @@ Camera.prototype.setFlat = function setFlat() {
 };
 
 Camera.prototype.clean = function clean() {
+    var path = this._dispatch.getRenderPath();
+
+    this._dispatch
+        .sendDrawCommand('WITH')
+        .sendDrawCommand(path)
+        .sendDrawCommand('*');
+
     switch (this._projectionType) {
         case Camera.FRUSTUM_PROJECTION:
             this._dispatch.sendDrawCommand('FRUSTUM_PROJECTION');
