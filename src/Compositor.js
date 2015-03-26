@@ -4,6 +4,7 @@ var VirtualElement = require('famous-dom-renderers').VirtualElement;
 var Camera = require('famous-components').Camera;
 var strip = require('famous-utilities').strip;
 var flatClone = require('famous-utilities').flatClone;
+
 var Context = require('./Context');
 
 /**
@@ -17,13 +18,6 @@ function Compositor() {
     this._contexts = {};
     this._outCommands = [];
     this._inCommands = [];
-
-    this._renderers = [];
-    this._renderState = {
-        projectionType: Camera.ORTHOGRAPHIC_PROJECTION,
-        perspectiveTransform: new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]),
-        viewTransform: new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1])
-    };
 }
 
 /**
@@ -57,7 +51,7 @@ Compositor.prototype.handleWith = function handleWith (commands) {
     var pathArr = path.split('/');
     var context = this.getOrSetContext(pathArr.shift());
 
-    context.receive(pathArr, commands);
+    context.receive(pathArr, path, commands);
 };
 
 /**
@@ -91,7 +85,7 @@ Compositor.prototype.getOrSetContext = function getOrSetContext(selector) {
  */
 Compositor.prototype.giveSizeFor = function giveSizeFor(commands) {
     var selector = commands.shift();
-    var size = this.getOrSetContext(selector)._DOMRenderer._getSize();
+    var size = this.getOrSetContext(selector).getRootSize();
     this.sendResize(selector, size);
     var _this = this;
     if (selector === 'body')
@@ -159,6 +153,7 @@ Compositor.prototype.drawCommands = function drawCommands() {
     var command;
     while (commands.length) {
         command = commands.shift();
+        
         switch (command) {
             case 'WITH':
                 this.handleWith(commands);
@@ -169,45 +164,14 @@ Compositor.prototype.drawCommands = function drawCommands() {
             case 'NEED_SIZE_FOR':
                 this.giveSizeFor(commands);
                 break;
-            case 'PINHOLE_PROJECTION':
-                this._renderState.projectionType = Camera.PINHOLE_PROJECTION;
-                this._renderState.perspectiveTransform[11] = -1/commands.shift();
-                break;
-            case 'ORTHOGRAPHIC_PROJECTION':
-                this._renderState.projectionType = Camera.ORTHOGRAPHIC_PROJECTION;
-                this._renderState.perspectiveTransform[11] = 0;
-                break;
-            case 'CHANGE_VIEW_TRANSFORM':
-                this._renderState.viewTransform[0] = commands.shift();
-                this._renderState.viewTransform[1] = commands.shift();
-                this._renderState.viewTransform[2] = commands.shift();
-                this._renderState.viewTransform[3] = commands.shift();
-
-                this._renderState.viewTransform[4] = commands.shift();
-                this._renderState.viewTransform[5] = commands.shift();
-                this._renderState.viewTransform[6] = commands.shift();
-                this._renderState.viewTransform[7] = commands.shift();
-
-                this._renderState.viewTransform[8] = commands.shift();
-                this._renderState.viewTransform[9] = commands.shift();
-                this._renderState.viewTransform[10] = commands.shift();
-                this._renderState.viewTransform[11] = commands.shift();
-
-                this._renderState.viewTransform[12] = commands.shift();
-                this._renderState.viewTransform[13] = commands.shift();
-                this._renderState.viewTransform[14] = commands.shift();
-                this._renderState.viewTransform[15] = commands.shift();
-                break;
         }
     }
 
+    // TODO: Switch to associative arrays here...
+    
     for (var key in this._contexts) {
         this._contexts[key].draw();
-    };
-    
-    // for (var i = 0; i < this._renderers.length; i++) {
-    //     this._renderers[i].draw(this._renderState);
-    // }
+    }
 
     return this._outCommands;
 };
