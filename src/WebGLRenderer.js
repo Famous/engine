@@ -24,15 +24,14 @@ function WebGLRenderer(container) {
     this.container = container;
     this.canvas = document.createElement('canvas');
 
-    if (this.container.getTarget() === document.body) {
+    if (this.container === document.body) {
         window.addEventListener('resize', this.updateSize.bind(this));
     }
 
-    this.container.getTarget().appendChild(this.canvas);
-    this.canvas.className = 'famous-webgl GL';
+    this.container.appendChild(this.canvas);
+    this.canvas.className = 'famous-webgl';
 
     var gl = this.gl = this.getWebGLContext(this.canvas);
-    var containerSize = this.container._getSize();
 
     gl.polygonOffset(0.1, 0.1);
     gl.enable(gl.POLYGON_OFFSET_FILL);
@@ -46,8 +45,9 @@ function WebGLRenderer(container) {
     /**
      * Lights
      */
+
     this.numLights = 0;
-    this.ambientLight = [0, 0, 0];
+    this.ambientLightColor = [0, 0, 0];
     this.lightRegistry = {};
     this.lightRegistryKeys = [];
     this.lightPositions = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
@@ -142,90 +142,75 @@ WebGLRenderer.prototype.createMesh = function createMesh(path) {
     };
 };
 
+WebGLRenderer.prototype.setMeshOptions = function(path, options) {
+    var mesh = this.meshRegistry[path] || this.createMesh(path);
 
-/**
- * Receives updates to meshes and other famous renderables, and updates
- * registries accordingly.
- *
- * @method receive
- *
- * @param {String} path Path to given famous renderable used as key in registry.
- * @param {Array} commands Array of commands used to update a renderable.
- */
-WebGLRenderer.prototype.receive = function receive(path, commands) {
-    var bufferName, bufferValue, bufferSpacing, uniformName, uniformValue, geometryId;
-    var mesh = this.meshRegistry[path];
-    var light = this.lightRegistry[path];
+    mesh.options = options;
+    return this;
+};
 
-    var command = commands.shift();
-    switch (command) {
+WebGLRenderer.prototype.setAmbientLightColor = function setAmbientLightColor(path, color) {
+    this.ambientLightColor[0] = color[0];
+    this.ambientLightColor[1] = color[1];
+    this.ambientLightColor[2] = color[2];
+    return this;
+};
 
-        case 'GL_SET_DRAW_OPTIONS':
-            if (!mesh) mesh = this.createMesh(path);
-            mesh.options = commands.shift();
-            break;
+WebGLRenderer.prototype.setLightPosition = function setLightPosition(path, position) {
+    var light = this.lightRegistry[path] || this.createLight(path);
 
-        case 'GL_AMBIENT_LIGHT':
-            this.ambientLight[0] = commands.shift();
-            this.ambientLight[1] = commands.shift();
-            this.ambientLight[2] = commands.shift();
-            break;
+    light.position[0] = position[0];
+    light.position[1] = position[1];
+    light.position[2] = position[2];
+    return this;
+};
 
-        case 'GL_LIGHT_POSITION':
-            if (!light) light = this.createLight(path);
-            light.position[0] = commands.shift();
-            light.position[1] = commands.shift();
-            light.position[2] = commands.shift();
-            break;
+WebGLRenderer.prototype.setLightColor = function setLightColor(path, color) {
+    var light = this.lightRegistry[path] || this.createLight(path);
 
-        case 'GL_LIGHT_COLOR':
-            if (!light) light = this.createLight(path);
-            light.color[0] = commands.shift();
-            light.color[1] = commands.shift();
-            light.color[2] = commands.shift();
-            break;
+    light.color[0] = color[0];
+    light.color[1] = color[1];
+    light.color[2] = color[2];
+    return this;
+};
 
-        case 'MATERIAL_INPUT':
-            if (!mesh) mesh = this.createMesh(path);
-            var name = commands.shift();
-            var mat = commands.shift();
-            mesh.uniformValues[name === 'baseColor' ? 3 : 4][0] = -mat._id;
-            if (mat.texture) mesh.texture = handleTexture.call(this, mat.texture);
-            this.program.registerMaterial(name, mat);
-            this.updateSize();
-            break;
+WebGLRenderer.prototype.handleMaterialInput = function handleMaterialInput(path, name, material) {
+    var mesh = this.meshRegistry[path] || this.createMesh(path);
 
-        case 'GL_SET_GEOMETRY':
-            if (!mesh) mesh = this.createMesh(path);
-            mesh.geometry = commands.shift();
-            mesh.drawType = commands.shift();
-            mesh.dynamic = commands.shift();
-            break;
+    mesh.uniformValues[name === 'baseColor' ? 3 : 4][0] = - material._id;
+    if (material.texture) mesh.texture = handleTexture.call(this, material.texture);
+    this.program.registerMaterial(name, material);
+    return this.updateSize();
+};
 
-        case 'GL_UNIFORMS':
-            if (!mesh) mesh = this.createMesh(path);
-            uniformName = commands.shift();
-            uniformValue = commands.shift();
-            var index = mesh.uniformKeys.indexOf(uniformName);
-            if (index === -1) {
-                mesh.uniformKeys.push(uniformName);
-                mesh.uniformValues.push(uniformValue);
-            }
-            else {
-                mesh.uniformValues[index] = uniformValue;
-            }
-            break;
+WebGLRenderer.prototype.setGeometry = function setGeometry(path, geometry, drawType, dynamic) {
+    var mesh = this.meshRegistry[path] || this.createMesh(path);
 
-        case 'GL_BUFFER_DATA':
-            geometryId = commands.shift();
-            bufferName = commands.shift();
-            bufferValue = commands.shift();
-            bufferSpacing = commands.shift();
-            this.bufferRegistry.allocate(geometryId, bufferName, bufferValue, bufferSpacing);
-            break;
+    mesh.geometry = geometry;
+    mesh.drawType = drawType;
+    mesh.dynamic = dynamic;
 
-        case 'WITH': commands.unshift(command); return;
+    return this;
+}
+
+WebGLRenderer.prototype.setMeshUniform = function setMeshUniform(path, uniformName, uniformValue) {
+    var mesh = this.meshRegistry[path] || this.createMesh(path);
+
+    var index = mesh.uniformKeys.indexOf(uniformName);
+
+    if (index === -1) {
+        mesh.uniformKeys.push(uniformName);
+        mesh.uniformValues.push(uniformValue);
     }
+    else {
+        mesh.uniformValues[index] = uniformValue;
+    }
+}
+
+WebGLRenderer.prototype.bufferData = function bufferData(path, geometryId, bufferName, bufferValue, bufferSpacing) {
+    this.bufferRegistry.allocate(geometryId, bufferName, bufferValue, bufferSpacing);
+
+    return this;
 };
 
 /**
@@ -260,7 +245,7 @@ WebGLRenderer.prototype.draw = function draw(renderState) {
         this.lightColors[2 + stride] = light.color[2];
     }
     this.program.setUniforms(['u_NumLights'], [this.numLights]);
-    this.program.setUniforms(['u_AmbientLight'], [this.ambientLight]);
+    this.program.setUniforms(['u_AmbientLight'], [this.ambientLightColor]);
     this.program.setUniforms(['u_LightPosition'], [this.lightPositions]);
     this.program.setUniforms(['u_LightColor'], [this.lightColors]);
 
@@ -458,10 +443,8 @@ function checkFrameBufferStatus(gl) {
  * @method updateSize
  */
 WebGLRenderer.prototype.updateSize = function updateSize() {
-    var newSize = this.container._getSize();
-
-    var width = newSize[0];
-    var height = newSize[1];
+    var width = this.container.offsetWidth;
+    var height = this.container.offsetHeight;
 
     this.cachedSize[0] = width;
     this.cachedSize[1] = height;
@@ -474,6 +457,8 @@ WebGLRenderer.prototype.updateSize = function updateSize() {
 
     this.resolutionValues[0] = this.cachedSize;
     this.program.setUniforms(this.resolutionName, this.resolutionValues);
+
+    return this;
 };
 
 /**
