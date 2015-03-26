@@ -168,7 +168,7 @@ Compositor.prototype.drawCommands = function drawCommands() {
     }
 
     // TODO: Switch to associative arrays here...
-    
+
     for (var key in this._contexts) {
         this._contexts[key].draw();
     }
