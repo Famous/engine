@@ -57,7 +57,11 @@ HTMLElement.prototype.clean = function clean() {
     var len = this._queue.length;
     if (len) {
     	var path = this._dispatch.getRenderPath();
-    	this._dispatch.sendDrawCommand(WITH).sendDrawCommand(path);
+    	this._dispatch
+            .sendDrawCommand(WITH)
+            .sendDrawCommand(path)
+            .sendDrawCommand('DOM');
+
     	for (var i = 0 ; i < len ; i++)
     	    this._dispatch.sendDrawCommand(this._queue.shift());
     }
