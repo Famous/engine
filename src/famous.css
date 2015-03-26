@@ -79,7 +79,7 @@ body {
 canvas.famous-webgl {
     pointer-events: none;
     position: absolute;
-    z-index: 9999;
+    z-index: 1;
     top: 0px;
     left: 0px;
 }
