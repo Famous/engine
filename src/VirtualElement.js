@@ -59,7 +59,6 @@ function VirtualElement (target, path, renderer, parent, rootElement, root) {
     this._children = {};
     this._size = [0, 0, 0];
     this._tagName = DIV;
-    this._origin = [0, 0];
     this._rootElement = rootElement || this;
     this._finalTransform = new Float32Array(16);
     this._MV = new Float32Array(16);
@@ -79,79 +78,6 @@ VirtualElement.prototype.getOrSetElement = function getOrSetElement (path, index
     var child = new VirtualElement(div, path, this._renderer, this, this._rootElement);
     this._children[index] = child;
     return child;
-};
-
-VirtualElement.prototype.receive = function receive (commands) {
-    var command = commands.shift();
-    switch (command) {
-        case CHANGE_TRANSFORM:
-            this.setMatrix(
-                commands.shift(),
-                commands.shift(),
-                commands.shift(),
-                commands.shift(),
-                commands.shift(),
-                commands.shift(),
-                commands.shift(),
-                commands.shift(),
-                commands.shift(),
-                commands.shift(),
-                commands.shift(),
-                commands.shift(),
-                commands.shift(),
-                commands.shift(),
-                commands.shift(),
-                commands.shift()
-            );
-            break;
-        case CHANGE_SIZE:
-            var width = commands.shift();
-            var height = commands.shift();
-            this._size[0] = width;
-            this._size[1] = height;
-            if (width !== true) {
-                this.setProperty('width', width + 'px');
-            } else {
-                this.setProperty('width', '');
-            }
-            if (height !== true) {
-                this.setProperty('height', height + 'px');
-            } else {
-                this.setProperty('height', '');
-            }
-            break;
-        case CHANGE_PROPERTY:
-            this.setProperty(commands.shift(), commands.shift());
-            break;
-        case CHANGE_CONTENT:
-            this.setContent(commands.shift());
-            break;
-        case CHANGE_ATTRIBUTE:
-            this.setAttribute(commands.shift(), commands.shift());
-            break;
-        case ADD_CLASS:
-            this.addClass(commands.shift());
-            break;
-        case REMOVE_CLASS:
-            this.removeClass(commands.shift());
-            break;
-        case ADD_EVENT_LISTENER:
-            var ev = commands.shift();
-            var methods;
-            var properties;
-            var c;
-            while ((c = commands.shift()) !== EVENT_PROPERTIES) methods = c;
-            while ((c = commands.shift()) !== EVENT_END) properties = c;
-            methods = methods || [];
-            properties = properties || [];
-            this.addEventListener(ev, this.dispatchEvent.bind(this, ev, methods, properties));
-            break;
-        case RECALL:
-            this.setProperty('display', 'none');
-            this._parent._allocator.deallocate(this._target);
-            break;
-        default: commands.unshift(command); return;
-    }
 };
 
 function _mirror(item, target, reference) {
@@ -221,8 +147,8 @@ VirtualElement.prototype.draw = function draw(renderState) {
     var m = this._finalMatrix;
     var perspectiveTransform = renderState.perspectiveTransform;
 
-    this._perspectiveTransform[8] = perspectiveTransform[11] * ((this._rootElement._size[0] * 0.5) - (this._size[0] * this._origin[0])),
-    this._perspectiveTransform[9] = perspectiveTransform[11] * ((this._rootElement._size[1] * 0.5) - (this._size[1] * this._origin[1]));
+    this._perspectiveTransform[8] = perspectiveTransform[11] * ((this._rootElement._size[0] * 0.5)),
+    this._perspectiveTransform[9] = perspectiveTransform[11] * ((this._rootElement._size[1] * 0.5));
     this._perspectiveTransform[11] = perspectiveTransform[11];
 
     if (this._parent) {
@@ -284,6 +210,21 @@ VirtualElement.prototype.setMatrix = function setMatrix (m0, m1, m2, m3, m4, m5,
     this._finalMatrix[14] = m14;
     this._finalMatrix[15] = m15;
 };
+
+VirtualElement.prototype.changeSize = function changeSize(width, height) {
+    this._size[0] = width;
+    this._size[1] = height;
+    if (width !== true) {
+        this.setProperty('width', width + 'px');
+    } else {
+        this.setProperty('width', '');
+    }
+    if (height !== true) {
+        this.setProperty('height', height + 'px');
+    } else {
+        this.setProperty('height', '');
+    }
+}
 
 VirtualElement.prototype.addClass = function addClass (className) {
     this._target.classList.add(className);
