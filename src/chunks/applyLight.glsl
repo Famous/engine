@@ -4,7 +4,7 @@ vec3 applyLight(in vec3 material) {
     vec3 finalColor = vec3(0.0);
     vec3 normal = normalize(v_Normal);
     vec3 ambientLight = u_AmbientLight * material;
-    vec3 eyeVector = -normalize(vec3(v_Position));
+    vec3 eyeVector = vec3(-v_Position);
     vec3 diffuse, specular, lightDirection;
 
     for(int i = 0; i < 4; i++) {

@@ -1,34 +1,30 @@
-#pragma glslify: convertToClipSpace = require(./chunks/convertToClipSpace)
 #pragma glslify: getNormalMatrix = require(./chunks/getNormalMatrix)
-#pragma glslify: invertYAxis = require(./chunks/invertYAxis)
 #pragma glslify: inverse = require(./chunks/inverse)
 #pragma glslify: transpose = require(./chunks/transpose)
 
 vec4 applyTransform(vec4 pos) {
-    pos.x += 1.0;
-    pos.y -= 1.0;
-
     mat4 MVMatrix = view * transform;
 
-    mat4 projection = perspective;
-    mat4 invertedYMatrix = invertYAxis(MVMatrix);
-    vec4 translation = invertedYMatrix[3];
-
+    pos.x += 1.0;
+    pos.y -= 1.0;
     pos.xyz *= size * 0.5;
     pos.y *= -1.0;
 
-    projection[0][0] = 1.0/(resolution.x * 0.5);
-    projection[1][1] = 1.0/(resolution.y * 0.5);
-    projection[2][2] = (resolution.y > resolution.x) ? -1.0/(resolution.y * 0.5) : -1.0/(resolution.x * 0.5);
+    MVMatrix[0][1] *= -1.0;
+    MVMatrix[1][1] *= -1.0;
+    MVMatrix[2][1] *= -1.0;
+    MVMatrix[3][1] *= -1.0;
+
+    mat4 MVPMatrix = perspective * MVMatrix;
 
     v_Position = (MVMatrix * pos).xyz;
-
-    mat4 MVPMatrix = projection * invertedYMatrix;
-    MVPMatrix[3] = vec4(0.0, 0.0, 0.0, MVPMatrix[3][3]);
-
     pos = MVPMatrix * pos;
 
-    pos += convertToClipSpace(translation);
+    pos.x /= (resolution.x * 0.5);
+    pos.y /= (resolution.y * 0.5);
+    pos.x -= 1.0;
+    pos.y += 1.0;
+    pos.z *= -0.00001;
 
     return pos;
 }
