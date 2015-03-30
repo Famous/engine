@@ -22,7 +22,7 @@
     "famous-math": "git+ssh://git@github.famo.us/platform/math#v0.1.0",
     "famous-physics": "git+ssh://git@github.famo.us/platform/physics#v0.2.0",
     "famous-polyfills": "git+ssh://git@github.famo.us/platform/polyfills#v0.1.0",
-    "famous-renderers": "git+ssh://git@github.famo.us/platform/renderers#v0.2.0",
+    "famous-renderers": "git+ssh://git@github.famo.us/platform/renderers#v0.2.1",
     "famous-router": "git+ssh://git@github.famo.us/platform/router#v0.1.0",
     "famous-stylesheets": "git+ssh://git@github.famo.us/platform/stylesheets#v0.2.0",
     "famous-transitions": "git+ssh://git@github.famo.us/platform/transitions#v0.1.1",
