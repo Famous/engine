@@ -3,7 +3,6 @@ module.exports = {
     core: require('famous-core'),
     engine: require('famous-engine'),
     domRenderables: require('famous-dom-renderables'),
-    layouts: require('famous-layouts'),
     math: require('famous-math'),
     physics: require('famous-physics'),
     renderers: require('famous-renderers'),
