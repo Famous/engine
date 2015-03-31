@@ -56,7 +56,7 @@ function WebGLRenderer(canvas) {
     this.textureRegistry = [];
     this.texCache = {};
     this.bufferRegistry = new BufferRegistry(gl);
-    this.program = new Program(gl);
+    this.program = new Program(gl, { debug: true });
 
     this.state = {
         boundArrayBuffer: null,

@@ -4,6 +4,7 @@ var Utility = require('famous-utilities');
 
 var vertexWrapper = require('famous-webgl-shaders').vertex;
 var fragmentWrapper = require('famous-webgl-shaders').fragment;
+var Debug = require('./Debug');
 
 var VERTEX_SHADER = 35633;
 var FRAGMENT_SHADER = 35632;
@@ -93,9 +94,10 @@ var header = 'precision mediump float;\n';
  * @param {WebGL_Context} gl Context to be used to create the shader program.
  */
 
-function Program(gl) {
+function Program(gl, options) {
     this.gl = gl;
     this.textureSlots = 1;
+    this.options = options;
 
     this.registeredMaterials = {};
     this.flaggedUniforms = [];
@@ -402,6 +404,10 @@ Program.prototype.setUniforms = function (uniformNames, uniformValue) {
  */
 Program.prototype.compileShader = function compileShader(shader, source) {
     var i = 1;
+
+    if (this.options.debug) {
+        this.gl.compileShader = Debug.call(this);
+    }
 
     this.gl.shaderSource(shader, source);
     this.gl.compileShader(shader);
