@@ -36,6 +36,6 @@
   },
   "dependencies": {
      "famous-utilities": "git+ssh://git@github.famo.us/platform/utilities#v0.2.0",
-     "famous-webgl-shaders": "git+ssh://git@github.famo.us/platform/webgl-shaders#v0.1.1"
+     "famous-webgl-shaders": "git+ssh://git@github.famo.us/platform/webgl-shaders#v0.1.2"
   }
 }
