@@ -10,6 +10,8 @@ vec4 applyTransform(vec4 pos) {
     pos.xyz *= size * 0.5;
     pos.y *= -1.0;
 
+    v_Position = (MVMatrix * pos).xyz;
+    
     MVMatrix[0][1] *= -1.0;
     MVMatrix[1][1] *= -1.0;
     MVMatrix[2][1] *= -1.0;
@@ -17,7 +19,6 @@ vec4 applyTransform(vec4 pos) {
 
     mat4 MVPMatrix = perspective * MVMatrix;
 
-    v_Position = (MVMatrix * pos).xyz;
     pos = MVPMatrix * pos;
 
     pos.x /= (resolution.x * 0.5);
