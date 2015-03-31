@@ -7,6 +7,7 @@ var BufferRegistry = require('./BufferRegistry');
 var checkers = require('./Checkerboard');
 var Plane = require('famous-webgl-geometries').Plane;
 var sorter = require('./radixSort');
+var Utility = require('famous-utilities');
 
 var identity = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
 
@@ -56,7 +57,7 @@ function WebGLRenderer(canvas) {
     this.textureRegistry = [];
     this.texCache = {};
     this.bufferRegistry = new BufferRegistry(gl);
-    this.program = new Program(gl, { debug: true });
+    this.program = new Program(gl, { debug: false });
 
     this.state = {
         boundArrayBuffer: null,
@@ -131,9 +132,18 @@ WebGLRenderer.prototype.createLight = function createLight(path) {
  */
 WebGLRenderer.prototype.createMesh = function createMesh(path) {
     this.meshRegistryKeys.push(path);
+    var uniforms = Utility.keyValueToArrays({
+        opacity: 1,
+        transform: identity,
+        size: [0, 0, 0],
+        baseColor: [0.5, 0.5, 0.5],
+        positionOffset: [0, 0, 0],
+        u_FlatShading: 0,
+        glossiness: 0
+    });
     return this.meshRegistry[path] = {
-        uniformKeys: ['opacity', 'transform', 'size', 'baseColor', 'positionOffset', 'u_FlatShading', 'glossiness'],
-        uniformValues: [1, identity, [0, 0, 0], [0.5, 0.5, 0.5], [0, 0, 0], 0, 0],
+        uniformKeys: uniforms.keys,
+        uniformValues: uniforms.values,
         buffers: {},
         geometry: null,
         drawType: null,
@@ -170,9 +180,16 @@ WebGLRenderer.prototype.getOrSetCutout = function getOrSetCutout(path) {
 
         this.cutoutRegistryKeys.push(path);
 
+        var uniforms = Utility.keyValueToArrays({
+            transform: identity,
+            size: [0, 0, 0],
+            origin: [0, 0, 0],
+            baseColor: [0, 0, 0],
+            opacity: 0
+        });
         return this.cutoutRegistry[path] = {
-            uniformKeys: ['transform', 'size', 'origin', 'baseColor', 'opacity'],
-            uniformValues: [identity, [0, 0, 0], [0, 0, 0], [0, 0, 0], 0],
+            uniformKeys: uniforms.keys,
+            uniformValues: uniforms.values,
             geometry: this.cutoutGeometry.id,
             drawType: 4
         };

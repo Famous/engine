@@ -38,49 +38,49 @@ var masks =  {
 /**
  * Uniform keys and values
  */
-var uniforms = {
-    'perspective': identityMatrix,
-    'view': identityMatrix,
-    'resolution': [0, 0, 0],
-    'transform': identityMatrix,
-    'size': [1, 1, 1],
-    'time': 0,
-    'opacity': 1,
-    'metalness': 0,
-    'glossiness': 0,
-    'baseColor': [1, 1, 1],
-    'normal': [1, 1, 1],
-    'positionOffset': [0, 0, 0],
-    'u_LightPosition': identityMatrix,
-    'u_LightColor': identityMatrix,
-    'u_AmbientLight': [0, 0, 0],
-    'u_FlatShading': 0,
-    'u_NumLights': 0
-};
-var uniformNames = Utility.keyValueToArrays(uniforms).keys;
-var uniformValues = Utility.keyValueToArrays(uniforms).values;
+var uniforms = Utility.keyValueToArrays({
+    perspective: identityMatrix,
+    view: identityMatrix,
+    resolution: [0, 0, 0],
+    transform: identityMatrix,
+    size: [1, 1, 1],
+    time: 0,
+    opacity: 1,
+    metalness: 0,
+    glossiness: 0,
+    baseColor: [1, 1, 1],
+    normal: [1, 1, 1],
+    positionOffset: [0, 0, 0],
+    u_LightPosition: identityMatrix,
+    u_LightColor: identityMatrix,
+    u_AmbientLight: [0, 0, 0],
+    u_FlatShading: 0,
+    u_NumLights: 0
+});
+var uniformNames = uniforms.keys;
+var uniformValues = uniforms.values;
 
 /**
  * Attributes keys and values
  */
-var attributes = {
-    'pos': 3,
-    'texCoord': 2,
-    'normals': 3
-};
-var attributeNames = Utility.keyValueToArrays(attributes).keys;
-var attributeValues = Utility.keyValueToArrays(attributes).values;
+var attributes = Utility.keyValueToArrays({
+    pos: 3,
+    texCoord: 2,
+    normals: 3
+});
+var attributeNames = attributes.keys;
+var attributeValues = attributes.values;
 
 /**
  * Varyings keys and values
  */
-var varyings = {
-    'v_TextureCoordinate': 2,
-    'v_Normal': 3,
-    'v_Position': 3
-};
-var varyingNames = Utility.keyValueToArrays(varyings).keys;
-var varyingValues = Utility.keyValueToArrays(varyings).values;
+var varyings = Utility.keyValueToArrays({
+    v_TextureCoordinate: 2,
+    v_Normal: 3,
+    v_Position: 3
+});
+var varyingNames = varyings.keys;
+var varyingValues = varyings.values;
 
 /**
  * A class that handles interactions with the WebGL shader program
