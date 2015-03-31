@@ -64,21 +64,20 @@ Context.prototype.getRootSize = function getRootSize() {
 
 Context.prototype.receive = function receive(pathArr, path, commands) {
     var pointer = this._children;
-    var index = pathArr.shift();
-    var renderTag = commands.shift();
+    var renderTag = commands.pop();
     var parentEl = this.DOMRenderer;
-
+    var id = pathArr.shift();
     var element;
 
     switch (renderTag) {
         case 'DOM': 
             while (pathArr.length) {
-                pointer = pointer[index] = pointer[index] || {};
+                pointer = pointer[id] = pointer[id] || {};
                 if (pointer.DOM) parentEl = pointer.DOM;
-                index = pathArr.shift();
+                id = pathArr.shift();
             }
-            pointer = pointer[index] = pointer[index] || {};
-            element = parentEl.getOrSetElement(path, index, commands);
+            pointer = pointer[id] = pointer[id] || {};
+            element = parentEl.getOrSetElement(path, id, commands);
             if (!pointer.DOM) this._renderers.push((pointer.DOM = element));
             break;
 
@@ -94,28 +93,30 @@ Context.prototype.receive = function receive(pathArr, path, commands) {
         default: break;
     }
 
-    while (commands.length) {
-        var command = commands.shift();
+    var index = commands.length;
+
+    while (index > 0) {
+        var command = commands[--index];
 
         switch (command) {
             case 'CHANGE_TRANSFORM':
                 var matrix = [
-                    commands.shift(),
-                    commands.shift(),
-                    commands.shift(),
-                    commands.shift(),
-                    commands.shift(),
-                    commands.shift(),
-                    commands.shift(),
-                    commands.shift(),
-                    commands.shift(),
-                    commands.shift(),
-                    commands.shift(),
-                    commands.shift(),
-                    commands.shift(),
-                    commands.shift(),
-                    commands.shift(),
-                    commands.shift()
+                    commands[--index],
+                    commands[--index],
+                    commands[--index],
+                    commands[--index],
+                    commands[--index],
+                    commands[--index],
+                    commands[--index],
+                    commands[--index],
+                    commands[--index],
+                    commands[--index],
+                    commands[--index],
+                    commands[--index],
+                    commands[--index],
+                    commands[--index],
+                    commands[--index],
+                    commands[--index]
                 ];
 
                 element.setMatrix.apply(
@@ -123,13 +124,13 @@ Context.prototype.receive = function receive(pathArr, path, commands) {
                     matrix
                 );
 
-                   if (this.WebGLRenderer) this.WebGLRenderer.setCutoutUniform(path, 'transform', matrix);
+                if (this.WebGLRenderer) this.WebGLRenderer.setCutoutUniform(path, 'transform', matrix);
 
                 break;
 
             case 'CHANGE_SIZE':
-                var width = commands.shift();
-                var height = commands.shift();
+                var width = commands[--index];
+                var height = commands[--index];
                 element.changeSize(width, height);
 
                 // TODO: switch from array to list of arguments here
@@ -138,37 +139,37 @@ Context.prototype.receive = function receive(pathArr, path, commands) {
 
             case 'CHANGE_PROPERTY':
                 if (this.WebGLRenderer) this.WebGLRenderer.getOrSetCutout(path);
-                element.setProperty(commands.shift(), commands.shift());
+                element.setProperty(commands[--index], commands[--index]);
                 break;
 
             case 'CHANGE_CONTENT':
                 if (this.WebGLRenderer) this.WebGLRenderer.getOrSetCutout(path);
-                element.setContent(commands.shift());
+                element.setContent(commands[--index]);
                 break;
 
             case 'CHANGE_ATTRIBUTE':
                 if (this.WebGLRenderer) this.WebGLRenderer.getOrSetCutout(path);
-                element.setAttribute(commands.shift(), commands.shift());
+                element.setAttribute(commands[--index], commands[--index]);
                 break;
 
             case 'ADD_CLASS':
                 if (this.WebGLRenderer) this.WebGLRenderer.getOrSetCutout(path);
-                element.addClass(commands.shift());
+                element.addClass(commands[--index]);
                 break;
 
             case 'REMOVE_CLASS':
                 if (this.WebGLRenderer) this.WebGLRenderer.getOrSetCutout(path);
-                element.removeClass(commands.shift());
+                element.removeClass(commands[--index]);
                 break;
 
             case 'ADD_EVENT_LISTENER':
                 if (this.WebGLRenderer) this.WebGLRenderer.getOrSetCutout(path);
-                var ev = commands.shift();
+                var ev = commands[--index];
                 var methods;
                 var properties;
                 var c;
-                while ((c = commands.shift()) !== 'EVENT_PROPERTIES') methods = c;
-                while ((c = commands.shift()) !== 'EVENT_END') properties = c;
+                while ((c = commands[--index]) !== 'EVENT_PROPERTIES') methods = c;
+                while ((c = commands[--index]) !== 'EVENT_END') properties = c;
                 methods = methods || [];
                 properties = properties || [];
                 element.addEventListener(ev, element.dispatchEvent.bind(element, ev, methods, properties));
@@ -180,74 +181,74 @@ Context.prototype.receive = function receive(pathArr, path, commands) {
                 break;
 
             case 'GL_SET_DRAW_OPTIONS': 
-                this.WebGLRenderer.setMeshOptions(path, commands.shift());
+                this.WebGLRenderer.setMeshOptions(path, commands[--index]);
                 break;
 
             case 'GL_AMBIENT_LIGHT':
                 this.WebGLRenderer.setAmbientLightColor(
                     path,
-                    commands.shift(),
-                    commands.shift(),
-                    commands.shift()
+                    commands[--index],
+                    commands[--index],
+                    commands[--index]
                 );
                 break;
 
             case 'GL_LIGHT_POSITION':
                 this.WebGLRenderer.setLightPosition(
                     path,
-                    commands.shift(),
-                    commands.shift(),
-                    commands.shift()
+                    commands[--index],
+                    commands[--index],
+                    commands[--index]
                 );
                 break;
 
             case 'GL_LIGHT_COLOR':
                 this.WebGLRenderer.setLightColor(
                     path,
-                    commands.shift(),
-                    commands.shift(),
-                    commands.shift()
+                    commands[--index],
+                    commands[--index],
+                    commands[--index]
                 );
                 break;
 
             case 'MATERIAL_INPUT':
                 this.WebGLRenderer.handleMaterialInput(
                     path,
-                    commands.shift(),
-                    commands.shift()
+                    commands[--index],
+                    commands[--index]
                 );
                 break;
 
             case 'GL_SET_GEOMETRY':
                 this.WebGLRenderer.setGeometry(
                     path,
-                    commands.shift(),
-                    commands.shift(),
-                    commands.shift()
+                    commands[--index],
+                    commands[--index],
+                    commands[--index]
                 );
                 break;
 
             case 'GL_UNIFORMS':
                 this.WebGLRenderer.setMeshUniform(
                     path,
-                    commands.shift(),
-                    commands.shift()
+                    commands[--index],
+                    commands[--index]
                 );
                 break;
 
             case 'GL_BUFFER_DATA':
                 this.WebGLRenderer.bufferData(
                     path,
-                    commands.shift(),
-                    commands.shift(),
-                    commands.shift(),
-                    commands.shift()
+                    commands[--index],
+                    commands[--index],
+                    commands[--index],
+                    commands[--index]
                 );
                 break;
 
             case 'PINHOLE_PROJECTION':
                 this._renderState.projectionType = Camera.PINHOLE_PROJECTION;
-                this._renderState.perspectiveTransform[11] = -1 / commands.shift();
+                this._renderState.perspectiveTransform[11] = -1 / commands[--index];
                 break;
 
             case 'ORTHOGRAPHIC_PROJECTION':
@@ -256,30 +257,32 @@ Context.prototype.receive = function receive(pathArr, path, commands) {
                 break;
 
             case 'CHANGE_VIEW_TRANSFORM':
-                this._renderState.viewTransform[0] = commands.shift();
-                this._renderState.viewTransform[1] = commands.shift();
-                this._renderState.viewTransform[2] = commands.shift();
-                this._renderState.viewTransform[3] = commands.shift();
+                this._renderState.viewTransform[0] = commands[--index];
+                this._renderState.viewTransform[1] = commands[--index];
+                this._renderState.viewTransform[2] = commands[--index];
+                this._renderState.viewTransform[3] = commands[--index];
 
-                this._renderState.viewTransform[4] = commands.shift();
-                this._renderState.viewTransform[5] = commands.shift();
-                this._renderState.viewTransform[6] = commands.shift();
-                this._renderState.viewTransform[7] = commands.shift();
+                this._renderState.viewTransform[4] = commands[--index];
+                this._renderState.viewTransform[5] = commands[--index];
+                this._renderState.viewTransform[6] = commands[--index];
+                this._renderState.viewTransform[7] = commands[--index];
 
-                this._renderState.viewTransform[8] = commands.shift();
-                this._renderState.viewTransform[9] = commands.shift();
-                this._renderState.viewTransform[10] = commands.shift();
-                this._renderState.viewTransform[11] = commands.shift();
+                this._renderState.viewTransform[8] = commands[--index];
+                this._renderState.viewTransform[9] = commands[--index];
+                this._renderState.viewTransform[10] = commands[--index];
+                this._renderState.viewTransform[11] = commands[--index];
 
-                this._renderState.viewTransform[12] = commands.shift();
-                this._renderState.viewTransform[13] = commands.shift();
-                this._renderState.viewTransform[14] = commands.shift();
-                this._renderState.viewTransform[15] = commands.shift();
+                this._renderState.viewTransform[12] = commands[--index];
+                this._renderState.viewTransform[13] = commands[--index];
+                this._renderState.viewTransform[14] = commands[--index];
+                this._renderState.viewTransform[15] = commands[--index];
                 break;
 
-            case 'WITH': return commands.unshift(command); break;
+            case 'WITH': commands.length = index + 1; return;
         }
     }
+    
+    return commands.length = index;
 };
 
 module.exports = Context;

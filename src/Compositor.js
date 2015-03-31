@@ -47,7 +47,7 @@ Compositor.prototype.sendEvent = function sendEvent(path, ev, payload) {
  *                              WebWorker, used to shift single messages from
  */
 Compositor.prototype.handleWith = function handleWith (commands) {
-    var path = commands.shift();
+    var path = commands.pop();
     var pathArr = path.split('/');
     var context = this.getOrSetContext(pathArr.shift());
 
@@ -84,7 +84,7 @@ Compositor.prototype.getOrSetContext = function getOrSetContext(selector) {
  *                              WebWorker, used to shift single messages from
  */
 Compositor.prototype.giveSizeFor = function giveSizeFor(commands) {
-    var selector = commands.shift();
+    var selector = commands.pop();
     var size = this.getOrSetContext(selector).getRootSize();
     this.sendResize(selector, size);
     var _this = this;
@@ -152,14 +152,14 @@ Compositor.prototype.drawCommands = function drawCommands() {
     var commands = this._inCommands;
     var command;
     while (commands.length) {
-        command = commands.shift();
+        command = commands.pop();
         
         switch (command) {
             case 'WITH':
                 this.handleWith(commands);
                 break;
             case 'INVOKE':
-                this.invoke(commands.shift(), commands.shift(), commands.shift(), commands.shift());
+                this.invoke(commands.pop(), commands.pop(), commands.pop(), commands.pop());
                 break;
             case 'NEED_SIZE_FOR':
                 this.giveSizeFor(commands);
