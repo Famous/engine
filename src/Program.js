@@ -8,8 +8,9 @@ var Debug = require('./Debug');
 
 var VERTEX_SHADER = 35633;
 var FRAGMENT_SHADER = 35632;
-
 var identityMatrix = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
+
+var header = 'precision mediump float;\n';
 
 var TYPES = {
     undefined: 'float ',
@@ -34,53 +35,52 @@ var masks =  {
     float: 4
 };
 
-var uniformNames = [
-    'perspective',
-    'view',
-    'resolution',
-    'transform',
-    'size',
-    'time',
-    'opacity',
-    'metalness',
-    'glossiness',
-    'baseColor',
-    'normal',
-    'positionOffset',
-    'u_LightPosition',
-    'u_LightColor',
-    'u_AmbientLight',
-    'u_FlatShading',
-    'u_NumLights'
-];
+/**
+ * Uniform keys and values
+ */
+var uniforms = {
+    'perspective': identityMatrix,
+    'view': identityMatrix,
+    'resolution': [0, 0, 0],
+    'transform': identityMatrix,
+    'size': [1, 1, 1],
+    'time': 0,
+    'opacity': 1,
+    'metalness': 0,
+    'glossiness': 0,
+    'baseColor': [1, 1, 1],
+    'normal': [1, 1, 1],
+    'positionOffset': [0, 0, 0],
+    'u_LightPosition': identityMatrix,
+    'u_LightColor': identityMatrix,
+    'u_AmbientLight': [0, 0, 0],
+    'u_FlatShading': 0,
+    'u_NumLights': 0
+};
+var uniformNames = Utility.keyValueToArrays(uniforms).keys;
+var uniformValues = Utility.keyValueToArrays(uniforms).values;
 
-var uniformValues = [
-    identityMatrix,
-    identityMatrix,
-    [0, 0, 0],
-    identityMatrix,
-    [1, 1, 1],
-    0,
-    1,
-    0,
-    0,
-    [1, 1, 1],
-    [1, 1, 1],
-    [0, 0, 0],
-    identityMatrix,
-    identityMatrix,
-    [0, 0, 0],
-    0,
-    0
-];
+/**
+ * Attributes keys and values
+ */
+var attributes = {
+    'pos': 3,
+    'texCoord': 2,
+    'normals': 3
+};
+var attributeNames = Utility.keyValueToArrays(attributes).keys;
+var attributeValues = Utility.keyValueToArrays(attributes).values;
 
-var attributeNames = ['pos', 'texCoord', 'normals'];
-var attributeValues = [3, 2, 3, 1];
-
-var varyingNames = ['v_TextureCoordinate', 'v_Normal', 'v_Position'];
-var varyingValues = [2, 3, 3];
-
-var header = 'precision mediump float;\n';
+/**
+ * Varyings keys and values
+ */
+var varyings = {
+    'v_TextureCoordinate': 2,
+    'v_Normal': 3,
+    'v_Position': 3
+};
+var varyingNames = Utility.keyValueToArrays(varyings).keys;
+var varyingValues = Utility.keyValueToArrays(varyings).values;
 
 /**
  * A class that handles interactions with the WebGL shader program
