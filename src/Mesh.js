@@ -221,27 +221,29 @@ Mesh.prototype.clean = function clean() {
 /**
 * Changes the color of Mesh, passing either a material expression or a basic
 * color using 'Color' as its helper. If no material expression is passed in,
-* then the Color accepts various inputs and an optional options parameter for
+* then the Color accepts various inputs and an optional transition parameter for
 * tweening colors. Its default parameters are in RGB, however, you can also
 * specify different inputs.
-* setBaseColor(r, g, b, option)
-* setBaseColor('rgb', 0, 0, 0, option)
-* setBaseColor('hsl', 0, 0, 0, option)
-* setBaseColor('hsv', 0, 0, 0, option)
-* setBaseColor('hex', '#000000', option)
-* setBaseColor('#000000', option)
-* setBaseColor('black', option)
+*
+* setBaseColor(r, g, b, transition, cb)
+* setBaseColor('rgb', 0, 0, 0, transition, cb)
+* setBaseColor('hsl', 0, 0, 0, transition, cb)
+* setBaseColor('hsv', 0, 0, 0, transition, cb)
+* setBaseColor('hex', '#000000', transition, cb)
+* setBaseColor('#000000', transition, cb)
+* setBaseColor('black', transition, cb)
 * setBaseColor(Color)
 *
 * @method setBaseColor
 * @param {Object|Array} Material, image, or vec3
-* @param {number} r Used to set the r value of Color
-* @param {number} g Used to set the g value of Color
-* @param {number} b Used to set the b value of Color
-* @param {object} options Optional options argument for tweening colors
+* @param {Number} r Used to set the r value of Color
+* @param {Number} g Used to set the g value of Color
+* @param {Number} b Used to set the b value of Color
+* @param {Object} transition Optional options argument for tweening colors
+* @param {Function} Callback
 * @chainable
 */
-Mesh.prototype.setBaseColor = function setBaseColor(type, a, b, c, options, cb) {
+Mesh.prototype.setBaseColor = function setBaseColor(type, a, b, c, transition, cb) {
     this.dispatch.dirtyRenderable(this._id);
 
     // If a material expression
@@ -254,7 +256,7 @@ Mesh.prototype.setBaseColor = function setBaseColor(type, a, b, c, options, cb) 
     else {
         this.queue.push('GL_UNIFORMS');
         if (this._expressions.baseColor) this._expressions.baseColor = null;
-        this._color.set(type, a, b, c, options, cb);
+        this._color.set(type, a, b, c, transition, cb);
         type = this._color.getNormalizedRGB();
     }
 

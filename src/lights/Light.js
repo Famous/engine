@@ -31,26 +31,29 @@ Light.toString = function toString() {
 
 /**
 * Changes the color of the light, using 'Color' as its helper. It accepts an
-* optional options parameter for tweening colors. Its default parameters are
+* optional transition parameter for tweening colors. Its default parameters are
 * in RGB, however, you can also specify different inputs.
-* setColor(r, g, b, option)
-* setColor('rgb', 0, 0, 0, option)
-* setColor('hsl', 0, 0, 0, option)
-* setColor('hsv', 0, 0, 0, option)
-* setColor('hex', '#000000', option)
-* setColor('#000000', option)
-* setColor('black', option)
-* setColor(Color)
+*
+* setColor(r, g, b, transition, callback)
+* setColor('rgb', 0, 0, 0, transition, callback)
+* setColor('hsl', 0, 0, 0, transition, callback)
+* setColor('hsv', 0, 0, 0, transition, callback)
+* setColor('hex', '#000000', transition, callback)
+* setColor('#000000', transition, callback)
+* setColor('black', transition, callback)
+* setColor(Color, transition, callback)
+*
 * @method setColor
-* @param {number} r Used to set the r value of Color
-* @param {number} g Used to set the g value of Color
-* @param {number} b Used to set the b value of Color
-* @param {object} options Optional options argument for tweening colors
+* @param {Number} r Used to set the r value of Color
+* @param {Number} g Used to set the g value of Color
+* @param {Number} b Used to set the b value of Color
+* @param {Object} transition Optional transition argument for tweening colors
+* @param {Function} Callback
 * @chainable
 */
-Light.prototype.setColor = function setColor(type, a, b, c, options, cb) {
+Light.prototype.setColor = function setColor(type, a, b, c, transition, cb) {
     this._dispatch.dirtyComponent(this._id);
-    this._color.set(type, a, b, c, options, cb);
+    this._color.set(type, a, b, c, transition, cb);
     this.queue.push(this.commands.color);
     var color = this._color.getNormalizedRGB();
     this.queue.push(color[0]);
