@@ -42,7 +42,7 @@ RotationalSpring.prototype.init = function init(options) {
         this.period = null;
         this.dampingRatio = null;
     }
-    else {
+    else if (options.period || options.dampingRatio) {
         this.period = this.period || 1;
         this.dampingRatio = this.dampingRatio || 0;
 

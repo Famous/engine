@@ -144,7 +144,6 @@ PhysicsEngine.prototype.add = function add() {
                 this.add(e);
             }
         } else {
-            console.log(entity.constructor.name)
             if (entity instanceof Particle) this.addBody(entity);
             else if (entity instanceof Constraint) this.addConstraint(entity);
             else if (entity instanceof Force) this.addForce(entity);
@@ -331,7 +330,7 @@ PhysicsEngine.prototype.getTransform = function getTransform(body) {
     var XYZ;
 
     if (oq.w !== 1) {
-        rot = Quaternion.multiply(q, oq, QUAT_REGISTER)
+        rot = Quaternion.multiply(q, oq, QUAT_REGISTER);
         loc = oq.rotateVector(p, VEC_REGISTER);
     }
     var XYZ = rot.toEulerXYZ(XYZ_REGISTER);
