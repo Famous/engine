@@ -167,8 +167,8 @@ Context.prototype.receive = function receive(pathArr, path, commands) {
                 var methods;
                 var properties;
                 var c;
-                while ((c = commands.shift()) !== EVENT_PROPERTIES) methods = c;
-                while ((c = commands.shift()) !== EVENT_END) properties = c;
+                while ((c = commands.shift()) !== 'EVENT_PROPERTIES') methods = c;
+                while ((c = commands.shift()) !== 'EVENT_END') properties = c;
                 methods = methods || [];
                 properties = properties || [];
                 element.addEventListener(ev, element.dispatchEvent.bind(element, ev, methods, properties));
