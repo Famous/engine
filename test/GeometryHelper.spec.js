@@ -22,6 +22,7 @@ test('GeometryHelper', function(t) {
 		    pos[1] = y;
 		    pos[2] = z;
 		}
+        generator.callCount = 0;
 
     	var detailX = 10;
     	var detailY = 10;
@@ -34,10 +35,7 @@ test('GeometryHelper', function(t) {
     		'Should call generator exactly (detailX + 1) * detailY times!'
     	);
 
-    	t.equals(
-    		buffers.vertices[]
-    	);
-        // t.end();
+        t.end();
     });
 
     t.end();

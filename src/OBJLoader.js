@@ -33,8 +33,7 @@ OBJLoader.load = function load(url, cb, options) {
             this.requests[url] = [cb];
             loadURL(
                 url,
-                _onsuccess.bind(
-                    this,
+                this._onsuccess(
                     url,
                     options
                 )
@@ -59,7 +58,7 @@ OBJLoader.load = function load(url, cb, options) {
  * @param {Boolean} value determining whether or not to manually calculate normals
  * @param {String} content of the server response
  */
-function _onsuccess(url, options, text) {
+OBJLoader._onsuccess = function _onsuccess(url, options, text) {
     var buffers = format.call(this, text, options || {});
     this.cached[url] = buffers;
 
@@ -277,6 +276,7 @@ function format(text, options) {
     cached.indices = flatten(cached.indices);
 
     if (options.normalize) {
+        console.log("HIJEFOJSOIEF")
         cached.vertices = GeometryHelper.normalizeVertices(
             cached.vertices
         );
