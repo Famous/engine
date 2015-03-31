@@ -71,7 +71,7 @@ Compositor.prototype.handleWith = function handleWith (commands) {
  */
 Compositor.prototype.getOrSetContext = function getOrSetContext(selector) {
     if (this._contexts[selector]) return this._contexts[selector];
-    else return (this._contexts[selector] = new Context(selector));
+    else return (this._contexts[selector] = new Context(selector, this));
 };
 
 /**
