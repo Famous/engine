@@ -51,6 +51,7 @@ PointLight.prototype.constructor = PointLight;
  */
 PointLight.prototype._receiveTransformChange = function _receiveTransformChange(transform) {
     this._dispatch.dirtyComponent(this._id);
+
     this.queue.push(this.commands.position);
     this.queue.push(transform._matrix[12]);
     this.queue.push(transform._matrix[13]);
