@@ -181,28 +181,28 @@ WebGLRenderer.prototype.setMeshOptions = function(path, options) {
     return this;
 };
 
-WebGLRenderer.prototype.setAmbientLightColor = function setAmbientLightColor(path, color) {
-    this.ambientLightColor[0] = color[0];
-    this.ambientLightColor[1] = color[1];
-    this.ambientLightColor[2] = color[2];
+WebGLRenderer.prototype.setAmbientLightColor = function setAmbientLightColor(path, r, g, b) {
+    this.ambientLightColor[0] = r;
+    this.ambientLightColor[1] = g;
+    this.ambientLightColor[2] = b;
     return this;
 };
 
-WebGLRenderer.prototype.setLightPosition = function setLightPosition(path, position) {
+WebGLRenderer.prototype.setLightPosition = function setLightPosition(path, x, y, z) {
     var light = this.lightRegistry[path] || this.createLight(path);
 
-    light.position[0] = position[0];
-    light.position[1] = position[1];
-    light.position[2] = position[2];
+    light.position[0] = x;
+    light.position[1] = y;
+    light.position[2] = z;
     return this;
 };
 
-WebGLRenderer.prototype.setLightColor = function setLightColor(path, color) {
+WebGLRenderer.prototype.setLightColor = function setLightColor(path, r, g, b) {
     var light = this.lightRegistry[path] || this.createLight(path);
 
-    light.color[0] = color[0];
-    light.color[1] = color[1];
-    light.color[2] = color[2];
+    light.color[0] = r;
+    light.color[1] = g;
+    light.color[2] = b;
     return this;
 };
 
