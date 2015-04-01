@@ -29,23 +29,17 @@ var RECALL = 'RECALL';
  * @component
  * @param {RenderNode} RenderNode to which the instance of Element will be a component of
  */
-function HTMLElement(dispatch, tagName) {
-    this._dispatch = dispatch;
-    this._id = dispatch.addRenderable(this);
+function HTMLElement(node, tagName) {
+    this._node = node;
+    this._id = node.addComponent(this);
     this._trueSized = [false, false];
     this._size = [0, 0, 0];
     this._queue = [];
+    this._tagName = tagName ? tagName : 'div';
 
-    this._queue.push(INIT_DOM);
-    this._queue.push(tagName ? tagName : 'div');
+    this._requestingUpdate = false;
 
     this._callbacks = new CallbackStore();
-    this._dispatch.onTransformChange(this._receiveTransformChange.bind(this));
-    this._dispatch.onSizeChange(this._receiveSizeChange.bind(this));
-    this._dispatch.onOpacityChange(this._receiveOpacityChange.bind(this));
-    this._receiveTransformChange(this._dispatch.getContext()._transform);
-    this._receiveSizeChange(this._dispatch.getContext()._size);
-    this._receiveOpacityChange(this._dispatch.getContext()._opacity);
 }
 
 // Return the name of the Element Class: 'element'
@@ -53,17 +47,30 @@ HTMLElement.toString = function toString() {
     return ELEMENT;
 };
 
-HTMLElement.prototype.clean = function clean() {
+HTMLElement.prototype._requestUpdate = function _requestUpdate () {
+    if (!this._requestingUpdate) {
+        this._requestingUpdate = true;
+        this._node.requestUpdate(this._id);
+    }
+};
+
+HTMLElement.prototype.init = function init () {
+    this._queue.push(INIT_DOM);
+    this._queue.push(this._tagName);
+    if (!this._requestingUpdate) this._requestUpdate();
+};
+
+HTMLElement.prototype.onUpdate = function onUpdate () {
     var len = this._queue.length;
     if (len) {
     	var path = this._dispatch.getRenderPath();
-    	this._dispatch
+    	this._node //node.sendDrawCommand will be depricated.
             .sendDrawCommand(WITH)
             .sendDrawCommand(path)
             .sendDrawCommand('DOM');
 
-    	for (var i = 0 ; i < len ; i++)
-    	    this._dispatch.sendDrawCommand(this._queue.shift());
+    	for (var i = 0 ; i < len ; i++) // node.sendDrawCommand will be depricated.
+    	    this._node.sendDrawCommand(this._queue.shift());
     }
     return false;
 };
