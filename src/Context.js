@@ -99,32 +99,11 @@ Context.prototype.receive = function receive(pathArr, path, commands) {
 
         switch (command) {
             case 'CHANGE_TRANSFORM':
-                var matrix = [
-                    commands[commands.index++],
-                    commands[commands.index++],
-                    commands[commands.index++],
-                    commands[commands.index++],
-                    commands[commands.index++],
-                    commands[commands.index++],
-                    commands[commands.index++],
-                    commands[commands.index++],
-                    commands[commands.index++],
-                    commands[commands.index++],
-                    commands[commands.index++],
-                    commands[commands.index++],
-                    commands[commands.index++],
-                    commands[commands.index++],
-                    commands[commands.index++],
-                    commands[commands.index++]
-                ];
-
-                element.setMatrix.apply(
-                    element,
-                    matrix
-                );
-
+                for (var i = 0, matrix = []; i < 16; i++) {
+                    matrix[i] = commands[commands.index++];
+                };
+                element.setMatrix.apply(element, matrix);
                 if (this.WebGLRenderer) this.WebGLRenderer.setCutoutUniform(path, 'transform', matrix);
-
                 break;
 
             case 'CHANGE_SIZE':
