@@ -30,8 +30,6 @@ var RECALL = 'RECALL';
  * @param {RenderNode} RenderNode to which the instance of Element will be a component of
  */
 function HTMLElement(node, tagName) {
-    this._node = node;
-    this._id = node.addComponent(this);
     this._trueSized = [false, false];
     this._size = [0, 0, 0];
     this._queue = [];
@@ -39,6 +37,9 @@ function HTMLElement(node, tagName) {
 
     this._requestingUpdate = false;
 
+    this._node = node;
+    this._id = node.addComponent(this);
+    this.init(node) // TODO: this is not ideal 
     this._callbacks = new CallbackStore();
 }
 
@@ -54,16 +55,21 @@ HTMLElement.prototype._requestUpdate = function _requestUpdate () {
     }
 };
 
-HTMLElement.prototype.init = function init () {
+HTMLElement.prototype.init = function init (node) {
     this._queue.push(INIT_DOM);
     this._queue.push(this._tagName);
-    if (!this._requestingUpdate) this._requestUpdate();
+    this.onTransformChange(node.getTransform());
+    this.onSizeChange(node.getSize());
 };
+
+// HTMLElement.prototype.onMount = function onMount (node) {
+//    this.init(node);
+// };
 
 HTMLElement.prototype.onUpdate = function onUpdate () {
     var len = this._queue.length;
     if (len) {
-    	var path = this._dispatch.getRenderPath();
+        var path = this._node.getLocation();
     	this._node //node.sendDrawCommand will be depricated.
             .sendDrawCommand(WITH)
             .sendDrawCommand(path)
@@ -72,35 +78,36 @@ HTMLElement.prototype.onUpdate = function onUpdate () {
     	for (var i = 0 ; i < len ; i++) // node.sendDrawCommand will be depricated.
     	    this._node.sendDrawCommand(this._queue.shift());
     }
-    return false;
+
+    this._requestingUpdate = false;
 };
 
-HTMLElement.prototype._receiveTransformChange = function _receiveTransformChange(transform) {
-    this._dispatch.dirtyRenderable(this._id);
+HTMLElement.prototype.onTransformChange = function onTransformChange(transform) {
+    if (!this._requestingUpdate) this._requestUpdate();
     var queue = this._queue;
     queue.push(CHANGE_TRANSFORM);
-    queue.push(transform._matrix[0]);
-    queue.push(transform._matrix[1]);
-    queue.push(transform._matrix[2]);
-    queue.push(transform._matrix[3]);
-    queue.push(transform._matrix[4]);
-    queue.push(transform._matrix[5]);
-    queue.push(transform._matrix[6]);
-    queue.push(transform._matrix[7]);
-    queue.push(transform._matrix[8]);
-    queue.push(transform._matrix[9]);
-    queue.push(transform._matrix[10]);
-    queue.push(transform._matrix[11]);
-    queue.push(transform._matrix[12]);
-    queue.push(transform._matrix[13]);
-    queue.push(transform._matrix[14]);
-    queue.push(transform._matrix[15]);
+    queue.push(transform[0]);
+    queue.push(transform[1]);
+    queue.push(transform[2]);
+    queue.push(transform[3]);
+    queue.push(transform[4]);
+    queue.push(transform[5]);
+    queue.push(transform[6]);
+    queue.push(transform[7]);
+    queue.push(transform[8]);
+    queue.push(transform[9]);
+    queue.push(transform[10]);
+    queue.push(transform[11]);
+    queue.push(transform[12]);
+    queue.push(transform[13]);
+    queue.push(transform[14]);
+    queue.push(transform[15]);
 };
 
-HTMLElement.prototype._receiveSizeChange = function _receiveSizeChange(size) {
-    this._dispatch.dirtyRenderable(this._id);
-    var width = this._trueSized[0] ? this._trueSized[0] : size._size[0];
-    var height = this._trueSized[1] ? this._trueSized[1] : size._size[1];
+HTMLElement.prototype.onSizeChange = function onSizeChange(size) {
+    if (!this._requestingUpdate) this._requestUpdate();
+    var width = this._trueSized[0] ? this._trueSized[0] : size[0];
+    var height = this._trueSized[1] ? this._trueSized[1] : size[1];
     this._queue.push('CHANGE_SIZE');
     this._queue.push(width);
     this._queue.push(height);
@@ -108,7 +115,7 @@ HTMLElement.prototype._receiveSizeChange = function _receiveSizeChange(size) {
     this._size[1] = height;
 };
 
-HTMLElement.prototype._receiveOpacityChange = function _receiveOpacityChange(opacity) {
+HTMLElement.prototype.onOpacityChange = function onOpacityChange(opacity) {
     this.property(OPACITY, opacity.value);
 };
 
@@ -119,10 +126,6 @@ HTMLElement.prototype.getSize = function getSize() {
 HTMLElement.prototype.on = function on (ev, methods, properties) {
     this.eventListener(ev, methods, properties);
     return this;
-};
-
-HTMLElement.prototype.kill = function kill () {
-    this._dispatch.sendDrawCommand(WITH).sendDrawCommand(this._dispatch.getRenderPath()).sendDrawCommand(RECALL);
 };
 
 /**
@@ -136,7 +139,7 @@ HTMLElement.prototype.kill = function kill () {
  * @return {HTMLElement} current HTMLElement
  */
 HTMLElement.prototype.property = function property(key, value) {
-    this._dispatch.dirtyRenderable(this._id);
+    if (!this._requestingUpdate) this._requestUpdate();
     this._queue.push(CHANGE_PROPERTY);
     this._queue.push(key);
     this._queue.push(value);
@@ -159,7 +162,7 @@ HTMLElement.prototype.trueSize = function trueSize(trueWidth, trueHeight) {
     if (trueHeight === undefined) trueHeight = true;
 
     if (this._trueSized[0] !== trueWidth || this._trueSized[1] !== trueHeight) {
-        this._dispatch.dirtyRenderable(this._id);
+        if (!this._requestingUpdate) this._requestUpdate();
     }
     this._trueSized[0] = trueWidth;
     this._trueSized[1] = trueHeight;
@@ -177,7 +180,7 @@ HTMLElement.prototype.trueSize = function trueSize(trueWidth, trueHeight) {
  * @return {HTMLElement} current HTMLElement
  */
 HTMLElement.prototype.attribute = function attribute(key, value) {
-    this._dispatch.dirtyRenderable(this._id);
+    if (!this._requestingUpdate) this._requestUpdate();
     this._queue.push(CHANGE_ATTRIBUTE);
     this._queue.push(key);
     this._queue.push(value);
@@ -194,7 +197,7 @@ HTMLElement.prototype.attribute = function attribute(key, value) {
  * @return {HTMLElement} current HTMLElement
  */
 HTMLElement.prototype.addClass = function addClass(value) {
-    this._dispatch.dirtyRenderable(this._id);
+    if (!this._requestingUpdate) this._requestUpdate();
     this._queue.push(ADD_CLASS);
     this._queue.push(value);
     return this;
@@ -209,7 +212,7 @@ HTMLElement.prototype.addClass = function addClass(value) {
  * @return {HTMLElement} current HTMLElement
  */
 HTMLElement.prototype.removeClass = function removeClass(value) {
-    this._dispatch.dirtyRenderable(this._id);
+    if (!this._requestingUpdate) this._requestUpdate();
     this._queue.push(REMOVE_CLASS);
     this._queue.push(value);
     return this;
@@ -225,7 +228,7 @@ HTMLElement.prototype.removeClass = function removeClass(value) {
  * @return {HTMLElement} current HTMLElement
  */
 HTMLElement.prototype.id = function id(value) {
-    this._dispatch.dirtyRenderable(this._id);
+    if (!this._requestingUpdate) this._requestUpdate();
     this._queue.push(CHANGE_ATTRIBUTE);
     this._queue.push(ID);
     this._queue.push(value);
@@ -242,7 +245,7 @@ HTMLElement.prototype.id = function id(value) {
  * @return {HTMLElement} current HTMLElement
  */
 HTMLElement.prototype.content = function content(value) {
-    this._dispatch.dirtyRenderable(this._id);
+    if (!this._requestingUpdate) this._requestUpdate();
     this._queue.push(CHANGE_CONTENT);
     this._queue.push(value);
     return this;
@@ -273,7 +276,7 @@ HTMLElement.prototype.get = function get (key) {
  * @return {Component} this
  */
 HTMLElement.prototype.eventListener = function eventListener (ev, methods, properties) {
-    this._dispatch.dirtyRenderable(this._id);
+    if (!this._requestingUpdate) this._requestUpdate();
     this._queue.push(ADD_EVENT_LISTENER);
     this._queue.push(ev);
     if (methods != null) this._queue.push(methods);
