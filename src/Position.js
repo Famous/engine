@@ -111,7 +111,6 @@ Position.prototype.isActive = function isActive() {
 * If true, component is to be updated on next engine tick
 *
 * @method
-* @return {Boolean}
 */
 Position.prototype.onUpdate = function onUpdate() {
     this._node.setPosition(this._x.get(), this._y.get(), this._z.get());
