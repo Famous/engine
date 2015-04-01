@@ -19,7 +19,7 @@ function Compositor() {
     this._outCommands = [];
     this._inCommands = [];
 
-    this._inCommands.index = 0;
+    this.clearCommands();
 }
 
 /**

@@ -95,7 +95,7 @@ Context.prototype.receive = function receive(pathArr, path, commands) {
 
     var command = commands[commands.index++];
 
-    while (commands.index < commands.length) {
+    while (command) {
 
         switch (command) {
             case 'CHANGE_TRANSFORM':
