@@ -34,10 +34,11 @@ Align.prototype.constructor = Align;
 * @method
 * @return {Boolean}
 */
-Align.prototype.clean = function clean() {
-    var context = this._dispatch._context;
-    context.setAlign(this._x.get(), this._y.get(), this._z.get());
-    return this._x.isActive() || this._y.isActive() || this._z.isActive();
+Align.prototype.onUpdate = function onUpdate() {
+    this._node.setAlign(this._x.get(), this._y.get(), this._z.get());
+
+    if (this.isActive()) this._node.requestUpdateOnNextTick(this._id);
+    else this._requestingUpdate = false;
 };
 
 module.exports = Align;

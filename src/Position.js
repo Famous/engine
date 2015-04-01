@@ -8,9 +8,12 @@ var Transitionable = require('famous-transitions').Transitionable;
  * @component
  * @param {LocalDispatch} dispatch LocalDispatch to be retrieved from corresponding Render Node of the Position component
  */
-function Position(dispatch) {
-    this._dispatch = dispatch;
-    this._id = dispatch.addComponent(this);
+function Position(node) {
+    this._node = node;
+    this._id = node.addComponent(this);
+  
+    this._requestingUpdate = false;
+    
     this._x = new Transitionable(0);
     this._y = new Transitionable(0);
     this._z = new Transitionable(0);
@@ -110,10 +113,11 @@ Position.prototype.isActive = function isActive() {
 * @method
 * @return {Boolean}
 */
-Position.prototype.clean = function clean() {
-    var context = this._dispatch.getContext();
-    context.setPosition(this._x.get(), this._y.get(), this._z.get());
-    return this.isActive();
+Position.prototype.onUpdate = function onUpdate() {
+    this._node.setPosition(this._x.get(), this._y.get(), this._z.get());
+    
+    if (this.isActive()) this._node.requestUpdateOnNextTick(this._id);
+    else this._requestingUpdate = false;
 };
 
 /** 
@@ -127,7 +131,11 @@ Position.prototype.clean = function clean() {
 * @chainable
 */
 Position.prototype.setX = function setX(val, options, callback) {
-    this._dispatch.dirtyComponent(this._id);
+    if (!this._requestingUpdate) {
+        this._node.requestUpdate(this._id);
+        this._requestingUpdate = true;
+    }
+
     this._x.set(val, options, callback);
     return this;
 };
@@ -143,7 +151,11 @@ Position.prototype.setX = function setX(val, options, callback) {
 * @chainable
 */
 Position.prototype.setY = function setY(val, options, callback) {
-    this._dispatch.dirtyComponent(this._id);
+    if (!this._requestingUpdate) {
+        this._node.requestUpdate(this._id);
+        this._requestingUpdate = true;
+    }
+
     this._y.set(val, options, callback);
     return this;
 };
@@ -159,7 +171,11 @@ Position.prototype.setY = function setY(val, options, callback) {
 * @chainable
 */
 Position.prototype.setZ = function setZ(val, options, callback) {
-    this._dispatch.dirtyComponent(this._id);
+    if (!this._requestingUpdate) {
+        this._node.requestUpdate(this._id);
+        this._requestingUpdate = true;
+    }
+
     this._z.set(val, options, callback);
     return this;
 };
@@ -178,7 +194,11 @@ Position.prototype.setZ = function setZ(val, options, callback) {
 * @chainable
 */
 Position.prototype.set = function set(x, y, z, options, callback) {
-    this._dispatch.dirtyComponent(this._id);
+    if (!this._requestingUpdate) {
+        this._node.requestUpdate(this._id);
+        this._requestingUpdate = true;
+    }
+   
     this._x.set(x, options);
     this._y.set(y, options);
     this._z.set(z, options, callback);
