@@ -1,128 +1,43 @@
-'use strict';
-
-var Node = require('./Node');
-var RenderProxy = require('./RenderProxy');
 
 var Famous = require('./Famous');
+var Node = require('./Node');
+var Size = require('./Size');
 
-/**
- * Context is the top-level node in the scene graph (= tree node).
- * As such, it populates the internal MessageQueue with commands received by
- * subsequent child-nodes. The Context is being updated by the Clock on every
- * FRAME and therefore recursively updates the scene grpah.
- *
- * @class  Context
- * @constructor
- * 
- * @param {String} selector     query selector used to 
- */
+var IDENT = new Float32Array([
+    1, 0, 0, 0,
+    0, 1, 0, 0,
+    0, 0, 1, 0,
+    0, 0, 0, 1
+]);
+
+var ZEROS = new Float32Array(3);
+
+var BOTTOM = {
+    getTransform: function getTransform () {
+        return IDENT;
+    },
+    getSize: function getSize () {
+        return ZEROS;
+    },
+    getUpdater: function getUpdater () {
+        return Famous;
+    }
+};
+
 function Context (selector) {
-    this._messageQueue = Famous.getMessageQueue();
-    this._globalDispatch = Famous.getGlobalDispatch();
-    this._clock = Famous.getClock();
-
-    this._clock.update(this);
-
-    this.proxy = new RenderProxy(this);
-    this.node = new Node(this.proxy, this._globalDispatch);
-    this.selector = selector;
-    this.dirty = true;
-    this.dirtyQueue = [];
-
-    this._messageQueue.enqueue('NEED_SIZE_FOR').enqueue(selector);
-    this._globalDispatch.targetedOn(selector, 'resize', this._receiveContextSize.bind(this));
+    Node.call(this);
+    this._selector = selector;
+    this.onMount(BOTTOM, selector);
+    Famous.registerContext(selector, this);
+    Famous.message('NEED_SIZE_FOR').message(selector);
 }
 
-/**
- * Adds a child to the internal list of child-nodes.
- *
- * @method addChild
- * @chainable
- *
- * @return {Context}    this
- */
-Context.prototype.addChild = function addChild () {
-    return this.node.addChild();
-};
+Context.prototype = Object.create(Node.prototype);
+Context.prototype.constructor = Context;
 
-/**
- * Removes a node returned by `addChild` from the Context's immediate children.
- *
- * @method  removeChild
- * @chainable
- * 
- * @param  {Node} node   node to be removed
- * @return {Context}     this
- */
-Context.prototype.removeChild = function removeChild (node) {
-    this.node.removeChild(node);
-    return this;
-};
-
-/**
- * Recursively updates all children.
- *
- * @method  update
- * @chainable
- * 
- * @return {Context}    this
- */
-Context.prototype.update = function update () {
-    this.node.update();
-    return this;
-};
-
-/**
- * Returns the selector the Context is attached to. Terminates recursive
- * `getRenderPath` scheduled by `RenderProxy`.
- *
- * @method  getRenderPath
- * @private
- * 
- * @return {String} selector
- */
-Context.prototype.getRenderPath = function getRenderPath () {
-    return this.selector;
-};
-
-/**
- * Appends the passed in command to the internal MessageQueue, thus scheduling
- * it to be sent to the Main Thread on the next FRAME.
- *
- * @method  receive
- * @chainable
- * 
- * @param  {Object} command command to be enqueued
- * @return {Context}        Context
- */
-Context.prototype.receive = function receive (command) {
-    if (this.dirty) this.dirtyQueue.push(command);
-    else this._messageQueue.enqueue(command);
-    return this;
-};
-
-/**
- * Method being executed whenever the context size changes.
- *
- * @method  _receiveContextSize
- * @chainable
- * @private
- * 
- * @param  {Array} size  new context size in the format `[width, height]`
- * @return {Context}     this
- */
 Context.prototype._receiveContextSize = function _receiveContextSize (size) {
-    this.node
-        .getDispatch()
-        .getContext()
-        .setAbsolute(size[0], size[1], 0);
-
-    if (this.dirty) {
-        this.dirty = false;
-        for (var i = 0, len = this.dirtyQueue.length ; i < len ; i++) this.receive(this.dirtyQueue.shift());
-    }
-
-    return this;
+    this.setSizeMode(Size.ABSOLUTE, Size.ABSOLUTE, Size.ABSOLUTE);
+    this.setAbsoluteSize(size[0], size[1], size[2]);
 };
 
 module.exports = Context;

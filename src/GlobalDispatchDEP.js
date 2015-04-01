@@ -119,7 +119,7 @@ GlobalDispatch.prototype.globalOff = function globalOff (path, key, cb) {
     var depth = path.split('/').length;
     if (this._globalCallbacks[depth]) this._globalCallbacks[depth].off(key, cb);
     return this;
-}
+};
 
 /**
  * Triggers all global event listeners registered on the specified type.

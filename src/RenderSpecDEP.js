@@ -348,7 +348,7 @@ Specification.External.Report.prototype.opacityChanged = function opacityChanged
 };
 
 Specification.External.Report.prototype.transformChanged = function transformChanged (transformReport) {
-    this.val |= (transformReport & ((1 <<< 16) - 1)) << 3;
+    this.val |= (transformReport & ((1 << 16) - 1)) << 3;
     return this;
 };
 
