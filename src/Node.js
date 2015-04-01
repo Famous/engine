@@ -210,15 +210,15 @@ Node.prototype.addChild = function addChild (child) {
         index = this._freedChildIndicies.length ? this._freedChildIndicies.pop() : this._children.length;
         this._children[index] = child;
 
-        if (this.isMounted() && child.onMount) {
+        if (this.isMounted() && child.mount) {
             var myId = this.getId();
             var childId = myId + '/' + index;
-            child.onMount(this, childId);
+            child.mount(this, childId);
         }
 
-        if (this.isShown() && this.value.showState.shown && child.onShow)
-            child.onShow();
+        if (this.isShown() && child.show) child.show();
     }
+
     return child;
 };
 
@@ -226,11 +226,11 @@ Node.prototype.removeChild = function removeChild (child) {
     var index = this._children.indexOf(child);
     if (index !== -1) {
         this._freedChildIndicies.push(index);
-        if (this.isShown() && child.onHide)
-            child.onHide();
+        if (this.isShown() && child.hide)
+            child.hide();
 
-        if (this.isMounted() && child.onDismount)
-            child.onDismount(this, this.value.location + '/' + index);
+        if (this.isMounted() && child.dismount)
+            child.dismount();
 
         this._children[index] = null;
     }
@@ -243,11 +243,12 @@ Node.prototype.addComponent = function addComponent (component) {
         this._components[index] = component;
 
         if (this.isMounted() && component.onMount)
-            component.onMount(this, this.getId());
+            component.onMount(this, this.getId() + ':' + index);
 
         if (this.isShown() && component.onShow)
             component.onShow();
     }
+
     return index;
 };
 
@@ -280,6 +281,118 @@ Node.prototype._vec3OptionalSet = function _vec3OptionalSet (vec3, index, val) {
     }
     return false;
 };
+
+Node.prototype.show = function show () {
+    var i = 0;
+    var items = this._components;
+    var len = items.length;
+    var item;
+
+    for (; i < len ; i++) {
+        item = items[i];
+        if (item && item.onShow) item.onShow();
+    }
+
+    i = 0;
+    items = this._children;
+    len = items.length;
+
+    for (; i < len ; i++) {
+        item = items[i];
+        if (item && item.onParentShow) item.onParentShow();
+    }
+};
+
+Node.prototype.hide = function hide () {
+    var i = 0;
+    var items = this._components;
+    var len = items.length;
+    var item;
+
+    for (; i < len ; i++) {
+        item = items[i];
+        if (item && item.onHide) item.onHide();
+    }
+
+    i = 0;
+    items = this._children;
+    len = items.length;
+
+    for (; i < len ; i++) {
+        item = items[i];
+        if (item && item.onParentHide) item.onParentHide();
+    }
+};
+
+Node.prototype.setAlign = function setAlign (x, y, z) {
+    var vec3 = this.value.offsets.align;
+    var propogate = false;
+
+    propogate = this._vec3OptionalSet(vec3, 0, x) || propogate;
+    propogate = this._vec3OptionalSet(vec3, 1, y) || propogate;
+    propogate = this._vec3OptionalSet(vec3, 2, z) || propogate;
+
+    if (propogate) {
+        var i = 0;
+        var list = this._components;
+        var len = list.length;
+        var item;
+        x = vec3[0];
+        y = vec3[1];
+        z = vec3[2];
+        for (; i < len ; i++) {
+            item = list[i];
+            if (item && item.onAlignChange) item.onAlignChange(x, y, z);
+        }
+    }
+};
+
+Node.prototype.setMountPoint = function setMountPoint (x, y, z) {
+    var vec3 = this.value.offsets.mountPoint;
+    var propogate = false;
+
+    propogate = this._vec3OptionalSet(vec3, 0, x) || propogate;
+    propogate = this._vec3OptionalSet(vec3, 1, y) || propogate;
+    propogate = this._vec3OptionalSet(vec3, 2, z) || propogate;
+
+    if (propogate) {
+        var i = 0;
+        var list = this._components;
+        var len = list.length;
+        var item;
+        x = vec3[0];
+        y = vec3[1];
+        z = vec3[2];
+        for (; i < len ; i++) {
+            item = list[i];
+            if (item && item.onMountPointChange) item.onMountPointChange(x, y, z);
+        }
+    }
+};
+
+Node.prototype.setOrigin = function setOrigin (x, y, z) {
+    var vec3 = this.value.offsets.origin;
+    var propogate = false;
+
+    propogate = this._vec3OptionalSet(vec3, 0, x) || propogate;
+    propogate = this._vec3OptionalSet(vec3, 1, y) || propogate;
+    propogate = this._vec3OptionalSet(vec3, 2, z) || propogate;
+
+    if (propogate) {
+        var i = 0;
+        var list = this._components;
+        var len = list.length;
+        var item;
+        x = vec3[0];
+        y = vec3[1];
+        z = vec3[2];
+        for (; i < len ; i++) {
+            item = list[i];
+            if (item && item.onOriginChange) item.onOriginChange(x, y, z);
+        }
+    }
+};
+
 
 Node.prototype.setPosition = function setPosition (x, y, z) {
     var vec3 = this.value.vectors.position;
@@ -518,8 +631,14 @@ Node.prototype.onUpdate = function onUpdate (time) {
         if (item && item.onUpdate) item.onUpdate(time);
     }
 
-    var transformChanged = TRANSFORM_PROCESSOR.fromSpecWithParent(this.getParent().getTransform(), this.value, this.getTransform());
-    var sizeChanged = SIZE_PROCESSOR.fromSpecWithParent(this.getParent().getSize(), this.value, this.getSize());
+    var mySize = this.getSize();
+    var parentSize = this.getParent().getSize();
+    var myTransform = this.getTransform();
+    var parentTransform = this.getParent().getTransform();
+    var sizeChanged = SIZE_PROCESSOR.fromSpecWithParent(parentSize, this.value, mySize);
+    mySize = this.getSize();
+ 
+    var transformChanged = TRANSFORM_PROCESSOR.fromSpecWithParent(this.getParent().getTransform(), this.value, mySize, parentSize, this.getTransform());
 
     if (transformChanged) this._transformChanged(this.getTransform());
     if (sizeChanged) this._sizeChanged(this.getSize());
@@ -533,7 +652,8 @@ Node.prototype.onUpdate = function onUpdate (time) {
     }
 };
 
-Node.prototype.onMount = function onMount (parent, myId) {
+Node.prototype.mount = function mount (parent, myId) {
+    if (this.isMounted()) return; 
     var i = 0;
     var list = this._components;
     var len = list.length;
@@ -544,10 +664,9 @@ Node.prototype.onMount = function onMount (parent, myId) {
     this.value.location = myId;
     this.value.showState.mounted = true;
 
-
     for (; i < len ; i++) {
         item = list[i];
-        if (item.onMount) item.onMount(this, myId);
+        if (item.onMount) item.onMount(this, myId + ':' + i);
     }
     
     i = 0;
@@ -555,22 +674,25 @@ Node.prototype.onMount = function onMount (parent, myId) {
     len = list.length;
     for (; i < len ; i++) {
         item = list[i];
-        if (item.onParentMount) item.onParentMount(this, myId);
+        if (item.onParentMount) item.onParentMount(this, myId, i);
     }
 
     if (this._requestingUpdate) this._requestUpdate(true);
 };
 
-Node.prototype.onDismount = function onDismount (parent, id) {
+Node.prototype.dismount = function dismount () {
+    if (!this.isMounted()) return; 
     var i = 0;
     var list = this._components;
     var len = list.length;
     var item;
 
-    this._parent = null;
-    this.value.location = null;
     this.value.showState.mounted = false;
+    this.value.location = null;
 
+    this._parent.removeChild(this);
+
+    this._parent = null;
 
     for (; i < len ; i++) {
         item = list[i];
@@ -582,25 +704,29 @@ Node.prototype.onDismount = function onDismount (parent, id) {
     len = list.length;
     for (; i < len ; i++) {
         item = list[i];
-        if (item.onParentDismount) item.onParentDismount(this);
+        if (item.onParentDismount) item.onParentDismount();
     }
 
     if (!this._requestingUpdate) this._requestUpdate();
     this._globalUpdater = null;
 };
 
-Node.prototype.onParentMount = function onParentMount (parent) {
-    this.mount(parent, this.getId());
+Node.prototype.onParentMount = function onParentMount (parent, parentId, index) {
+    this.mount(parent, parentId + '/' + index);
 };
 
-Node.prototype.onParentDismount = function onParentDismount (parent) {
-    this.onDismount(parent, this.getId());
+Node.prototype.onParentDismount = function onParentDismount () {
+    this.dismount();
 };
 
-Node.prototype.onParentTransformChange = function onParentTransformChange (parentTransform) {
-    if (!this._requestingUpdate) this._requestUpdate();
-};
+Node.prototype.onParentShow = Node.prototype.show;
 
-Node.prototype.onParentSizeChange = Node.prototype.onParentTransformChange;
+Node.prototype.onParentHide = Node.prototype.hide;
+
+Node.prototype.onParentTransformChange = Node.prototype._requestUpdate; 
+
+Node.prototype.onParentSizeChange = Node.prototype._requestUpdate;
 
 module.exports = Node;
+
+

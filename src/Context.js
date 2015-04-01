@@ -27,7 +27,7 @@ var BOTTOM = {
 function Context (selector) {
     Node.call(this);
     this._selector = selector;
-    this.onMount(BOTTOM, selector);
+    this.mount(BOTTOM, selector);
     Famous.registerContext(selector, this);
     Famous.message('NEED_SIZE_FOR').message(selector);
 }

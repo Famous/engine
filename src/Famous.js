@@ -56,15 +56,15 @@ Famous.prototype.requestUpdateOnNextTick = function requestUpdateOnNextTick (req
     this._nextUpdateQueue.push(requester);
 };
 
-Famous.prototype.postMessage = function postMessage (message) {
-    while (message.length > 0) {
-        var command = message.shift();
+Famous.prototype.postMessage = function postMessage (messages) {
+    while (messages.length > 0) {
+        var command = messages.shift();
         switch (command) {
             case 'WITH':
-                this.handleWith(message);
+                this.handleWith(messages);
                 break;
             case 'FRAME':
-                this.handleFrame(message);
+                this.handleFrame(messages);
                 break;
             default:
                 console.error('Unknown command ' + command);
@@ -74,14 +74,14 @@ Famous.prototype.postMessage = function postMessage (message) {
     return this;
 };
 
-Famous.prototype.handleWith = function handleWith (message) {
-    var path = message.shift();
-    var command = message.shift();
+Famous.prototype.handleWith = function handleWith (messages) {
+    var path = messages.shift();
+    var command = messages.shift();
 
     switch (command) {
         case 'TRIGGER':
-            var type = message.shift();
-            var ev = message.shift();
+            var type = messages.shift();
+            var ev = messages.shift();
             if (type === 'resize') this.getContext(path)._receiveContextSize(ev);
             // this._globalDispatch.targetedTrigger(path, type, ev);
             break;
@@ -92,8 +92,8 @@ Famous.prototype.handleWith = function handleWith (message) {
     return this;
 };
 
-Famous.prototype.handleFrame = function handleFrame (message) {
-    this.step(message.shift());
+Famous.prototype.handleFrame = function handleFrame (messages) {
+    this.step(messages.shift());
     return this;
 };
 
@@ -136,9 +136,10 @@ Famous.prototype.getFrame = function getFrame () {
     return this._frame;
 };
 
-Famous.prototype.message = function message (message) {
-    this._messages.push(message);
+Famous.prototype.message = function message (messages) {
+    this._messages.push(messages);
     return this;
 };
 
-module.exports = Famous;
+module.exports = new Famous();
+

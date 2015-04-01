@@ -9,7 +9,7 @@ Transform.prototype.get = function get () {
     return this._matrix;
 };
 
-Transform.prototype.fromSpecWithParent = function fromSpecWithParent (parentMatrix, spec, target) {
+Transform.prototype.fromSpecWithParent = function fromSpecWithParent (parentMatrix, spec, mySize, parentSize, target) {
     target = target ? target : this._matrix;
 
     // local cache of everything
@@ -54,15 +54,15 @@ Transform.prototype.fromSpecWithParent = function fromSpecWithParent (parentMatr
     var scaleX      = spec.vectors.scale[0];
     var scaleY      = spec.vectors.scale[1];
     var scaleZ      = spec.vectors.scale[2];
-    var alignX      = spec.offsets.align[0];
-    var alignY      = spec.offsets.align[1];
-    var alignZ      = spec.offsets.align[2];
-    var mountPointX = spec.offsets.mountPoint[0];
-    var mountPointY = spec.offsets.mountPoint[1];
-    var mountPointZ = spec.offsets.mountPoint[2];
-    var originX     = spec.offsets.origin[0];
-    var originY     = spec.offsets.origin[1];
-    var originZ     = spec.offsets.origin[2];
+    var alignX      = spec.offsets.align[0] * parentSize[0];
+    var alignY      = spec.offsets.align[1] * parentSize[1];
+    var alignZ      = spec.offsets.align[2] * parentSize[2];
+    var mountPointX = spec.offsets.mountPoint[0] * mySize[0];
+    var mountPointY = spec.offsets.mountPoint[1] * mySize[1];
+    var mountPointZ = spec.offsets.mountPoint[2] * mySize[2];
+    var originX     = spec.offsets.origin[0] * mySize[0];
+    var originY     = spec.offsets.origin[1] * mySize[1];
+    var originZ     = spec.offsets.origin[2] * mySize[2];
     var cosX        = Math.cos(rotX);
     var cosY        = Math.cos(rotY);
     var cosZ        = Math.cos(rotZ);
