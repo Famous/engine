@@ -1,6 +1,6 @@
 'use strict';
 
-var _defaultCurves = {
+var curves = {
     /**
      * @property linear
      * @static
@@ -327,7 +327,7 @@ var _defaultCurves = {
      * @type {Function}
      */
     inBounce: function(t) {
-        return 1.0 - _defaultCurves.outBounce(1.0-t);
+        return 1.0 - curves.outBounce(1.0-t);
     },
 
     /**
@@ -353,118 +353,9 @@ var _defaultCurves = {
      * @type {Function}
      */
     inOutBounce: function(t) {
-        if (t < .5) return _defaultCurves.inBounce(t*2) * .5;
-        return _defaultCurves.outBounce(t*2-1.0) * .5 + .5;
+        if (t < .5) return curves.inBounce(t*2) * .5;
+        return curves.outBounce(t*2-1.0) * .5 + .5;
     }
 };
 
-var _curves = Object.create(_defaultCurves);
-
-/*
- * A library of curves which map an animation explicitly as a function of time.
- *    The following easing curves are available by default and can not be
- *    unregistered or overwritten:
- *
- *    linear,
- *    easeIn, easeOut, easeInOut,
- *    easeOutBounce,
- *    spring,
- *    inQuad, outQuad, inOutQuad,
- *    inCubic, outCubic, inOutCubic,
- *    inQuart, outQuart, inOutQuart,
- *    inQuint, outQuint, inOutQuint,
- *    inSine, outSine, inOutSine,
- *    inExpo, outExpo, inOutExpo,
- *    inCirc, outCirc, inOutCirc,
- *    inElastic, outElastic, inOutElastic,
- *    inBack, outBack, inOutBack,
- *    inBounce, outBounce, inOutBounce
- *
- * @class Easing
- * @deprecated Use curves instead
- */
-var Easing = {
-    /**
-     * Registers a given curve to be available in subsequent transitions by
-     *    adding it to the interal dictionary of registered curves.
-     *
-     * @method registerCurve
-     * @chainable
-     * @static
-     *
-     * @throws {Error} Will throw an error when attempting to overwrite default
-     *    curve.
-     * @throws {Error} Will throw an error if curve has already been registered.
-     * 
-     * @param {String} name unique name for later access
-     * @param {Function} curve function of one numeric variable mapping [0,1]
-     *    to range inside [0,1]
-     * @return {Easing} this
-     */
-    registerCurve: function(name, curve) {
-        console.warn('Easing is deprecated! Use transitions.curves instead!');
-        if (_defaultCurves[name]) throw new Error('Default curves can not be overwritten');
-        if (_curves[name]) throw new Error('Curve has already been registered');
-        _curves[name] = curve;
-        return this;
-    },
-
-    /**
-     * Unregisters the curve registered under the given name by removing it from
-     *    the internal dictionary of registered curves. This won't effect
-     *    currently active transitions.
-     *
-     * @method unregisterCurve
-     * @chainable
-     * @static
-     *
-     * @throws {Error} Will throw an error if curve does not exist.
-     * @param {String} name name of curve
-     * @return {Easing} this
-     */
-    unregisterCurve: function(name) {
-        console.warn('Easing is deprecated! Use transitions.curves instead!');
-        if (_defaultCurves[name]) throw new Error('Default curves can not be unregistered');
-        if (!_curves[name]) throw new Error('Curve has not been registered');
-        delete _curves[name];
-        return this;
-    },
-
-    /**
-     * Returns the easing curve with the given name.
-     *
-     * @method getCurve
-     * @static
-     * 
-     * @param {String} name name of curve
-     * @return {Function} curve function of one numeric variable mapping [0,1]
-     *    to range inside [0,1]
-     */
-    getCurve: function(name) {
-        console.warn('Easing is deprecated! Use transitions.curves instead!');
-        return _curves[name];
-    },
-
-    /**
-     * Retrieves the names of all previously registered easing curves.
-     * 
-     * @method getCurves
-     * @static
-     * 
-     * @return {String[]} array of registered easing curves
-     */
-    getCurves: function() {
-        console.warn('Easing is deprecated! Use transitions.curves instead!');
-        return Object.keys(_defaultCurves).concat(Object.keys(_curves));
-    },
-
-    createBezierCurve: function(v1, v2) {
-        console.warn('Easing is deprecated! Use transitions.curves instead!');
-        v1 = v1 || 0; v2 = v2 || 0;
-        return function(t) {
-            return v1*t + (-2*v1 - v2 + 3)*t*t + (v1 + v2 - 2)*t*t*t;
-        };
-    }
-};
-
-module.exports = Easing;
+module.exports = curves;

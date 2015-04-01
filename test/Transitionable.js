@@ -1,16 +1,19 @@
 'use strict';
 
+var time = 0;
+var _now = Date.now;
+
 var test = require('tape');
 var Transitionable = require('../src/Transitionable');
 
-var time = 0;
-var _now = Date.now;
 
 test('Transitionable', function(t) {
     t.test('set up', function(t) {
         time = 0;
-        Date.now = function() {
-            return time;
+        Transitionable.Clock = {
+            now: function() {
+                return time;
+            }
         };
         t.end();
     });
@@ -28,13 +31,13 @@ test('Transitionable', function(t) {
 
         args.forEach(function(arg) {
             var transitionable = new Transitionable(arg);
-            t.equal(transitionable.get(), arg, 'Transitionable constructor should set intial state');
+            t.equal(transitionable.get(), arg, 'Transitionable constructor should set initial state');
         });
 
         t.end();
     });
 
-    t.test('set method', function(t) {
+    t.test('set method [deprecated]', function(t) {
         t.plan(6);
         var transitionable = new Transitionable();
         t.equal(typeof transitionable.set, 'function', 'transitionable.set should be a function');
@@ -53,21 +56,21 @@ test('Transitionable', function(t) {
         };
 
         time = 0;
-        transitionable.set(4, { duration: 500 }, callback);
+        transitionable.set(0, null, callback);
         time = 510;
-        transitionable.set(4, undefined, callback);
+        transitionable.set(4, { duration: 500 }, callback);
         time = 550;
-        transitionable.set(0);
+        transitionable.get();
     });
 
-    t.test('reset method', function(t) {
+    t.test('reset method [deprecated]', function(t) {
         var transitionable = new Transitionable();
         t.equal(typeof transitionable.reset, 'function', 'transitionable.reset should be a function');
 
         transitionable.set(0);
         transitionable.set(1, { duration: 500 });
-        transitionable.reset();
-        t.equal(transitionable.get(), undefined, 'Transitionable.reset should reset state if transition is active');
+        transitionable.reset(1);
+        t.equal(transitionable.get(), 1, 'Transitionable.reset should reset state if transition is active');
 
         t.end();
     });
@@ -77,12 +80,10 @@ test('Transitionable', function(t) {
         var transitionable = new Transitionable();
         t.equal(typeof transitionable.delay, 'function', 'transitionable.delay should be a function');
 
-        // TODO test callback
-
-        transitionable.set(0);
+        transitionable.from(0);
         transitionable.delay(500);
         t.equal(transitionable.get(), 0, 'transitionable.delay should delay the execution of the action queue');
-        transitionable.set(1);
+        transitionable.from(1);
         t.equal(transitionable.get(500), 1, 'transitionable.delay should delay the execution of the action queue');
     });
 
@@ -116,7 +117,7 @@ test('Transitionable', function(t) {
             var transitionable = new Transitionable();
             time = 0;
             transitionable.set(0);
-            transitionable.set(1, { transition: 500 });
+            transitionable.set(1, { duration: 500 });
             time = 250;
             t.equal(transitionable.get(), 0.5);
         });
@@ -126,7 +127,7 @@ test('Transitionable', function(t) {
             var transitionable = new Transitionable();
             time = 0;
             transitionable.set([0, 0, 0]);
-            transitionable.set([1, 1, 1], { transition: 500 });
+            transitionable.set([1, 1, 1], { duration: 500 });
             time = 250;
             t.deepEqual(transitionable.get(), [0.5, 0.5, 0.5]);
         });
@@ -146,7 +147,7 @@ test('Transitionable', function(t) {
         t.equal(transitionable.isActive(), false, 'transitionable.isActive should return false if transition is not active');
     });
 
-    t.test('halt method', function(t) {
+    t.test('halt method #1', function(t) {
         t.plan(4);
         var transitionable = new Transitionable();
         t.equal(typeof transitionable.halt, 'function', 'transitionable.halt should be a function');
@@ -160,6 +161,22 @@ test('Transitionable', function(t) {
         time = 600;
         t.equal(transitionable.isActive(), false, 'transitionable should not be active after transition has been halted');
         t.equal(transitionable.get(), 0.5, 'transitionable state should not change after transition has been halted');
+    });
+
+    t.test('halt method #2', function(t) {
+        t.plan(2);
+        time = 0;
+        var transitionable = new Transitionable();
+        t.equal(typeof transitionable.halt, 'function', 'transitionable.halt should be a function');
+        time = 0;
+        transitionable.set([0, 0, 0]);
+        time = 50;
+        transitionable.set([1, 2, 3], { duration: 100 });
+        time = 50;
+        transitionable.halt();
+        var value1 = transitionable.get();
+        var value2 = transitionable.get();
+        t.deepEqual(value1, value2);
     });
 
     t.test('callback', function(t) {
@@ -177,7 +194,7 @@ test('Transitionable', function(t) {
     });
 
     t.test('setting a value inside of a callback', function(t) {
-        t.plan(2);
+        t.plan(4);
         time = 0;
         var transitionable = new Transitionable(0);
         var test1 = false;
@@ -191,19 +208,16 @@ test('Transitionable', function(t) {
         });
 
         time = 500;
-        transitionable.get();
+        t.equal(transitionable.get(), 1);
         t.ok(test1)
         time = 1000;
-        transitionable.get();
+        t.equal(transitionable.get(), 3);
         t.ok(test2);
     });
 
     t.test('setting a value multiple times', function(t) {
-        t.plan(1);
         time = 0;
         var transitionable = new Transitionable(0);
-        var test1 = false;
-        var test2 = false;
 
         function testFunction() {
             transitionable.set(1, {curve: 'linear', duration: 500}, function() {
@@ -213,14 +227,101 @@ test('Transitionable', function(t) {
         
         testFunction();
         time = 500;
-        transitionable.get(); // To call the callback
+        t.equal(transitionable.get(), 1); // To call the callback
         time = 1000;
         testFunction();
         time = 1500;
         transitionable.get(); // To call the callback
         time = 2000;
-        t.ok(transitionable.get() === 0);
+        t.equal(transitionable.get(), 0);
 
+        t.end();
+    });
+
+    t.test('continous polling', function(t) {
+        var transitionable = new Transitionable();
+        time = 0;
+        transitionable.from(0)
+            .to(100, 'linear', 100)
+            .to(200, 'linear', 100)
+            .to(300, 'linear', 100);
+
+        time = 0;
+        t.equal(transitionable.get(), 0);
+
+        time = 100;
+        t.equal(transitionable.get(), 100);
+
+        time = 200;
+        t.equal(transitionable.get(), 200);
+
+        time = 300;
+        t.equal(transitionable.get(), 300);
+
+        t.end();
+    });
+
+    t.test('inconsistent polling', function(t) {
+        t.plan(11);
+
+        var transitionable = new Transitionable();
+        time = 0;
+        transitionable.from(0)
+            .to(100, 'linear', 100, function() {
+                t.equal(time, 100);
+                t.pass();
+            })
+            .to(200, 'linear', 100, function() {
+                t.equal(time, 400);
+                t.pass();
+            })
+            .to(300, 'linear', 100, function() {
+                t.pass();
+                t.equal(time, 400);
+            })
+            .to(400, 'linear', 100, function() {
+                t.pass();
+                t.equal(time, 400);
+            });
+
+        time = 0;
+        t.equal(transitionable.get(), 0);
+
+        time = 100;
+        t.equal(transitionable.get(), 100);
+
+        time = 400;
+        t.equal(transitionable.get(), 400);
+
+        t.end();
+    });
+
+    t.test('pausing transitions', function(t) {
+        var transitionable = new Transitionable();
+        time = 0;
+        transitionable.from(0).to(1, 'linear', 1000);
+
+        time = 500;
+        t.equal(transitionable.get(), 0.5);
+        transitionable.pause();
+        t.equal(transitionable.get(), 0.5);
+        t.equal(transitionable.isPaused(), true);
+
+        time = 750;
+        t.equal(transitionable.get(), 0.5);
+        t.equal(transitionable.isPaused(), true);
+
+        transitionable.resume();
+
+        time = 750;
+        t.equal(transitionable.get(), 0.5);
+        t.equal(transitionable.isPaused(), false);
+
+        time = 1250;
+        t.equal(transitionable.get(), 1);
+        t.equal(transitionable.isPaused(), false);
+
+        t.end();
     });
 
     t.test('tear down', function(t) {
