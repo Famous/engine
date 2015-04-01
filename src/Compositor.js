@@ -87,7 +87,7 @@ Compositor.prototype.getOrSetContext = function getOrSetContext(selector) {
  */
 Compositor.prototype.giveSizeFor = function giveSizeFor(commands) {
     var selector = commands[commands.index++];
-    
+
     var size = this.getOrSetContext(selector).getRootSize();
     this.sendResize(selector, size);
     var _this = this;
@@ -184,9 +184,6 @@ Compositor.prototype.drawCommands = function drawCommands() {
         this._contexts[key].draw();
     }
 
-    this._inCommands.index  = 0;
-    this._inCommands.length = 0;
-
     return this._outCommands;
 };
 
@@ -211,6 +208,8 @@ Compositor.prototype.receiveCommands = function receiveCommands(commands) {
  * @method clearCommands
  */
 Compositor.prototype.clearCommands = function clearCommands() {
+    this._inCommands.index = 0;
+    this._inCommands.length = 0;
     this._outCommands.length = 0;
     this._sentResize = false;
 };
