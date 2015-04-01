@@ -31,6 +31,9 @@ function Context(selector, compositor) {
     this._renderers = [];
     this._children = {};
 
+    this._meshTransform = [];
+    this._meshSize = [0, 0, 0];
+
     this.updateSize();
 }
 
@@ -99,20 +102,22 @@ Context.prototype.receive = function receive(pathArr, path, commands) {
 
         switch (command) {
             case 'CHANGE_TRANSFORM':
-                for (var i = 0, matrix = []; i < 16; i++) {
-                    matrix[i] = commands[commands.index++];
-                };
-                element.setMatrix.apply(element, matrix);
-                if (this.WebGLRenderer) this.WebGLRenderer.setCutoutUniform(path, 'transform', matrix);
+                for (var i = 0; i < 16; i++) {
+                    this._meshTransform[i] = commands[commands.index++];
+                }
+                element.setMatrix.apply(element, this._meshTransform);
+                if (this.WebGLRenderer) this.WebGLRenderer.setCutoutUniform(path, 'transform', this._meshTransform);
                 break;
 
             case 'CHANGE_SIZE':
                 var width = commands[commands.index++];
                 var height = commands[commands.index++];
-                element.changeSize(width, height);
 
+                element.changeSize(width, height);
                 // TODO: switch from array to list of arguments here
-                if (this.WebGLRenderer) this.WebGLRenderer.setCutoutUniform(path, 'size', [width, height, 0]);
+                this._meshSize[0] = width;
+                this._meshSize[1] = height;
+                if (this.WebGLRenderer) this.WebGLRenderer.setCutoutUniform(path, 'size', this._meshSize);
                 break;
 
             case 'CHANGE_PROPERTY':
