@@ -9,10 +9,12 @@ var Transitionable = require('famous-transitions').Transitionable;
  * @component
  * @param {LocalDispatch} dispatch LocalDispatch to be retrieved from corresponding Render Node of the Opacity component
  */
-function Opacity(dispatch) {
-    this._dispatch = dispatch;
-    this._id = dispatch.addComponent(this);
+function Opacity(node) {
+    this._node = node;
+    this._id = node.addComponent(this);
     this._value = new Transitionable(1);
+
+    this._requestingUpdate = false;
 }
 
 /**
@@ -59,19 +61,6 @@ Opacity.prototype.setState = function setState(state) {
 
 /**
 *
-* If true, component is to be updated on next engine tick
-*
-* @method
-* @return {Boolean}
-*/
-Opacity.prototype.clean = function clean() {
-    var context = this._dispatch._context;
-    context.setOpacity(this._value.get());
-    return this._value.isActive();
-};
-
-/**
-*
 * Setter for Opacity with callback
 *
 * @method
@@ -82,6 +71,12 @@ Opacity.prototype.clean = function clean() {
 */
 Opacity.prototype.set = function set(value, options, callback) {
     this._dispatch.dirtyComponent(this._id);
+
+    if (!this._requestingUpdate) {
+        this._node.requestUpdate(this._id);
+        this._requestingUpdate = true;
+    }
+
     this._value.set(value, options, callback);
     return this;
 };
@@ -107,6 +102,17 @@ Opacity.prototype.get = function get() {
 Opacity.prototype.halt = function halt() {
     this._value.halt();
     return this;
+};
+
+Opacity.prototype.isActive = function isActive(){
+    return this._value.isActive();
+};
+
+Opacity.prototype.onUpdate = function onUpdate() {
+    this._node.setOpacity(this._value.get());
+    
+    if (this.isActive()) this._node.requestUpdateOnNextTick(this._id);
+    else this._requestingUpdate = false;
 };
 
 module.exports = Opacity;

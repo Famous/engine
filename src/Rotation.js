@@ -8,8 +8,8 @@ var Position = require('./Position');
  * @component
  * @param {LocalDispatch} dispatch LocalDispatch to be retrieved from corresponding Render Node of the Rotation component
  */
-function Rotation(dispatch) {
-    Position.call(this, dispatch);
+function Rotation(node) {
+    Position.call(this, node);
 }
 
 /**
@@ -26,17 +26,11 @@ Rotation.toString = function toString() {
 Rotation.prototype = Object.create(Position.prototype);
 Rotation.prototype.constructor = Rotation;
 
-/**
-*
-* If true, component is to be updated on next engine tick
-*
-* @method
-* @return {Boolean}
-*/
-Rotation.prototype.clean = function clean() {
-    var context = this._dispatch._context;
-    context.setRotation(this._x.get(), this._y.get(), this._z.get());
-    return this._x.isActive() || this._y.isActive() || this._z.isActive();
+Rotation.prototype.onUpdate = function onUpdate() {
+    this._node.setRotation(this._x.get(), this._y.get(), this._z.get());
+    
+    if (this.isActive()) this._node.requestUpdateOnNextTick(this._id);
+    else this._requestingUpdate = false;
 };
 
 module.exports = Rotation;

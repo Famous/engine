@@ -10,14 +10,14 @@ var Transitionable = require('famous-transitions').Transitionable;
  * @constructor
  * @component
  * 
- * @param {LocalDispatch} dispatch LocalDispatch to be retrieved from
+ * @param {LocalDispatch} node LocalDispatch to be retrieved from
  *                                 corresponding RenderNode of the Size
  *                                 component
  */
-function Size(dispatch) {
-    this._dispatch = dispatch;
-    this._id = dispatch.addComponent(this);
-    dispatch.dirtyComponent(this._id);
+function Size(node) {
+    this._node = node;
+    this._id = node.addComponent(this);
+    this._requestingUpdate = false;
     this._absoluteMode = false;
     this._proportional = {
         x: new Transitionable(1),
@@ -131,65 +131,40 @@ Size.prototype.setState = function setState(state) {
     return false;
 };
 
-Size.prototype._cleanAbsoluteX = function _cleanAbsoluteX(prop) {
-    if (prop.dirtyX)
-        prop.dirtyX = prop.x.isActive();
-    return prop.x.get();
+Size.prototype._isActive = function _isActive(type) {
+    return type.x.isActive() || type.y.isActive() || type.z.isActive();
 };
 
-Size.prototype._cleanAbsoluteY = function _cleanAbsoluteY(prop) {
-    if (prop.dirtyY)
-        prop.dirtyY = prop.y.isActive();
-    return prop.y.get();
-};
-
-Size.prototype._cleanAbsoluteZ = function _cleanAbsoluteZ(prop) {
-    if (prop.dirtyZ)
-        prop.dirtyZ = prop.z.isActive();
-    return prop.z.get();
-};
-
-/**
-*
-* If true, component is to be updated on next engine tick
-*
-* @method clean
-* 
-* @return {Boolean} boolean indicating whether the component is still dirty
-*/
-Size.prototype.clean = function clean () {
-    var context = this._dispatch._context;
+Size.prototype.onUpdate = function onUpdate() {
+    var dirty;
     if (this._absoluteMode) {
         var abs = this._absolute;
-        context.setAbsolute(
-            this._cleanAbsoluteX(abs),
-            this._cleanAbsoluteY(abs),
-            this._cleanAbsoluteZ(abs)
+        this._node.setAbsolute(
+            abs.x.get(),
+            abs.y.get(),
+            abs.z.get()
         );
-        return abs.x.isActive() ||
-            abs.y.isActive() ||
-            abs.z.isActive();
+        dirty = this._isActive(abs);
     } else {
         var prop = this._proportional;
         var diff = this._differential;
-        context.setProportions(
-            this._cleanAbsoluteX(prop),
-            this._cleanAbsoluteY(prop),
-            this._cleanAbsoluteZ(prop)
+        this._node.setProportions(
+            prop.x.get(),
+            prop.y.get(),
+            prop.z.get()
         );
-        context.setDifferential(
-            this._cleanAbsoluteX(diff),
-            this._cleanAbsoluteY(diff),
-            this._cleanAbsoluteZ(diff)
+        this._node.setDifferential(
+            diff.x.get(),
+            diff.y.get(),
+            diff.z.get()
         );
-        return prop.x.isActive() ||
-            prop.y.isActive() ||
-            prop.z.isActive() ||
-            diff.x.isActive() ||
-            diff.y.isActive() ||
-            diff.z.isActive();
+        dirty = this._isActive(prop) || this._isActive(diff);
     }
+
+    if (dirty) this._node.requestUpdateOnNextTick(this._id);
+    else this._requestingUpdate = false;
 };
+
 
 /**
 * Applies absolute size.
@@ -206,20 +181,20 @@ Size.prototype.clean = function clean () {
 * @return {Size} this
 */
 Size.prototype.setAbsolute = function setAbsolute(x, y, z, options, callback) {
-    this._dispatch.dirtyComponent(this._id);
+    if (!this._requestingUpdate) {
+        this._node.requestUpdate(this._id);
+        this._requestingUpdate = true;
+    }
     var abs = this._absolute;
     this._absoluteMode = true;
     if (x != null) {
         abs.x.set(x, options, callback);
-        abs.dirtyX = true;
     }
     if (y != null) {
         abs.y.set(y, options, callback);
-        abs.dirtyY = true;
     }
     if (z != null) {
         abs.z.set(z, options, callback);
-        abs.dirtyZ = true;
     }
     return this;
 };
@@ -239,21 +214,20 @@ Size.prototype.setAbsolute = function setAbsolute(x, y, z, options, callback) {
 * @return {Size} this
 */
 Size.prototype.setProportional = function setProportional(x, y, z, options, callback) {
-    this._dispatch.dirtyComponent(this._id);
-    this._needsDEBUG = true;
+    if (!this._requestingUpdate) {
+        this._node.requestUpdate(this._id);
+        this._requestingUpdate = true;
+    }
     var prop = this._proportional;
     this._absoluteMode = false;
     if (x != null) {
         prop.x.set(x, options, callback);
-        prop.dirtyX = true;
     }
     if (y != null) {
         prop.y.set(y, options, callback);
-        prop.dirtyY = true;
     }
     if (z != null) {
         prop.z.set(z, options, callback);
-        prop.dirtyZ = true;
     }
     return this;
 };
@@ -272,20 +246,21 @@ Size.prototype.setProportional = function setProportional(x, y, z, options, call
 *                            transitions have been completed
 */
 Size.prototype.setDifferential = function setDifferential(x, y, z, options, callback) {
-    this._dispatch.dirtyComponent(this._id);
+    if (!this._requestingUpdate) {
+        this._node.requestUpdate(this._id);
+        this._requestingUpdate = true;
+    }
+
     var prop = this._differential;
     this._absoluteMode = false;
     if (x != null) {
         prop.x.set(x, options, callback);
-        prop.dirtyX = true;
     }
     if (y != null) {
         prop.y.set(y, options, callback);
-        prop.dirtyY = true;
     }
     if (z != null) {
         prop.z.set(z, options, callback);
-        prop.dirtyZ = true;
     }
     return this;
 };
@@ -298,7 +273,7 @@ Size.prototype.setDifferential = function setDifferential(x, y, z, options, call
 * @return {Number[]} size three dimensional computed size
 */
 Size.prototype.get = function get () {
-    return this._dispatch.getContext().getSize();
+    return this._node.getContext().getSize();
 };
 
 /**
