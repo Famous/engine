@@ -72,7 +72,9 @@ VirtualElement.prototype.getTarget = function getTarget () {
 
 VirtualElement.prototype.getOrSetElement = function getOrSetElement (path, index, commands) {
     if (this._children[index]) return this._children[index];
-    this._tagName = commands[commands.index += 2];
+
+    this._tagName = commands[commands.index++];
+    commands.index++;
     var div = this._allocator.allocate(this._tagName);
     var child = new VirtualElement(div, path, this._renderer, this, this._rootElement);
     this._children[index] = child;
