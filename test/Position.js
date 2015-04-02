@@ -44,7 +44,7 @@ test('Position', function(t) {
     t.test('setState method', function(t) {
         var position = new Position({
             addComponent: noop,
-            dirtyComponent: noop            
+            dirtyComponent: noop
         });
 
         t.equal(typeof position.setState, 'function', 'position.setState should be a function');
@@ -102,7 +102,7 @@ test('Position', function(t) {
         t.equal(typeof position.setX, 'function', 'position.setX should be a function');
         t.equal(position.setX(1), position, 'position.setX should be chainable');
     });
-    
+
     t.test('setY method', function(t) {
         t.plan(3);
         var position = new Position({
@@ -114,7 +114,7 @@ test('Position', function(t) {
         t.equal(typeof position.setY, 'function', 'position.setY should be a function');
         t.equal(position.setY(1), position, 'position.setY should be chainable');
     });
-    
+
     t.test('setZ method', function(t) {
         t.plan(3);
         var position = new Position({
