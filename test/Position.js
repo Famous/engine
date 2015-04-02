@@ -77,6 +77,9 @@ test('Position', function(t) {
             dirtyComponent: function() {
                 t.pass();
             },
+            getContext: function() {
+                return this._context;
+            },
             _context: {
                 setPosition: function (x, y, z) {
                     t.deepEqual(Array.prototype.slice.call(arguments), [1, 2, 3]);
