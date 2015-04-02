@@ -231,8 +231,8 @@ Mesh.prototype.setBaseColor = function setBaseColor(color) {
     // If a material expression
     if (color._compile) {
         this.queue.push('MATERIAL_INPUT');
-        this._expressions.baseColor = type;
-        color = type._compile();
+        this._expressions.baseColor = color;
+        color = color._compile();
     }
     // A color component
     else {
