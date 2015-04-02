@@ -159,8 +159,7 @@ Mesh.prototype.clean = function clean() {
 
     this.dispatch
         .sendDrawCommand('WITH')
-        .sendDrawCommand(path)
-        .sendDrawCommand('WEBGL');
+        .sendDrawCommand(path);
 
     var bufferIndex;
     if (this._geometry) {
