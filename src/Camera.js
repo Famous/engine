@@ -92,8 +92,7 @@ Camera.prototype.clean = function clean() {
 
     this._dispatch
         .sendDrawCommand('WITH')
-        .sendDrawCommand(path)
-        .sendDrawCommand('*');
+        .sendDrawCommand(path);
 
     switch (this._projectionType) {
         case Camera.FRUSTUM_PROJECTION:
