@@ -12,7 +12,7 @@ var sqrt = Math.sqrt;
  * @param {Number} y The y component.
  * @param {Number} z The z component.
  */
-var Vec3 = function(x,y,z){
+var Vec3 = function(x ,y, z){
     this.x = x || 0;
     this.y = y || 0;
     this.z = z || 0;
@@ -27,7 +27,7 @@ var Vec3 = function(x,y,z){
  * @param {Number} z The z component.
  * @chainable
  */
-Vec3.prototype.set = function set(x,y,z) {
+Vec3.prototype.set = function set(x, y, z) {
     if (x != null) this.x = x;
     if (y != null) this.y = y;
     if (z != null) this.z = z;
@@ -122,8 +122,8 @@ Vec3.prototype.rotateZ = function rotateZ(theta) {
     var cosTheta = cos(theta);
     var sinTheta = sin(theta);
 
-    this.x =   x * cosTheta - y * sinTheta;
-    this.y =   x * sinTheta + y * cosTheta;
+    this.x = x * cosTheta - y * sinTheta;
+    this.y = x * sinTheta + y * cosTheta;
 
     return this;
 };
@@ -184,9 +184,9 @@ Vec3.prototype.scale = function scale(s) {
  * @chainable
  */
 Vec3.prototype.invert = function invert() {
-    this.x *= -1;
-    this.y *= -1;
-    this.z *= -1;
+    this.x = -this.x;
+    this.y = -this.y;
+    this.z = -this.z;
 
     return this;
 };
@@ -268,7 +268,7 @@ Vec3.prototype.clear = function clear() {
  * @return {Boolean}
  */
 Vec3.prototype.isZero = function isZero() {
-    return !(this.x !== 0 || this.y !== 0 || this.z !== 0);
+    return this.x === 0 && this.y === 0 && this.z === 0;
 };
 
 /**
