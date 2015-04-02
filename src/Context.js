@@ -93,7 +93,6 @@ Context.prototype.receive = function receive(pathArr, path, commands) {
                 }
                 pointer = pointer[id] = pointer[id] || {};
                 element = parentEl.addChild(path, id, commands[commands.index++]);
-                command = commands[commands.index  - 1];
                 this._elementHash[path] = element;
                 this._renderers.push((pointer.DOM = element));
                 break;
