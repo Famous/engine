@@ -30,6 +30,7 @@ function Context(selector, compositor) {
     this._size = [];
     this._renderers = [];
     this._children = {};
+    this._elementHash = {};
 
     this._meshTransform = [];
     this._meshSize = [0, 0, 0];
@@ -65,40 +66,41 @@ Context.prototype.getRootSize = function getRootSize() {
     return this._size;
 };
 
+Context.prototype.initWebGL = function initWebGL() {
+    this._renderers.push((this.WebGLRenderer = new WebGLRenderer(this.canvas)));
+    this.WebGLRenderer.updateSize(this._size);
+};
+
 Context.prototype.receive = function receive(pathArr, path, commands) {
-    var pointer = this._children;
-    var command = commands[commands.index++];
-    var renderTag = Context.commandToRenderTag[command];
-    var parentEl = this.DOMRenderer;
-    var id = pathArr.shift();
+    var pointer;
+    var parentEl;
     var element;
+    var id;
 
-    switch (renderTag) {
-        case 'DOM':
-            while (pathArr.length) {
-                pointer = pointer[id] = pointer[id] || {};
-                if (pointer.DOM) parentEl = pointer.DOM;
-                id = pathArr.shift();
-            }
-            pointer = pointer[id] = pointer[id] || {};
-            element = parentEl.getOrSetElement(path, id, commands);
-            command = commands[commands.index  - 1];
-            if (!pointer.DOM) this._renderers.push((pointer.DOM = element));
-            break;
-
-        case 'WEBGL':
-            if (!this.WebGLRenderer) {
-                this._renderers.push((this.WebGLRenderer = new WebGLRenderer(this.canvas)));
-                this.WebGLRenderer.updateSize(this._size);
-            }
-            break;
-
-        default: break;
-    }
+    var command = commands[commands.index++];
 
     while (command) {
         switch (command) {
+            case 'INIT_DOM':
+                id = pathArr.shift();
+                pointer = this._children;
+                parentEl = this.DOMRenderer;
+
+                while (pathArr.length) {
+                    pointer = pointer[id] = pointer[id] || {};
+                    if (pointer.DOM) parentEl = pointer.DOM;
+                    id = pathArr.shift();
+                }
+                pointer = pointer[id] = pointer[id] || {};
+                element = parentEl.addChild(path, id, commands[commands.index++]);
+                command = commands[commands.index  - 1];
+                this._elementHash[path] = element;
+                this._renderers.push((pointer.DOM = element));
+                break;
+
             case 'CHANGE_TRANSFORM':
+                if (!element) element = this._elementHash[path];
+
                 for (var i = 0; i < 16; i++) {
                     this._meshTransform[i] = commands[commands.index++];
                 }
@@ -107,42 +109,50 @@ Context.prototype.receive = function receive(pathArr, path, commands) {
                 break;
 
             case 'CHANGE_SIZE':
+                if (!element) element = this._elementHash[path];
                 var width = commands[commands.index++];
                 var height = commands[commands.index++];
 
                 element.changeSize(width, height);
-                // TODO: switch from array to list of arguments here
-                this._meshSize[0] = width;
-                this._meshSize[1] = height;
-                if (this.WebGLRenderer) this.WebGLRenderer.setCutoutUniform(path, 'size', this._meshSize);
+                if (this.WebGLRenderer) {
+                    this._meshSize[0] = width;
+                    this._meshSize[1] = height;
+                    this.WebGLRenderer.setCutoutUniform(path, 'size', this._meshSize);
+                }
                 break;
 
             case 'CHANGE_PROPERTY':
+                if (!element) element = this._elementHash[path];
                 if (this.WebGLRenderer) this.WebGLRenderer.getOrSetCutout(path);
                 element.setProperty(commands[commands.index++], commands[commands.index++]);
                 break;
 
             case 'CHANGE_CONTENT':
+                if (!element) element = this._elementHash[path];
                 if (this.WebGLRenderer) this.WebGLRenderer.getOrSetCutout(path);
                 element.setContent(commands[commands.index++]);
                 break;
 
             case 'CHANGE_ATTRIBUTE':
+                if (!element) element = this._elementHash[path];
                 if (this.WebGLRenderer) this.WebGLRenderer.getOrSetCutout(path);
                 element.setAttribute(commands[commands.index++], commands[commands.index++]);
                 break;
 
             case 'ADD_CLASS':
+                if (!element) element = this._elementHash[path];
                 if (this.WebGLRenderer) this.WebGLRenderer.getOrSetCutout(path);
                 element.addClass(commands[commands.index++]);
                 break;
 
             case 'REMOVE_CLASS':
+                if (!element) element = this._elementHash[path];
                 if (this.WebGLRenderer) this.WebGLRenderer.getOrSetCutout(path);
                 element.removeClass(commands[commands.index++]);
                 break;
 
             case 'ADD_EVENT_LISTENER':
+                if (!element) element = this._elementHash[path];
                 if (this.WebGLRenderer) this.WebGLRenderer.getOrSetCutout(path);
                 var ev = commands[commands.index++];
                 var methods;
@@ -156,15 +166,20 @@ Context.prototype.receive = function receive(pathArr, path, commands) {
                 break;
 
             case 'RECALL':
+                if (!element) element = this._elementHash[path];
                 element.setProperty('display', 'none');
                 element._parent._allocator.deallocate(element._target);
+                this._renderers.splice(this._renderers.indexOf(element), 1);
+                delete this._elementHash[path];
                 break;
 
             case 'GL_SET_DRAW_OPTIONS': 
+                if (!this.WebGLRenderer) this.initWebGL();
                 this.WebGLRenderer.setMeshOptions(path, commands[commands.index++]);
                 break;
 
             case 'GL_AMBIENT_LIGHT':
+                if (!this.WebGLRenderer) this.initWebGL();
                 this.WebGLRenderer.setAmbientLightColor(
                     path,
                     commands[commands.index++],
@@ -174,6 +189,7 @@ Context.prototype.receive = function receive(pathArr, path, commands) {
                 break;
 
             case 'GL_LIGHT_POSITION':
+                if (!this.WebGLRenderer) this.initWebGL();
                 this.WebGLRenderer.setLightPosition(
                     path,
                     commands[commands.index++],
@@ -183,6 +199,7 @@ Context.prototype.receive = function receive(pathArr, path, commands) {
                 break;
 
             case 'GL_LIGHT_COLOR':
+                if (!this.WebGLRenderer) this.initWebGL();
                 this.WebGLRenderer.setLightColor(
                     path,
                     commands[commands.index++],
@@ -192,6 +209,7 @@ Context.prototype.receive = function receive(pathArr, path, commands) {
                 break;
 
             case 'MATERIAL_INPUT':
+                if (!this.WebGLRenderer) this.initWebGL();
                 this.WebGLRenderer.handleMaterialInput(
                     path,
                     commands[commands.index++],
@@ -200,6 +218,7 @@ Context.prototype.receive = function receive(pathArr, path, commands) {
                 break;
 
             case 'GL_SET_GEOMETRY':
+                if (!this.WebGLRenderer) this.initWebGL();
                 this.WebGLRenderer.setGeometry(
                     path,
                     commands[commands.index++],
@@ -209,6 +228,7 @@ Context.prototype.receive = function receive(pathArr, path, commands) {
                 break;
 
             case 'GL_UNIFORMS':
+                if (!this.WebGLRenderer) this.initWebGL();
                 this.WebGLRenderer.setMeshUniform(
                     path,
                     commands[commands.index++],
@@ -217,6 +237,7 @@ Context.prototype.receive = function receive(pathArr, path, commands) {
                 break;
 
             case 'GL_BUFFER_DATA':
+                if (!this.WebGLRenderer) this.initWebGL();
                 this.WebGLRenderer.bufferData(
                     path,
                     commands[commands.index++],
@@ -264,26 +285,5 @@ Context.prototype.receive = function receive(pathArr, path, commands) {
         command = commands[commands.index++];
     }
 };
-
-Context.commandToRenderTag = {
-    INIT_DOM: 'DOM',
-    CHANGE_TRANSFORM: 'DOM',
-    CHANGE_SIZE: 'DOM',
-    CHANGE_PROPERTY: 'DOM',
-    CHANGE_CONTENT: 'DOM',
-    CHANGE_ATTRIBUTE: 'DOM',
-    ADD_CLASS: 'DOM',
-    REMOVE_CLASS: 'DOM',
-    ADD_EVENT_LISTENER: 'DOM',
-    RECALL: 'DOM',
-    GL_SET_DRAW_OPTIONS: 'WEBGL',
-    GL_AMBIENT_LIGHT: 'WEBGL',
-    GL_LIGHT_POSITION: 'WEBGL',
-    GL_LIGHT_COLOR: 'WEBGL',
-    MATERIAL_INPUT: 'WEBGL',
-    GL_SET_GEOMETRY: 'WEBGL',
-    GL_UNIFORMS: 'WEBGL',
-    GL_BUFFER_DATA: 'WEBGL'
-}
 
 module.exports = Context;
