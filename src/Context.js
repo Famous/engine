@@ -63,17 +63,18 @@ Context.prototype.draw = function draw() {
 
 Context.prototype.getRootSize = function getRootSize() {
     return this._size;
-}
+};
 
 Context.prototype.receive = function receive(pathArr, path, commands) {
     var pointer = this._children;
-    var renderTag = commands[commands.index++];
+    var command = commands[commands.index++];
+    var renderTag = Context.commandToRenderTag[command];
     var parentEl = this.DOMRenderer;
     var id = pathArr.shift();
     var element;
 
     switch (renderTag) {
-        case 'DOM': 
+        case 'DOM':
             while (pathArr.length) {
                 pointer = pointer[id] = pointer[id] || {};
                 if (pointer.DOM) parentEl = pointer.DOM;
@@ -81,14 +82,13 @@ Context.prototype.receive = function receive(pathArr, path, commands) {
             }
             pointer = pointer[id] = pointer[id] || {};
             element = parentEl.getOrSetElement(path, id, commands);
+            command = commands[commands.index  - 1];
             if (!pointer.DOM) this._renderers.push((pointer.DOM = element));
             break;
 
         case 'WEBGL':
             if (!this.WebGLRenderer) {
-                this._renderers.push(
-                    (this.WebGLRenderer = new WebGLRenderer(this.canvas))
-                );
+                this._renderers.push((this.WebGLRenderer = new WebGLRenderer(this.canvas)));
                 this.WebGLRenderer.updateSize(this._size);
             }
             break;
@@ -96,10 +96,7 @@ Context.prototype.receive = function receive(pathArr, path, commands) {
         default: break;
     }
 
-    var command = commands[commands.index++];
-
     while (command) {
-
         switch (command) {
             case 'CHANGE_TRANSFORM':
                 for (var i = 0; i < 16; i++) {
@@ -267,5 +264,26 @@ Context.prototype.receive = function receive(pathArr, path, commands) {
         command = commands[commands.index++];
     }
 };
+
+Context.commandToRenderTag = {
+    INIT_DOM: 'DOM',
+    CHANGE_TRANSFORM: 'DOM',
+    CHANGE_SIZE: 'DOM',
+    CHANGE_PROPERTY: 'DOM',
+    CHANGE_CONTENT: 'DOM',
+    CHANGE_ATTRIBUTE: 'DOM',
+    ADD_CLASS: 'DOM',
+    REMOVE_CLASS: 'DOM',
+    ADD_EVENT_LISTENER: 'DOM',
+    RECALL: 'DOM',
+    GL_SET_DRAW_OPTIONS: 'WEBGL',
+    GL_AMBIENT_LIGHT: 'WEBGL',
+    GL_LIGHT_POSITION: 'WEBGL',
+    GL_LIGHT_COLOR: 'WEBGL',
+    MATERIAL_INPUT: 'WEBGL',
+    GL_SET_GEOMETRY: 'WEBGL',
+    GL_UNIFORMS: 'WEBGL',
+    GL_BUFFER_DATA: 'WEBGL'
+}
 
 module.exports = Context;
