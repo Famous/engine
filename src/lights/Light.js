@@ -1,7 +1,5 @@
 'use strict';
 
-var Color = require('famous-utilities').Color;
-
 /**
  * The blueprint for all light components for inheriting common functionality.
  *
@@ -15,7 +13,7 @@ function Light(dispatch) {
     this._dispatch = dispatch;
     this._id = dispatch.addComponent(this);
     this.queue = [];
-    this._color = new Color();
+    this._color;
     this.commands = { color: '' };
 };
 
@@ -30,35 +28,20 @@ Light.toString = function toString() {
 };
 
 /**
-* Changes the color of the light, using 'Color' as its helper. It accepts an
-* optional transition parameter for tweening colors. Its default parameters are
-* in RGB, however, you can also specify different inputs.
-*
-* setColor(r, g, b, transition, callback)
-* setColor('rgb', 0, 0, 0, transition, callback)
-* setColor('hsl', 0, 0, 0, transition, callback)
-* setColor('hsv', 0, 0, 0, transition, callback)
-* setColor('hex', '#000000', transition, callback)
-* setColor('#000000', transition, callback)
-* setColor('black', transition, callback)
-* setColor(Color, transition, callback)
+* Changes the color of the light, using the 'Color' utility component.
 *
 * @method setColor
-* @param {Number} r Used to set the r value of Color
-* @param {Number} g Used to set the g value of Color
-* @param {Number} b Used to set the b value of Color
-* @param {Object} transition Optional transition argument for tweening colors
-* @param {Function} Callback
+* @param {Color} Color instance
 * @chainable
 */
-Light.prototype.setColor = function setColor(type, a, b, c, transition, cb) {
+Light.prototype.setColor = function setColor(color) {
     this._dispatch.dirtyComponent(this._id);
-    this._color.set(type, a, b, c, transition, cb);
+    this._color = color;
     this.queue.push(this.commands.color);
-    var color = this._color.getNormalizedRGB();
-    this.queue.push(color[0]);
-    this.queue.push(color[1]);
-    this.queue.push(color[2]);
+    var rgb = this._color.getNormalizedRGB();
+    this.queue.push(rgb[0]);
+    this.queue.push(rgb[1]);
+    this.queue.push(rgb[2]);
     return this;
 };
 
@@ -67,12 +50,11 @@ Light.prototype.setColor = function setColor(type, a, b, c, transition, cb) {
 * provided.
 
 * @method getColor
-* @param {string} option An optional specification for returning colors in
-* different formats: RGB, HSL, Hex, HSV
-* @returns {number} value The color value. Defaults to RGB.
+* @param {String} option Optional for returning in RGB or in Hex
+* @returns {Number} value The color value. Defaults to RGB.
 */
 Light.prototype.getColor = function getColor(option) {
-    return this._color.getColor(option);
+    return (this._color.getColor) ? this._color.getColor(option) : this._color;
 };
 
 /**
@@ -95,12 +77,12 @@ Light.prototype.clean = function clean() {
         this._dispatch.sendDrawCommand(this.queue.shift());
     }
 
-    if (this._color.isActive()) {
+    if (this._color && this._color.isActive()) {
         this._dispatch.sendDrawCommand(this.commands.color);
-        var color = this._color.getNormalizedRGB();
-        this._dispatch.sendDrawCommand(color[0]);
-        this._dispatch.sendDrawCommand(color[1]);
-        this._dispatch.sendDrawCommand(color[2]);
+        var rgb = this._color.getNormalizedRGB();
+        this._dispatch.sendDrawCommand(rgb[0]);
+        this._dispatch.sendDrawCommand(rgb[1]);
+        this._dispatch.sendDrawCommand(rgb[2]);
         return true;
     }
 

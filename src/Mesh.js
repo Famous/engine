@@ -1,7 +1,6 @@
 'use strict';
 
 var Transitionable = require('famous-transitions').Transitionable;
-var Color = require('famous-utilities').Color;
 var Geometry = require('famous-webgl-geometries');
 
 /**
@@ -20,7 +19,7 @@ function Mesh (dispatch, options) {
     this.queue = [];
     this._id = dispatch.addRenderable(this);
 
-    this._color = new Color();
+    this._color;
     this._glossiness = new Transitionable(0);
     this._positionOffset = new Transitionable([0, 0, 0]);
     this._metallness = new Transitionable(0);
@@ -201,7 +200,7 @@ Mesh.prototype.clean = function clean() {
     var i = this.queue.length;
     while (i--) this.dispatch.sendDrawCommand(this.queue.shift());
 
-    if (this._color.isActive()) {
+    if (this._color && this._color.isActive()) {
         this.dispatch.sendDrawCommand('GL_UNIFORMS');
         this.dispatch.sendDrawCommand('baseColor');
         this.dispatch.sendDrawCommand(this._color.getNormalizedRGB());
@@ -219,49 +218,32 @@ Mesh.prototype.clean = function clean() {
 };
 
 /**
-* Changes the color of Mesh, passing either a material expression or a basic
-* color using 'Color' as its helper. If no material expression is passed in,
-* then the Color accepts various inputs and an optional transition parameter for
-* tweening colors. Its default parameters are in RGB, however, you can also
-* specify different inputs.
-*
-* setBaseColor(r, g, b, transition, cb)
-* setBaseColor('rgb', 0, 0, 0, transition, cb)
-* setBaseColor('hsl', 0, 0, 0, transition, cb)
-* setBaseColor('hsv', 0, 0, 0, transition, cb)
-* setBaseColor('hex', '#000000', transition, cb)
-* setBaseColor('#000000', transition, cb)
-* setBaseColor('black', transition, cb)
-* setBaseColor(Color)
+* Changes the color of Mesh, passing either a material expression or
+* color using the 'Color' utility component.
 *
 * @method setBaseColor
-* @param {Object|Array} Material, image, or vec3
-* @param {Number} r Used to set the r value of Color
-* @param {Number} g Used to set the g value of Color
-* @param {Number} b Used to set the b value of Color
-* @param {Object} transition Optional options argument for tweening colors
-* @param {Function} Callback
+* @param {Object|Color} Material, image, vec3, or Color instance
 * @chainable
 */
-Mesh.prototype.setBaseColor = function setBaseColor(type, a, b, c, transition, cb) {
+Mesh.prototype.setBaseColor = function setBaseColor(color) {
     this.dispatch.dirtyRenderable(this._id);
 
     // If a material expression
-    if (type._compile) {
+    if (color._compile) {
         this.queue.push('MATERIAL_INPUT');
         this._expressions.baseColor = type;
-        type = type._compile();
+        color = type._compile();
     }
     // A color component
     else {
         this.queue.push('GL_UNIFORMS');
         if (this._expressions.baseColor) this._expressions.baseColor = null;
-        this._color.set(type, a, b, c, transition, cb);
-        type = this._color.getNormalizedRGB();
+        this._color = color;
+        color = color.getNormalizedRGB();
     }
 
     this.queue.push('baseColor');
-    this.queue.push(type);
+    this.queue.push(color);
     return this;
 };
 
@@ -273,7 +255,8 @@ Mesh.prototype.setBaseColor = function setBaseColor(type, a, b, c, transition, c
  * @returns {MaterialExpress|Color}
  */
 Mesh.prototype.getBaseColor = function getBaseColor(option) {
-    return this._expressions.baseColor || this._color.getColor(option);
+    return this._expressions.baseColor ||
+           (this._color.getColor) ? this._color.getColor(option) : this._color;
 };
 
 /**
@@ -343,9 +326,8 @@ Mesh.prototype.getNormals = function getNormals(materialExpression) {
  * glossiness for tweening.
  * @chainable
  */
-Mesh.prototype.setGlossiness = function setGlossiness() {
+Mesh.prototype.setGlossiness = function setGlossiness(value) {
     this.dispatch.dirtyRenderable(this._id);
-    var materialExpression = Array.prototype.concat.apply([], arguments);
 
     if (materialExpression[0]._compile) {
         this.queue.push('MATERIAL_INPUT');
