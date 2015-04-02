@@ -4,7 +4,6 @@
   "description": "Famous Utilities",
   "main": "src/index.js",
   "scripts": {
-    "color": "tape test/Color.js | tap-spec",
     "test": "tape test/*.js | tap-spec",
     "lint": "jshint --reporter node_modules/jshint-stylish/stylish.js src/"
   },

@@ -6,48 +6,46 @@ var Transitionable = require('famous-transitions').Transitionable;
  * @class Color
  * @constructor
  * @component
- * @param Optional arguments for setting the color when instantiated
+ * @param {Color|String|Array} Optional argument for setting color using
+ * Hex, a Color instance, color name or RGB
+ * @param {Object} Optional transition
+ * @param {Function} Callback
  */
-function Color(type, a, b, c, transition, cb) {
+function Color(color, transition, cb) {
     this._r = new Transitionable(0);
     this._g = new Transitionable(0);
     this._b = new Transitionable(0);
-    if (type) this.set(type, a, b, c, transition, cb);
+    if (color) this.set(color, transition, cb);
 };
 
 /**
 * Returns the definition of the Class: 'Color'
 * @method toString
-* @return {string} definition
+* @return {String} definition
 */
 Color.toString = function toString() {
     return 'Color';
 };
 
 /**
-* Sets the color. It accepts an optional transition parameter for transitioning colors.
-* Its default parameters are in RGB, however, you can also specify different inputs.
-* set(r, g, b, transition, callback)
-* set('hex', '#000000', transition, callback)
-* set('rgb', 0, 0, 0, transition, callback)
+* Sets the color. It accepts an optional transition parameter and callback.
+* set(Color, transition, callback)
 * set('#000000', transition, callback)
 * set('black', transition, callback)
-* set(Color, transition, callback)
+* set([r, g, b], transition, callback)
 * @method set
-* @param {type|number} Specify the type of input or a number
-* @param Color values specified with various types
-* @param {object} transition Optional transition parameters
-* @param {function} callback Optional
+ * @param {Color|String|Array} Optional argument for setting color using
+ * Hex, a Color instance, color name or RGB
+ * @param {Object} Optional transition
+ * @param {Function} Callback
 * @chainable
 */
-Color.prototype.set = function set(a, b, c, d, e, f) {
-    switch (Color.determineType(a)) {
-        case 'rgb': return this.setRGB(b, c, d, e, f);
-        case 'hex': return this.setHex(b, c, d);
-        case 'colorName': return this.setColor(a, b, c);
-        case 'instance': return this.fromColor(a, b, c);
-        case 'defaultHex': return this.setHex(a, b, c);
-        case 'defaultRGB': return this.setRGB(a, b, c, d, e);
+Color.prototype.set = function set(color, transition, cb) {
+    switch (Color.determineType(color)) {
+        case 'hex': return this.setHex(color, transition, cb);
+        case 'colorName': return this.setColor(color, transition, cb);
+        case 'instance': return this.changeTo(color, transition, cb);
+        case 'rgb': return this.setRGB(color[0], color[1], color[2], transition, cb);
     }
 };
 
@@ -55,7 +53,7 @@ Color.prototype.set = function set(a, b, c, d, e, f) {
  * Returns whether Color is still in an animating (transitioning) state.
  *
  * @method isActive
- * @returns {boolean} boolean
+ * @returns {Boolean} boolean
  */
 Color.prototype.isActive = function isActive() {
     return this._r.isActive() || this._g.isActive() || this._b.isActive();
@@ -77,49 +75,29 @@ Color.prototype.halt = function halt() {
 };
 
 /**
- * Tweens to another color values which can be set with
- * various inputs: RGB, Hex, color name, or another Color instance.
+ * Sets the color values from another Color instance.
  *
  * @method changeTo
- * @param Color values
- * @param {object} transition Optional transition parameters
- * @param {function} callback Optional
+ * @param {Color} Color instance
+ * @param {Object} transition Optional transition
+ * @param {Function} callback Optional
  * @chainable
  */
-Color.prototype.changeTo = function changeTo(type, a, b, c, transition, cb) {
-    if (type) this.set(type, a, b, c, transition, cb);
-    return this;
-};
-
-/**
- * Copies the color values from another Color instance
- *
- * @method fromColor
- * @param Color instance
- * @param {object} transition Optional transition parameters
- * @param {function} callback Optional
- * @chainable
- */
-Color.prototype.fromColor = function fromColor(color, transition, cb) {
+Color.prototype.changeTo = function changeTo(color, transition, cb) {
     if (Color.isColorInstance(color)) {
         var rgb = color.getRGB();
-        this.setRGB(rgb[0], rgb[1], rgb[2], transition, function() {
-            this._r = color._r;
-            this._g = color._g;
-            this._b = color._b;
-            cb && cb();
-        }.bind(this));
+        this.setRGB(rgb[0], rgb[1], rgb[2], transition, cb);
     }
     return this;
 };
 
 /**
- * Sets the color based on static color names
+ * Sets the color based on static color names.
  *
  * @method setColor
- * @param Color name
- * @param {object} transition Optional transition parameters
- * @param {function} callback Optional
+ * @param {String} Color name
+ * @param {Object} transition Optional transition parameters
+ * @param {Function} callback Optional
  * @chainable
  */
 Color.prototype.setColor = function setColor(name, transition, cb) {
@@ -133,8 +111,8 @@ Color.prototype.setColor = function setColor(name, transition, cb) {
  * Returns the color in either RGB or with the requested format.
  *
  * @method getColor
- * @param Optional argument for determining which type of color to get (default is RGB)
- * @returns Color in either RGB or specific value
+ * @param {String} Optional argument for determining which type of color to get (default is RGB)
+ * @returns Color in either RGB or specific option value
  */
 Color.prototype.getColor = function getColor(option) {
     if (Color.isString(option)) option = option.toLowerCase();
@@ -145,9 +123,9 @@ Color.prototype.getColor = function getColor(option) {
  * Sets the R of the Color's RGB
  *
  * @method setR
- * @param R component of Color
- * @param {object} transition Optional transition parameters
- * @param {function} callback Optional
+ * @param {Integer} R channel of color
+ * @param {Object} transition Optional transition parameters
+ * @param {Function} callback Optional
  * @chainable
  */
 Color.prototype.setR = function setR(r, transition, cb) {
@@ -159,9 +137,9 @@ Color.prototype.setR = function setR(r, transition, cb) {
  * Sets the G of the Color's RGB
  *
  * @method setG
- * @param G component of Color
- * @param {object} transition Optional transition parameters
- * @param {function} callback Optional
+ * @param {Integer} G channel of color
+ * @param {Object} transition Optional transition parameters
+ * @param {Function} callback Optional
  * @chainable
  */
 Color.prototype.setG = function setG(g, transition, cb) {
@@ -173,9 +151,9 @@ Color.prototype.setG = function setG(g, transition, cb) {
  * Sets the B of the Color's RGB
  *
  * @method setB
- * @param B component of Color
- * @param {object} transition Optional transition parameters
- * @param {function} callback Optional
+ * @param {Integer} B channel of color
+ * @param {Object} transition Optional transition parameters
+ * @param {Function} callback Optional
  * @chainable
  */
 Color.prototype.setB = function setB(b, transition, cb) {
@@ -187,9 +165,11 @@ Color.prototype.setB = function setB(b, transition, cb) {
  * Sets RGB
  *
  * @method setRGB
- * @param RGB component of Color
- * @param {object} transition Optional transition parameters
- * @param {function} callback Optional
+ * @param {Integer} R channel of color
+ * @param {Integer} G channel of color
+ * @param {Integer} B channel of color
+ * @param {Object} transition Optional transition parameters
+ * @param {Function} callback Optional
  * @chainable
  */
 Color.prototype.setRGB = function setRGB(r, g, b, transition, cb) {
@@ -269,9 +249,9 @@ Color.prototype.getHex = function getHex() {
  * Sets color using Hex
  *
  * @method setHex
- * @param Hex value
- * @param {object} transition Optional transition parameters
- * @param {function} callback Optional
+ * @param {String} Hex value
+ * @param {Object} transition Optional transition parameters
+ * @param {Function} callback Optional
  * @chainable
  */
 Color.prototype.setHex = function setHex(hex, transition, cb) {
@@ -295,7 +275,7 @@ Color.prototype.setHex = function setHex(hex, transition, cb) {
  * Converts a number to a hex value
  *
  * @method toHex
- * @param Number
+ * @param {Integer} Number
  * @returns Hex value
  */
 Color.toHex = function toHex(num) {
@@ -304,19 +284,17 @@ Color.toHex = function toHex(num) {
 };
 
 /**
- * Parses the given input to the appropriate color configuration
+ * Determines the given input with the appropriate configuration
  *
  * @method determineType
- * @param Color type
- * @returns {string} Appropriate color type
+ * @param {Color|String|Array} Color type
+ * @returns {String} Appropriate color type
  */
-Color.determineType = function determineType(val) {
-    if (Color.isColorInstance(val)) return 'instance';
-    if (colorNames[val]) return 'colorName';
-    if (Color.isHex(val)) return 'defaultHex';
-    if (!Color.isString(val)) return 'defaultRGB';
-    if (val.toLowerCase() === 'rgb') return 'rgb';
-    if (val.toLowerCase() === 'hex') return 'hex';
+Color.determineType = function determineType(type) {
+    if (Color.isColorInstance(type)) return 'instance';
+    if (colorNames[type]) return 'colorName';
+    if (Color.isHex(type)) return 'hex';
+    if (Array.isArray(type)) return 'rgb';
 };
 
 /**

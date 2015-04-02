@@ -13,12 +13,10 @@ var transition = { duration: 500, curve: 'linear' };
 
 function createArguments() {
     var inputs = [
-        { type: 'rgb',              args: ['rgb', 250, 235, 215] },
-        { type: 'hex',              args: ['hex', '#faebd7'] },
-        { type: 'colorName',        args: ['antiquewhite'] },
-        { type: 'instance',         args: [new Color('antiquewhite')] },
-        { type: 'defaultHex',       args: ['#faebd7'] },
-        { type: 'defaultRGB',       args: [250, 235, 215] },
+        { type: 'hex',          arg: '#faebd7' },
+        { type: 'rgb',          arg: [250, 235, 215] },
+        { type: 'colorName',    arg: 'antiquewhite' },
+        { type: 'instance',     arg: new Color('antiquewhite') },
     ];
     inputs.forEach(function(input) {
         input.transition = transition;
@@ -27,7 +25,6 @@ function createArguments() {
     return inputs;
 }
 var inputs = createArguments();
-var length = inputs.length;
 
 function type(input) {
     return input ? 'input type ['+ input.type +'] ' : '';
@@ -41,28 +38,23 @@ function callback(t, input) {
     t.pass(type(input) + 'should accept and invoke callback function');
 }
 
-/**
- * Helper function for testing a constructor with
- * an array of arguments
- */
-function construct(constructor, args) {
-    function F() {
-        return constructor.apply(this, args);
-    }
-    F.prototype = constructor.prototype;
-    return new F();
-}
-
 test('Color', function(t) {
 
     t.test('Time setup', function(t) {
         time = 0;
+
         Date.now = function() { return time; };
-        t.equal(typeof Date.now, 'function', 'should be a function');
+        t.equal(typeof Date.now, 'function',
+            'should be a function');
+
         time = 50;
-        t.equal(Date.now(), 50, 'should manipulate current time for testing');
+        t.equal(Date.now(), 50,
+            'should manipulate current time for testing');
+
         time = 0;
-        t.equal(Date.now(), 0, 'should be able to set time to 0');
+        t.equal(Date.now(), 0,
+            'should be able to set time to 0');
+
         t.end();
     });
 
@@ -72,16 +64,13 @@ test('Color', function(t) {
 
         t.doesNotThrow(function() {
             inputs.forEach(function(input) {
-                construct(Color, input.args)
+                new Color(input.arg);
             });
         }, 'should not throw an error with various color inputs');
 
         inputs.forEach(function(input) {
-            var color = construct(Color, input.args.concat([ transition ]));
+            var color = new Color(input.arg, transition, callback.bind(null, t, input));
             t.equal(color.isActive(), true, transitionPass(input));
-            construct(Color, input.args.concat([
-                undefined, callback.bind(null, t, input)
-            ]));
         });
 
         t.end();
@@ -104,7 +93,7 @@ test('Color', function(t) {
 
         inputs.forEach(function(input) {
             color = new Color();
-            color.set.apply(color, input.args);
+            color.set(input.arg);
             t.deepEqual(color.getRGB(), [250, 235, 215],
                 type(input) + 'should set state');
         });
@@ -113,11 +102,11 @@ test('Color', function(t) {
             time = 0;
             color = new Color();
 
-            color.set.apply(color, input.args.concat([ input.transition ]));
-            t.equal(color.isActive(), true, transitionPass(input));
-
             t.deepEqual(color.getRGB(), [0, 0, 0],
                 type(input) + 'should be black when initialized');
+
+            color.set(input.arg, transition);
+            t.equal(color.isActive(), true, transitionPass(input));
 
             time = 250;
             t.equal(color.isActive(), true,
@@ -134,9 +123,7 @@ test('Color', function(t) {
             t.equal(color.isActive(), false,
                 type(input) + 'should return false if transition is not active');
 
-            color.set.apply(color, input.args.concat([
-                undefined, callback.bind(null, t, input)
-            ]));
+            color.set(input.arg, undefined, callback.bind(null, t, input));
         });
 
         t.end();
@@ -145,13 +132,13 @@ test('Color', function(t) {
     t.test('Color.prototype.isActive', function(t) {
         var color = new Color();
 
-        t.equal(typeof color.isActive,
-            'function', 'should be a function');
+        t.equal(typeof color.isActive, 'function',
+            'should be a function');
 
         t.equal(color.isActive(), false,
             'should return false if transition is not active');
 
-        color.set(255, 255, 255, transition);
+        color.set([255, 255, 255], transition);
         t.equal(color.isActive(), true,
             'should return true if transition is active');
 
@@ -162,13 +149,13 @@ test('Color', function(t) {
         t.end();
     });
 
-
     t.test('Color.prototype.halt', function(t) {
         time = 0;
         var color = new Color();
-        t.equal(typeof color.halt, 'function', 'should be a function');
+        t.equal(typeof color.halt, 'function',
+            'should be a function');
 
-        color.set(100, 100, 100, transition);
+        color.set([100, 100, 100], transition);
 
         time = 250;
         t.deepEqual(color.getRGB(), [50, 50, 50]);
@@ -186,56 +173,22 @@ test('Color', function(t) {
     });
 
     t.test('Color.prototype.changeTo', function(t) {
-        var color = new Color();
-        t.equal(typeof color.changeTo, 'function', 'should be a function');
+        var color = new Color([0, 0, 0]);
 
-        inputs.forEach(function(input) {
-            color = new Color();
-            color.changeTo.apply(color, input.args);
-
-            t.deepEqual(color.getRGB(), [250, 235, 215],
-                type(input) + 'should set state');
-
-            color.changeTo.apply(color, input.args.concat([ input.transition ]));
-            t.equal(color.isActive(), true, transitionPass(input));
-
-            color.changeTo.apply(color, input.args.concat([
-                undefined, callback.bind(null, t, input)
-            ]));
-        });
-
-        t.end();
-    });
-
-
-    t.test('Color.prototype.fromColor', function(t) {
-        var color = new Color('rgb', 0, 0, 0);
-
-        t.equal(typeof color.fromColor, 'function',
+        t.equal(typeof color.changeTo, 'function',
             'should be a function');
 
-        color.fromColor(255, 255, 255);
+        color.changeTo([255, 255, 255]);
         t.deepEqual(color.getRGB(), [0, 0, 0],
             'should remain unchanged unless input is a Color instance');
 
-        var anotherColor = new Color('rgb', 255, 255, 255);
-        color.fromColor(anotherColor);
+        var anotherColor = new Color([255, 255, 255]);
+        color.changeTo(anotherColor);
         t.deepEqual(color.getRGB(), [255, 255, 255],
             'should change to the new color');
 
-        t.equal(anotherColor._r === color._r, true,
-            'should replace first internal component to the new instance');
-
-        t.equal(anotherColor._g === color._g, true,
-            'should replace second internal component to the new instance');
-
-        t.equal(anotherColor._b === color._b, true,
-            'should replace third internal component to the new instance');
-
-        color.fromColor(anotherColor, transition);
+        color.changeTo(anotherColor, transition, callback.bind(null, t));
         t.equal(color.isActive(), true, transitionPass());
-
-        color.fromColor(anotherColor, undefined, callback.bind(null, t));
 
         t.end();
     });
@@ -257,10 +210,8 @@ test('Color', function(t) {
         t.deepEqual(color.getRGB(), [255, 255, 0],
             'should change to the new color value');
 
-        color.setColor('pink', transition);
+        color.setColor('pink', transition, callback.bind(null, t));
         t.equal(color.isActive(), true, transitionPass());
-
-        color.setColor('orange', undefined, callback.bind(null, t));
 
         t.end();
     });
@@ -304,10 +255,8 @@ test('Color', function(t) {
         t.deepEqual(color.getRGB(), [255, 0, 0],
             'should change the R channel');
 
-        color.setR(35, transition);
+        color.setR(35, transition, callback.bind(null, t));
         t.equal(color.isActive(), true, transitionPass());
-
-        color.setR(140, undefined, callback.bind(null, t));
 
         t.end();
     });
@@ -322,10 +271,8 @@ test('Color', function(t) {
         t.deepEqual(color.getRGB(), [0, 255, 0],
             'should change the R channel');
 
-        color.setG(35, transition);
+        color.setG(35, transition, callback.bind(null, t));
         t.equal(color.isActive(), true, transitionPass());
-
-        color.setG(140, undefined, callback.bind(null, t));
 
         t.end();
     });
@@ -340,10 +287,8 @@ test('Color', function(t) {
         t.deepEqual(color.getRGB(), [0, 0, 255],
             'should change the R channel');
 
-        color.setB(35, transition);
+        color.setB(35, transition, callback.bind(null, t));
         t.equal(color.isActive(), true, transitionPass());
-
-        color.setB(140, undefined, callback.bind(null, t));
 
         t.end();
     });
@@ -358,10 +303,8 @@ test('Color', function(t) {
         t.deepEqual(color.getRGB(), [255, 255, 255],
             'should change the RGB channels');
 
-        color.setRGB(35, 53, 100, transition);
+        color.setRGB(35, 53, 100, transition, callback.bind(null, t));
         t.equal(color.isActive(), true, transitionPass());
-
-        color.setRGB(89, 93, 180, undefined, callback.bind(null, t));
 
         t.end();
     });
@@ -480,11 +423,9 @@ test('Color', function(t) {
         t.deepEqual(color.getRGB(), [255, 255, 255],
             'should change RGB using red in short-hand hex (#ff0)');
 
-        color.setHex('#000', transition);
+        color.setHex('#000', transition, callback.bind(null, t));
         t.equal(color.isActive(), true,
             'should accept a transition argument');
-
-        color.setHex('#333', undefined, callback.bind(null, t));
 
         t.end();
     });
@@ -510,7 +451,7 @@ test('Color', function(t) {
 
         inputs.forEach(function(input) {
             var color = new Color();
-            t.equal(Color.determineType.apply(null, input.args), input.type,
+            t.equal(Color.determineType(input.arg), input.type,
                 type(input) + 'should be identified');
         });
 
