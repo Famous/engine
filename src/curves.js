@@ -355,6 +355,10 @@ var curves = {
     inOutBounce: function(t) {
         if (t < .5) return curves.inBounce(t*2) * .5;
         return curves.outBounce(t*2-1.0) * .5 + .5;
+    },
+
+    flat: function() {
+        return 0;
     }
 };
 

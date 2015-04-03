@@ -2,8 +2,6 @@
 
 var curves = require('./curves');
 
-function noop() { return 0; }
-
 /**
  * A state maintainer for a smooth transition between
  *    numerically-specified states. Example numeric states include floats and
@@ -92,7 +90,7 @@ Transitionable.prototype.to = function to(finalState, curve, duration, callback)
         finalState,
         curve != null ? curve : curves.linear,
         duration != null ? duration : 100,
-        callback != null ? callback : noop
+        callback
     );
     return this;
 };
@@ -134,7 +132,7 @@ Transitionable.prototype.from = function from(initialState) {
  */
 Transitionable.prototype.delay = function delay(duration, callback) {
     var endState = this._queue.length > 0 ? this._queue[this._queue.length - 4] : this._end;
-    return this.to(endState, noop, duration, callback || noop);
+    return this.to(endState, curves.flat, duration, callback);
 };
 
 /**
@@ -196,7 +194,8 @@ Transitionable.prototype.get = function get(t) {
         this._end = this._queue.shift();
         this._queue.shift();
         this._queue.shift();
-        this._queue.shift()();
+        var callback = this._queue.shift();
+        if (callback) callback();
     }
     return progress > 1 ? this.get() : state;
 };
