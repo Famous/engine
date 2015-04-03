@@ -3,8 +3,6 @@
 var Node = require('./Node');
 var RenderProxy = require('./RenderProxy');
 
-var Famous = require('./Famous');
-
 /**
  * Context is the top-level node in the scene graph (= tree node).
  * As such, it populates the internal MessageQueue with commands received by
@@ -17,10 +15,10 @@ var Famous = require('./Famous');
  * @param {String} [selector=body]  query selector used as container for
  *                                  context
  */
-function Context (selector) {
-    this._messageQueue = Famous.getMessageQueue();
-    this._globalDispatch = Famous.getGlobalDispatch();
-    this._clock = Famous.getClock();
+function Context (selector, messageQueue, globalDispatch, clock) {
+    this._messageQueue = messageQueue;
+    this._globalDispatch = globalDispatch;
+    this._clock = clock;
 
     this._clock.update(this);
 
