@@ -12,6 +12,8 @@ function Clock () {
     this._updates = [];
     this._nextStepUpdates = [];
     this._time = 0;
+
+    this._updatingIndex = 0;
 }
 
 /**
@@ -27,13 +29,15 @@ function Clock () {
 Clock.prototype.step = function step (time) {
     this._time = time;
 
-    for (var i = 0, len = this._updates.length; i < len; i++) {
-        this._updates[i].update(time);
+    for (; this._updatingIndex < this._updates.length; this._updatingIndex++) {
+        this._updates[this._updatingIndex].update(time);
     }
 
     while (this._nextStepUpdates.length > 0) {
         this._nextStepUpdates.shift().update(time);
     }
+
+    this._updatingIndex = 0;
 
     return this;
 };
@@ -70,6 +74,7 @@ Clock.prototype.update = function update (updateable) {
 Clock.prototype.noLongerUpdate = function noLongerUpdate(updateable) {
     var index = this._updates.indexOf(updateable);
     if (index > -1) {
+        if (index <= this._updatingIndex && this._updatingIndex !== 0) this._updatingIndex--;
         this._updates.splice(index, 1);
     }
     return this;
