@@ -21,7 +21,7 @@ test('Transitionable', function(t) {
     t.test('constructor', function(t) {
         t.equal(typeof Transitionable, 'function', 'Transitionable should be a function');
 
-        var args = [ undefined, 2, [1, 2], [1, 2, 3] ];
+        var args = [ 2, [1, 2], [1, 2, 3] ];
 
         t.doesNotThrow(function() {
             args.forEach(function(arg) {

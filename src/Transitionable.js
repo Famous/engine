@@ -51,6 +51,10 @@ function noop() { return 0; }
  */
 function Transitionable(initialState) {
     this._queue = [];
+    this._multi = null;
+    this._end = null;
+    this._startedAt = null;
+    this._pausedAt = null;
     if (initialState != null) this.from(initialState);
 }
 
@@ -78,7 +82,7 @@ Transitionable.Clock = typeof performance !== 'undefined' ? performance : Date;
  * @return {Transitionable}         this
  */
 Transitionable.prototype.to = function to(finalState, curve, duration, callback) {
-    curve = typeof curve === 'string' ? curves[curve] : curve;
+    curve = curve.constructor === String ? curves[curve] : curve;
     this._queue.push(finalState, curve || curves.linear, duration, callback || noop);
     return this;
 };
@@ -95,7 +99,11 @@ Transitionable.prototype.to = function to(finalState, curve, duration, callback)
  */
 Transitionable.prototype.from = function from(initialState) {
     this._end = initialState;
-    this._multi = this._end.constructor === Array ? [] : false;
+    if (initialState.constructor === Array && this._multi != null && this._multi.constructor === Array) {
+        this._multi.length = initialState.length;
+    } else {
+        this._multi = initialState.constructor === Array ? [] : false;
+    }
     this._queue.length = 0;
     this._startedAt = this.constructor.Clock.now();
     this._pausedAt = null;
