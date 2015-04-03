@@ -2,9 +2,6 @@
 
 var CallbackStore = require('famous-utilities').CallbackStore;
 
-var ELEMENT = 'element';
-var ID = 'id';
-var OPACITY = 'opacity';
 var WITH = 'WITH';
 var CHANGE_TRANSFORM = 'CHANGE_TRANSFORM';
 var CHANGE_PROPERTY = 'CHANGE_PROPERTY';
@@ -32,25 +29,45 @@ var RECALL = 'RECALL';
 function HTMLElement(dispatch, tagName) {
     this._dispatch = dispatch;
     this._id = dispatch.addRenderable(this);
-    this._trueSized = [false, false];
-    this._size = [0, 0, 0];
     this._queue = [];
 
+    this._tagName = tagName ? tagName : 'div';
+    this._transform = new Float32Array(16);
+    this._size = [0, 0, 0];
+    this._trueSized = [false, false];
+    this._opacity = 1;
+    this._properties = {};
+    this._classes = {};
+    this._attributes = {};
+    this._content = '';
+
     this._queue.push(INIT_DOM);
-    this._queue.push(tagName ? tagName : 'div');
+    this._queue.push(this._tagName);
 
     this._callbacks = new CallbackStore();
     this._dispatch.onTransformChange(this._receiveTransformChange.bind(this));
     this._dispatch.onSizeChange(this._receiveSizeChange.bind(this));
     this._dispatch.onOpacityChange(this._receiveOpacityChange.bind(this));
-    this._receiveTransformChange(this._dispatch.getContext()._transform);
-    this._receiveSizeChange(this._dispatch.getContext()._size);
-    this._receiveOpacityChange(this._dispatch.getContext()._opacity);
 }
 
 // Return the name of the Element Class: 'element'
 HTMLElement.toString = function toString() {
-    return ELEMENT;
+    return 'element';
+};
+
+HTMLElement.prototype.getState = function getState() {
+    return {
+        renderable: this.constructor.toString(),
+        tagName: this._tagName,
+        transform: this._transform,
+        size: this._size,
+        trueSized: this._trueSized,
+        opacity: this._opacity,
+        properties: this._properties,
+        classes: this._classes,
+        attributes: this._attributes,
+        content: this._content
+    };
 };
 
 HTMLElement.prototype.clean = function clean() {
@@ -69,6 +86,7 @@ HTMLElement.prototype.clean = function clean() {
 };
 
 HTMLElement.prototype._receiveTransformChange = function _receiveTransformChange(transform) {
+    this._transform = transform._matrix;
     this._dispatch.dirtyRenderable(this._id);
     var queue = this._queue;
     queue.push(CHANGE_TRANSFORM);
@@ -91,6 +109,7 @@ HTMLElement.prototype._receiveTransformChange = function _receiveTransformChange
 };
 
 HTMLElement.prototype._receiveSizeChange = function _receiveSizeChange(size) {
+    this._size = size;
     this._dispatch.dirtyRenderable(this._id);
     var width = this._trueSized[0] ? this._trueSized[0] : size._size[0];
     var height = this._trueSized[1] ? this._trueSized[1] : size._size[1];
@@ -102,7 +121,8 @@ HTMLElement.prototype._receiveSizeChange = function _receiveSizeChange(size) {
 };
 
 HTMLElement.prototype._receiveOpacityChange = function _receiveOpacityChange(opacity) {
-    this.property(OPACITY, opacity.value);
+    this._opacity = opacity;
+    this.property('opacity', opacity.value);
 };
 
 HTMLElement.prototype.getSize = function getSize() {
@@ -129,6 +149,7 @@ HTMLElement.prototype.kill = function kill () {
  * @return {HTMLElement} current HTMLElement
  */
 HTMLElement.prototype.property = function property(key, value) {
+    this._properties[key] = value;
     this._dispatch.dirtyRenderable(this._id);
     this._queue.push(CHANGE_PROPERTY);
     this._queue.push(key);
@@ -170,6 +191,7 @@ HTMLElement.prototype.trueSize = function trueSize(trueWidth, trueHeight) {
  * @return {HTMLElement} current HTMLElement
  */
 HTMLElement.prototype.attribute = function attribute(key, value) {
+    this._attributes[key] = value;
     this._dispatch.dirtyRenderable(this._id);
     this._queue.push(CHANGE_ATTRIBUTE);
     this._queue.push(key);
@@ -187,6 +209,7 @@ HTMLElement.prototype.attribute = function attribute(key, value) {
  * @return {HTMLElement} current HTMLElement
  */
 HTMLElement.prototype.addClass = function addClass(value) {
+    this._classes[value] = true;
     this._dispatch.dirtyRenderable(this._id);
     this._queue.push(ADD_CLASS);
     this._queue.push(value);
@@ -202,6 +225,7 @@ HTMLElement.prototype.addClass = function addClass(value) {
  * @return {HTMLElement} current HTMLElement
  */
 HTMLElement.prototype.removeClass = function removeClass(value) {
+    delete this._classes[value];
     this._dispatch.dirtyRenderable(this._id);
     this._queue.push(REMOVE_CLASS);
     this._queue.push(value);
@@ -218,9 +242,10 @@ HTMLElement.prototype.removeClass = function removeClass(value) {
  * @return {HTMLElement} current HTMLElement
  */
 HTMLElement.prototype.id = function id(value) {
+    this._attributes.id = value;
     this._dispatch.dirtyRenderable(this._id);
     this._queue.push(CHANGE_ATTRIBUTE);
-    this._queue.push(ID);
+    this._queue.push('id');
     this._queue.push(value);
     return this;
 };
@@ -235,6 +260,7 @@ HTMLElement.prototype.id = function id(value) {
  * @return {HTMLElement} current HTMLElement
  */
 HTMLElement.prototype.content = function content(value) {
+    this._content = value;
     this._dispatch.dirtyRenderable(this._id);
     this._queue.push(CHANGE_CONTENT);
     this._queue.push(value);
