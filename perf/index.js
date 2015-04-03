@@ -1,3 +1,5 @@
+'use strict';
+
 var Transitionable = require('../src/Transitionable');
 
 var centerX = window.innerWidth / 2;
@@ -10,9 +12,8 @@ function Dot(container) {
     this.el = document.createElement('div');
     container.appendChild(this.el);
     this.el.style.background = 'red';
-    this.el.style.width = '2px';
-    this.el.style.height = '2px';
-    this.el.style.borderRadius = '100%';
+    this.el.style.width = '1px';
+    this.el.style.height = '1px';
     this.el.style.position = 'absolute';
     this.transitionable = new Transitionable();
     var _this = this;
@@ -32,11 +33,12 @@ Dot.prototype.start = function start() {
 
 Dot.prototype.update = function update() {
     var state = this.transitionable.get();
-    this.el.style.transform = 'translateX(' + state[0] + 'px) translateY(' + state[1] + 'px)';
+    this.el.style.left = Math.floor(state[0]) + 'px';
+    this.el.style.top = Math.floor(state[1]) + 'px';
 };
 
 var dots = [];
-var container = document.createElement('el');
+var container = document.createElement('div');
 document.body.appendChild(container);
 for (var i = 0; i < count; i++) {
     dots.push(new Dot(container));

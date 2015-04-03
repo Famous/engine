@@ -5,7 +5,7 @@
   "main": "src/index.js",
   "scripts": {
     "test": "tape test/*.js | tap-spec",
-    "perf": "watchify perf/index.js -o perf/bundle.js -d",
+    "perf": "watchify perf/index.js -o perf/bundle.js -d -v",
     "cover": "browserify -t coverify test/*.js | node | coverify",
     "lint": "jshint --reporter node_modules/jshint-stylish/stylish.js src/"
   },

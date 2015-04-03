@@ -72,18 +72,28 @@ Transitionable.Clock = typeof performance !== 'undefined' ? performance : Date;
  * @method to
  * @chainable
  * 
- * @param  {Number|Array.Number}    finalState  final state to transiiton to
- * @param  {String|Function}        curve       easing function used for
- *                                              interpolating [0, 1]
- * @param  {Number}                 duration    duration of transition
- * @param  {Function}               callback    callback function to be called
- *                                              after the transition is
- *                                              complete
+ * @param  {Number|Array.Number}    finalState              final state to
+ *                                                          transiton to
+ * @param  {String|Function}        [curve=curves.linear]   easing function
+ *                                                          used for
+ *                                                          interpolating
+ *                                                          [0, 1]
+ * @param  {Number}                 [duration=100]          duration of
+ *                                                          transition
+ * @param  {Function}               [callback]              callback function
+ *                                                          to be called after
+ *                                                          the transition is
+ *                                                          complete
  * @return {Transitionable}         this
  */
 Transitionable.prototype.to = function to(finalState, curve, duration, callback) {
-    curve = curve.constructor === String ? curves[curve] : curve;
-    this._queue.push(finalState, curve || curves.linear, duration, callback || noop);
+    curve = curve != null && curve.constructor === String ? curves[curve] : curve
+    this._queue.push(
+        finalState,
+        curve != null ? curve : curves.linear,
+        duration != null ? duration : 100,
+        callback != null ? callback : noop
+    );
     return this;
 };
 
@@ -117,10 +127,10 @@ Transitionable.prototype.from = function from(initialState) {
  * @method delay
  * @chainable
  *
- * @param {Number} duration delay time (ms)
- * @param {Function} callback Zero-argument function to call on observed
- *    completion (t=1)
- * @return {Transitionable} this
+ * @param {Number}      duration    delay time in ms
+ * @param {Function}    [callback]  Zero-argument function to call on observed
+ *                                  completion (t=1)
+ * @return {Transitionable}         this
  */
 Transitionable.prototype.delay = function delay(duration, callback) {
     var endState = this._queue.length > 0 ? this._queue[this._queue.length - 4] : this._end;
