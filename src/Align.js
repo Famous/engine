@@ -15,7 +15,7 @@ var Transform = require('./Transform');
 function Align () {
     this.x = 0;
     this.y = 0;
-    this.z = 0;
+    this.z = 0.5;
     this.transform = new Transform();
 }
 
@@ -90,7 +90,7 @@ Align.prototype.set = function set (x, y, z) {
 Align.prototype.update = function update (size) {
     var x = size[0] * this.x;
     var y = size[1] * this.y;
-    var z = size[2] * this.z;
+    var z = size[2] * (this.z - 0.5);
     this.transform.setTranslation(x, y, z);
     return this.transform;
 };
