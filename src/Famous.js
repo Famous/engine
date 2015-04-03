@@ -7,7 +7,7 @@ var GlobalDispatch = require('./GlobalDispatch');
 var MessageQueue = require('./MessageQueue');
 var ProxyRegistry = require('./ProxyRegistry');
 
-var isWorker = self.window !== self;
+var isWorker = typeof self !== 'undefined' && self.window !== self;
 
 /**
  * Famous is the toplevel object being exposed as a singleton inside the Web
