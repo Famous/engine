@@ -1,3 +1,5 @@
+'use strict';
+
 module.exports = {
     Buffer: require('./Buffer'),
     BufferRegistry: require('./BufferRegistry'),
