@@ -33,7 +33,8 @@ OBJLoader.load = function load(url, cb, options) {
             this.requests[url] = [cb];
             loadURL(
                 url,
-                this._onsuccess(
+                this._onsuccess.bind(
+                    this,
                     url,
                     options
                 )
@@ -276,7 +277,6 @@ function format(text, options) {
     cached.indices = flatten(cached.indices);
 
     if (options.normalize) {
-        console.log("HIJEFOJSOIEF")
         cached.vertices = GeometryHelper.normalizeVertices(
             cached.vertices
         );
