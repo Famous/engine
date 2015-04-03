@@ -324,6 +324,18 @@ test('Transitionable', function(t) {
         t.end();
     });
 
+    t.test('override method', function(t) {
+        var transitionable = new Transitionable();
+        time = 0;
+        transitionable.from(0).to(1, null, 1000);
+        time = 500;
+        t.equal(transitionable.get(), 0.5);
+        transitionable.override(2);
+        time = 1000;
+        t.equal(transitionable.get(), 2);
+        t.end();
+    });
+
     t.test('tear down', function(t) {
         Date.now = _now;
         t.end();

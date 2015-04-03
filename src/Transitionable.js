@@ -137,6 +137,31 @@ Transitionable.prototype.delay = function delay(duration, callback) {
     return this.to(endState, noop, duration, callback || noop);
 };
 
+/**
+ * Overrides current transition.
+ *
+ * @method override
+ * @chainable
+ * 
+ * @param  {Number|Array.Number}    [finalState]    final state to transiton to
+ * @param  {String|Function}        [curve]         easing function used for
+ *                                                  interpolating [0, 1]
+ * @param  {Number}                 [duration]      duration of transition
+ * @param  {Function}               [callback]      callback function to be
+ *                                                  called after the transition
+ *                                                  is complete
+ * @return {Transitionable}         this
+ */
+Transitionable.prototype.override = function override(finalState, curve, duration, callback) {
+    if (this._queue.length > 0) {
+        if (finalState != null) this._queue[0] = finalState;
+        if (curve != null)      this._queue[1] = curve.constructor === String ? curves[curve] : curve;
+        if (duration != null)   this._queue[0] = duration;
+        if (callback != null)   this._queue[0] = callback;
+    }
+    return this;
+};
+
 Transitionable.prototype._interpolate = function _interpolate(from, to, progress) {
     if (this._multi) {
         for (var i = 0; i < to.length; i++) {
