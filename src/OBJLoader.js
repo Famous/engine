@@ -33,7 +33,7 @@ OBJLoader.load = function load(url, cb, options) {
             this.requests[url] = [cb];
             loadURL(
                 url,
-                _onsuccess.bind(
+                this._onsuccess.bind(
                     this,
                     url,
                     options
@@ -59,7 +59,7 @@ OBJLoader.load = function load(url, cb, options) {
  * @param {Boolean} value determining whether or not to manually calculate normals
  * @param {String} content of the server response
  */
-function _onsuccess(url, options, text) {
+OBJLoader._onsuccess = function _onsuccess(url, options, text) {
     var buffers = format.call(this, text, options || {});
     this.cached[url] = buffers;
 
@@ -270,6 +270,7 @@ function format(text, options) {
         faceTexCoords
     );
 
+
     cached.vertices = flatten(cached.vertices);
     cached.normals = flatten(cached.normals);
     cached.texCoords = flatten(cached.texCoords);
@@ -283,8 +284,8 @@ function format(text, options) {
 
     if (options.computeNormals) {
         cached.normals = GeometryHelper.computeNormals(
-            cached.indices,
-            cached.vertices
+            cached.vertices,
+            cached.indices
         );
     }
 
