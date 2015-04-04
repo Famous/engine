@@ -5,7 +5,7 @@
   "main": "src/index.js",
   "scripts": {
     "test": "tape test/*.js",
-    "lint": "jshint --reporter node_modules/jshint-stylish/stylish.js src/"
+    "lint": "jshint --reporter node_modules/jshint-stylish/stylish.js src; true"
   },
   "repository": {
     "type": "git",
