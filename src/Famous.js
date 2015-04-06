@@ -1,9 +1,10 @@
 'use strict';
 
-var isWorker = self.window !== self;
+var isWorker = typeof self !== 'undefined' && self.window !== self;
+
+var Clock = require('./Clock');
 
 function Famous (config) {
-
     this._config = config ? config : Famous.DEFAULT_CONFIG;
 
     this._nextUpdateQueue = [];
@@ -15,9 +16,7 @@ function Famous (config) {
 
     this._inUpdate = false;
 
-    this._time = 0;
-    this._initializationTime = 0;
-    this._frame = 0;
+    this._clock = new Clock();
 
     var _this = this;
     if (isWorker)
@@ -48,9 +47,6 @@ Famous.prototype.requestUpdate = function requestUpdate (requester) {
     if (this._inUpdate) this.requestUpdateOnNextTick(requester);
     else this._updateQueue.push(requester);
 };
-
-var prevFrame = 0;
-var prevLocation = 0;
 
 Famous.prototype.requestUpdateOnNextTick = function requestUpdateOnNextTick (requester) {
     this._nextUpdateQueue.push(requester);
@@ -98,9 +94,7 @@ Famous.prototype.handleFrame = function handleFrame (messages) {
 };
 
 Famous.prototype.step = function step (time) {
-    if (!this._initializationTime) this._initializationTime = time;
-    this._time = time;
-    this._frame++;
+    this._clock.step(time);
 
     this._update(time);
 
@@ -124,16 +118,8 @@ Famous.prototype.getContext = function getContext (selector) {
     return this._contexts[selector];
 };
 
-Famous.prototype.getTime = function getTime () {
-    return this._time - this._initializationTime;
-};
-
-Famous.prototype.now = function now () {
-    return this._time;
-};
-
-Famous.prototype.getFrame = function getFrame () {
-    return this._frame;
+Famous.prototype.getClock = function getClock () {
+    return this._clock;
 };
 
 Famous.prototype.message = function message (messages) {
@@ -142,4 +128,3 @@ Famous.prototype.message = function message (messages) {
 };
 
 module.exports = new Famous();
-
