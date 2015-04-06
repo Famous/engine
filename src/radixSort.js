@@ -5,7 +5,8 @@ var radixBits = 11,
     msbMask = 1 << ((32 - 1) % radixBits),
     lastMask = (msbMask << 1) - 1,
     passCount = ((32 / radixBits) + 0.999999999999999) | 0,
-    maxOffset = maxRadix * (passCount - 1);
+    maxOffset = maxRadix * (passCount - 1),
+    normalizer = Math.pow(20, 6);
 
 var buffer = new ArrayBuffer(4);
 var floatView = new Float32Array(buffer, 0, 1);
@@ -71,12 +72,12 @@ function sort(list, registry) {
 
     function comp (i) {
         var key = list[i];
-        return registry[key].uniformValues[1][14];
+        return registry[key].uniformValues[1][14] + normalizer;
     }
 
     function mutator (i, value) {
         var key = list[i];
-        registry[key].uniformValues[1][14] = intToFloat(value);
+        registry[key].uniformValues[1][14] = intToFloat(value) - normalizer;
         return key;
     }
 }
