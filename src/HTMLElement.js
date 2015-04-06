@@ -135,7 +135,7 @@ HTMLElement.prototype.on = function on (ev, methods, properties) {
 };
 
 HTMLElement.prototype.kill = function kill () {
-    this._dispatch.sendDrawCommand(WITH).sendDrawCommand(this._dispatch.getRenderPath()).sendDrawCommand(RECALL);
+    this._dispatch.sendDrawCommand(WITH).sendDrawCommand(this._dispatch.getRenderPath()).sendDrawCommand('DOM').sendDrawCommand(RECALL);
 };
 
 /**
