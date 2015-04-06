@@ -11,7 +11,8 @@ module.exports = {
     // Clock: require('./Clock'),
     // LocalDispatch: require('./LocalDispatch'),
     // MountPoint: require('./MountPoint'),
-    Node: require('./Node')
+    Node: require('./Node'),
+    Size: require('./Size')
     // Opacity: require('./Opacity'),
     // Origin: require('./Origin'),
     // RenderContext: require('./RenderContext'),
