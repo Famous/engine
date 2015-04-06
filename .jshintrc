@@ -13,7 +13,8 @@
 	"nonew": true,
 	"globals": {
 		"performance": true,
-		"Symbol": true
+		"Symbol": true,
+		"console": true
 	},
 
 	"validthis": true
