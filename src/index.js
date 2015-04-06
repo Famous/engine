@@ -5,12 +5,13 @@ module.exports = {
     // ComponentStore: require('./ComponentStore'),
     // GlobalDispatch: require('./GlobalDispatch'),
     Context: require('./Context'),
-    Famous: require('./Famous')
+    Famous: require('./Famous'),
+    Dispatcher: require('./Dispatcher'),
     // Layer: require('./Layer'),
     // Clock: require('./Clock'),
     // LocalDispatch: require('./LocalDispatch'),
     // MountPoint: require('./MountPoint'),
-    // Node: require('./Node'),
+    Node: require('./Node')
     // Opacity: require('./Opacity'),
     // Origin: require('./Origin'),
     // RenderContext: require('./RenderContext'),

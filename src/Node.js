@@ -632,14 +632,14 @@ Node.prototype.onUpdate = function onUpdate (time) {
     }
 
     var mySize = this.getSize();
-    var parentSize = this.getParent().getSize();
+    var parent = this.getParent();
+    var parentSize = parent.getSize();
     var myTransform = this.getTransform();
-    var parentTransform = this.getParent().getTransform();
+    var parentTransform = parent.getTransform();
     var sizeChanged = SIZE_PROCESSOR.fromSpecWithParent(parentSize, this.value, mySize);
     mySize = this.getSize();
  
     var transformChanged = TRANSFORM_PROCESSOR.fromSpecWithParent(this.getParent().getTransform(), this.value, mySize, parentSize, this.getTransform());
-
     if (transformChanged) this._transformChanged(this.getTransform());
     if (sizeChanged) this._sizeChanged(this.getSize());
 
@@ -726,6 +726,10 @@ Node.prototype.onParentHide = Node.prototype.hide;
 Node.prototype.onParentTransformChange = Node.prototype._requestUpdate; 
 
 Node.prototype.onParentSizeChange = Node.prototype._requestUpdate;
+
+Node.prototype.onReceive = function onRecieve (event, payload) {
+    console.log(event, payload);
+};
 
 module.exports = Node;
 

@@ -35,6 +35,10 @@ function Context (selector) {
 Context.prototype = Object.create(Node.prototype);
 Context.prototype.constructor = Context;
 
+Context.prototype.getSelector = function getSelector () {
+    return this._selector;
+};
+
 Context.prototype._receiveContextSize = function _receiveContextSize (size) {
     this.setSizeMode(Size.ABSOLUTE, Size.ABSOLUTE, Size.ABSOLUTE);
     this.setAbsoluteSize(size[0], size[1], size[2]);
