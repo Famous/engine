@@ -465,7 +465,7 @@ Node.prototype.setScale = function setScale (x, y, z) {
 
 Node.prototype.setOpacity = function setOpacity (val) {
     if (val != this.value.showState.opacity) {
-        this.values.showState.opacity = val;
+        this.value.showState.opacity = val;
         if (!this._requestingUpdate) this._requestUpdate();
 
         var i = 0;
