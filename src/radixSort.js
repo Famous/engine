@@ -12,7 +12,19 @@ var buffer = new ArrayBuffer(4);
 var floatView = new Float32Array(buffer, 0, 1);
 var intView = new Int32Array(buffer, 0, 1);
 
-function floatToInt (k) {
+function comp(list, registry, i) {
+    var key = list[i];
+    return registry[key].uniformValues[1][14] + normalizer;
+}
+
+function mutator(list, registry, i, value) {
+    var key = list[i];
+    registry[key].uniformValues[1][14] = intToFloat(value) - normalizer;
+    return key;
+}
+
+
+function floatToInt(k) {
     floatView[0] = k;
     return intView[0];
 }
@@ -33,7 +45,7 @@ function sort(list, registry) {
     for (i = 0, n = maxRadix * passCount; i < n; i++) buckets[i] = 0;
 
     for (i = 0, n = list.length; i < n; i++) {
-        div = floatToInt(comp(i));
+        div = floatToInt(comp(list, registry, i));
         div ^= div >> 31 | 0x80000000;
         for (j = 0, k = 0; j < maxOffset; j += maxRadix, k += radixBits) {
             buckets[j + (div >>> k & radixMask)]++;
@@ -50,13 +62,13 @@ function sort(list, registry) {
     }
     if (--passCount) {
         for (i = 0, n = list.length; i < n; i++) {
-            div = floatToInt(comp(i));
-            out[++buckets[div & radixMask]] = mutator(i, div ^= div >> 31 | 0x80000000);
+            div = floatToInt(comp(list, registry, i));
+            out[++buckets[div & radixMask]] = mutator(list, registry, i, div ^= div >> 31 | 0x80000000);
         }
         swap = out, out = list, list = swap;
         while (++pass < passCount) {
             for (i = 0, n = list.length, offset = pass * maxRadix, size = pass * radixBits; i < n; i++) {
-                div = floatToInt(            comp(i));
+                div = floatToInt(comp(list, registry, i));
                 out[++buckets[offset + (div >>> size & radixMask)]] = list[i];
             }
             swap = out, out = list, list = swap;
@@ -64,22 +76,12 @@ function sort(list, registry) {
     }
 
     for (i = 0, n = list.length, offset = pass * maxRadix, size = pass * radixBits; i < n; i++) {
-        div = floatToInt(comp(i));
-        out[++buckets[offset + (div >>> size & lastMask)]] = mutator(i, div ^ (~div >> 31 | 0x80000000));
+        div = floatToInt(comp(list, registry, i));
+        out[++buckets[offset + (div >>> size & lastMask)]] = mutator(list, registry, i, div ^ (~div >> 31 | 0x80000000));
     }
 
     return out;
 
-    function comp (i) {
-        var key = list[i];
-        return registry[key].uniformValues[1][14] + normalizer;
-    }
-
-    function mutator (i, value) {
-        var key = list[i];
-        registry[key].uniformValues[1][14] = intToFloat(value) - normalizer;
-        return key;
-    }
 }
 
 module.exports = sort;
