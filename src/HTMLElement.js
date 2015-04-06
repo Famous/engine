@@ -26,12 +26,13 @@ var RECALL = 'RECALL';
  * @component
  * @param {RenderNode} RenderNode to which the instance of Element will be a component of
  */
-function HTMLElement(dispatch, tagName, options) {
+function HTMLElement(dispatch, options) {
+    options = options || {};
     this._dispatch = dispatch;
     this._id = dispatch.addRenderable(this);
     this._queue = [];
 
-    this._tagName = tagName ? tagName : 'div';
+    this._tagName = options.tagName ? options.tagName : 'div';
     this._transform = new Float32Array(16);
     this._size = [0, 0, 0];
     this._trueSized = [false, false];

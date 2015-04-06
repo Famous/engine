@@ -2,7 +2,6 @@
 
 var test = require('tape');
 var HTMLElement = require('../src/HTMLElement');
-var MockDispatch = require('./MockDispatch');
 
 function noop() {}
 
@@ -112,7 +111,8 @@ test('HTMLElement', function(t) {
                 return 'render/path';
             }
         };
-        var el = new HTMLElement(dispatch, 'section', {
+        var el = new HTMLElement(dispatch, {
+            tagName: 'section',
             attributes: {
                 attr1: 'attr1Val',
                 attr2: 'attr2Val',
