@@ -9,12 +9,10 @@
  * @private
  */
 function Clock () {
-	this._updates = [];
-	this._nextStepUpdates = [];
-	this._time = 0;
-	this._frame = 0;
-
-	this._updatingIndex = 0;
+    this._time = 0;
+    this._frame = 0;
+    this._timerQueue = [];
+    this._updatingIndex = 0;
 }
 
 /**
@@ -28,58 +26,19 @@ function Clock () {
  * @return {Clock}       this
  */
 Clock.prototype.step = function step (time) {
-	this._frame++;
-	this._time = time;
-
-	for (; this._updatingIndex < this._updates.length; this._updatingIndex++) {
-		this._updates[this._updatingIndex].update(time);
-	}
-
-	while (this._nextStepUpdates.length > 0) {
-		this._nextStepUpdates.shift().update(time);
-	}
-
-	this._updatingIndex = 0;
-
-	return this;
-};
-
-/**
- * Registers an object to be updated on every frame.
- *
- * @method  update
- * @chainable
- * 
- * @param {Object}      updateable          Object having an `update` method
- * @param {Function}    updateable.update   update method to be called on every
- *                                          step
- * @return {Clock}                          this
- */
-Clock.prototype.update = function update (updateable) {
-	if (this._updates.indexOf(updateable) === -1) {
-		this._updates.push(updateable);
-	}
-	return this;
-};
-
-/**
- * Deregisters a previously using `update` registered object to be no longer
- * updated on every frame.
- *
- * @method  noLongerUpdate
- * @chainable
- * 
- * @param  {Object} updateable  Object previously registered using the `update`
- *                              method
- * @return {Clock}              this
- */
-Clock.prototype.noLongerUpdate = function noLongerUpdate(updateable) {
-	var index = this._updates.indexOf(updateable);
-	if (index > -1) {
-		if (index <= this._updatingIndex && this._updatingIndex !== 0) this._updatingIndex--;
-		this._updates.splice(index, 1);
-	}
-	return this;
+    this._frame++;
+    this._time = time;
+    for (var i = 0; i < this._timerQueue.length; i += 5) {
+        if (this._time > this._timerQueue[i+1] + this._timerQueue[i+2]) {
+            this._timerQueue[i].apply(this, this._timerQueue[i+3]);
+            if (!this._timerQueue[i+4]) {
+                this._timerQueue.splice(i, i+5);
+            } else {
+                this._timerQueue[i+1] = this._time;
+            }
+        }
+    }
+    return this;
 };
 
 /**
@@ -92,7 +51,7 @@ Clock.prototype.noLongerUpdate = function noLongerUpdate(updateable) {
  *                       `update` method on all registered objects
  */
 Clock.prototype.getTime = function getTime() {
-	return this._time;
+    return this._time;
 };
 
 /**
@@ -104,7 +63,7 @@ Clock.prototype.getTime = function getTime() {
  *                       `update` method on all registered objects
  */
 Clock.prototype.now = function now () {
-	return this._time;
+    return this._time;
 };
 
 /**
@@ -115,25 +74,7 @@ Clock.prototype.now = function now () {
  * @return {Number} frames
  */
 Clock.prototype.getFrame = function getFrame () {
-	return this._frame;
-};
-
-/**
- * Registers object to be updated **once** on the next step. Registered
- * updateables are not guaranteed to be unique, therefore multiple updates per
- * step per object are possible.
- *
- * @method nextStep
- * @chainable
- * 
- * @param {Object}      updateable          Object having an `update` method
- * @param {Function}    updateable.update   update method to be called on the
- *                                          next step
- * @return {Clock}                          this
- */
-Clock.prototype.nextStep = function nextStep(updateable) {
-	this._nextStepUpdates.push(updateable);
-	return this;
+    return this._frame;
 };
 
 /**
@@ -149,38 +90,8 @@ Clock.prototype.nextStep = function nextStep(updateable) {
  * @return {Function} decorated passed in callback function
  */
 Clock.prototype.setTimeout = function (callback, delay) {
-	var params = Array.prototype.slice.call(arguments, 2);
-
-	// problem this._time might be null
-	var startedAt = this._time;
-	var _this = this;
-	var looper = {
-		update: function update (time) {
-			if (time - startedAt >= delay) {
-				callback.apply(this, params);
-				_this.noLongerUpdate(looper);
-			}
-		}
-	};
-	callback.__looper = looper
-	this.update(looper);
-	return callback;
-};
-
-/**
- * Removes previously via `Clock#setTimeout` or `Clock#setInterval`
- * registered callback function
- *
- * @method clearTimer
- * @chainable
- * 
- * @param  {Function} callback  previously via `Clock#setTimeout` or
- *                              `Clock#setInterval` registered callback function
- * @return {Clock}              this
- */
-Clock.prototype.clearTimer = function (callback) {
-	this.noLongerUpdate(callback.__looper);
-	return this;
+    var params = Array.prototype.slice.call(arguments, 2);
+    return this._timerQueue.push(callback, this._time, delay, params, false);
 };
 
 /**
@@ -196,20 +107,39 @@ Clock.prototype.clearTimer = function (callback) {
  * @return {Function} decorated passed in callback function
  */
 Clock.prototype.setInterval = function setInterval(callback, delay) {
-	var params = Array.prototype.slice.call(arguments, 2);
-	var startedAt = this._time;
+    var params = Array.prototype.slice.call(arguments, 2);
+    return this._timerQueue.push(callback, this._time, delay, params, true);
+};
 
-	var looper = {
-		update: function update (time) {
-			if (time - startedAt >= delay) {
-				callback.apply(this, params);
-				startedAt = time;
-			}
-		}
-	};
-	callback.__looper = looper;
-	this.update(looper);
-	return callback;
+/**
+ * Removes previously via `Clock#setInterval` registered callback function.
+ *
+ * @method clearInterval
+ * @chainable
+ * 
+ * @param  {Number} intervalID  by `Clock#setInterval` returned intervalID
+ * @return {Clock}              this
+ */
+Clock.prototype.clearInterval = function clearInterval(intervalID) {
+    if (this._timerQueue[intervalID-1] === true) {
+        this._timerQueue.splice(intervalID-5, intervalID);
+    }
+};
+
+/**
+ * Removes previously via `Clock#setTimeout` registered callback function.
+ *
+ * @method clearTimeout
+ * @chainable
+ * 
+ * @param  {Number} timeoutID   by `Clock#setTimeout` returned timeoutID
+ * @return {Clock}              this
+ */
+Clock.prototype.clearTimeout = function clearTimeout(timeoutID) {
+    if (this._timerQueue[timeoutID-1] === false) {
+        this._timerQueue.splice(timeoutID-5, timeoutID);
+    }
+    return this;
 };
 
 module.exports = Clock;
