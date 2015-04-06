@@ -9,6 +9,7 @@ module.exports = {
     MethodStore: require('./MethodStore'),
     ObjectManager: require('./ObjectManager'),
     Color: require('./Color'),
-    strip: require('./strip')
+    strip: require('./strip'),
+    keyValueToArrays: require('./keyValueToArrays')
 };
 
