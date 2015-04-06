@@ -2,7 +2,7 @@
 
 'use strict';
 
-var curves = {
+var Curves = {
     /**
      * @property linear
      * @static
@@ -329,7 +329,7 @@ var curves = {
      * @type {Function}
      */
     inBounce: function(t) {
-        return 1.0 - curves.outBounce(1.0-t);
+        return 1.0 - Curves.outBounce(1.0-t);
     },
 
     /**
@@ -355,8 +355,8 @@ var curves = {
      * @type {Function}
      */
     inOutBounce: function(t) {
-        if (t < .5) return curves.inBounce(t*2) * .5;
-        return curves.outBounce(t*2-1.0) * .5 + .5;
+        if (t < .5) return Curves.inBounce(t*2) * .5;
+        return Curves.outBounce(t*2-1.0) * .5 + .5;
     },
 
     flat: function() {
@@ -364,4 +364,4 @@ var curves = {
     }
 };
 
-module.exports = curves;
+module.exports = Curves;

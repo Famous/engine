@@ -1,6 +1,6 @@
 'use strict';
 
-var curves = require('./curves');
+var Curves = require('./Curves');
 
 /**
  * A state maintainer for a smooth transition between
@@ -72,7 +72,7 @@ Transitionable.Clock = typeof performance !== 'undefined' ? performance : Date;
  * 
  * @param  {Number|Array.Number}    finalState              final state to
  *                                                          transiton to
- * @param  {String|Function}        [curve=curves.linear]   easing function
+ * @param  {String|Function}        [curve=Curves.linear]   easing function
  *                                                          used for
  *                                                          interpolating
  *                                                          [0, 1]
@@ -85,10 +85,10 @@ Transitionable.Clock = typeof performance !== 'undefined' ? performance : Date;
  * @return {Transitionable}         this
  */
 Transitionable.prototype.to = function to(finalState, curve, duration, callback) {
-    curve = curve != null && curve.constructor === String ? curves[curve] : curve;
+    curve = curve != null && curve.constructor === String ? Curves[curve] : curve;
     this._queue.push(
         finalState,
-        curve != null ? curve : curves.linear,
+        curve != null ? curve : Curves.linear,
         duration != null ? duration : 100,
         callback
     );
@@ -132,7 +132,7 @@ Transitionable.prototype.from = function from(initialState) {
  */
 Transitionable.prototype.delay = function delay(duration, callback) {
     var endState = this._queue.length > 0 ? this._queue[this._queue.length - 4] : this._end;
-    return this.to(endState, curves.flat, duration, callback);
+    return this.to(endState, Curves.flat, duration, callback);
 };
 
 /**
@@ -153,7 +153,7 @@ Transitionable.prototype.delay = function delay(duration, callback) {
 Transitionable.prototype.override = function override(finalState, curve, duration, callback) {
     if (this._queue.length > 0) {
         if (finalState != null) this._queue[0] = finalState;
-        if (curve != null)      this._queue[1] = curve.constructor === String ? curves[curve] : curve;
+        if (curve != null)      this._queue[1] = curve.constructor === String ? Curves[curve] : curve;
         if (duration != null)   this._queue[0] = duration;
         if (callback != null)   this._queue[0] = callback;
     }

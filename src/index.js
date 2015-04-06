@@ -3,6 +3,6 @@
 module.exports = {
     after: require('./after'),
     Easing: require('./Easing'),
-    curves: require('./curves'),
+    Curves: require('./Curves'),
     Transitionable: require('./Transitionable')
 };
