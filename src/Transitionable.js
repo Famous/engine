@@ -85,7 +85,7 @@ Transitionable.Clock = typeof performance !== 'undefined' ? performance : Date;
  * @return {Transitionable}         this
  */
 Transitionable.prototype.to = function to(finalState, curve, duration, callback) {
-    curve = curve != null && curve.constructor === String ? curves[curve] : curve
+    curve = curve != null && curve.constructor === String ? curves[curve] : curve;
     this._queue.push(
         finalState,
         curve != null ? curve : curves.linear,

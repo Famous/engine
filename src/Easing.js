@@ -1,3 +1,5 @@
+/*jshint -W008 */
+
 'use strict';
 
 var _defaultCurves = {
