@@ -19,16 +19,14 @@ function Mesh (dispatch, options) {
     this.queue = [];
     this._id = dispatch.addRenderable(this);
 
-    this._color;
     this._glossiness = new Transitionable(0);
     this._positionOffset = new Transitionable([0, 0, 0]);
-    this._metallness = new Transitionable(0);
-    this._normals = new Transitionable([0, 0, 0]);
 
     this._size = [];
     this._expressions = {};
+    this._flatShading = false;
     this._geometry;
-    this._flatShading = 0;
+    this._color;
 
     this.dispatch.onTransformChange(this._receiveTransformChange.bind(this));
     this.dispatch.onSizeChange(this._receiveSizeChange.bind(this));
@@ -49,6 +47,22 @@ function Mesh (dispatch, options) {
 */
 Mesh.toString = function toString() {
     return 'Mesh';
+};
+
+/**
+ * Pass custom options to Mesh, such as a 3 element map
+ * which displaces the position of each vertex in world space.
+ *
+ * @method setOptions
+ * @chainable
+ *
+ * @param {Object} Options
+ * @chainable
+ */
+Mesh.prototype.setOptions = function setOptions(options) {
+    this.queue.push('GL_SET_DRAW_OPTIONS');
+    this.queue.push(options);
+    return this;
 };
 
 /**
@@ -129,7 +143,6 @@ Mesh.prototype.setGeometry = function setGeometry(geometry, options) {
         this.queue.push(geometry.id);
         this.queue.push(geometry.spec.type);
         this.queue.push(geometry.spec.dynamic);
-
         this._geometry = geometry;
     }
 
@@ -147,6 +160,41 @@ Mesh.prototype.getGeometry = function getGeometry() {
 };
 
 /**
+* Pushes invalidations commands, if any exist
+*
+* @private
+* @method _pushInvalidations
+*/
+Mesh.prototype._pushInvalidations = function _pushInvalidations(expressionName) {
+    var uniformKey;
+    var expression = this._expressions[expressionName];
+    if (expression) {
+        var i = expression.invalidations.length;
+        while (i--) {
+            uniformKey = expression.invalidations.pop();
+            this.dispatch.sendDrawCommand('GL_UNIFORMS');
+            this.dispatch.sendDrawCommand(uniformKey);
+            this.dispatch.sendDrawCommand(expression.uniforms[uniformKey]);
+        }
+    }
+};
+
+/**
+* Pushes active commands for any values that are in transition (active) state
+*
+* @private
+* @method _pushActiveCommands
+*/
+Mesh.prototype._pushActiveCommands = function _pushActiveCommands(property, command, value) {
+    if (this[property] && this[property].isActive()) {
+        this.dispatch.sendDrawCommand('GL_UNIFORMS');
+        this.dispatch.sendDrawCommand(command);
+        this.dispatch.sendDrawCommand(this[property][value || 'get']());
+        return true;
+    }
+};
+
+/**
 * Returns boolean: if true, renderable is to be updated on next engine tick
 *
 * @private
@@ -155,13 +203,14 @@ Mesh.prototype.getGeometry = function getGeometry() {
 */
 Mesh.prototype.clean = function clean() {
     var path = this.dispatch.getRenderPath();
+    var bufferIndex;
+    var i;
 
     this.dispatch
         .sendDrawCommand('WITH')
         .sendDrawCommand(path)
         .sendDrawCommand('WEBGL');
 
-    var bufferIndex;
     if (this._geometry) {
         i = this._geometry.spec.invalidations.length;
         while (i--) {
@@ -174,44 +223,18 @@ Mesh.prototype.clean = function clean() {
         }
     }
 
-    var baseColor = this._expressions.baseColor;
-    var uniformKey;
-    if (baseColor) {
-        i = baseColor.invalidations.length;
-        while (i--) {
-            uniformKey = baseColor.invalidations.pop();
-            this.dispatch.sendDrawCommand('GL_UNIFORMS');
-            this.dispatch.sendDrawCommand(uniformKey);
-            this.dispatch.sendDrawCommand(baseColor.uniforms[uniformKey]);
-        }
-    }
+    // If any invalidations exist, push them into the queue
+    this._pushInvalidations('baseColor');
+    this._pushInvalidations('positionOffset');
 
-    var positionOffset = this._expressions.positionOffset;
-    if (positionOffset) {
-        i = positionOffset.invalidations.length;
-        while (i--) {
-            uniformKey = positionOffset.invalidations.pop();
-            this.dispatch.sendDrawCommand('GL_UNIFORMS');
-            this.dispatch.sendDrawCommand(uniformKey);
-            this.dispatch.sendDrawCommand(positionOffset.uniforms[uniformKey]);
-        }
-    }
+    // If any values are active, push them into the queue
+    this._pushActiveCommands('_color', 'baseColor', 'getNormalizedRGB');
+    this._pushActiveCommands('_glossiness', 'glossiness');
+    this._pushActiveCommands('_positionOffset', 'positionOffset');
 
-    var i = this.queue.length;
-    while (i--) this.dispatch.sendDrawCommand(this.queue.shift());
-
-    if (this._color && this._color.isActive()) {
-        this.dispatch.sendDrawCommand('GL_UNIFORMS');
-        this.dispatch.sendDrawCommand('baseColor');
-        this.dispatch.sendDrawCommand(this._color.getNormalizedRGB());
-        return true;
-    }
-
-    if (this._glossiness.isActive()) {
-        this.dispatch.sendDrawCommand('GL_UNIFORMS');
-        this.dispatch.sendDrawCommand('glossiness');
-        this.dispatch.sendDrawCommand(this._glossiness.get());
-        return true;
+    i = this.queue.length;
+    while (i--) {
+        this.dispatch.sendDrawCommand(this.queue.shift());
     }
 
     return this.queue.length;
@@ -234,10 +257,10 @@ Mesh.prototype.setBaseColor = function setBaseColor(color) {
         this._expressions.baseColor = color;
         color = color._compile();
     }
-    // A color component
-    else {
+    // If a color component
+    else if (color.getNormalizedRGB) {
         this.queue.push('GL_UNIFORMS');
-        if (this._expressions.baseColor) this._expressions.baseColor = null;
+        this._expressions.baseColor = null;
         this._color = color;
         color = color.getNormalizedRGB();
     }
@@ -249,14 +272,13 @@ Mesh.prototype.setBaseColor = function setBaseColor(color) {
 
 
 /**
- * Returns either the material expression or the color of Mesh.
+ * Returns either the material expression or the color instance of Mesh.
  *
  * @method getBaseColor
  * @returns {MaterialExpress|Color}
  */
-Mesh.prototype.getBaseColor = function getBaseColor(option) {
-    return this._expressions.baseColor ||
-           (this._color.getColor) ? this._color.getColor(option) : this._color;
+Mesh.prototype.getBaseColor = function getBaseColor() {
+    return this._expressions.baseColor || this._color;
 };
 
 /**
@@ -268,10 +290,10 @@ Mesh.prototype.getBaseColor = function getBaseColor(option) {
  */
 Mesh.prototype.setFlatShading = function setFlatShading(bool) {
     this.dispatch.dirtyRenderable(this._id);
-    this._flatShading = bool ? 1 : 0;
+    this._flatShading = bool;
     this.queue.push('GL_UNIFORMS');
     this.queue.push('u_FlatShading');
-    this.queue.push(this._flatShading);
+    this.queue.push(this._flatShading ? 1 : 0);
     return this;
 };
 
@@ -279,10 +301,10 @@ Mesh.prototype.setFlatShading = function setFlatShading(bool) {
  * Returns a boolean for whether Mesh is affected by light.
  *
  * @method getFlatShading
- * @returns {boolean} Boolean
+ * @returns {Boolean} Boolean
  */
 Mesh.prototype.getFlatShading = function getFlatShading() {
-    return this._flatShading ? true : false;
+    return this._flatShading;
 };
 
 
@@ -299,7 +321,10 @@ Mesh.prototype.getFlatShading = function getFlatShading() {
  */
 Mesh.prototype.setNormals = function setNormals(materialExpression) {
     this.dispatch.dirtyRenderable(this._id);
-    if (materialExpression._compile) materialExpression = materialExpression._compile();
+    if (materialExpression._compile) {
+        this._expressions.normals = materialExpression;
+        materialExpression = materialExpression._compile();
+    }
     this.queue.push(typeof materialExpression === 'number' ? 'UNIFORM_INPUT' : 'MATERIAL_INPUT');
     this.queue.push('normal');
     this.queue.push(materialExpression);
@@ -307,13 +332,13 @@ Mesh.prototype.setNormals = function setNormals(materialExpression) {
 };
 
 /**
- * Returns the Normals expression of Mesh (work in progress)
+ * Returns the Normals expression of Mesh
  *
  * @method getNormals
  * @returns The normals expression for Mesh
  */
 Mesh.prototype.getNormals = function getNormals(materialExpression) {
-    return null;
+    return this._expressions.normals;
 };
 
 /**
@@ -322,22 +347,22 @@ Mesh.prototype.getNormals = function getNormals(materialExpression) {
  *
  * @method setGlossiness
  * @param {MaterialExpression|Number}
- * @param {Object} Options Optional paramter to be passed with scalar
- * glossiness for tweening.
+ * @param {Object} Optional tweening parameter
+ * @param {Function} Callback
  * @chainable
  */
-Mesh.prototype.setGlossiness = function setGlossiness(value) {
+Mesh.prototype.setGlossiness = function setGlossiness(materialExpression, transition, cb) {
     this.dispatch.dirtyRenderable(this._id);
 
-    if (materialExpression[0]._compile) {
+    if (materialExpression._compile) {
         this.queue.push('MATERIAL_INPUT');
-        this._expressions.glossiness = materialExpression[0];
-        materialExpression = materialExpression[0]._compile();
+        this._expressions.glossiness = materialExpression;
+        materialExpression = materialExpression._compile();
     }
     else {
-        this._glossiness.set(materialExpression[0], materialExpression[1]);
-        this._expressions.glossiness = null;
         this.queue.push('GL_UNIFORMS');
+        this._expressions.glossiness = null;
+        this._glossiness.set(materialExpression, transition, cb);
         materialExpression = this._glossiness.get();
     }
 
@@ -352,37 +377,8 @@ Mesh.prototype.setGlossiness = function setGlossiness(value) {
  * @method getGlossiness
  * @returns {MaterialExpress|Number}
  */
-Mesh.prototype.getGlossiness = function getGlossiness(materialExpression) {
+Mesh.prototype.getGlossiness = function getGlossiness() {
     return this._expressions.glossiness || this._glossiness.get();
-};
-
-/**
- * Defines 1 element map which describes the electrical conductivity of a
- * material.
- *
- * @method metallic
- * @chainable
- *
- * @param {Object} Material or Image
- * @return {Element} current Mesh
- */
-Mesh.prototype.setMetallness = function setMetallness(materialExpression) {
-    this.dispatch.dirtyRenderable(this._id);
-    if (materialExpression._compile) materialExpression = materialExpression._compile();
-    this.queue.push(typeof materialExpression === 'number' ? 'UNIFORM_INPUT' : 'MATERIAL_INPUT');
-    this.queue.push('metallic');
-    this.queue.push(materialExpression);
-    return this;
-};
-
-/**
- * Returns material expression for metallness.
- *
- * @method getMetallness
- * @returns {MaterialExpress}
- */
-Mesh.prototype.getMetallness = function getMetallness() {
-    return this._expressions.metallness || this._metallness.get();
 };
 
 /**
@@ -392,22 +388,23 @@ Mesh.prototype.getMetallness = function getMetallness() {
  * @method setPositionOffset
  * @chainable
  *
- * @param {Object} Material Expression
+ * @param {MaterialExpression|Array}
+ * @param {Object} Optional tweening parameter
+ * @param {Function} Callback
  * @chainable
  */
-Mesh.prototype.setPositionOffset = function positionOffset(materialExpression) {
+Mesh.prototype.setPositionOffset = function positionOffset(materialExpression, transition, cb) {
     this.dispatch.dirtyRenderable(this._id);
-    var materialExpression = Array.prototype.concat.apply([], arguments);
 
-    if (materialExpression[0]._compile) {
+    if (materialExpression._compile) {
         this.queue.push('MATERIAL_INPUT');
-        this._expressions.positionOffset = materialExpression[0];
-        materialExpression = materialExpression[0]._compile();
+        this._expressions.positionOffset = materialExpression;
+        materialExpression = materialExpression._compile();
     }
     else {
-        this._positionOffset.set(materialExpression[0], materialExpression[1]);
-        this._expressions.positionOffset = null;
         this.queue.push('GL_UNIFORMS');
+        this._expressions.positionOffset = null;
+        this._positionOffset.set(materialExpression, transition, cb);
         materialExpression = this._positionOffset.get();
     }
 
@@ -424,22 +421,6 @@ Mesh.prototype.setPositionOffset = function positionOffset(materialExpression) {
  */
 Mesh.prototype.getPositionOffset = function getPositionOffset(materialExpression) {
     return this._expressions.positionOffset || this._positionOffset.get();
-};
-
-/**
- * Defines 3 element map which displaces the position of each vertex in world
- * space.
- *
- * @method setOptions
- * @chainable
- *
- * @param {Object} Options
- * @chainable
- */
-Mesh.prototype.setOptions = function setOptions(options) {
-    this.queue.push('GL_SET_DRAW_OPTIONS');
-    this.queue.push(options);
-    return this;
 };
 
 module.exports = Mesh;
