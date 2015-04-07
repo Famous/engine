@@ -124,7 +124,6 @@ Node.prototype.getParent = function getParent () {
 };
 
 Node.prototype.requestUpdate = function requestUpdate (id) {
-    if (!this.isMounted()) return;
     if (this._inUpdate) return this.requestUpdateOnNextTick(id);
     this._updateQueue.push(id);
     if (!this._requestingUpdate) this._requestUpdate();
@@ -243,7 +242,7 @@ Node.prototype.addComponent = function addComponent (component) {
         this._components[index] = component;
 
         if (this.isMounted() && component.onMount)
-            component.onMount(this, this.getId() + ':' + index);
+            component.onMount(this, this.getId() + ':' + index, index);
 
         if (this.isShown() && component.onShow)
             component.onShow();
@@ -666,7 +665,7 @@ Node.prototype.mount = function mount (parent, myId) {
 
     for (; i < len ; i++) {
         item = list[i];
-        if (item.onMount) item.onMount(this, myId + ':' + i);
+        if (item.onMount) item.onMount(this, myId + ':' + i, i);
     }
     
     i = 0;
