@@ -1,5 +1,6 @@
 
 var Famous = require('./Famous');
+var Dispatch = require('./Dispatcher');
 var Node = require('./Node');
 var Size = require('./Size');
 
@@ -26,10 +27,13 @@ var BOTTOM = {
 
 function Context (selector) {
     Node.call(this);
+    this._dispatch = new Dispatch(this);
     this._selector = selector;
-    this.mount(BOTTOM, selector);
+
+    this.onMount(BOTTOM, selector);
     Famous.registerContext(selector, this);
     Famous.message('NEED_SIZE_FOR').message(selector);
+    this.show();
 }
 
 Context.prototype = Object.create(Node.prototype);
@@ -37,6 +41,10 @@ Context.prototype.constructor = Context;
 
 Context.prototype.getSelector = function getSelector () {
     return this._selector;
+};
+
+Context.prototype.getDispatch = function getDispatch () {
+    return this._dispatch;
 };
 
 Context.prototype._receiveContextSize = function _receiveContextSize (size) {

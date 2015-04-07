@@ -40,6 +40,11 @@ function Node () {
     this.value = new Node.Spec();
 }
 
+Node.RELATIVE_SIZE = Size.RELATIVE;
+Node.ABSOLUTE_SIZE = Size.ABSOLUTE;
+Node.RENDER_SIZE = Size.RENDER;
+Node.DEFAULT_SIZE = Size.DEFAULT;
+
 Node.Spec = function Spec () {
     this.location = null;
     this.showState = {
@@ -210,13 +215,13 @@ Node.prototype.addChild = function addChild (child) {
         index = this._freedChildIndicies.length ? this._freedChildIndicies.pop() : this._children.length;
         this._children[index] = child;
 
-        if (this.isMounted() && child.mount) {
+        if (this.isMounted() && child.onMount) {
             var myId = this.getId();
             var childId = myId + '/' + index;
-            child.mount(this, childId);
+            child.onMount(this, childId);
         }
 
-        if (this.isShown() && child.show) child.show();
+        if (this.isShown() && child.onShow) child.onShow();
     }
 
     return child;
@@ -226,11 +231,11 @@ Node.prototype.removeChild = function removeChild (child) {
     var index = this._children.indexOf(child);
     if (index !== -1) {
         this._freedChildIndicies.push(index);
-        if (this.isShown() && child.hide)
-            child.hide();
+        if (this.isShown() && child.onHide)
+            child.onHide();
 
-        if (this.isMounted() && child.dismount)
-            child.dismount();
+        if (this.isMounted() && child.onDismount)
+            child.onDismount();
 
         this._children[index] = null;
     }
@@ -243,7 +248,7 @@ Node.prototype.addComponent = function addComponent (component) {
         this._components[index] = component;
 
         if (this.isMounted() && component.onMount)
-            component.onMount(this, this.getId() + ':' + index);
+            component.onMount(this, this.getId() + ':' + index, index);
 
         if (this.isShown() && component.onShow)
             component.onShow();
@@ -288,6 +293,8 @@ Node.prototype.show = function show () {
     var len = items.length;
     var item;
 
+    this.value.showState.shown = true;
+
     for (; i < len ; i++) {
         item = items[i];
         if (item && item.onShow) item.onShow();
@@ -308,6 +315,8 @@ Node.prototype.hide = function hide () {
     var items = this._components;
     var len = items.length;
     var item;
+
+    this.value.showState.shown = false;
 
     for (; i < len ; i++) {
         item = items[i];
@@ -652,7 +661,7 @@ Node.prototype.onUpdate = function onUpdate (time) {
     }
 };
 
-Node.prototype.mount = function mount (parent, myId) {
+Node.prototype.onMount = function onMount (parent, myId) {
     if (this.isMounted()) return; 
     var i = 0;
     var list = this._components;
@@ -666,7 +675,7 @@ Node.prototype.mount = function mount (parent, myId) {
 
     for (; i < len ; i++) {
         item = list[i];
-        if (item.onMount) item.onMount(this, myId + ':' + i);
+        if (item.onMount) item.onMount(this, myId + ':' + i, i);
     }
     
     i = 0;
@@ -680,7 +689,7 @@ Node.prototype.mount = function mount (parent, myId) {
     if (this._requestingUpdate) this._requestUpdate(true);
 };
 
-Node.prototype.dismount = function dismount () {
+Node.prototype.onDismount = function onDismount () {
     if (!this.isMounted()) return; 
     var i = 0;
     var list = this._components;
@@ -726,6 +735,10 @@ Node.prototype.onParentHide = Node.prototype.hide;
 Node.prototype.onParentTransformChange = Node.prototype._requestUpdate; 
 
 Node.prototype.onParentSizeChange = Node.prototype._requestUpdate;
+
+Node.prototype.onShow = Node.prototype.show;
+
+Node.prototype.onHide = Node.prototype.hide;
 
 Node.prototype.onReceive = function onRecieve (event, payload) {
     console.log(event, payload);

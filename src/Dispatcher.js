@@ -1,4 +1,4 @@
-
+'use strict';
 
 function Dispatcher (context) {
     this._context = context;
@@ -10,12 +10,15 @@ Dispatcher.prototype.lookupNode = function lookupNode (location) {
     _splitTo(location, path);
     if (path[0] !== this._context.getSelector()) return void 0;
     var children = this._context.getChildren();
+    path[0] = this._context;
     var child;
     var i = 1;
     while (i < path.length) {
-        child = children[path[i++]];
+        child = children[path[i]];
+        path[i] = child;
         if (child) children = child.getChildren();
         else return void 0;
+        i++;
     }
     return child;
 };
@@ -38,6 +41,17 @@ Dispatcher.prototype.dispatch = function dispatch (event, payload) {
     }
 };
 
+Dispatcher.prototype.dispatchUIEvent = function dispatchUIEvent (path, event, payload) {
+    var queue = this._queue;
+    var node;
+
+    this.lookupNode(path);
+    while (queue.length) {
+        node = queue.pop();
+        if (node.onReceive) node.onReceive(event, payload);
+    }
+};
+
 function _splitTo (string, target) {
     target.length = 0;
     var last = 0;
@@ -51,3 +65,4 @@ function _splitTo (string, target) {
 }
 
 module.exports = Dispatcher;
+

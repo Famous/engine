@@ -73,13 +73,14 @@ Famous.prototype.postMessage = function postMessage (messages) {
 Famous.prototype.handleWith = function handleWith (messages) {
     var path = messages.shift();
     var command = messages.shift();
+    var i;
+    var len;
 
     switch (command) {
         case 'TRIGGER':
             var type = messages.shift();
             var ev = messages.shift();
             if (type === 'resize') this.getContext(path)._receiveContextSize(ev);
-            // this._globalDispatch.targetedTrigger(path, type, ev);
             break;
         default:
             console.error('Unknown command ' + command);
