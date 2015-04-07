@@ -48,6 +48,10 @@ HTMLElement.toString = function toString() {
     return ELEMENT;
 };
 
+HTMLElement.prototype.getValue = function getValue () {
+    return ELEMENT;
+};
+
 HTMLElement.prototype._requestUpdate = function _requestUpdate () {
     if (!this._requestingUpdate) {
         this._requestingUpdate = true;
