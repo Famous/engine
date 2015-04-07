@@ -308,7 +308,7 @@ Node.prototype.addComponent = function addComponent (component) {
         this._components[index] = component;
 
         if (this.isMounted() && component.onMount)
-            component.onMount(this, this.getId() + ':' + index, index);
+            component.onMount(this, index);
 
         if (this.isShown() && component.onShow)
             component.onShow();
@@ -735,7 +735,7 @@ Node.prototype.mount = function mount (parent, myId) {
 
     for (; i < len ; i++) {
         item = list[i];
-        if (item.onMount) item.onMount(this, myId + ':' + i, i);
+        if (item.onMount) item.onMount(this, i);
     }
     
     i = 0;
