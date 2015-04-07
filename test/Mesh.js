@@ -260,7 +260,12 @@ test('Mesh', function(t) {
         t.equal(typeof mesh.clean, 'function',
             'should be a function');
 
+        t.true(mesh.queue,
+            'should have a populated queue');
+
         mesh.clean();
+        t.equal(mesh.queue.length, 0,
+            'should have an empty (cleaned) queue');
 
         t.end();
     });
