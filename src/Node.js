@@ -71,6 +71,67 @@ Node.Spec = function Spec () {
     };
 };
 
+/**
+ * @method getContext
+ * @chainable
+ * 
+ * @deprecated Node can be used directly instead!
+ * @return {Node} this
+ */
+Node.prototype.getContext = function getContext () {
+    console.warn(
+        'Node#getContext is deprecated!\n' +
+        'Nodes can be used directly!'
+    );
+    return this;
+};
+
+/**
+ * @method getDispatch
+ * @chainable
+ * 
+ * @deprecated Node can be used directly instead!
+ * @return {Node} this
+ */
+Node.prototype.getDispatch = function getDispatch () {
+    console.warn(
+        'Node#getDispatch is deprecated!\n' +
+        'Component constructors accept a Node instead!' +
+        'Use new Component(node) instead of new Component(node.getDispatch())!'
+    );
+    return this;
+};
+
+/**
+ * @method getRenderProxy
+ * @chainable
+ * 
+ * @deprecated Node can be used directly instead!
+ * @return {Node} this
+ */
+Node.prototype.getRenderProxy = function getRenderProxy () {
+    console.warn(
+        'Node#getRenderProxy is deprecated!\n' +
+        'RenderProxy functionality has been merged into Node!'
+    );
+    return this;
+};
+
+/**
+ * @method getRenderPath
+ * @chainable
+ *
+ * @deprecated getRenderPath
+ * @return {string} render path
+ */
+Node.prototype.getRenderPath = function getRenderPath () {
+    console.warn(
+        'Node#getRenderPath is deprecated!\n' +
+        'Use Node#getLocation instead!'
+    );
+    return this.getLocation;
+}
+
 Node.prototype.getLocation = function getLocation () {
     return this.value.location;
 };
