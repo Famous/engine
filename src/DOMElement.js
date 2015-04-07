@@ -1,7 +1,6 @@
 
 function DOMElement (node, tagName) {
     this._node = node;
-    this._path = null;
 
     this._requestingUpdate = false;
 
@@ -29,14 +28,13 @@ DOMElement.prototype.getValue = function getValue () {
 };
 
 DOMElement.prototype.onUpdate = function onUpdate () {
-    var path = this._path;
     var node = this._node;
     var queue = this._changeQueue;
     var len = queue.length;
     
-    if (len && path && node) {
+    if (len && node) {
         node.sendDrawCommand('WITH');
-        node.sendDrawCommand(path);
+        node.sendDrawCommand(node.getLocation());
         node.sendDrawCommand('DOM');
 
         while (len--) node.sendDrawCommand(queue.shift());
@@ -45,9 +43,8 @@ DOMElement.prototype.onUpdate = function onUpdate () {
     this._requestingUpdate = false;
 };
 
-DOMElement.prototype.onMount = function onMount (node, path, id) {
+DOMElement.prototype.onMount = function onMount (node, id) {
     this._node = node;
-    this._path = path;
     this._id = id;
     this.draw();
     this.setAttribute('data-fa-path', node.getLocation());
