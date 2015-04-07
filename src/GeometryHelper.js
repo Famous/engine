@@ -40,8 +40,7 @@ GeometryHelper.generateParametric = function generateParametric(detailX, detailY
 
     // We must wrap around slightly more than once for uv coordinates to look correct.
 
-    // var Xrange = Math.PI + (Math.PI / detailX);
-    var Xrange = Math.PI;
+    var Xrange = Math.PI + (Math.PI / (detailX - 1));
     var out = [];
 
     for (i = 0; i < detailX + 1; i++) {
@@ -292,12 +291,21 @@ GeometryHelper.getSpheroidUV = function getSpheroidUV(vertices, out) {
     var length = vertices.length / 3;
     var vertex;
 
+    var uv = [];
+
     for(var i = 0; i < length; i++) {
-        vertex = vertices.slice(i * 3, i * 3 + 3);
-        out.push(
-            this.getAzimuth(vertex) * 0.5 / Math.PI + 0.5,
-            this.getAltitude(vertex) / Math.PI + 0.5
-        );
+        vertex = outputs[0].set(
+            vertices[i * 3],
+            vertices[i * 3 + 1],
+            vertices[i * 3 + 2]
+        )
+        .normalize()
+        .toArray();
+
+        uv[0] = this.getAzimuth(vertex) * 0.5 / Math.PI + 0.5;
+        uv[1] = this.getAltitude(vertex) / Math.PI + 0.5;
+
+        out.push.apply(out, uv);
     }
 
     return out;

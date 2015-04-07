@@ -21,27 +21,28 @@ function Tetrahedron(options) {
     var geometry;
     var detail;
     var i;
+    var t = Math.sqrt(3);
     
     var vertices = [
         // Back 
-        -1,  1, -1,
-         1,  1, -1,
-         0, -1,  0,
+         1, -1, -1 / t,
+        -1, -1, -1 / t,
+         0,  1,  0,
         
         // Right
-         0,  1,  1,
-         0, -1,  0,
-         1,  1, -1,
+         0,  1,  0,
+         0, -1, t - 1 / t,
+         1, -1, -1 / t,
 
         // Left
-        -1,  1, -1,
-         0, -1,  0,
-         0,  1,  1,
+         0,  1,  0,
+        -1, -1, -1 / t,
+         0, -1,  t - 1 / t,
 
         // Bottom
-        -1,  1, -1,
-         0,  1,  1,
-         1,  1, -1,
+         0, -1,  t - 1 / t,
+        -1, -1, -1 / t,
+         1, -1, -1 / t,
     ];
 
     var indices = [
