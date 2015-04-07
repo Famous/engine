@@ -3,8 +3,6 @@
 var Transitionable = require('famous-transitions/src/Transitionable');
 var Quaternion = require('famous-math/src/Quaternion');
 
-var Q_REGISTER = new Quaternion();
-
 function Vec3Transitionable() {
     this._dirty = false;
     this._x = new Transitionable(0);
@@ -13,53 +11,77 @@ function Vec3Transitionable() {
 }
 
 Vec3Transitionable.prototype.set = function set(x, y, z, options, callback) {
-    this.dirty = true;
+    this._dirty = true;
     this._x.set(x, options);
     this._y.set(y, options);
     this._z.set(z, options, callback);
     return this;
-}
+};
 
 Vec3Transitionable.prototype.isActive = function isActive() {
     return this._x.isActive() || this._y.isActive() || this._z.isActive();
 };
 
+Vec3Transitionable.prototype.halt = function halt() {
+    this._x.halt();
+    this._y.halt();
+    this._z.halt();
+    return this;
+};
+
 function QuatTransitionable() {
+    this._queue = [];
+    this._front = -1;
+    this._end = 0;
     this._dirty = false;
-    this._eulers = {x: 0, y: 0, z: 0};
     this._t = new Transitionable(0);
     this._lastQ = new Quaternion();
-    this._q = new Quaternion();
     this._targetQ = new Quaternion();
+    this._q = new Quaternion();
+    this._eulers = {x: 0, y: 0, z: 0};
 }
 
 QuatTransitionable.prototype.get = function get() {
-    this._lastQ.slerp(this._targetQ, this._t.get(), this._q);
+    var t = this._t.get();
+    if (this._queue.length > 0 && t >= this._front + 1) {
+        this._front++;
+        this._lastQ.copy(this._q);
+        this._targetQ = this._queue.shift();
+    }
+    this._lastQ.slerp(this._targetQ, t - this._front, this._q);
     this._q.toEuler(this._eulers);
     return this._eulers;
 };
 
-QuatTransitionable.prototype.set = function set(x, y, z, options, callback) {
-    this.dirty = true;
-    this._lastQ.copy(this._q);
-    this._targetQ.fromEuler(x, y, z);
-    this._t.reset().set(0).set(1, options, callback);
+QuatTransitionable.prototype.set = function set(q, options, callback) {
+    this._dirty = true;
+    this._queue.push(q);
+    this._end++;
+    this._t.set(this._end, options, callback);
+    this.get();
     return this;
 };
 
-QuatTransitionable.prototype.rotate = function rotate(x, y, z, options, callback) {
-    this.dirty = true;
-    this._lastQ.copy(this._q);
-    this._targetQ.fromEuler(x, y, z).leftMultiply(this._lastQ);
-    this._t.reset().set(0).set(1, options, callback);
+QuatTransitionable.prototype.isActive = function isActive() {
+    return this._t.isActive();
+};
+
+QuatTransitionable.prototype.halt = function halt() {
+    this._dirty = false;
+    this._t.reset(0);
+    this._queue.length = 0;
+    this._front = -1;
+    this._end = 0;
     return this;
 };
 
 /**
+ * Interface to manage various aspects of the transform and facilitate transitions.
+ *
  * @class Transform
  * @constructor
  * @component
- * @param {LocalDispatch} dispatch LocalDispatch to be retrieved from corresponding Render Node of the Transform component
+ * @param {LocalDispatch} dispatch LocalDispatch to be retrieved from corresponding Render Node of the Transform component.
  */
 function Transform(dispatch) {
     this._dispatch = dispatch;
@@ -73,11 +95,10 @@ function Transform(dispatch) {
 }
 
 /**
-*
-* stringifies Transform constructor
+* The String form of the Transform component.
 *
 * @method
-* @return {String} the definition of the Component Class: 'Transform'
+* @return {String} 'Transform'
 */
 Transform.toString = function toString() {
     return 'Transform';
@@ -125,13 +146,15 @@ Transform.prototype.translate = function translate(x, y, z, options, callback) {
 Transform.prototype.setRotation = function setRotation(x, y, z, options, callback) {
     this._dispatch.dirtyComponent(this._id);
     if (!this.rotation) this.rotation = new QuatTransitionable();
-    this.rotation.set(x, y, z, options, callback);
+    var q = new Quaternion().fromEuler(x, y, z);
+    this.rotation.set(q, options, callback);
 };
 
 Transform.prototype.rotate = function rotate(x, y, z, options, callback) {
     this._dispatch.dirtyComponent(this._id);
     if (!this.rotation) this.rotation = new QuatTransitionable();
-    this.rotation.rotate(x, y, z, options, callback);
+    var q = new Quaternion().fromEuler(x, y, z).leftMultiply(this.rotation._targetQ);
+    this.rotation.set(q, options, callback);
 };
 
 Transform.prototype.clean = function clean() {
