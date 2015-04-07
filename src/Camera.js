@@ -12,11 +12,9 @@ function Camera(node) {
     this._focalDepth = 0;
     this._near = 0;
     this._far = 0;
+    this._requestingUpdate = false;
     this._id = node.addComponent(this);
     this._viewTransform = new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
-
-    node.onTransformChange(buildViewTransform.bind(this));
-
     this.setFlat();
 }
 
@@ -41,7 +39,6 @@ Camera.prototype.getState = function getState() {
 
 
 Camera.prototype.setState = function setState(state) {
-    this._node.dirtyComponent(this._id);
     if (state.component === this.constructor.toString()) {
         this.set(state.projectionType, state.focalDepth, state.near, state.far);
         return true;
@@ -50,7 +47,10 @@ Camera.prototype.setState = function setState(state) {
 };
 
 Camera.prototype.set = function set(type, depth, near, far) {
-    this._node.dirtyComponent(this._id);
+    if (!this._requestingUpdate) {
+        this._node.requestUpdate(this._id);
+        this._requestingUpdate = true;
+    }
     this._projectionType = type;
     this._focalDepth = depth;
     this._near = near;
@@ -58,7 +58,10 @@ Camera.prototype.set = function set(type, depth, near, far) {
 };
 
 Camera.prototype.setDepth = function setDepth(depth) {
-    this._node.dirtyComponent(this._id);
+    if (!this._requestingUpdate) {
+        this._node.requestUpdate(this._id);
+        this._requestingUpdate = true;
+    }
     this._projectionType = Camera.PINHOLE_PROJECTION;
     this._focalDepth = depth;
     this._near = 0;
@@ -68,7 +71,10 @@ Camera.prototype.setDepth = function setDepth(depth) {
 };
 
 Camera.prototype.setFrustum = function setFrustum(near, far) {
-    this._node.dirtyComponent(this._id);
+    if (!this._requestingUpdate) {
+        this._node.requestUpdate(this._id);
+        this._requestingUpdate = true;
+    }
     this._projectionType = Camera.FRUSTUM_PROJECTION;
     this._focalDepth = 0;
     this._near = near;
@@ -78,7 +84,10 @@ Camera.prototype.setFrustum = function setFrustum(near, far) {
 };
 
 Camera.prototype.setFlat = function setFlat() {
-    this._node.dirtyComponent(this._id);
+    if (!this._requestingUpdate) {
+        this._node.requestUpdate(this._id);
+        this._requestingUpdate = true;
+    }
     this._projectionType = Camera.ORTHOGRAPHIC_PROJECTION;
     this._focalDepth = 0;
     this._near = 0;
@@ -87,11 +96,10 @@ Camera.prototype.setFlat = function setFlat() {
     return this;
 };
 
-
-MountPoint.prototype.onUpdate = function onUpdate() {
+Camera.prototype.onUpdate = function onUpdate() {
     this._requestingUpdate = false;
 
-    var path = this._node.getRenderPath();
+    var path = this._node.getLocation();
 
     this._node
         .sendDrawCommand('WITH')
@@ -137,18 +145,17 @@ MountPoint.prototype.onUpdate = function onUpdate() {
         this._node.sendDrawCommand(this._viewTransform[14]);
         this._node.sendDrawCommand(this._viewTransform[15]);
     }
-    return false;
 };
 
 
-function buildViewTransform(transform) {
-    var a = transform._matrix;
+Camera.prototype.onTransformChange = function onTransformChange(transform) {
+    var a = transform;
     this._viewDirty = true;
 
-    if (!this._requestingUpdate) {
-        this._node.requestUpdate(this._id);
-        this._requestingUpdate = true;
-    }
+    // if (!this._requestingUpdate) {
+    //     this._node.requestUpdate(this._id);
+    //     this._requestingUpdate = true;
+    // }
 
     var a00 = a[0], a01 = a[1], a02 = a[2], a03 = a[3],
     a10 = a[4], a11 = a[5], a12 = a[6], a13 = a[7],

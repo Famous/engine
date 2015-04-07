@@ -1,6 +1,7 @@
 'use strict';
 
 var Transitionable = require('famous-transitions').Transitionable;
+var CoreSize = require('famous-core').Size;
 
 /**
  * Size component used for managing the size of the underlying RenderContext.
@@ -18,7 +19,6 @@ function Size(node) {
     this._node = node;
     this._id = node.addComponent(this);
     this._requestingUpdate = false;
-    this._absoluteMode = false;
     this._proportional = {
         x: new Transitionable(1),
         y: new Transitionable(1),
@@ -35,6 +35,16 @@ function Size(node) {
         z: new Transitionable(0)
     };
 }
+
+Size.RELATIVE = CoreSize.RELATIVE;
+Size.ABSOLUTE = CoreSize.ABSOLUTE;
+Size.RENDER = CoreSize.RENDER;
+Size.DEFAULT = CoreSize.DEFAULT;
+
+Size.prototype.setMode = function setMode(x, y, z) {
+    this._node.setSizeMode(x, y, z);
+    return this;
+};
 
 /** 
 * Stringifies Size.
@@ -80,18 +90,13 @@ Size.toString = function toString() {
 * @return {absoluteSizeState|relativeSizeState}
 */
 Size.prototype.getState = function getState() {
-    if (this._absoluteMode) {
-        return {
-            component: this.constructor.toString(),
-            type: 'absolute',
+    return {
+        sizeMode: this._node.value.sizeMode,
+        absolute: {
             x: this._absolute.x.get(),
             y: this._absolute.y.get(),
             z: this._absolute.z.get()
-        };
-    }
-    return {
-        component: this.constructor.toString(),
-        type: 'relative',
+        },
         differential: {
             x: this._differential.x.get(),
             y: this._differential.y.get(),
@@ -119,14 +124,16 @@ Size.prototype.getState = function getState() {
 */
 Size.prototype.setState = function setState(state) {
     if (state.component === this.constructor.toString()) {
-        this._absoluteMode = state.type === 'absolute';
-        if (this._absoluteMode)
-            this.setAbsolute(state.x, state.y, state.z);
-        else {
-            this.setProportional(state.proportional.x, state.proportional.y, state.proportional.z);
-            this.setDifferential(state.differential.x, state.differential.y, state.differential.z);
+        this.setMode.apply(this, state.sizeMode);
+        if (state.absolute) {
+            this.setAbsolute(state.absolute.x, state.absolute.y, state.absolute.z);
         }
-        return true;
+        if (state.differential) {
+            this.setAbsolute(state.differential.x, state.differential.y, state.differential.z);
+        }
+        if (state.proportional) {
+            this.setAbsolute(state.proportional.x, state.proportional.y, state.proportional.z);
+        }
     }
     return false;
 };
@@ -135,33 +142,35 @@ Size.prototype._isActive = function _isActive(type) {
     return type.x.isActive() || type.y.isActive() || type.z.isActive();
 };
 
-Size.prototype.onUpdate = function onUpdate() {
-    var dirty;
-    if (this._absoluteMode) {
-        var abs = this._absolute;
-        this._node.setAbsolute(
-            abs.x.get(),
-            abs.y.get(),
-            abs.z.get()
-        );
-        dirty = this._isActive(abs);
-    } else {
-        var prop = this._proportional;
-        var diff = this._differential;
-        this._node.setProportions(
-            prop.x.get(),
-            prop.y.get(),
-            prop.z.get()
-        );
-        this._node.setDifferential(
-            diff.x.get(),
-            diff.y.get(),
-            diff.z.get()
-        );
-        dirty = this._isActive(prop) || this._isActive(diff);
-    }
+Size.prototype.isActive = function isActive(){
+    return (
+        this._isActive(this._absolute) ||
+        this._isActive(this._proportional) ||
+        this._isActive(this._differential)
+    );
+};
 
-    if (dirty) this._node.requestUpdateOnNextTick(this._id);
+Size.prototype.onUpdate = function onUpdate() {
+    var abs = this._absolute;
+    this._node.setAbsoluteSize(
+        abs.x.get(),
+        abs.y.get(),
+        abs.z.get()
+    );
+    var prop = this._proportional;
+    var diff = this._differential;
+    this._node.setProportionalSize(
+        prop.x.get(),
+        prop.y.get(),
+        prop.z.get()
+    );
+    this._node.setDifferentialSize(
+        diff.x.get(),
+        diff.y.get(),
+        diff.z.get()
+    );
+
+    if (this.isActive()) this._node.requestUpdateOnNextTick(this._id);
     else this._requestingUpdate = false;
 };
 
@@ -186,7 +195,6 @@ Size.prototype.setAbsolute = function setAbsolute(x, y, z, options, callback) {
         this._requestingUpdate = true;
     }
     var abs = this._absolute;
-    this._absoluteMode = true;
     if (x != null) {
         abs.x.set(x, options, callback);
     }
@@ -219,7 +227,6 @@ Size.prototype.setProportional = function setProportional(x, y, z, options, call
         this._requestingUpdate = true;
     }
     var prop = this._proportional;
-    this._absoluteMode = false;
     if (x != null) {
         prop.x.set(x, options, callback);
     }
@@ -250,17 +257,15 @@ Size.prototype.setDifferential = function setDifferential(x, y, z, options, call
         this._node.requestUpdate(this._id);
         this._requestingUpdate = true;
     }
-
-    var prop = this._differential;
-    this._absoluteMode = false;
+    var diff = this._differential;
     if (x != null) {
-        prop.x.set(x, options, callback);
+        diff.x.set(x, options, callback);
     }
     if (y != null) {
-        prop.y.set(y, options, callback);
+        diff.y.set(y, options, callback);
     }
     if (z != null) {
-        prop.z.set(z, options, callback);
+        diff.z.set(z, options, callback);
     }
     return this;
 };

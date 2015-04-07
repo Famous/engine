@@ -70,8 +70,6 @@ Opacity.prototype.setState = function setState(state) {
 * @chainable
 */
 Opacity.prototype.set = function set(value, options, callback) {
-    this._dispatch.dirtyComponent(this._id);
-
     if (!this._requestingUpdate) {
         this._node.requestUpdate(this._id);
         this._requestingUpdate = true;

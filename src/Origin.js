@@ -27,7 +27,7 @@ Origin.toString = function toString() {
 Origin.prototype = Object.create(Position.prototype);
 Origin.prototype.constructor = Origin;
 
-Rotation.prototype.onUpdate = function onUpdate() {
+Origin.prototype.onUpdate = function onUpdate() {
     this._node.setOrigin(this._x.get(), this._y.get(), this._z.get());
     
     if (this.isActive()) this._node.requestUpdateOnNextTick(this._id);
