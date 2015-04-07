@@ -127,4 +127,11 @@ Famous.prototype.message = function message (messages) {
     return this;
 };
 
+Famous.prototype.createContext = function createContext () {
+    console.error(
+        'Famous#createContext is deprecated!' + 
+        'Use new Context instead!'
+    );
+};
+
 module.exports = new Famous();
