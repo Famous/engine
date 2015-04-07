@@ -660,7 +660,7 @@ Node.prototype.onUpdate = function onUpdate (time) {
     }
 };
 
-Node.prototype.onMount = function onMount (parent, myId) {
+Node.prototype.mount = function mount (parent, myId) {
     if (this.isMounted()) return; 
     var i = 0;
     var list = this._components;
@@ -688,7 +688,7 @@ Node.prototype.onMount = function onMount (parent, myId) {
     if (this._requestingUpdate) this._requestUpdate(true);
 };
 
-Node.prototype.onDismount = function onDismount () {
+Node.prototype.dismount = function dismount () {
     if (!this.isMounted()) return; 
     var i = 0;
     var list = this._components;
@@ -738,6 +738,10 @@ Node.prototype.onParentSizeChange = Node.prototype._requestUpdate;
 Node.prototype.onShow = Node.prototype.show;
 
 Node.prototype.onHide = Node.prototype.hide;
+
+Node.prototype.onMount = Node.prototype.mount;
+
+Node.prototype.onDismount = Node.prototype.dismount;
 
 Node.prototype.onReceive = function onRecieve (event, payload) {
     console.log(event, payload);
