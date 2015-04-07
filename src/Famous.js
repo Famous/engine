@@ -80,7 +80,7 @@ Famous.prototype.handleWith = function handleWith (messages) {
         case 'TRIGGER':
             var type = messages.shift();
             var ev = messages.shift();
-            if (type === 'resize') this.getContext(path)._receiveContextSize(ev);
+            this.getContext(path).getDispatch().dispatchUIEvent(path, type, ev);
             break;
         default:
             console.error('Unknown command ' + command);
@@ -116,7 +116,7 @@ Famous.prototype.registerContext = function registerContext (selector, context) 
 };
 
 Famous.prototype.getContext = function getContext (selector) {
-    return this._contexts[selector];
+    return this._contexts[selector.split('/')[0]];
 };
 
 Famous.prototype.getClock = function getClock () {

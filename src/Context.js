@@ -52,4 +52,12 @@ Context.prototype._receiveContextSize = function _receiveContextSize (size) {
     this.setAbsoluteSize(size[0], size[1], size[2]);
 };
 
+Context.prototype.onReceive = function onReceive (event, payload) {
+    if (event === 'CONTEXT_RESIZE') {
+        this.setSizeMode(Size.ABSOLUTE, Size.ABSOLUTE, Size.ABSOLUTE);
+        this.setAbsoluteSize(payload[0], payload[1], payload[2]);
+    }
+};
+
 module.exports = Context;
+

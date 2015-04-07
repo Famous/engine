@@ -61,6 +61,7 @@ function _splitTo (string, target) {
             last = i + 1;
         }
     }
+    if (!target.length && string.length) target.push(string);
     return target;
 }
 
