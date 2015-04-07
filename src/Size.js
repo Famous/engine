@@ -1,6 +1,7 @@
 'use strict';
 
 var Transitionable = require('famous-transitions').Transitionable;
+var CoreSize = require('famous-core').Size;
 
 /**
  * Size component used for managing the size of the underlying RenderContext.
@@ -34,6 +35,11 @@ function Size(node) {
         z: new Transitionable(0)
     };
 }
+
+Size.RELATIVE = CoreSize.RELATIVE;
+Size.ABSOLUTE = CoreSize.ABSOLUTE;
+Size.RENDER = CoreSize.RENDER;
+Size.DEFAULT = CoreSize.DEFAULT;
 
 Size.prototype.setMode = function setMode(x, y, z) {
     this._node.setSizeMode(x, y, z);
