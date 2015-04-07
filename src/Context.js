@@ -4,7 +4,6 @@ var Camera = require('famous-components').Camera;
 
 function Context(selector, compositor) {
     this._rootEl = document.querySelector(selector);
-
     if (this._rootEl === document.body) {
         window.addEventListener('resize', this.updateSize.bind(this));
     }

@@ -1,7 +1,6 @@
 'use strict';
 
 var VirtualElement = require('famous-dom-renderers').VirtualElement;
-var Camera = require('famous-components').Camera;
 var strip = require('famous-utilities').strip;
 var flatClone = require('famous-utilities').flatClone;
 
