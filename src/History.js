@@ -1,5 +1,7 @@
 'use strict';
 
+var sessionHistorySupport = window.history && window.history.pushState && window.history.replaceState;
+
 /**
  * A stateless shim for hash routing. Used by router.
  *   Supports hash bang routing and HTML5 pushState.
@@ -165,7 +167,5 @@ History.prototype.getState = function getState() {
         return decodeURI(this._location.pathname).substring(this._root.length);
     }
 };
-
-var sessionHistorySupport = window.history && window.history.pushState && window.history.replaceState;
 
 module.exports = History;
