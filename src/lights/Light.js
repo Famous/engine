@@ -14,14 +14,14 @@ function Light(dispatch) {
     this._id = dispatch.addComponent(this);
     this.queue = [];
     this._color;
-    this.commands = { color: '' };
+    this.commands = { color: 'GL_LIGHT_COLOR' };
 };
 
 /**
 * Returns the definition of the Class: 'Light'
 *
 * @method toString
-* @return {string} definition
+* @return {String} definition
 */
 Light.toString = function toString() {
     return 'Light';
@@ -35,6 +35,7 @@ Light.toString = function toString() {
 * @chainable
 */
 Light.prototype.setColor = function setColor(color) {
+    if (!color.getNormalizedRGB) return false;
     this._dispatch.dirtyComponent(this._id);
     this._color = color;
     this.queue.push(this.commands.color);
@@ -46,15 +47,13 @@ Light.prototype.setColor = function setColor(color) {
 };
 
 /**
-* Returns the current color value. Defaults to RGB values if no option is
-* provided.
+* Returns the current color.
 
 * @method getColor
-* @param {String} option Optional for returning in RGB or in Hex
-* @returns {Number} value The color value. Defaults to RGB.
+* @returns {Color} Color.
 */
 Light.prototype.getColor = function getColor(option) {
-    return (this._color.getColor) ? this._color.getColor(option) : this._color;
+    return this._color;
 };
 
 /**
@@ -62,7 +61,7 @@ Light.prototype.getColor = function getColor(option) {
 *
 * @private
 * @method clean
-* @returns {boolean} Boolean
+* @returns {Boolean} Boolean
 */
 Light.prototype.clean = function clean() {
     var path = this._dispatch.getRenderPath();

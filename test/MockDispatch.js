@@ -4,6 +4,8 @@ function MockDispatch() {}
 
 MockDispatch.prototype.addRenderable = function addRenderable() {};
 
+MockDispatch.prototype.addComponent = function addComponent() {};
+
 MockDispatch.prototype.getRenderPath = function getRenderPath() {
     return 'body/0/1';
 };
@@ -24,6 +26,8 @@ MockDispatch.prototype.getContext = function getContext() {
 MockDispatch.prototype.sendDrawCommand = function sendDrawCommand() { return this };
 
 MockDispatch.prototype.dirtyRenderable = function dirtyRenderable() {};
+
+MockDispatch.prototype.dirtyComponent = function dirtyComponent() {};
 
 MockDispatch.prototype.onTransformChange = function onTransformChange() {};
 
