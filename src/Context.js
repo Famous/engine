@@ -60,7 +60,7 @@ Context.prototype.draw = function draw() {
 
 Context.prototype.getRootSize = function getRootSize() {
     return this._size;
-}
+};
 
 Context.prototype.receive = function receive(pathArr, path, commands) {
     var pointer = this._children;
@@ -69,7 +69,6 @@ Context.prototype.receive = function receive(pathArr, path, commands) {
     var parentEl = this.DOMRenderer;
 
     var element;
-
     switch (renderTag) {
         case 'DOM': 
             while (pathArr.length) {
@@ -93,37 +92,20 @@ Context.prototype.receive = function receive(pathArr, path, commands) {
 
         default: break;
     }
+    
 
     while (commands.length) {
         var command = commands.shift();
 
         switch (command) {
             case 'CHANGE_TRANSFORM':
-                var matrix = [
-                    commands.shift(),
-                    commands.shift(),
-                    commands.shift(),
-                    commands.shift(),
-                    commands.shift(),
-                    commands.shift(),
-                    commands.shift(),
-                    commands.shift(),
-                    commands.shift(),
-                    commands.shift(),
-                    commands.shift(),
-                    commands.shift(),
-                    commands.shift(),
-                    commands.shift(),
-                    commands.shift(),
-                    commands.shift()
-                ];
-
-                element.setMatrix.apply(
-                    element,
-                    matrix
-                );
-
-                   if (this.WebGLRenderer) this.WebGLRenderer.setCutoutUniform(path, 'transform', matrix);
+                
+                element.setMatrix(commands.shift(), commands.shift(), commands.shift(), commands.shift(),
+                                  commands.shift(), commands.shift(), commands.shift(), commands.shift(),
+                                  commands.shift(), commands.shift(), commands.shift(), commands.shift(),
+                                  commands.shift(), commands.shift(), commands.shift(), commands.shift());
+                
+                if (this.WebGLRenderer) this.WebGLRenderer.setCutoutUniform(path, 'transform', matrix);
 
                 break;
 
