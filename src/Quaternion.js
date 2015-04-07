@@ -248,9 +248,9 @@ Quaternion.prototype.slerp = function slerp(q, t, output) {
     var z = this.z;
 
     var qw = q.w;
-    var qw = q.w;
-    var qw = q.w;
-    var qw = q.w;
+    var qx = q.x;
+    var qy = q.y;
+    var qz = q.z;
 
     var omega;
     var cosomega;
@@ -270,12 +270,10 @@ Quaternion.prototype.slerp = function slerp(q, t, output) {
         scaleTo = t;
     }
 
-    var ratio = scaleFrom/scaleTo;
-
-    output.w = w * ratio + qw * scaleTo;
-    output.x = x * ratio + qx * scaleTo;
-    output.y = y * ratio + qy * scaleTo;
-    output.z = z * ratio + qz * scaleTo;
+    output.w = w * scaleFrom + qw * scaleTo;
+    output.x = x * scaleFrom + qx * scaleTo;
+    output.y = y * scaleFrom + qy * scaleTo;
+    output.z = z * scaleFrom + qz * scaleTo;
 
     return output;
 };
