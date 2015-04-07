@@ -108,7 +108,7 @@ Compositor.prototype.giveSizeFor = function giveSizeFor(commands) {
  * @param  {Array} size         new context size
  */
 Compositor.prototype.sendResize = function sendResize (selector, size) {
-    this._outCommands.push('WITH', selector, 'TRIGGER', 'resize', size);
+    this._outCommands.push('WITH', selector, 'TRIGGER', 'CONTEXT_RESIZE', size);
     this._sentResize = true;
 };
 
