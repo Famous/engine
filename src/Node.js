@@ -129,7 +129,6 @@ Node.prototype.getParent = function getParent () {
 };
 
 Node.prototype.requestUpdate = function requestUpdate (id) {
-    if (!this.isMounted()) return;
     if (this._inUpdate) return this.requestUpdateOnNextTick(id);
     this._updateQueue.push(id);
     if (!this._requestingUpdate) this._requestUpdate();
