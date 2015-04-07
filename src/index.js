@@ -1,5 +1,6 @@
 'use strict';
 
 module.exports = {
-    HTMLElement: require('./HTMLElement')
+    HTMLElement: require('./HTMLElement'),
+    DOMElement: require('./DOMElement')
 };

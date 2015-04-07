@@ -7,9 +7,11 @@ function DOMElement (node, tagName) {
 
     this._changeQueue = [];
     
-    this._classes = [];
+    this._classes = ['fa-surface'];
     this._requestingEventListeners = [];
-    this._styles = {};
+    this._styles = {
+        display: 'none' 
+    };
     this._attributes = {};
     this._content = null;
 
@@ -26,15 +28,35 @@ DOMElement.prototype.getValue = function getValue () {
     };
 };
 
+DOMElement.prototype.onUpdate = function onUpdate () {
+    var path = this._path;
+    var node = this._node;
+    var queue = this._changeQueue;
+    var len = queue.length;
+    
+    if (len && path && node) {
+        node.sendDrawCommand('WITH');
+        node.sendDrawCommand(path);
+        node.sendDrawCommand('DOM');
+
+        while (len--) node.sendDrawCommand(queue.shift());
+    }
+
+    this._requestingUpdate = false;
+};
+
 DOMElement.prototype.onMount = function onMount (node, path, id) {
     this._node = node;
     this._path = path;
     this._id = id;
     this.draw();
+    this.setAttribute('data-fa-path', node.getLocation());
 };
 
 DOMElement.prototype.onDismount = function onDismount () {
-    this._recall();
+    this.setProperty('display', 'none');
+    this.setAttribute('data-fa-path', '');
+    this._changeQueue.push('RECALL');
 };
 
 DOMElement.prototype.onShow = function onShow () {
@@ -43,6 +65,7 @@ DOMElement.prototype.onShow = function onShow () {
 
 DOMElement.prototype.onHide = function onHide () {
     this.setProperty('display', 'none');
+    this._changeQueue.push('RECALL');
 };
 
 DOMElement.prototype.onTransformChange = function onTransformChange (transform) {
@@ -57,8 +80,11 @@ DOMElement.prototype.onSizeChange = function onSizeChange (size) {
     var sizeMode = this._node.getSizeMode();
     var sizedX = sizeMode[0] !== Node.RENDER_SIZE;
     var sizedY = sizeMode[1] !== Node.RENDER_SIZE;
-    if (sizedX) this.setProperty('width', size[0] + 'px');
-    if (sizedY) this.setProperty('height', size[1] + 'px');
+    this._changeQueue.push('CHANGE_SIZE',
+            sizedX ? size[0] : sizedX,
+            sizedY ? size[1] : sizedY);
+
+    if (!this._requestingUpdate) this._requestUpdate();
 };
 
 DOMElement.prototype.onAddUIEvent = function onAddUIEvent (UIEvent, methods, properties) {
@@ -86,6 +112,8 @@ DOMElement.prototype._requestUpdate = function _requestUpdate () {
 
 DOMElement.prototype.init = function init () {
     this._changeQueue.push('INIT_DOM', this._tagName);
+    this.onTransformChange(this._node.getTransform());
+    this.onSizeChange(this._node.getSize());
     if (!this._requestingUpdate) this._requestUpdate();
 };
 
@@ -130,7 +158,7 @@ DOMElement.prototype.setAttribute = function setAttribute (name, value) {
 DOMElement.prototype.setProperty = function setProperty (name, value) {
     if (this._styles[name] !== value || this._inDraw) {
         this._styles[name] = value;
-        this._changeQueue.push('CHANGE_PROERPTY', name, value);
+        this._changeQueue.push('CHANGE_PROPERTY', name, value);
         if (!this._requestingUpdate) this._requestUpdate();
     }
 };
@@ -153,8 +181,9 @@ DOMElement.prototype.draw = function draw () {
 
     for (key in this._attributes)
         if (this._attributes[key])
-            this.setAttribute(key, value);
+            this.setAttribute(key, this._attributes[key]);
 
+    this._inDraw = false;
 };
 
 module.exports = DOMElement;
