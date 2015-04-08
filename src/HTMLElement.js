@@ -111,8 +111,7 @@ HTMLElement.prototype.clean = function clean() {
     	var path = this._dispatch.getRenderPath();
     	this._dispatch
             .sendDrawCommand(WITH)
-            .sendDrawCommand(path)
-            .sendDrawCommand('DOM');
+            .sendDrawCommand(path);
 
     	for (var i = 0 ; i < len ; i++)
     	    this._dispatch.sendDrawCommand(this._queue.shift());
