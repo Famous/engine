@@ -1,3 +1,5 @@
+'use strict';
+
 // Generates a checkerboard pattern to be used as a placeholder texture
 // while an image loads over the network.
 

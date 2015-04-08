@@ -1,0 +1,21 @@
+{
+	"browser": true,
+	"browserify": true,
+	"globalstrict": true,
+
+	"boss": true,
+	"eqeqeq": true,
+	"eqnull": true,
+	"expr": true,
+	"latedef": "nofunc",
+	"unused": true,
+	"undef": true,
+	"nonew": true,
+	"globals": {
+		"performance": true,
+		"Symbol": true,
+		"console": true
+	},
+
+	"validthis": true
+}
