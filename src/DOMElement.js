@@ -166,6 +166,15 @@ DOMElement.prototype.setProperty = function setProperty (name, value) {
     return this;
 };
 
+DOMElement.prototype.setContent = function setContent (content) {
+    if (this._content !== content || this._inDraw) {
+        this._content = content;
+        this._changeQueue.push('CHANGE_CONTENT', content);
+        this._requestUpdate();
+    }
+    return this;
+};
+
 DOMElement.prototype.draw = function draw () {
     var key;
     var i;
