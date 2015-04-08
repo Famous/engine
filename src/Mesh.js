@@ -208,8 +208,7 @@ Mesh.prototype.clean = function clean() {
 
     this.dispatch
         .sendDrawCommand('WITH')
-        .sendDrawCommand(path)
-        .sendDrawCommand('WEBGL');
+        .sendDrawCommand(path);
 
     if (this._geometry) {
         i = this._geometry.spec.invalidations.length;

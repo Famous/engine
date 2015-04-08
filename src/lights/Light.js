@@ -68,8 +68,7 @@ Light.prototype.clean = function clean() {
 
     this._dispatch
         .sendDrawCommand('WITH')
-        .sendDrawCommand(path)
-        .sendDrawCommand('WEBGL');
+        .sendDrawCommand(path);
 
     var i = this.queue.length;
     while (i--) {
