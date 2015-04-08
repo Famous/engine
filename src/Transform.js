@@ -12,9 +12,19 @@ function Vec3Transitionable() {
 
 Vec3Transitionable.prototype.set = function set(x, y, z, options, callback) {
     this._dirty = true;
-    this._x.set(x, options);
-    this._y.set(y, options);
-    this._z.set(z, options, callback);
+
+    var cbX = null;
+    var cbY = null;
+    var cbZ = null;
+
+    if (z != null) cbZ = callback;
+    else if (y != null) cbY = callback;
+    else if (x != null) cbX = callback;
+
+    if (x != null) this._x.set(x, options, cbX);
+    if (y != null) this._y.set(y, options, cbY);
+    if (z != null) this._z.set(z, options, cbZ);
+
     return this;
 };
 
@@ -143,7 +153,7 @@ Transform.prototype.translate = function translate(x, y, z, options, callback) {
     this.position.set(curX + x, curY + y, curZ + z, options, callback);
 };
 
-Transform.prototype.setRotation = function setRotation(x, y, z, options, callback) {
+Transform.prototype.setRotation = function setRotation(x, y, z, options, callback, bool) {
     this._dispatch.dirtyComponent(this._id);
     if (!this.rotation) this.rotation = new QuatTransitionable();
     var q = new Quaternion().fromEuler(x, y, z);
