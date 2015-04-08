@@ -13,7 +13,7 @@ var Transform = require('./Transform');
 function Origin () {
     this.x = 0;
     this.y = 0;
-    this.z = 0;
+    this.z = 0.5;
     this.isActive = false;
     this.dirty = false;
     this.toOriginTransform = new Transform();
@@ -48,7 +48,7 @@ Origin.prototype.set = function set (x, y, z) {
 Origin.prototype.update = function update (size) {
     var x = size[0] * this.x;
     var y = size[1] * this.y;
-    var z = size[2] * this.z;
+    var z = size[2] * (this.z - 0.5);
     this.toOriginTransform.setTranslation(-x, -y, -z);
     this.fromOriginTransform.setTranslation(x, y, z);
     return this.transform;
