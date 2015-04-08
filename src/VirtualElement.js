@@ -70,14 +70,19 @@ VirtualElement.prototype.getTarget = function getTarget () {
     return this._target;
 };
 
-VirtualElement.prototype.getOrSetElement = function getOrSetElement (path, index, commands) {
-    if (this._children[index]) return this._children[index];
-    commands.shift();
-    this._tagName = commands.shift();
-    var div = this._allocator.allocate(this._tagName);
+VirtualElement.prototype.addChild = function addChild(path, index, tagName) {
+    this._tagName = tagName;
+
+    var div = this._allocator.allocate(tagName);
     var child = new VirtualElement(div, path, this._renderer, this, this._rootElement);
+
     this._children[index] = child;
+
     return child;
+};
+
+VirtualElement.prototype.getChild = function getChild(index) {
+    return this._children[index];
 };
 
 function _mirror(item, target, reference) {
