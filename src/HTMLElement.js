@@ -26,12 +26,23 @@ var RECALL = 'RECALL';
  * @component
  * @param {RenderNode} RenderNode to which the instance of Element will be a component of
  */
-function HTMLElement(dispatch, tagName) {
+function HTMLElement(dispatch, options) {
+    if (typeof options === 'string') {
+        console.warn(
+            'HTMLElement constructor signature changed!\n' +
+            'Pass in an options object with {tagName: ' + options + '} instead.'
+        );
+        options = {
+            tagName: options
+        };
+    }
+
+    options = options || {};
     this._dispatch = dispatch;
     this._id = dispatch.addRenderable(this);
     this._queue = [];
 
-    this._tagName = tagName ? tagName : 'div';
+    this._tagName = options.tagName ? options.tagName : 'div';
     this._transform = new Float32Array(16);
     this._size = [0, 0, 0];
     this._trueSized = [false, false];
@@ -48,6 +59,30 @@ function HTMLElement(dispatch, tagName) {
     this._dispatch.onTransformChange(this._receiveTransformChange.bind(this));
     this._dispatch.onSizeChange(this._receiveSizeChange.bind(this));
     this._dispatch.onOpacityChange(this._receiveOpacityChange.bind(this));
+
+    this._receiveTransformChange(this._dispatch.getContext()._transform);
+    this._receiveSizeChange(this._dispatch.getContext()._size);
+    this._receiveOpacityChange(this._dispatch.getContext()._opacity);
+
+    if (options == null) return;
+
+    if (options.classes) {
+        for (var i = 0; i < options.classes.length; i++)
+            this.addClass(options.classes[i]);
+    }
+
+    if (options.attributes) {
+        for (var key in options.attributes)
+            this.attribute(key, options.attributes[key]);
+    }
+
+    if (options.properties) {
+        for (var key in options.properties)
+            this.property(key, options.properties[key]);
+    }
+
+    if (options.id) this.id(options.id);
+    if (options.content) this.content(options.content);
 }
 
 // Return the name of the Element Class: 'element'
