@@ -414,6 +414,7 @@ Node.prototype.setAlign = function setAlign (x, y, z) {
             if (item && item.onAlignChange) item.onAlignChange(x, y, z);
         }
     }
+    return this;
 };
 
 Node.prototype.setMountPoint = function setMountPoint (x, y, z) {
@@ -437,6 +438,7 @@ Node.prototype.setMountPoint = function setMountPoint (x, y, z) {
             if (item && item.onMountPointChange) item.onMountPointChange(x, y, z);
         }
     }
+    return this;
 };
 
 Node.prototype.setOrigin = function setOrigin (x, y, z) {
@@ -460,6 +462,7 @@ Node.prototype.setOrigin = function setOrigin (x, y, z) {
             if (item && item.onOriginChange) item.onOriginChange(x, y, z);
         }
     }
+    return this;
 };
 
 
@@ -484,6 +487,7 @@ Node.prototype.setPosition = function setPosition (x, y, z) {
             if (item && item.onPositionChange) item.onPositionChange(x, y, z);
         }
     }
+    return this;
 };
 
 Node.prototype.setRotation = function setRotation (x, y, z) {
@@ -507,6 +511,7 @@ Node.prototype.setRotation = function setRotation (x, y, z) {
             if (item && item.onRotationChange) item.onRotationChange(x, y, z);
         }
     }
+    return this;
 };
 
 Node.prototype.setScale = function setScale (x, y, z) {
@@ -530,6 +535,7 @@ Node.prototype.setScale = function setScale (x, y, z) {
             if (item && item.onScaleChange) item.onScaleChange(x, y, z);
         }
     }
+    return this;
 };
 
 Node.prototype.setOpacity = function setOpacity (val) {
@@ -546,6 +552,7 @@ Node.prototype.setOpacity = function setOpacity (val) {
             if (item && item.onOpacityChange) item.onOpacityChange(val);
         }
     }
+    return this;
 };
 
 Node.prototype.setSizeMode = function setSizeMode (x, y, z) {
@@ -569,6 +576,7 @@ Node.prototype.setSizeMode = function setSizeMode (x, y, z) {
             if (item && item.onSizeModeChange) item.onSizeModeChange(x, y, z);
         }
     }
+    return this;
 };
 
 Node.prototype.setProportionalSize = function setProportionalSize (x, y, z) {
@@ -592,6 +600,7 @@ Node.prototype.setProportionalSize = function setProportionalSize (x, y, z) {
             if (item && item.onProportionalSizeChange) item.onProportionalSizeChange(x, y, z);
         }
     }
+    return this;
 };
 
 Node.prototype.setDifferentialSize = function setDifferentialSize (x, y, z) {
@@ -615,6 +624,7 @@ Node.prototype.setDifferentialSize = function setDifferentialSize (x, y, z) {
             if (item && item.onDifferentialSizeChange) item.onDifferentialSizeChange(x, y, z);
         }
     }
+    return this;
 };
 
 Node.prototype.setAbsoluteSize = function setAbsoluteSize (x, y, z) {
@@ -638,6 +648,7 @@ Node.prototype.setAbsoluteSize = function setAbsoluteSize (x, y, z) {
             if (item && item.onAbsoluteSizeChange) item.onAbsoluteSizeChange(x, y, z);
         }
     }
+    return this;
 };
 
 Node.prototype._transformChanged = function _transformChanged (transform) {
