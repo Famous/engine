@@ -1,5 +1,15 @@
 
-function DOMElement (node, tagName) {
+function DOMElement (node, options) {
+    if (typeof options === 'string') {
+        console.warn(
+            'HTMLElement constructor signature changed!\n' +
+            'Pass in an options object with {tagName: ' + options + '} instead.'
+        );
+        options = {
+            tagName: options
+        };
+    }
+
     this._node = node;
 
     this._requestingUpdate = false;
@@ -14,8 +24,28 @@ function DOMElement (node, tagName) {
     this._attributes = {};
     this._content = null;
 
-    this._tagName = tagName ? tagName : 'div';
+    this._tagName = options && options.tagName ? options.tagName : 'div';
     this._id = node.addComponent(this);
+
+    if (!options) return;
+
+    if (options.classes) {
+        for (var i = 0; i < options.classes.length; i++)
+            this.addClass(options.classes[i]);
+    }
+
+    if (options.attributes) {
+        for (var key in options.attributes)
+            this.setAttribute(key, options.attributes[key]);
+    }
+
+    if (options.properties) {
+        for (var key in options.properties)
+            this.setProperty(key, options.properties[key]);
+    }
+
+    if (options.id) this.setId(options.id);
+    if (options.content) this.setContent(options.content);
 }
 
 DOMElement.prototype.getValue = function getValue () {
@@ -117,7 +147,7 @@ DOMElement.prototype.init = function init () {
     if (!this._requestingUpdate) this._requestUpdate();
 };
 
-DOMElement.prototype.setID = function setID (id) {
+DOMElement.prototype.setId = function setId (id) {
     this.setAttribute('id', id);
     return this;
 };
