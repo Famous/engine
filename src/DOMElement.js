@@ -82,6 +82,7 @@ DOMElement.prototype.onSizeChange = function onSizeChange (size) {
             sizedY ? size[1] : sizedY);
 
     if (!this._requestingUpdate) this._requestUpdate();
+    return this;
 };
 
 DOMElement.prototype.onAddUIEvent = function onAddUIEvent (UIEvent, methods, properties) {
@@ -116,6 +117,7 @@ DOMElement.prototype.init = function init () {
 
 DOMElement.prototype.setID = function setID (id) {
     this.setAttribute('ID', id);
+    return this;
 };
 
 DOMElement.prototype.addClass = function addClass (value) {
@@ -123,25 +125,27 @@ DOMElement.prototype.addClass = function addClass (value) {
         this._changeQueue.push('ADD_CLASS', value);
         this._classes.push(value);
         if (!this._requestingUpdate) this._requestUpdate();
-        return;
+        return this;
     }
 
     if (this._inDraw) {
         this._changeQueue.push('ADD_CLASS', value);
         if (!this._requestingUpdate) this._requestUpdate();
     }
+    return this;
 };
 
 DOMElement.prototype.removeClass = function removeClass (value) {
     var index = this._classes.indexOf(value);
 
-    if (index < 0) return;
+    if (index < 0) return this;
 
     this._changeQueue.push('REMOVE_CLASS', value);
 
     this._classes.splice(index, 1);
 
     if (!this._requestingUpdate) this._requestUpdate();
+    return this;
 };
 
 DOMElement.prototype.setAttribute = function setAttribute (name, value) {
@@ -150,6 +154,7 @@ DOMElement.prototype.setAttribute = function setAttribute (name, value) {
         this._changeQueue.push('CHANGE_ATTRIBUTE', name, value);
         if (!this._requestUpdate) this._requestUpdate();
     }
+    return this;
 };
 
 DOMElement.prototype.setProperty = function setProperty (name, value) {
@@ -158,6 +163,7 @@ DOMElement.prototype.setProperty = function setProperty (name, value) {
         this._changeQueue.push('CHANGE_PROPERTY', name, value);
         if (!this._requestingUpdate) this._requestUpdate();
     }
+    return this;
 };
 
 DOMElement.prototype.draw = function draw () {
