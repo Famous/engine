@@ -5,6 +5,7 @@
   "main": "src/index.js",
   "scripts": {
     "test": "tape test/*.js | tap-spec",
+    "perf": "watchify perf/index.js -o perf/bundle.js -d -v",
     "cover": "browserify -t coverify test/*.js | node | coverify",
     "lint": "jshint --reporter node_modules/jshint-stylish/stylish.js src/"
   },
@@ -23,6 +24,7 @@
     "jshint": "^2.5.11",
     "jshint-stylish": "^1.0.0",
     "tap-spec": "^2.2.0",
-    "tape": "^3.0.3"
+    "tape": "^3.0.3",
+    "watchify": "^3.1.0"
   }
 }

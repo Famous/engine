@@ -1,184 +1,174 @@
 'use strict';
 
-var MultipleTransition = require('./MultipleTransition');
-var TweenTransition = require('./TweenTransition');
+var Curves = require('./Curves');
 
 /**
  * A state maintainer for a smooth transition between
- *    numerically-specified states. Example numeric states include floats or
- *    Transform objects.
+ *    numerically-specified states. Example numeric states include floats and
+ *    arrays of floats objects.
  *
- * An initial state is set with the constructor or set(startState). A
- *    corresponding end state and transition are set with set(endState,
- *    transition). Subsequent calls to set(endState, transition) begin at
- *    the last state. Calls to get(timestamp) provide the interpolated state
- *    along the way.
+ * An initial state is set with the constructor or using
+ *     {@link Transitionable#from}. Subsequent transitions consist of an
+ *     intermediate state, easing curve, duration and callback. The final state
+ *     of each transition is the initial state of the subsequent one. Calls to
+ *     {@link Transitionable#get} provide the interpolated state along the way.
  *
- * Note that there is no event loop here - calls to get() are the only way
- *    to find state projected to the current (or provided) time and are
- *    the only way to trigger callbacks. Usually this kind of object would
- *    be part of the render() path of a visible component.
+ * Note that there is no event loop here - calls to {@link Transitionable#get}
+ *    are the only way to find state projected to the current (or provided)
+ *    time and are the only way to trigger callbacks and mutate the internal
+ *    transition queue.
  *
+ * @example
+ * var t = new Transitionable([0, 0]);
+ * t
+ *     .to([100, 0], 'linear', 1000)
+ *     .delay(1000)
+ *     .to([200, 0], 'outBounce', 1000);
+ * 
+ * var div = document.createElement('div');
+ * div.style.background = 'blue';
+ * div.style.width = '100px';
+ * div.style.height = '100px';
+ * document.body.appendChild(div);
+ * 
+ * div.addEventListener('click', function() {
+ *     t.isPaused() ? t.resume() : t.pause();
+ * });
+ * 
+ * requestAnimationFrame(function loop() {
+ *     div.style.transform = 'translateX(' + t.get()[0] + 'px)' + ' translateY(' + t.get()[1] + 'px)';
+ *     requestAnimationFrame(loop);
+ * });
+ * 
  * @class Transitionable
  * @constructor
- * @param {number|Array.Number|Object.<number|string, number>} start
- *    beginning state
+ * @param {Number|Array.Number} initialState    initial state to transition
+ *                                              from - equivalent to a pursuant
+ *                                              invocation of
+ *                                              {@link Transitionable#from}
  */
-function Transitionable(start) {
-    this._endStateQueue = [];
-    this._transitionQueue = [];
-    this._callbackQueue = [];
-
-    this.reset(start);
-
-    var _this = this;
-    this._boundLoadNext = function() {
-        _this._loadNext();
-    };
+function Transitionable(initialState) {
+    this._queue = [];
+    this._multi = null;
+    this._end = null;
+    this._startedAt = null;
+    this._pausedAt = null;
+    if (initialState != null) this.from(initialState);
 }
 
-var transitionMethods = {};
-
-Transitionable.registerMethod = function registerMethod(name, engineClass) {
-    if (!(name in transitionMethods)) {
-        transitionMethods[name] = engineClass;
-        return true;
-    }
-    else return false;
-};
-
-Transitionable.unregisterMethod = function unregisterMethod(name) {
-    if (name in transitionMethods) {
-        delete transitionMethods[name];
-        return true;
-    }
-    else return false;
-};
-
-Transitionable.prototype._loadNext = function _loadNext() {
-    if (this._transitionQueue.length === 0) {
-        this.set(this.get()); // no update required
-        return;
-    }
-    this._currentEndState = this._endStateQueue.shift();
-    this._currentTransition = this._transitionQueue.shift();
-    this._callback = this._callbackQueue.shift();
-
-    var method = null;
-    if (this._currentTransition instanceof Object && this._currentTransition.method) {
-        method = this._currentTransition.method;
-        if (typeof method === 'string') method = transitionMethods[method];
-    }
-    else {
-        method = TweenTransition;
-    }
-
-    if (this._currentMethod !== method) {
-        if (!(this._currentEndState instanceof Object) || method.SUPPORTS_MULTIPLE === true || this._currentEndState.length <= method.SUPPORTS_MULTIPLE) {
-            this._engineInstance = new method();
-        }
-        else {
-            this._engineInstance = new MultipleTransition(method);
-        }
-        this._currentMethod = method;
-    }
-
-    this._engineInstance.reset(this.state, this.velocity);
-    if (this.velocity !== undefined) this._currentTransition.velocity = this.velocity;
-
-    this._engineInstance.set(this._currentEndState, this._currentTransition, this._boundLoadNext);
-
-    if (this._callback) {
-        var callback = this._callback;
-        this._callback = null;
-        callback();
-        return;
-    }
-};
-
-
 /**
- * Add transition to end state to the queue of pending transitions. Special
- *    Use: calling without a transition resets the object to that state with
- *    no pending actions
- *
- * @method set
- *
- * @param {number|FamousMatrix|Array.Number|Object.<number, number>} endState
- *    end state to which we interpolate
- * @param {transition=} transition object of type {duration: number, curve:
- *    f[0,1] -> [0,1] or name}. If transition is omitted, change will be
- *    instantaneous.
- * @param {function()=} callback Zero-argument function to call on observed
- *    completion (t=1)
+ * Internal Clock used for determining the current time for the ongoing
+ * transitions.
+ * 
+ * @type {Performance|Date|Object}
  */
-Transitionable.prototype.set = function set(endState, transition, callback) {
-    if (!transition) {
-        this.reset(endState);
-        if (callback) callback();
-        return this;
-    }
-
-    this._endStateQueue.push(endState);
-    this._transitionQueue.push(transition);
-    this._callbackQueue.push(callback);
-
-    if (!this._currentTransition && !this._currentEndState) this._loadNext();
-    return this;
-};
+Transitionable.Clock = typeof performance !== 'undefined' ? performance : Date;
 
 /**
- * Cancel all transitions and reset to a stable state
+ * Registers a transition to be pushed onto the internal queue.
  *
- * @method reset
+ * @method to
  * @chainable
- *
- * @param {number|Array.Number|Object.<number, number>} startState
- *    stable state to set to
+ * 
+ * @param  {Number|Array.Number}    finalState              final state to
+ *                                                          transiton to
+ * @param  {String|Function}        [curve=Curves.linear]   easing function
+ *                                                          used for
+ *                                                          interpolating
+ *                                                          [0, 1]
+ * @param  {Number}                 [duration=100]          duration of
+ *                                                          transition
+ * @param  {Function}               [callback]              callback function
+ *                                                          to be called after
+ *                                                          the transition is
+ *                                                          complete
+ * @return {Transitionable}         this
  */
-Transitionable.prototype.reset = function reset(startState, startVelocity) {
-    this._currentMethod = null;
-    this._engineInstance = null;
-    this.state = startState;
-    this.velocity = startVelocity;
-
-    this._currentEndState = null;
-    this._currentTransition = null;
-    this._callback = null;
-
-    this._endStateQueue.length = 0;
-    this._transitionQueue.length = 0;
-    this._callbackQueue.length = 0;
+Transitionable.prototype.to = function to(finalState, curve, duration, callback) {
+    curve = curve != null && curve.constructor === String ? Curves[curve] : curve;
+    this._queue.push(
+        finalState,
+        curve != null ? curve : Curves.linear,
+        duration != null ? duration : 100,
+        callback
+    );
     return this;
 };
 
 /**
- * Add delay action to the pending action queue queue.
+ * Resets the transition queue to a stable initial state.
+ *
+ * @method from
+ * @chainable
+ * 
+ * @param  {Number|Array.Number}    initialState    initial state to
+ *                                                  transition from
+ * @return {Transitionable}         this
+ */
+Transitionable.prototype.from = function from(initialState) {
+    this._end = initialState;
+    if (initialState.constructor === Array && this._multi != null && this._multi.constructor === Array) {
+        this._multi.length = initialState.length;
+    } else {
+        this._multi = initialState.constructor === Array ? [] : false;
+    }
+    this._queue.length = 0;
+    this._startedAt = this.constructor.Clock.now();
+    this._pausedAt = null;
+    return this;
+};
+
+/**
+ * Delays the execution of the subsequent transition for a certain period of
+ * time.
  *
  * @method delay
  * @chainable
  *
- * @param {number} duration delay time (ms)
- * @param {function} callback Zero-argument function to call on observed
- *    completion (t=1)
- * @return {Transitionable} this
+ * @param {Number}      duration    delay time in ms
+ * @param {Function}    [callback]  Zero-argument function to call on observed
+ *                                  completion (t=1)
+ * @return {Transitionable}         this
  */
 Transitionable.prototype.delay = function delay(duration, callback) {
-    var endValue;
-    if (this._endStateQueue.length) {
-        endValue = this._endStateQueue[this._endStateQueue.length - 1];
-    } else if (this._currentEndState) {
-        endValue = this._currentEndState;
-    } else {
-        endValue = this.get();
-    }
+    var endState = this._queue.length > 0 ? this._queue[this._queue.length - 4] : this._end;
+    return this.to(endState, Curves.flat, duration, callback);
+};
 
-    return this.set(endValue, {
-        duration: duration,
-        curve: function() {
-            return 0;
+/**
+ * Overrides current transition.
+ *
+ * @method override
+ * @chainable
+ * 
+ * @param  {Number|Array.Number}    [finalState]    final state to transiton to
+ * @param  {String|Function}        [curve]         easing function used for
+ *                                                  interpolating [0, 1]
+ * @param  {Number}                 [duration]      duration of transition
+ * @param  {Function}               [callback]      callback function to be
+ *                                                  called after the transition
+ *                                                  is complete
+ * @return {Transitionable}         this
+ */
+Transitionable.prototype.override = function override(finalState, curve, duration, callback) {
+    if (this._queue.length > 0) {
+        if (finalState != null) this._queue[0] = finalState;
+        if (curve != null)      this._queue[1] = curve.constructor === String ? Curves[curve] : curve;
+        if (duration != null)   this._queue[0] = duration;
+        if (callback != null)   this._queue[0] = callback;
+    }
+    return this;
+};
+
+Transitionable.prototype._interpolate = function _interpolate(from, to, progress) {
+    if (this._multi) {
+        for (var i = 0; i < to.length; i++) {
+            this._multi[i] = from[i] + progress * (to[i] - from[i]);
         }
-    }, callback);
+        return this._multi;
+    } else {
+        return from + progress * (to - from);
+    }
 };
 
 /**
@@ -187,29 +177,38 @@ Transitionable.prototype.delay = function delay(duration, callback) {
  *
  * @method get
  *
- * @param {number=} timestamp Evaluate the curve at a normalized version of this
+ * @param {Number=} timestamp Evaluate the curve at a normalized version of this
  *    time. If omitted, use current time. (Unix epoch time)
- * @return {number|Object.<number|string, number>} beginning state
+ * @return {Number|Array.Number} beginning state
  *    interpolated to this point in time.
  */
-Transitionable.prototype.get = function get(timestamp) {
-    if (this._engineInstance) {
-        if (this._engineInstance.getVelocity)
-            this.velocity = this._engineInstance.getVelocity();
-        this.state = this._engineInstance.get(timestamp);
+Transitionable.prototype.get = function get(t) {
+    t = this._pausedAt ? this._pausedAt : t;
+    t = t ? t : this.constructor.Clock.now();
+    if (this._queue.length === 0) return this._end;
+
+    var progress = (t - this._startedAt) / this._queue[2];
+    var state = this._interpolate(this._end, this._queue[0], this._queue[1](progress > 1 ? 1 : progress));
+    if (progress >= 1) {
+        this._startedAt = this._startedAt + this._queue[2];
+        this._end = this._queue.shift();
+        this._queue.shift();
+        this._queue.shift();
+        var callback = this._queue.shift();
+        if (callback) callback();
     }
-    return this.state;
+    return progress > 1 ? this.get() : state;
 };
 
 /**
- * Is there at least one action pending completion?
+ * Is there at least one transition pending completion?
  *
  * @method isActive
  *
  * @return {boolean}
  */
 Transitionable.prototype.isActive = function isActive() {
-    return !!this._currentTransition;
+    return this._queue.length > 0;
 };
 
 /**
@@ -221,8 +220,7 @@ Transitionable.prototype.isActive = function isActive() {
  * @return {Transitionable} this
  */
 Transitionable.prototype.halt = function halt() {
-    this.set(this.get());
-    return this;
+    return this.from(this.get());
 };
 
 /**
@@ -234,7 +232,7 @@ Transitionable.prototype.halt = function halt() {
  * @return {Transitionable} this
  */
 Transitionable.prototype.pause = function pause() {
-    if (this._engineInstance) this._engineInstance.pause();
+    this._pausedAt = this.constructor.Clock.now();
     return this;
 };
 
@@ -247,12 +245,7 @@ Transitionable.prototype.pause = function pause() {
  * @return {Boolean} if the current action has been paused
  */
 Transitionable.prototype.isPaused = function isPaused() {
-    if (!this._engineInstance) {
-        return false;
-    }
-    else {
-        return this._engineInstance.isPaused();
-    }
+    return !!this._pausedAt;
 };
 
 /**
@@ -264,7 +257,50 @@ Transitionable.prototype.isPaused = function isPaused() {
  * @return {Transitionable} this
  */
 Transitionable.prototype.resume = function resume() {
-    if (this._engineInstance) this._engineInstance.resume();
+    var diff = this._pausedAt - this._startedAt;
+    this._startedAt = this.constructor.Clock.now() - diff;
+    this._pausedAt = null;
+    return this;
+};
+
+/**
+ * Cancel all transitions and reset to a stable state
+ *
+ * @method reset
+ * @chainable
+ * @deprecated Use `.from` instead!
+ *
+ * @param {Number|Array.Number|Object.<number, number>} startState
+ *    stable state to set to
+ */
+Transitionable.prototype.reset = function(start) {
+    return this.from(start);
+};
+
+/**
+ * Add transition to end state to the queue of pending transitions. Special
+ *    Use: calling without a transition resets the object to that state with
+ *    no pending actions
+ *
+ * @method set
+ * @chainable
+ * @deprecated Use `.to` instead!
+ * 
+ * @param {Number|FamousMatrix|Array.Number|Object.<number, number>} endState
+ *    end state to which we interpolate
+ * @param {transition=} transition object of type {duration: number, curve:
+ *    f[0,1] -> [0,1] or name}. If transition is omitted, change will be
+ *    instantaneous.
+ * @param {function()=} callback Zero-argument function to call on observed
+ *    completion (t=1)
+ */
+Transitionable.prototype.set = function(state, transition, callback) {
+    if (transition == null) {
+        this.from(state);
+        if (callback) callback();
+    } else {
+        this.to(state, transition.curve, transition.duration, callback);
+    }
     return this;
 };
 
