@@ -16,10 +16,7 @@ var Light = require('./Light');
  */
 function AmbientLight(dispatch) {
     Light.call(this, dispatch);
-
-    this.commands = {
-        color: 'GL_AMBIENT_LIGHT'
-    };
+    this.commands.color = 'GL_AMBIENT_LIGHT';
 };
 
 /**

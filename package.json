@@ -4,7 +4,8 @@
   "description": "Famous WebGL renderables",
   "main": "src/index.js",
   "scripts": {
-    "test": "testling '' | tap-spec",
+    "test": "tape test/*.js | tap-spec",
+    "watch-tests": "nodemon test/*.js --exec 'npm run test'",
     "watch": "nodemon --ignore node_modules/ -e js,json --exec 'npm test'",
     "lint": "jshint --reporter node_modules/jshint-stylish/stylish.js src; true"
   },
@@ -35,8 +36,7 @@
     "watchify": "^2.1.1"
   },
   "dependencies": {
-    "famous-transitions": "git+ssh://git@github.famo.us/platform/transitions#v0.1.1",
-    "famous-utilities": "git+ssh://git@github.famo.us/platform/utilities#v0.2.0",
-    "famous-webgl-geometries": "git+ssh://git@github.famo.us/platform/webgl-geometries#v0.1.0"
+    "famous-webgl-geometries": "git+ssh://git@github.famo.us/platform/webgl-geometries#v0.1.0",
+    "famous-transitions": "git+ssh://git@github.famo.us/platform/transitions#v0.1.1"
   }
 }

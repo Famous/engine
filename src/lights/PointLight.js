@@ -14,12 +14,7 @@ var Light = require('./Light');
  */
 function PointLight(dispatch) {
     Light.call(this, dispatch);
-
-    this.commands = {
-        color: 'GL_LIGHT_COLOR',
-        position: 'GL_LIGHT_POSITION'
-    };
-
+    this.commands.position = 'GL_LIGHT_POSITION';
     this._receiveTransformChange(this._dispatch.getContext()._transform);
     this._dispatch.onTransformChange(this._receiveTransformChange.bind(this));
 };
