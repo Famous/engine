@@ -27,6 +27,16 @@ var RECALL = 'RECALL';
  * @param {RenderNode} RenderNode to which the instance of Element will be a component of
  */
 function HTMLElement(dispatch, options) {
+    if (typeof options === 'string') {
+        console.warn(
+            'HTMLElement constructor signature changed!\n' +
+            'Pass in an options object with {tagName: ' + options + '} instead.'
+        );
+        options = {
+            tagName: options
+        };
+    }
+
     options = options || {};
     this._dispatch = dispatch;
     this._id = dispatch.addRenderable(this);
