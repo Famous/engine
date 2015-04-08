@@ -93,4 +93,38 @@ test('Clock', function(t) {
         clock.step(1235);
         clock.step(1236);
     });
+
+    t.test('removing from update queue', function(t) {
+        t.plan(1);
+
+        var clock = new Clock();
+        var a = {
+            counter: 0,
+            update: function() {
+                this.counter++;
+            }
+        };
+
+        var b = {
+            counter: 0,
+            update: function() {
+                clock.noLongerUpdate(a);
+                this.counter++;
+            }
+        };
+
+        var c = {
+            counter: 0,
+            update: function() {
+                this.counter++;
+            }
+        };
+
+        clock.update(a);
+        clock.update(b);
+        clock.update(c);
+        clock.step();
+
+        t.equal(c.counter, 1, 'should have updated c');
+    });
 });
