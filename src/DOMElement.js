@@ -31,7 +31,7 @@ DOMElement.prototype.onUpdate = function onUpdate () {
     var node = this._node;
     var queue = this._changeQueue;
     var len = queue.length;
-    
+
     if (len && node) {
         node.sendDrawCommand('WITH');
         node.sendDrawCommand(node.getLocation());
@@ -54,6 +54,7 @@ DOMElement.prototype.onDismount = function onDismount () {
     this.setProperty('display', 'none');
     this.setAttribute('data-fa-path', '');
     this._changeQueue.push('RECALL');
+    this._initialized = false;
 };
 
 DOMElement.prototype.onShow = function onShow () {
@@ -110,26 +111,27 @@ DOMElement.prototype._requestUpdate = function _requestUpdate () {
 
 DOMElement.prototype.init = function init () {
     this._changeQueue.push('INIT_DOM', this._tagName);
+    this._initialized = true;
     this.onTransformChange(this._node.getTransform());
     this.onSizeChange(this._node.getSize());
     if (!this._requestingUpdate) this._requestUpdate();
 };
 
 DOMElement.prototype.setID = function setID (id) {
-    this.setAttribute('ID', id);
+    this.setAttribute('id', id);
     return this;
 };
 
 DOMElement.prototype.addClass = function addClass (value) {
     if (this._classes.indexOf(value) < 0) {
-        this._changeQueue.push('ADD_CLASS', value);
+        if (this._initialized) this._changeQueue.push('ADD_CLASS', value);
         this._classes.push(value);
         if (!this._requestingUpdate) this._requestUpdate();
         return this;
     }
 
     if (this._inDraw) {
-        this._changeQueue.push('ADD_CLASS', value);
+        if (this._initialized) this._changeQueue.push('ADD_CLASS', value);
         if (!this._requestingUpdate) this._requestUpdate();
     }
     return this;
@@ -151,7 +153,7 @@ DOMElement.prototype.removeClass = function removeClass (value) {
 DOMElement.prototype.setAttribute = function setAttribute (name, value) {
     if (this._attributes[name] !== value || this._inDraw) {
         this._attributes[name] = value;
-        this._changeQueue.push('CHANGE_ATTRIBUTE', name, value);
+        if (this._initialized) this._changeQueue.push('CHANGE_ATTRIBUTE', name, value);
         if (!this._requestUpdate) this._requestUpdate();
     }
     return this;
@@ -160,7 +162,7 @@ DOMElement.prototype.setAttribute = function setAttribute (name, value) {
 DOMElement.prototype.setProperty = function setProperty (name, value) {
     if (this._styles[name] !== value || this._inDraw) {
         this._styles[name] = value;
-        this._changeQueue.push('CHANGE_PROPERTY', name, value);
+        if (this._initialized) this._changeQueue.push('CHANGE_PROPERTY', name, value);
         if (!this._requestingUpdate) this._requestUpdate();
     }
     return this;
@@ -169,8 +171,8 @@ DOMElement.prototype.setProperty = function setProperty (name, value) {
 DOMElement.prototype.setContent = function setContent (content) {
     if (this._content !== content || this._inDraw) {
         this._content = content;
-        this._changeQueue.push('CHANGE_CONTENT', content);
-        this._requestUpdate();
+        if (this._initialized) this._changeQueue.push('CHANGE_CONTENT', content);
+        if (!this._requestingUpdate) this._requestUpdate();
     }
     return this;
 };
@@ -186,7 +188,9 @@ DOMElement.prototype.draw = function draw () {
 
     for (i = 0, len = this._classes.length ; i < len ; i++)
         this.addClass(this._classes[i]);
-    
+
+    this.setContent(this._content);
+
     for (key in this._styles) 
         if (this._styles[key])
             this.setProperty(key, this._styles[key]);
