@@ -23,7 +23,7 @@
     "files": [
       "test/*.js"
     ],
-    "scripts": "tests/utilities/bind-polyfill.js"
+    "scripts": "tests/bind-polyfill.js"
   },
   "devDependencies": {
     "browserify": "^8.1.0",
