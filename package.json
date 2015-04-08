@@ -6,7 +6,7 @@
   "scripts": {
     "test": "tape test/*.js | tap-spec",
     "watch": "nodemon --ignore node_modules/ -e js,json --exec 'npm test'",
-    "lint": "jshint --reporter node_modules/jshint-stylish/stylish.js src/"
+    "lint": "jshint --reporter node_modules/jshint-stylish/stylish.js src; true"
   },
   "repository": {
     "type": "git",
@@ -25,6 +25,8 @@
     "tape": "^3.0.3"
   },
   "dependencies": {
-    "famous-transitions": "git+ssh://git@github.famo.us/platform/transitions#v0.1.1"
+    "famous-transitions": "git+ssh://git@github.famo.us/platform/transitions#v0.1.1",
+    "famous-math": "git+ssh://git@github.famo.us/platform/math#v0.1.0",
+    "famous-utilities": "git+ssh://git@github.famo.us/platform/utilities#v0.2.0"
   }
 }
