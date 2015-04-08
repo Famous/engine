@@ -5,6 +5,7 @@
   "main": "src/index.js",
   "scripts": {
     "test": "tape test/*.js | tap-spec",
+    "watch-tests": "nodemon test/*.js --exec 'npm run test'",
     "lint": "jshint --reporter node_modules/jshint-stylish/stylish.js src; true"
   },
   "repository": {
