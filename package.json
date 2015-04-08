@@ -7,7 +7,7 @@
     "test": "tape test/*.js | tap-spec",
     "perf": "watchify perf/index.js -o perf/bundle.js -d -v",
     "cover": "browserify -t coverify test/*.js | node | coverify",
-    "lint": "jshint --reporter node_modules/jshint-stylish/stylish.js src/"
+    "lint": "jshint --reporter node_modules/jshint-stylish/stylish.js src; true"
   },
   "repository": {
     "type": "git",
