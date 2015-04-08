@@ -5,7 +5,7 @@
   "main": "src/index.js",
   "scripts": {
     "test": "tape test/*.spec.js test/*/*.spec.js | tap-spec",
-    "lint": "jshint --reporter node_modules/jshint-stylish/stylish.js src/"
+    "lint": "jshint --reporter node_modules/jshint-stylish/stylish.js src; true"
   },
   "repository": {
     "type": "git",
@@ -33,6 +33,6 @@
   },
   "dependencies": {
     "famous-math": "git+ssh://git@github.famo.us/platform/math#v0.1.0",
-    "famous-utilities": "git+ssh://git@github.famo.us/platform/utilities#v0.1.0"
+    "famous-utilities": "git+ssh://git@github.famo.us/platform/utilities#v0.2.0"
   }
 }
