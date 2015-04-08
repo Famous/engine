@@ -37,7 +37,7 @@ Position.toString = function toString() {
 * @method
 * @return {Object}
 */
-Position.prototype.getState = function getState() {
+Position.prototype.getValue = function getValue() {
     return {
         component: this.constructor.toString(),
         x: this._x.get(),
