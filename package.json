@@ -5,6 +5,7 @@
   "main": "src/index.js",
   "scripts": {
     "test": "tape test/*.js | tap-spec",
+    "cover": "browserify -t coverify test/*.js | node | coverify",
     "lint": "jshint --reporter node_modules/jshint-stylish/stylish.js src; true"
   },
   "repository": {
@@ -18,6 +19,8 @@
   },
   "homepage": "https://github.com/Famous/math",
   "devDependencies": {
+    "browserify": "^9.0.7",
+    "coverify": "^1.1.0",
     "jshint": "^2.5.11",
     "jshint-stylish": "^1.0.0",
     "tap-spec": "^2.2.0",
