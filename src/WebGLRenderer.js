@@ -6,6 +6,7 @@ var Buffer = require('./Buffer');
 var BufferRegistry = require('./BufferRegistry');
 var checkers = require('./Checkerboard');
 var Plane = require('famous-webgl-geometries').Plane;
+var sorter = require('./radixSort');
 
 var identity = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
 
@@ -29,8 +30,10 @@ function WebGLRenderer(canvas) {
     gl.polygonOffset(0.1, 0.1);
     gl.enable(gl.POLYGON_OFFSET_FILL);
     gl.enable(gl.DEPTH_TEST);
-    gl.disable(gl.BLEND);
+    gl.enable(gl.BLEND);
     gl.depthFunc(gl.LEQUAL);
+    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+    gl.enable(gl.CULL_FACE);
 
     this.meshRegistry = {};
     this.meshRegistryKeys = [];
@@ -285,6 +288,10 @@ WebGLRenderer.prototype.draw = function draw(renderState) {
     this.projectionTransform[11] = renderState.perspectiveTransform[11];
 
     this.program.setUniforms(['perspective', 'time', 'view'], [this.projectionTransform, Date.now()  % 100000 / 1000, renderState.viewTransform]);
+    var keys = this.meshRegistryKeys;
+    var registry = this.meshRegistry;
+
+    this.meshRegistryKeys = sorter(keys, registry);
 
     for (var i = 0, len = this.cutoutRegistryKeys.length; i < len; i++) {
         cutout = this.cutoutRegistry[this.cutoutRegistryKeys[i]];
@@ -299,6 +306,15 @@ WebGLRenderer.prototype.draw = function draw(renderState) {
     for(var i = 0; i < this.meshRegistryKeys.length; i++) {
         mesh = this.meshRegistry[this.meshRegistryKeys[i]];
         buffers = this.bufferRegistry.registry[mesh.geometry];
+
+        var gl = this.gl;
+        if (mesh.uniformValues[0] < 1) {
+            gl.depthMask(false);
+            gl.enable(gl.BLEND);
+        } else {
+            gl.depthMask(true);
+            gl.disable(gl.BLEND);
+        }
 
         if (!buffers) continue;
 
@@ -574,7 +590,7 @@ function handleTexture(input) {
             texture = new Texture(this.gl, options);
             texture.src = texture;
             texture.setImage(checkers);
-            source.addEventListener('loadeddata', function(x) {
+            source.addEventListener('loadeddata', function() {
                 texture.setImage(source);
                 setInterval(function () { texture.setImage(source); }, 16);
             });
