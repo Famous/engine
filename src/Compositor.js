@@ -1,7 +1,6 @@
 'use strict';
 
 var VirtualElement = require('famous-dom-renderers').VirtualElement;
-var Camera = require('famous-components').Camera;
 var strip = require('famous-utilities').strip;
 var flatClone = require('famous-utilities').flatClone;
 
@@ -18,6 +17,8 @@ function Compositor() {
     this._contexts = {};
     this._outCommands = [];
     this._inCommands = [];
+
+    this.clearCommands();
 }
 
 /**
@@ -47,7 +48,7 @@ Compositor.prototype.sendEvent = function sendEvent(path, ev, payload) {
  *                              WebWorker, used to shift single messages from
  */
 Compositor.prototype.handleWith = function handleWith (commands) {
-    var path = commands.shift();
+    var path = commands[commands.index++];
     var pathArr = path.split('/');
     var context = this.getOrSetContext(pathArr.shift());
 
@@ -84,7 +85,8 @@ Compositor.prototype.getOrSetContext = function getOrSetContext(selector) {
  *                              WebWorker, used to shift single messages from
  */
 Compositor.prototype.giveSizeFor = function giveSizeFor(commands) {
-    var selector = commands.shift();
+    var selector = commands[commands.index++];
+
     var size = this.getOrSetContext(selector).getRootSize();
     this.sendResize(selector, size);
     var _this = this;
@@ -150,21 +152,29 @@ Compositor.prototype.invoke = function invoke (target, methodName, args, functio
  */
 Compositor.prototype.drawCommands = function drawCommands() {
     var commands = this._inCommands;
-    var command;
-    while (commands.length) {
-        command = commands.shift();
-        
+    var command = commands[commands.index++];
+
+    while (command) {
         switch (command) {
             case 'WITH':
                 this.handleWith(commands);
                 break;
+
             case 'INVOKE':
-                this.invoke(commands.shift(), commands.shift(), commands.shift(), commands.shift());
+                this.invoke(
+                    commands[commands.index++],
+                    commands[commands.index++],
+                    commands[commands.index++],
+                    commands[commands.index++]
+                );
                 break;
+
             case 'NEED_SIZE_FOR':
                 this.giveSizeFor(commands);
                 break;
         }
+
+        command = commands[commands.index++];
     }
 
     // TODO: Switch to associative arrays here...
@@ -197,6 +207,8 @@ Compositor.prototype.receiveCommands = function receiveCommands(commands) {
  * @method clearCommands
  */
 Compositor.prototype.clearCommands = function clearCommands() {
+    this._inCommands.index = 0;
+    this._inCommands.length = 0;
     this._outCommands.length = 0;
     this._sentResize = false;
 };
