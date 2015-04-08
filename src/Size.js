@@ -206,22 +206,34 @@ Size.prototype.clean = function clean () {
 * @return {Size} this
 */
 Size.prototype.setAbsolute = function setAbsolute(x, y, z, options, callback) {
-    this._dispatch.dirtyComponent(this._id);
-    var abs = this._absolute;
     this._absoluteMode = true;
+    this._setSizeType(this._absolute, x, y, z, options, callback);
+    return this;
+};
+
+Size.prototype._setSizeType = function setProp(prop, x, y, z, options, callback){
+    this._dispatch.dirtyComponent(this._id);
+
+    var cbX = null;
+    var cbY = null;
+    var cbZ = null;
+
+    if (z != null) cbZ = callback;
+    else if (y != null) cbY = callback;
+    else if (x != null) cbX = callback;
+
     if (x != null) {
-        abs.x.set(x, options, callback);
-        abs.dirtyX = true;
+        prop.x.set(x, options, cbX);
+        prop.dirtyX = true;
     }
     if (y != null) {
-        abs.y.set(y, options, callback);
-        abs.dirtyY = true;
+        prop.y.set(y, options, cbY);
+        prop.dirtyY = true;
     }
     if (z != null) {
-        abs.z.set(z, options, callback);
-        abs.dirtyZ = true;
+        prop.z.set(z, options, cbZ);
+        prop.dirtyZ = true;
     }
-    return this;
 };
 
 /**
@@ -239,22 +251,8 @@ Size.prototype.setAbsolute = function setAbsolute(x, y, z, options, callback) {
 * @return {Size} this
 */
 Size.prototype.setProportional = function setProportional(x, y, z, options, callback) {
-    this._dispatch.dirtyComponent(this._id);
-    this._needsDEBUG = true;
-    var prop = this._proportional;
     this._absoluteMode = false;
-    if (x != null) {
-        prop.x.set(x, options, callback);
-        prop.dirtyX = true;
-    }
-    if (y != null) {
-        prop.y.set(y, options, callback);
-        prop.dirtyY = true;
-    }
-    if (z != null) {
-        prop.z.set(z, options, callback);
-        prop.dirtyZ = true;
-    }
+    this._setSizeType(this._proportional, x, y, z, options, callback);
     return this;
 };
 
@@ -272,21 +270,8 @@ Size.prototype.setProportional = function setProportional(x, y, z, options, call
 *                            transitions have been completed
 */
 Size.prototype.setDifferential = function setDifferential(x, y, z, options, callback) {
-    this._dispatch.dirtyComponent(this._id);
-    var prop = this._differential;
     this._absoluteMode = false;
-    if (x != null) {
-        prop.x.set(x, options, callback);
-        prop.dirtyX = true;
-    }
-    if (y != null) {
-        prop.y.set(y, options, callback);
-        prop.dirtyY = true;
-    }
-    if (z != null) {
-        prop.z.set(z, options, callback);
-        prop.dirtyZ = true;
-    }
+    this._setSizeType(this._differential, x, y, z, options, callback);
     return this;
 };
 

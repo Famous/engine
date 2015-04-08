@@ -179,9 +179,17 @@ Position.prototype.setZ = function setZ(val, options, callback) {
 */
 Position.prototype.set = function set(x, y, z, options, callback) {
     this._dispatch.dirtyComponent(this._id);
-    this._x.set(x, options);
-    this._y.set(y, options);
-    this._z.set(z, options, callback);
+    var cbX = null;
+    var cbY = null;
+    var cbZ = null;
+
+    if (z != null) cbZ = callback;
+    else if (y != null) cbY = callback;
+    else if (x != null) cbX = callback;
+
+    if (x != null) this._x.set(x, options, cbX);
+    if (y != null) this._y.set(y, options, cbY);
+    if (z != null) this._z.set(z, options, cbZ);
     return this;
 };
 
