@@ -5,8 +5,6 @@ var isWorker = typeof self !== 'undefined' && self.window !== self;
 var Clock = require('./Clock');
 
 function Famous (config) {
-    this._config = config ? config : Famous.DEFAULT_CONFIG;
-
     this._nextUpdateQueue = [];
     this._updateQueue = [];
 
@@ -24,8 +22,6 @@ function Famous (config) {
             _this.postMessage(ev.data);
         });
 }
-
-Famous.DEFAULT_CONFIG = {};
 
 Famous.prototype._update = function _update (time) {
     this._inUpdate = true;
