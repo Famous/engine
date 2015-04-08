@@ -4,7 +4,8 @@
   "description": "Famous engine",
   "main": "src/index.js",
   "scripts": {
-    "test": "tape test/*.js",
+    "test": "tape test/*.js | tap-spec",
+    "cover": "browserify -t coverify test/*.js | node | coverify",
     "lint": "jshint --reporter node_modules/jshint-stylish/stylish.js src; true"
   },
   "repository": {
@@ -18,12 +19,13 @@
   },
   "homepage": "https://github.com/Famous/engine",
   "devDependencies": {
+    "coverify": "^1.1.0",
     "jshint": "^2.5.11",
     "jshint-stylish": "^1.0.0",
     "tap-spec": "^2.2.0",
     "tape": "^3.0.3"
   },
   "dependencies": {
-    "famous-polyfills":  "git+ssh://git@github.famo.us/platform/polyfills#v0.1.0"
+    "famous-polyfills": "git+ssh://git@github.famo.us/platform/polyfills#v0.1.0"
   }
 }
