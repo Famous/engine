@@ -2,7 +2,7 @@
 
 var test = require('tape');
 var ConvexBodyFactory = require('../../src/bodies/ConvexBodyFactory');
-var Vec3 = require('famous-math/src/Vec3');
+var Vec3 = require('famous-math').Vec3;
 
 function arraysAreApproximatelyEqual(a, b, tolerance) {
     for (var i = 0, len = a.length; i < len; i++) {

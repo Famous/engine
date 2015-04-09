@@ -1,9 +1,9 @@
 'use strict';
 
 var Particle = require('../../src/bodies/Particle');
-var Vec3 = require('famous-math/src/Vec3');
-var Quaternion = require('famous-math/src/Quaternion');
-var Mat33 = require('famous-math/src/Mat33');
+var Vec3 = require('famous-math').Vec3;
+var Quaternion = require('famous-math').Quaternion;
+var Mat33 = require('famous-math').Mat33;
 var test = require('tape');
 
 test('Particle', function(t) {

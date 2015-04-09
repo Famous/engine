@@ -1,7 +1,7 @@
 'use strict';
 
-var Vec3 = require('famous-math/src/Vec3');
-var ObjectManager = require('famous-utilities/src/ObjectManager');
+var Vec3 = require('famous-math').Vec3;
+var ObjectManager = require('famous-utilities').ObjectManager;
 
 var MANIFOLD = 'Manifold';
 var CONTACT = 'Contact';

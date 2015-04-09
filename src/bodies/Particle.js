@@ -1,10 +1,10 @@
 'use strict';
 
-var Vec3 = require('famous-math/src/Vec3');
-var Quaternion = require('famous-math/src/Quaternion');
-var Mat33 = require('famous-math/src/Mat33');
+var Vec3 = require('famous-math').Vec3;
+var Quaternion = require('famous-math').Quaternion;
+var Mat33 = require('famous-math').Mat33;
 
-var CallbackStore = require('famous-utilities/src/CallbackStore');
+var CallbackStore = require('famous-utilities').CallbackStore;
 
 var ZERO_VECTOR = new Vec3();
 

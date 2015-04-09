@@ -3,9 +3,9 @@
 var RotationalSpring = require('../../src/forces/RotationalSpring');
 var Force = require('../../src/forces/Force');
 var Box = require('../../src/bodies/Box');
-var Vec3 = require('famous-math/src/Vec3');
-var Mat33 = require('famous-math/src/Mat33');
-var Quaternion = require('famous-math/src/Quaternion');
+var Vec3 = require('famous-math').Vec3;
+var Mat33 = require('famous-math').Mat33;
+var Quaternion = require('famous-math').Quaternion;
 var test = require('tape');
 
 function vec3sAreEqual(a,b) {
