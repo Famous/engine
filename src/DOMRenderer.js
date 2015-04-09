@@ -17,21 +17,77 @@ function DOMRenderer (element, selector, compositor) {
     this._eventListeners = {};
 }
 
-DOMRenderer.prototype.addEventListener = function addEventListener(path, type) {
+DOMRenderer.prototype.addEventListener = function addEventListener(path, type, properties, preventDefault) {
     if (!this._eventListeners[type]) {
-        this._eventListeners[type] = {};
-        this._root.element.addEventListener(type, this._triggerEvent.bind(this, type));
+        this._root.element.addEventListener(type, this._triggerEvent.bind(this));
     }
-    this._eventListeners[type][path] = true;
+
+    this._eventListeners[type][path] = {
+        properties: properties,
+        preventDefault: preventDefault
+    };
 };
 
-DOMRenderer.prototype._triggerEvent = function _triggerEvent(type, ev) {
+function _mirror(item, target, reference) {
+    var i, len;
+    var key, keys;
+    if (typeof item === 'string' || typeof item === 'number') target[item] = reference[item];
+    else if (Array.isArray(item)) {
+        for (i = 0, len = item.length; i < len; i++) {
+            _mirror(item[i], target, reference);
+        }
+    }
+    else {
+        keys = Object.keys(item);
+        for (i = 0, len = keys.length; i < len; i++) {
+            key = keys[i];
+            if (reference[key]) {
+                target[key] = {};
+                _mirror(item[key], target[key], reference[key])
+            }
+        }
+    }
+}
+
+function _stripEvent (ev, properties) {
+    var result = {};
+    var i, len;
+    for (i = 0, len = properties ? properties.length : 0; i < len; i++) {
+        var prop = properties[i];
+        _mirror(prop, result, ev);
+    }
+    switch (ev.type) {
+        case 'mousedown':
+        case 'mouseup':
+        case 'click':
+            result.x = ev.x;
+            result.y = ev.y;
+            result.timeStamp = ev.timeStamp;
+            break;
+        case 'mousemove':
+            result.x = ev.x;
+            result.y = ev.y;
+            result.movementX = ev.movementX;
+            result.movementY = ev.movementY;
+            break;
+        case 'wheel':
+            result.deltaX = ev.deltaX;
+            result.deltaY = ev.deltaY;
+            break;
+    }
+    return result;
+}
+
+DOMRenderer.prototype._triggerEvent = function _triggerEvent(ev) {
     for (var i = 0; i < ev.path.length; i++) {
         if (!ev.path[i].dataset) continue;
         var path = ev.path[i].dataset.faPath;
-        if (this._eventListeners[type][path]) {
-            this._compositor.sendEvent(path, type, ev);
+        if (this._eventListeners[ev.type][path]) {
+            this._compositor.sendEvent(path, ev.type, _stripEvent(ev, this._eventListeners[ev.type][path].properties));
             ev.stopPropagation();
+            if (this._eventListeners[ev.type][path].preventDefault) {
+                ev.preventDefault();
+            }
             break;
         }
     }
