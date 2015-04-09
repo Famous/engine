@@ -819,10 +819,6 @@ Node.prototype.onMount = Node.prototype.mount;
 
 Node.prototype.onDismount = Node.prototype.dismount;
 
-Node.prototype.onReceive = function onRecieve (event, payload) {
-    console.log(event, payload);
-};
-
 module.exports = Node;
 
 

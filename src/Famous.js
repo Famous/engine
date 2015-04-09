@@ -77,6 +77,7 @@ Famous.prototype.handleWith = function handleWith (messages) {
         case 'TRIGGER':
             var type = messages.shift();
             var ev = messages.shift();
+            
             this.getContext(path).getDispatch().dispatchUIEvent(path, type, ev);
             break;
         default:
