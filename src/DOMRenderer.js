@@ -151,8 +151,9 @@ DOMRenderer.prototype.setMatrix = function setMatrix (transform) {
     for (var i = 0 ; i < 16 ; i++) worldTransform[i] = transform[i];
 
     invert(this._target.invertedParent, this._parent.worldTransform);
-    invert(this._target.finalTransform, this._target.invertedParent, worldTransform);
-    
+    multiply(this._target.finalTransform, this._target.invertedParent, worldTransform);
+
+
     this._target.element.style[TRANSFORM] = stringifyMatrix(this._target.finalTransform);
 };
 
