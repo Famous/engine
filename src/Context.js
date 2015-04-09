@@ -14,19 +14,18 @@ function Context(selector, compositor) {
     this._rootEl.appendChild(DOMLayerEl);
     this.DOMRenderer = new DOMRenderer(DOMLayerEl, selector); 
  
-    this.WebGLRenderer;
-    this.canvas = document.createElement('canvas');
-    this.canvas.className = 'famous-webgl';
-    this._rootEl.appendChild(this.canvas);
+    this.WebGLRenderer = null;
+    this.canvas = null;
 
     this._renderState = {
         projectionType: Camera.ORTHOGRAPHIC_PROJECTION,
         perspectiveTransform: new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]),
-        viewTransform: new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1])
+        viewTransform: new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]),
+        viewDirty: false,
+        perspectiveDirty: false
     };
 
     this._size = [];
-    this._renderers = [];
     this._children = {};
     this._elementHash = {};
 
@@ -46,8 +45,10 @@ Context.prototype.updateSize = function () {
     this._size[1] = height;
     this._size[2] = (width > height) ? width : height;
 
-    this.canvas.width  = width;
-    this.canvas.height = height;
+    if (this.canvas) {
+        this.canvas.width  = width;
+        this.canvas.height = height;
+    }
 
     if (this.WebGLRenderer) this.WebGLRenderer.updateSize(this._size);
 
@@ -55,9 +56,11 @@ Context.prototype.updateSize = function () {
 }
 
 Context.prototype.draw = function draw() {
-    for (var i = 0; i < this._renderers.length; i++) {
-        this._renderers[i].draw(this._renderState);
-    }
+    this.DOMRenderer.draw(this._renderState);
+    if (this.WebGLRenderer) this.WebGLRenderer.draw(this._renderState);
+
+    if (this._renderState.perspectiveDirty) this._renderState.perspectiveDirty = false;
+    if (this._renderState.viewDirty) this._renderState.viewDirty = false;
 };
 
 Context.prototype.getRootSize = function getRootSize() {
@@ -65,17 +68,20 @@ Context.prototype.getRootSize = function getRootSize() {
 };
 
 Context.prototype.initWebGL = function initWebGL() {
-    this._renderers.push((this.WebGLRenderer = new WebGLRenderer(this.canvas)));
+    this.canvas = document.createElement('canvas');
+    this.canvas.className = 'famous-webgl';
+    this._rootEl.appendChild(this.canvas);
     this.WebGLRenderer.updateSize(this._size);
 };
 
-Context.prototype.receive = function receive(pathArr, path, commands) {
+Context.prototype.receive = function receive(pathArr, path, commands, iterator) {
     var pointer;
     var parentEl;
     var element;
     var id;
+    var localIterator = iterator;
 
-    var command = commands[commands.index++];
+    var command = commands[localIterator++];
 
     this.DOMRenderer.loadPath(path);
     this.DOMRenderer.findTarget();
@@ -83,11 +89,11 @@ Context.prototype.receive = function receive(pathArr, path, commands) {
     while (command) {
         switch (command) {
             case 'INIT_DOM':
-                this.DOMRenderer.insertEl(commands[commands.index++]);
+                this.DOMRenderer.insertEl(commands[localIterator++]);
                 break;
 
             case 'CHANGE_TRANSFORM':
-                for (var i = 0 ; i < 16 ; i++) this._meshTransform[i] = commands[commands.index++];
+                for (var i = 0 ; i < 16 ; i++) this._meshTransform[i] = commands[localIterator++];
 
                 this.DOMRenderer.setMatrix(this._meshTransform);
 
@@ -97,8 +103,8 @@ Context.prototype.receive = function receive(pathArr, path, commands) {
                 break;
 
             case 'CHANGE_SIZE':
-                var width = commands[commands.index++];
-                var height = commands[commands.index++];
+                var width = commands[localIterator++];
+                var height = commands[localIterator++];
 
                 this.DOMRenderer.setSize(width, height);
                 if (this.WebGLRenderer) {
@@ -110,64 +116,56 @@ Context.prototype.receive = function receive(pathArr, path, commands) {
 
             case 'CHANGE_PROPERTY':
                 if (this.WebGLRenderer) this.WebGLRenderer.getOrSetCutout(path);
-                this.DOMRenderer.setProperty(commands[commands.index++], commands[commands.index++]);
+                this.DOMRenderer.setProperty(commands[localIterator++], commands[localIterator++]);
                 break;
 
             case 'CHANGE_CONTENT':
                 if (this.WebGLRenderer) this.WebGLRenderer.getOrSetCutout(path);
-                this.DOMRenderer.setContent(commands[commands.index++]);
+                this.DOMRenderer.setContent(commands[localIterator++]);
                 break;
 
             case 'CHANGE_ATTRIBUTE':
                 if (this.WebGLRenderer) this.WebGLRenderer.getOrSetCutout(path);
-                this.DOMRenderer.setAttribute(commands[commands.index++], commands[commands.index++]);
+                this.DOMRenderer.setAttribute(commands[localIterator++], commands[localIterator++]);
                 break;
 
             case 'ADD_CLASS':
                 if (this.WebGLRenderer) this.WebGLRenderer.getOrSetCutout(path);
-                this.DOMRenderer.addClass(commands[commands.index++]); 
+                this.DOMRenderer.addClass(commands[localIterator++]); 
                 break;
 
             case 'REMOVE_CLASS':
                 if (!element) element = this._elementHash[path];
                 if (this.WebGLRenderer) this.WebGLRenderer.getOrSetCutout(path);
-                element.removeClass(commands[commands.index++]);
+                element.removeClass(commands[localIterator++]);
                 break;
 
             case 'ADD_EVENT_LISTENER':
                 if (!element) element = this._elementHash[path];
                 if (this.WebGLRenderer) this.WebGLRenderer.getOrSetCutout(path);
-                var ev = commands[commands.index++];
+                var ev = commands[localIterator++];
                 var methods;
                 var properties;
                 var c;
-                while ((c = commands[commands.index++]) !== 'EVENT_PROPERTIES') methods = c;
-                while ((c = commands[commands.index++]) !== 'EVENT_END') properties = c;
+                while ((c = commands[localIterator++]) !== 'EVENT_PROPERTIES') methods = c;
+                while ((c = commands[localIterator++]) !== 'EVENT_END') properties = c;
                 methods = methods || [];
                 properties = properties || [];
                 element.addEventListener(ev, element.dispatchEvent.bind(element, ev, methods, properties));
                 break;
 
-            case 'RECALL':
-                if (!element) element = this._elementHash[path];
-                element.setProperty('display', 'none');
-                element._parent._allocator.deallocate(element._target);
-                this._renderers.splice(this._renderers.indexOf(element), 1);
-                delete this._elementHash[path];
-                break;
-
             case 'GL_SET_DRAW_OPTIONS': 
                 if (!this.WebGLRenderer) this.initWebGL();
-                this.WebGLRenderer.setMeshOptions(path, commands[commands.index++]);
+                this.WebGLRenderer.setMeshOptions(path, commands[localIterator++]);
                 break;
 
             case 'GL_AMBIENT_LIGHT':
                 if (!this.WebGLRenderer) this.initWebGL();
                 this.WebGLRenderer.setAmbientLightColor(
                     path,
-                    commands[commands.index++],
-                    commands[commands.index++],
-                    commands[commands.index++]
+                    commands[localIterator++],
+                    commands[localIterator++],
+                    commands[localIterator++]
                 );
                 break;
 
@@ -175,9 +173,9 @@ Context.prototype.receive = function receive(pathArr, path, commands) {
                 if (!this.WebGLRenderer) this.initWebGL();
                 this.WebGLRenderer.setLightPosition(
                     path,
-                    commands[commands.index++],
-                    commands[commands.index++],
-                    commands[commands.index++]
+                    commands[localIterator++],
+                    commands[localIterator++],
+                    commands[localIterator++]
                 );
                 break;
 
@@ -185,9 +183,9 @@ Context.prototype.receive = function receive(pathArr, path, commands) {
                 if (!this.WebGLRenderer) this.initWebGL();
                 this.WebGLRenderer.setLightColor(
                     path,
-                    commands[commands.index++],
-                    commands[commands.index++],
-                    commands[commands.index++]
+                    commands[localIterator++],
+                    commands[localIterator++],
+                    commands[localIterator++]
                 );
                 break;
 
@@ -195,8 +193,8 @@ Context.prototype.receive = function receive(pathArr, path, commands) {
                 if (!this.WebGLRenderer) this.initWebGL();
                 this.WebGLRenderer.handleMaterialInput(
                     path,
-                    commands[commands.index++],
-                    commands[commands.index++]
+                    commands[localIterator++],
+                    commands[localIterator++]
                 );
                 break;
 
@@ -204,9 +202,9 @@ Context.prototype.receive = function receive(pathArr, path, commands) {
                 if (!this.WebGLRenderer) this.initWebGL();
                 this.WebGLRenderer.setGeometry(
                     path,
-                    commands[commands.index++],
-                    commands[commands.index++],
-                    commands[commands.index++]
+                    commands[localIterator++],
+                    commands[localIterator++],
+                    commands[localIterator++]
                 );
                 break;
 
@@ -214,8 +212,8 @@ Context.prototype.receive = function receive(pathArr, path, commands) {
                 if (!this.WebGLRenderer) this.initWebGL();
                 this.WebGLRenderer.setMeshUniform(
                     path,
-                    commands[commands.index++],
-                    commands[commands.index++]
+                    commands[localIterator++],
+                    commands[localIterator++]
                 );
                 break;
 
@@ -223,50 +221,58 @@ Context.prototype.receive = function receive(pathArr, path, commands) {
                 if (!this.WebGLRenderer) this.initWebGL();
                 this.WebGLRenderer.bufferData(
                     path,
-                    commands[commands.index++],
-                    commands[commands.index++],
-                    commands[commands.index++],
-                    commands[commands.index++]
+                    commands[localIterator++],
+                    commands[localIterator++],
+                    commands[localIterator++],
+                    commands[localIterator++]
                 );
                 break;
 
             case 'PINHOLE_PROJECTION':
                 this._renderState.projectionType = Camera.PINHOLE_PROJECTION;
-                this._renderState.perspectiveTransform[11] = -1 / commands[commands.index++];
+                this._renderState.perspectiveTransform[11] = -1 / commands[localIterator++];
+
+                this._renderState.perspectiveDirty = true;
                 break;
 
             case 'ORTHOGRAPHIC_PROJECTION':
                 this._renderState.projectionType = Camera.ORTHOGRAPHIC_PROJECTION;
                 this._renderState.perspectiveTransform[11] = 0;
+
+                this._renderState.perspectiveDirty = true;
                 break;
 
             case 'CHANGE_VIEW_TRANSFORM':
-                this._renderState.viewTransform[0] = commands[commands.index++];
-                this._renderState.viewTransform[1] = commands[commands.index++];
-                this._renderState.viewTransform[2] = commands[commands.index++];
-                this._renderState.viewTransform[3] = commands[commands.index++];
+                this._renderState.viewTransform[0] = commands[localIterator++];
+                this._renderState.viewTransform[1] = commands[localIterator++];
+                this._renderState.viewTransform[2] = commands[localIterator++];
+                this._renderState.viewTransform[3] = commands[localIterator++];
 
-                this._renderState.viewTransform[4] = commands[commands.index++];
-                this._renderState.viewTransform[5] = commands[commands.index++];
-                this._renderState.viewTransform[6] = commands[commands.index++];
-                this._renderState.viewTransform[7] = commands[commands.index++];
+                this._renderState.viewTransform[4] = commands[localIterator++];
+                this._renderState.viewTransform[5] = commands[localIterator++];
+                this._renderState.viewTransform[6] = commands[localIterator++];
+                this._renderState.viewTransform[7] = commands[localIterator++];
 
-                this._renderState.viewTransform[8] = commands[commands.index++];
-                this._renderState.viewTransform[9] = commands[commands.index++];
-                this._renderState.viewTransform[10] = commands[commands.index++];
-                this._renderState.viewTransform[11] = commands[commands.index++];
+                this._renderState.viewTransform[8] = commands[localIterator++];
+                this._renderState.viewTransform[9] = commands[localIterator++];
+                this._renderState.viewTransform[10] = commands[localIterator++];
+                this._renderState.viewTransform[11] = commands[localIterator++];
 
-                this._renderState.viewTransform[12] = commands[commands.index++];
-                this._renderState.viewTransform[13] = commands[commands.index++];
-                this._renderState.viewTransform[14] = commands[commands.index++];
-                this._renderState.viewTransform[15] = commands[commands.index++];
+                this._renderState.viewTransform[12] = commands[localIterator++];
+                this._renderState.viewTransform[13] = commands[localIterator++];
+                this._renderState.viewTransform[14] = commands[localIterator++];
+                this._renderState.viewTransform[15] = commands[localIterator++];
+
+                this._renderState.viewDirty = true;
                 break;
 
-            case 'WITH': return commands.index--;
+            case 'WITH': return localIterator--;
         }
 
-        command = commands[commands.index++];
+        command = commands[localIterator++];
     }
+
+    return localIterator;
 };
 
 module.exports = Context;

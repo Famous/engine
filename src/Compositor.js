@@ -47,12 +47,13 @@ Compositor.prototype.sendEvent = function sendEvent(path, ev, payload) {
  * @param  {Array} commands     remaining message queue received from the
  *                              WebWorker, used to shift single messages from
  */
-Compositor.prototype.handleWith = function handleWith (commands) {
-    var path = commands[commands.index++];
+Compositor.prototype.handleWith = function handleWith (iterator, commands) {
+    var localIterator = iterator;
+    var path = commands[localIterator++];
     var pathArr = path.split('/');
     var context = this.getOrSetContext(pathArr.shift());
 
-    context.receive(pathArr, path, commands);
+    return context.receive(pathArr, path, commands, localIterator);
 };
 
 /**
@@ -84,8 +85,9 @@ Compositor.prototype.getOrSetContext = function getOrSetContext(selector) {
  * @param  {Array} commands     remaining message queue received from the
  *                              WebWorker, used to shift single messages from
  */
-Compositor.prototype.giveSizeFor = function giveSizeFor(commands) {
-    var selector = commands[commands.index++];
+Compositor.prototype.giveSizeFor = function giveSizeFor(iterator, commands) {
+    var localIterator = iterator;
+    var selector = commands[localIterator++];
 
     var size = this.getOrSetContext(selector).getRootSize();
     this.sendResize(selector, size);
@@ -96,6 +98,8 @@ Compositor.prototype.giveSizeFor = function giveSizeFor(commands) {
                 _this.sendResize(selector, _this.getOrSetContext(selector).getRootSize());
             }
         });
+
+    return localIterator;
 };
 
 /**
@@ -152,29 +156,30 @@ Compositor.prototype.invoke = function invoke (target, methodName, args, functio
  */
 Compositor.prototype.drawCommands = function drawCommands() {
     var commands = this._inCommands;
-    var command = commands[commands.index++];
+    var localIterator = 0;
+    var command = commands[localIterator++];
 
     while (command) {
         switch (command) {
             case 'WITH':
-                this.handleWith(commands);
+                localIterator = this.handleWith(localIterator, commands);
                 break;
 
             case 'INVOKE':
                 this.invoke(
-                    commands[commands.index++],
-                    commands[commands.index++],
-                    commands[commands.index++],
-                    commands[commands.index++]
+                    commands[localIterator++],
+                    commands[localIterator++],
+                    commands[localIterator++],
+                    commands[localIterator++]
                 );
                 break;
 
             case 'NEED_SIZE_FOR':
-                this.giveSizeFor(commands);
+                localIterator = this.giveSizeFor(localIterator, commands);
                 break;
         }
 
-        command = commands[commands.index++];
+        command = commands[localIterator++];
     }
 
     // TODO: Switch to associative arrays here...
@@ -207,7 +212,6 @@ Compositor.prototype.receiveCommands = function receiveCommands(commands) {
  * @method clearCommands
  */
 Compositor.prototype.clearCommands = function clearCommands() {
-    this._inCommands.index = 0;
     this._inCommands.length = 0;
     this._outCommands.length = 0;
     this._sentResize = false;
