@@ -72,7 +72,10 @@ ContactManifoldTable.prototype.addManifold = function addManifold(lowID, highID,
 
     var index = this._IDPool.length ? this._IDPool.pop() : this.manifolds.length;
     this.collisionMatrix[lowID][highID] = index;
-    return this.manifolds[index] = OMRequestManifold().reset(lowID, highID, bodyA, bodyB);
+    var manifold = OMRequestManifold().reset(lowID, highID, bodyA, bodyB);
+    this.manifolds[index] = manifold;
+
+    return manifold;
 };
 
 /**
@@ -104,7 +107,11 @@ ContactManifoldTable.prototype.update = function update(dt) {
         var manifold = manifolds[i];
         if (!manifold) continue;
         var persists = manifold.update(dt);
-        if (!persists) this.removeManifold(manifold, i);
+        if (!persists) {
+            this.removeManifold(manifold, i);
+            manifold.bodyA.events.trigger('collision:end', manifold);
+            manifold.bodyB.events.trigger('collision:end', manifold);
+        }
     }
 };
 
@@ -169,6 +176,8 @@ ContactManifoldTable.prototype.registerContact = function registerContact(bodyA,
     if (!collisionMatrix[lowID] || collisionMatrix[lowID][highID] == null) {
         manifold = this.addManifold(lowID, highID, bodyA, bodyB);
         manifold.addContact(bodyA, bodyB, collisionData);
+        bodyA.events.trigger('collision:start', manifold);
+        bodyB.events.trigger('collision:start', manifold);
     } else {
         manifold = manifolds[ collisionMatrix[lowID][highID] ];
         manifold.contains(collisionData)

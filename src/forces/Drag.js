@@ -1,7 +1,6 @@
 'use strict';
 
 var Force = require('./Force');
-var Particle = require('../bodies/Particle');
 var Vec3 = require('famous-math').Vec3;
 
 var FORCE_REGISTER = new Vec3();

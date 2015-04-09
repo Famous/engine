@@ -8,7 +8,7 @@ var Vec3 = require('famous-math').Vec3;
 var Quaternion = require('famous-math').Quaternion;
 
 var VEC_REGISTER = new Vec3();
-var XYZ_REGISTER = new Vec3();
+var ZYX_REGISTER = new Vec3();
 var QUAT_REGISTER = new Quaternion();
 var DELTA_REGISTER = new Vec3();
 
@@ -327,21 +327,21 @@ PhysicsEngine.prototype.getTransform = function getTransform(body) {
     var q = body.orientation;
     var rot = q;
     var loc = p;
-    var XYZ;
+    var ZYX;
 
     if (oq.w !== 1) {
-        rot = Quaternion.multiply(q, oq, QUAT_REGISTER)
+        rot = Quaternion.multiply(q, oq, QUAT_REGISTER);
         loc = oq.rotateVector(p, VEC_REGISTER);
     }
-    var XYZ = rot.toEulerXYZ(XYZ_REGISTER);
+    var ZYX = rot.toEuler(ZYX_REGISTER);
 
     transform.position[0] = o.x+loc.x;
     transform.position[1] = o.y+loc.y;
     transform.position[2] = o.z+loc.z;
 
-    transform.rotation[0] = XYZ.x;
-    transform.rotation[1] = XYZ.y;
-    transform.rotation[2] = XYZ.z;
+    transform.rotation[0] = ZYX.x;
+    transform.rotation[1] = ZYX.y;
+    transform.rotation[2] = ZYX.z;
 
     return transform;
 };

@@ -37,8 +37,6 @@ test('RotationalDrag', function(t) {
         var v = Vec3.clone(p1.angularVelocity);
         v.scale(-d.strength);
 
-        v.applyMatrix(p1.inertia);
-
         d.update();
 
         t.assert(vec3sAreEqual(p1.torque, v), '.update should apply forces correctly');

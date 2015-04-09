@@ -77,7 +77,7 @@ CollisionData.prototype.reset = function reset(penetration, normal, worldContact
  * @param {Object} options
  */
 function Collision(targets, options) {
-    this.targets = targets || [];
+    this.targets = [].concat(targets);
 
     Constraint.call(this, options);
 }

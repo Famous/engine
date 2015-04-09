@@ -2,7 +2,6 @@
 
 var Force = require('./Force');
 var Vec3 = require('famous-math').Vec3;
-var Particle = require('./../bodies/Particle');
 
 var FORCE_REGISTER = new Vec3();
 
