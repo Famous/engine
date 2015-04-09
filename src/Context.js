@@ -139,8 +139,10 @@ Context.prototype.receive = function receive(pathArr, path, commands) {
             case 'ADD_EVENT_LISTENER':
                 if (this.WebGLRenderer) this.WebGLRenderer.getOrSetCutout(path);
                 var type = commands[commands.index++];
-                commands.index++;
-                this.DOMRenderer.addEventListener(path, type);
+                var properties = commands[commands.index++];
+                var preventDefault = commands[commands.index++];
+
+                this.DOMRenderer.addEventListener(path, type, properties, preventDefault);
                 break;
 
             case 'RECALL':
