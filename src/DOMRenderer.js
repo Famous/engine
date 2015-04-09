@@ -152,7 +152,7 @@ DOMRenderer.prototype.setMatrix = function setMatrix (transform) {
 
     invert(this._target.invertedParent, this._parent.worldTransform);
     invert(this._target.finalTransform, this._target.invertedParent, worldTransform);
-    debugger;
+    
     this._target.element.style[TRANSFORM] = stringifyMatrix(this._target.finalTransform);
 };
 
