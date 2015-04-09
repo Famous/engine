@@ -1,6 +1,6 @@
-var VirtualElement = require('famous-dom-renderers').VirtualElement;
 var WebGLRenderer = require('famous-webgl-renderers').WebGLRenderer;
 var Camera = require('famous-components').Camera;
+var DOMRenderer = require('famous-dom-renderers').DOMRenderer;
 
 function Context(selector, compositor) {
     this._rootEl = document.querySelector(selector);
@@ -12,9 +12,8 @@ function Context(selector, compositor) {
     DOMLayerEl.style.width = '100%';
     DOMLayerEl.style.height = '100%';
     this._rootEl.appendChild(DOMLayerEl);
-    this.DOMRenderer = new VirtualElement(DOMLayerEl, selector, compositor, undefined, undefined, true);
-    this.DOMRenderer.setMatrix(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
-    
+    this.DOMRenderer = new DOMRenderer(DOMLayerEl, selector); 
+ 
     this.WebGLRenderer;
     this.canvas = document.createElement('canvas');
     this.canvas.className = 'famous-webgl';
@@ -78,40 +77,30 @@ Context.prototype.receive = function receive(pathArr, path, commands) {
 
     var command = commands[commands.index++];
 
+    this.DOMRenderer.loadPath(path);
+    this.DOMRenderer.findTarget();
+
     while (command) {
         switch (command) {
             case 'INIT_DOM':
-                id = pathArr.shift();
-                pointer = this._children;
-                parentEl = this.DOMRenderer;
-
-                while (pathArr.length) {
-                    pointer = pointer[id] = pointer[id] || {};
-                    if (pointer.DOM) parentEl = pointer.DOM;
-                    id = pathArr.shift();
-                }
-                pointer = pointer[id] = pointer[id] || {};
-                element = parentEl.addChild(path, id, commands[commands.index++]);
-                this._elementHash[path] = element;
-                this._renderers.push((pointer.DOM = element));
+                this.DOMRenderer.insertEl(commands[commands.index++]);
                 break;
 
             case 'CHANGE_TRANSFORM':
-                if (!element) element = this._elementHash[path];
+                for (var i = 0 ; i < 16 ; i++) this._meshTransform[i] = commands[commands.index++];
 
-                for (var i = 0; i < 16; i++) {
-                    this._meshTransform[i] = commands[commands.index++];
-                }
-                element.setMatrix.apply(element, this._meshTransform);
-                if (this.WebGLRenderer) this.WebGLRenderer.setCutoutUniform(path, 'transform', this._meshTransform);
+                this.DOMRenderer.setMatrix(this._meshTransform);
+
+                if (this.WebGLRenderer)
+                    this.WebGLRenderer.setCutoutUniform(path, 'transform', this._meshTransform);
+                
                 break;
 
             case 'CHANGE_SIZE':
-                if (!element) element = this._elementHash[path];
                 var width = commands[commands.index++];
                 var height = commands[commands.index++];
 
-                element.changeSize(width, height);
+                this.DOMRenderer.setSize(width, height);
                 if (this.WebGLRenderer) {
                     this._meshSize[0] = width;
                     this._meshSize[1] = height;
@@ -120,27 +109,23 @@ Context.prototype.receive = function receive(pathArr, path, commands) {
                 break;
 
             case 'CHANGE_PROPERTY':
-                if (!element) element = this._elementHash[path];
                 if (this.WebGLRenderer) this.WebGLRenderer.getOrSetCutout(path);
-                element.setProperty(commands[commands.index++], commands[commands.index++]);
+                this.DOMRenderer.setProperty(commands[commands.index++], commands[commands.index++]);
                 break;
 
             case 'CHANGE_CONTENT':
-                if (!element) element = this._elementHash[path];
                 if (this.WebGLRenderer) this.WebGLRenderer.getOrSetCutout(path);
-                element.setContent(commands[commands.index++]);
+                this.DOMRenderer.setContent(commands[commands.index++]);
                 break;
 
             case 'CHANGE_ATTRIBUTE':
-                if (!element) element = this._elementHash[path];
                 if (this.WebGLRenderer) this.WebGLRenderer.getOrSetCutout(path);
-                element.setAttribute(commands[commands.index++], commands[commands.index++]);
+                this.DOMRenderer.setAttribute(commands[commands.index++], commands[commands.index++]);
                 break;
 
             case 'ADD_CLASS':
-                if (!element) element = this._elementHash[path];
                 if (this.WebGLRenderer) this.WebGLRenderer.getOrSetCutout(path);
-                element.addClass(commands[commands.index++]);
+                this.DOMRenderer.addClass(commands[commands.index++]); 
                 break;
 
             case 'REMOVE_CLASS':
