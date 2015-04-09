@@ -13,6 +13,8 @@ function DOMRenderer (element, selector) {
     this._selector = selector;
     this._elements = {};
     this._elements[selector] = this._root;
+    this.perspectiveTransform = new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
+    this._VPtransform = new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
 }
 
 DOMRenderer.prototype.getSize = function getSize () {
@@ -20,6 +22,37 @@ DOMRenderer.prototype.getSize = function getSize () {
 };
 
 DOMRenderer.prototype._getSize = DOMRenderer.prototype.getSize;
+
+DOMRenderer.prototype.draw = function draw (renderState) {
+    if (renderState.perspectiveDirty) {
+        this.perspectiveDirty = true;
+
+        this.perspectiveTransform[0] = renderState.perspectiveTransform[0];
+        this.perspectiveTransform[1] = renderState.perspectiveTransform[1];
+        this.perspectiveTransform[2] = renderState.perspectiveTransform[2];
+        this.perspectiveTransform[3] = renderState.perspectiveTransform[3];
+
+        this.perspectiveTransform[4] = renderState.perspectiveTransform[4];
+        this.perspectiveTransform[5] = renderState.perspectiveTransform[5];
+        this.perspectiveTransform[6] = renderState.perspectiveTransform[6];
+        this.perspectiveTransform[7] = renderState.perspectiveTransform[7];
+
+        this.perspectiveTransform[8] = renderState.perspectiveTransform[8];
+        this.perspectiveTransform[9] = renderState.perspectiveTransform[9];
+        this.perspectiveTransform[10] = renderState.perspectiveTransform[10];
+        this.perspectiveTransform[11] = renderState.perspectiveTransform[11];
+
+        this.perspectiveTransform[12] = renderState.perspectiveTransform[12];
+        this.perspectiveTransform[13] = renderState.perspectiveTransform[13];
+        this.perspectiveTransform[14] = renderState.perspectiveTransform[14];
+        this.perspectiveTransform[15] = renderState.perspectiveTransform[15];
+    }
+    
+    if (renderState.viewDirty || renderState.perspectiveDirty) {
+        multiply(this._VPtransform, this.perspectiveTransform, renderState.viewTransform);
+        this._root.element.style[TRANSFORM] = stringifyMatrix(this._VPtransform);
+    }
+};
 
 DOMRenderer.prototype._assertPathLoaded = function _asserPathLoaded () {
     if (!this._path) throw new Error('path not loaded');
@@ -152,7 +185,6 @@ DOMRenderer.prototype.setMatrix = function setMatrix (transform) {
 
     invert(this._target.invertedParent, this._parent.worldTransform);
     multiply(this._target.finalTransform, this._target.invertedParent, worldTransform);
-
 
     this._target.element.style[TRANSFORM] = stringifyMatrix(this._target.finalTransform);
 };
