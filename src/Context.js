@@ -61,7 +61,7 @@ Context.prototype.draw = function draw() {
 };
 
 Context.prototype.getRootSize = function getRootSize() {
-    return this._size;
+    return this.DOMRenderer.getSize();
 };
 
 Context.prototype.initWebGL = function initWebGL() {
