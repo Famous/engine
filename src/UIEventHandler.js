@@ -11,18 +11,14 @@ var CallbackStore = require('famous-utilities').CallbackStore;
  * @param {Object[]} events An array of event objects specifying .event and .callback properties.
  */
 function UIEventHandler (dispatch, events) {
+    this.dispatch = dispatch;
     this._events = new CallbackStore();
-    var renderables = dispatch.getRenderables();
-    for (var i = 0, len = renderables.length; i < len; i++)
-        for (var j = 0, len2 = events.length; j < len2; j++) {
-            var eventName = events[j].event;
-            var methods = events[j].methods;
-            var properties = events[j].properties;
-            var callback = events[j].callback;
-            this._events.on(eventName, callback);
-            if (renderables[i].on) renderables[i].on(eventName, methods, properties);
-            dispatch.registerTargetedEvent(eventName, this.trigger.bind(this, eventName));
+
+    if (events) {
+        for (var i = 0, len = events.length; i < len; i++) {
+            this.on(events[i], events[i].callback);
         }
+    }
 }
 
 /**
@@ -34,6 +30,37 @@ function UIEventHandler (dispatch, events) {
  */
 UIEventHandler.toString = function toString() {
     return 'UIEventHandler';
+};
+
+/**
+ * Register a callback to be invoked on an event.
+ *
+ * @method on
+ * @param {Object|String} ev The event object or event name.
+ * @param {Function} cb The callback.
+ */
+UIEventHandler.prototype.on = function on(ev, cb) {
+    var renderables = this.dispatch.getRenderables();
+    var eventName = ev.event || ev;
+    var methods = ev.methods;
+    var properties = ev.properties;
+    for (var i = 0, len = renderables.length; i < len; i++) {
+        if (renderables[i].on) renderables[i].on(eventName, methods, properties);
+    }
+    this._events.on(eventName, cb);
+    this.dispatch.registerTargetedEvent(eventName, this.trigger.bind(this, eventName));
+};
+
+/**
+ * Deregister a callback from an event.
+ *
+ * @method on
+ * @param {String} ev The event name.
+ * @param {Function} cb The callback.
+ */
+UIEventHandler.prototype.off = function off(ev, cb) {
+    this._events.off(ev, cb);
+    this.dispatch.deregisterGlobalEvent(ev, this.trigger.bind(this, ev))
 };
 
 /**

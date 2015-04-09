@@ -17,8 +17,7 @@ function EventHandler (dispatch, events) {
         for (var i = 0, len = events.length; i < len; i++) {
             var eventName = events[i].event;
             var callback = events[i].callback;
-            this._events.on(eventName, callback);
-            dispatch.registerGlobalEvent(eventName, this.trigger.bind(this, eventName));
+            this.on(eventName, callback);
         }
     }
 }
