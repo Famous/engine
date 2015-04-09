@@ -1,8 +1,28 @@
 'use strict';
 
+// TODO: Dispatcher should be generalized so that it can work on any Node
+// not just Contexts.
+
+
+/**
+ * The Dispatcher class is used to propogate events down the
+ * scene graph.
+ *
+ * @param {Context} Context on which it operates
+ */
 function Dispatcher (context) {
-    this._context = context;
-    this._queue = [];
+    
+    this._context = context; // A reference to the context
+                             // on which the dispatcher
+                             // operates
+
+    this._queue = []; // The queue is used for two purposes
+                      // 1. It is used to list indicies in the
+                      //    Nodes path which are then used to lookup
+                      //    a node in the scene graph.
+                      // 2. It is used to assist dispatching
+                      //    such that it is possible to do a breadth first
+                      //    traversal of the scene graph.
 }
 
 Dispatcher.prototype.lookupNode = function lookupNode (location) {
