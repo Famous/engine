@@ -19,6 +19,7 @@ function DOMRenderer (element, selector, compositor) {
 
 DOMRenderer.prototype.addEventListener = function addEventListener(path, type, properties, preventDefault) {
     if (!this._eventListeners[type]) {
+        this._eventListeners[type] = {};
         this._root.element.addEventListener(type, this._triggerEvent.bind(this));
     }
 
