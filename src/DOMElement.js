@@ -83,7 +83,6 @@ DOMElement.prototype.onMount = function onMount (node, id) {
 DOMElement.prototype.onDismount = function onDismount () {
     this.setProperty('display', 'none');
     this.setAttribute('data-fa-path', '');
-    this._changeQueue.push('RECALL');
     this._initialized = false;
 };
 
@@ -93,7 +92,6 @@ DOMElement.prototype.onShow = function onShow () {
 
 DOMElement.prototype.onHide = function onHide () {
     this.setProperty('display', 'none');
-    this._changeQueue.push('RECALL');
 };
 
 DOMElement.prototype.onTransformChange = function onTransformChange (transform) {
