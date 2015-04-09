@@ -24,22 +24,22 @@ var Curves = require('./Curves');
  *     .to([100, 0], 'linear', 1000)
  *     .delay(1000)
  *     .to([200, 0], 'outBounce', 1000);
- * 
+ *
  * var div = document.createElement('div');
  * div.style.background = 'blue';
  * div.style.width = '100px';
  * div.style.height = '100px';
  * document.body.appendChild(div);
- * 
+ *
  * div.addEventListener('click', function() {
  *     t.isPaused() ? t.resume() : t.pause();
  * });
- * 
+ *
  * requestAnimationFrame(function loop() {
  *     div.style.transform = 'translateX(' + t.get()[0] + 'px)' + ' translateY(' + t.get()[1] + 'px)';
  *     requestAnimationFrame(loop);
  * });
- * 
+ *
  * @class Transitionable
  * @constructor
  * @param {Number|Array.Number} initialState    initial state to transition
@@ -59,7 +59,7 @@ function Transitionable(initialState) {
 /**
  * Internal Clock used for determining the current time for the ongoing
  * transitions.
- * 
+ *
  * @type {Performance|Date|Object}
  */
 Transitionable.Clock = typeof performance !== 'undefined' ? performance : Date;
@@ -69,7 +69,7 @@ Transitionable.Clock = typeof performance !== 'undefined' ? performance : Date;
  *
  * @method to
  * @chainable
- * 
+ *
  * @param  {Number|Array.Number}    finalState              final state to
  *                                                          transiton to
  * @param  {String|Function}        [curve=Curves.linear]   easing function
@@ -86,6 +86,10 @@ Transitionable.Clock = typeof performance !== 'undefined' ? performance : Date;
  */
 Transitionable.prototype.to = function to(finalState, curve, duration, callback) {
     curve = curve != null && curve.constructor === String ? Curves[curve] : curve;
+    if (this._queue.length === 0) {
+        this._startedAt = this.constructor.Clock.now();
+        this._pausedAt = null;
+    }
     this._queue.push(
         finalState,
         curve != null ? curve : Curves.linear,
@@ -100,7 +104,7 @@ Transitionable.prototype.to = function to(finalState, curve, duration, callback)
  *
  * @method from
  * @chainable
- * 
+ *
  * @param  {Number|Array.Number}    initialState    initial state to
  *                                                  transition from
  * @return {Transitionable}         this
@@ -140,7 +144,7 @@ Transitionable.prototype.delay = function delay(duration, callback) {
  *
  * @method override
  * @chainable
- * 
+ *
  * @param  {Number|Array.Number}    [finalState]    final state to transiton to
  * @param  {String|Function}        [curve]         easing function used for
  *                                                  interpolating [0, 1]
@@ -154,8 +158,8 @@ Transitionable.prototype.override = function override(finalState, curve, duratio
     if (this._queue.length > 0) {
         if (finalState != null) this._queue[0] = finalState;
         if (curve != null)      this._queue[1] = curve.constructor === String ? Curves[curve] : curve;
-        if (duration != null)   this._queue[0] = duration;
-        if (callback != null)   this._queue[0] = callback;
+        if (duration != null)   this._queue[2] = duration;
+        if (callback != null)   this._queue[3] = callback;
     }
     return this;
 };
@@ -216,7 +220,7 @@ Transitionable.prototype.isActive = function isActive() {
  *
  * @method halt
  * @chainable
- * 
+ *
  * @return {Transitionable} this
  */
 Transitionable.prototype.halt = function halt() {
@@ -225,10 +229,10 @@ Transitionable.prototype.halt = function halt() {
 
 /**
  * Pause transition. This will not erase any actions.
- * 
+ *
  * @method pause
  * @chainable
- * 
+ *
  * @return {Transitionable} this
  */
 Transitionable.prototype.pause = function pause() {
@@ -241,7 +245,7 @@ Transitionable.prototype.pause = function pause() {
  *
  * @method isPaused
  * @chainable
- * 
+ *
  * @return {Boolean} if the current action has been paused
  */
 Transitionable.prototype.isPaused = function isPaused() {
@@ -250,10 +254,10 @@ Transitionable.prototype.isPaused = function isPaused() {
 
 /**
  * Resume transition.
- * 
+ *
  * @method resume
  * @chainable
- * 
+ *
  * @return {Transitionable} this
  */
 Transitionable.prototype.resume = function resume() {
@@ -285,7 +289,7 @@ Transitionable.prototype.reset = function(start) {
  * @method set
  * @chainable
  * @deprecated Use `.to` instead!
- * 
+ *
  * @param {Number|FamousMatrix|Array.Number|Object.<number, number>} endState
  *    end state to which we interpolate
  * @param {transition=} transition object of type {duration: number, curve:

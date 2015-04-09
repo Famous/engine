@@ -57,7 +57,7 @@ test('Transitionable', function(t) {
 
         time = 0;
         transitionable.set(0, null, callback);
-        time = 510;
+        time = 10;
         transitionable.set(4, { duration: 500 }, callback);
         time = 550;
         transitionable.get();
@@ -222,9 +222,9 @@ test('Transitionable', function(t) {
         function testFunction() {
             transitionable.set(1, {curve: 'linear', duration: 500}, function() {
                 transitionable.set(0, {curve: 'linear', duration: 500});
-            });    
+            });
         }
-        
+
         testFunction();
         time = 500;
         t.equal(transitionable.get(), 1); // To call the callback
