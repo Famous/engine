@@ -316,6 +316,11 @@ Node.prototype.addComponent = function addComponent (component) {
     return index;
 };
 
+Node.prototype.addRenderable = function addRenderable (component) {
+    console.warn("Node#addRenderable is depricated!\n use node.addComponent instead");
+    this.addComponent(component);
+};
+
 Node.prototype.removeComponent = function removeComponent (component) {
     var index = this._components.indexOf(component);
     if (index !== -1) {
