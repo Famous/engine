@@ -31,6 +31,8 @@ DOMRenderer.prototype._triggerEvent = function _triggerEvent(type, ev) {
         var path = ev.path[i].dataset.faPath;
         if (this._eventListeners[type][path]) {
             this._compositor.sendEvent(path, type, ev);
+            ev.stopPropagation();
+            break;
         }
     }
 };
