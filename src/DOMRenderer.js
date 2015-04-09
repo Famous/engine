@@ -16,7 +16,7 @@ function DOMRenderer (element, selector) {
 }
 
 DOMRenderer.prototype.getSize = function getSize () {
-    return [this._root.offsetWidth, this._root.offsetHeight];
+    return [this._root.element.offsetWidth, this._root.element.offsetHeight];
 };
 
 DOMRenderer.prototype._getSize = DOMRenderer.prototype.getSize;
@@ -102,6 +102,7 @@ DOMRenderer.prototype.insertEl = function insertEl (tagName) {
         
         this._target = new ElementCache(document.createElement(tagName));
         this._parent.element.appendChild(this._target.element);
+        this._elements[this._path] = this._target;
         
         for (var i = 0, len = this._children.length ; i < len ; i++) {
             this._target.element.appendChild(this._children[i].element);
@@ -120,9 +121,8 @@ DOMRenderer.prototype.setProperty = function setProperty (name, value) {
 
 DOMRenderer.prototype.setSize = function setSize (width, height) {
     this._assertTargetLoaded();
-    console.log(width, height);
-    this._target.element.style.width = width + 'px';
-    this._target.element.style.height = height + 'px';
+    if (width != null && width !== true) this._target.element.style.width = width + 'px';
+    if (height != null && height !== true) this._target.element.style.height = height + 'px';
 };
 
 DOMRenderer.prototype.setAttribute = function setAttribute (name, value) {
