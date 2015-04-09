@@ -81,9 +81,10 @@ function _splitTo (string, target) {
             last = i + 1;
         }
     }
-    if (!target.length && string.length) target.push(string);
+    if (i - last > 0) target.push(string.substring(last, i));
     return target;
 }
+
 
 module.exports = Dispatcher;
 
