@@ -803,6 +803,17 @@ Node.prototype.onParentDismount = function onParentDismount () {
     this.dismount();
 };
 
+Node.prototype.receive = function receive (type, ev) {
+    var i = 0;
+    var list = this._components;
+    var len = list.length;
+    var item;
+    for (; i < len ; i++) {
+        item = list[i];
+        if (item && item.onReceive) item.onReceive(type, ev);
+    }
+};
+
 Node.prototype.onParentShow = Node.prototype.show;
 
 Node.prototype.onParentHide = Node.prototype.hide;
@@ -819,6 +830,6 @@ Node.prototype.onMount = Node.prototype.mount;
 
 Node.prototype.onDismount = Node.prototype.dismount;
 
+Node.prototype.onReceive = Node.prototype.receive;
+
 module.exports = Node;
-
-
