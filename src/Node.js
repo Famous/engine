@@ -2,7 +2,6 @@
 
 var Transform = require('./Transform');
 var Size = require('./Size');
-var Famous = require('./Famous');
 
 var TRANSFORM_PROCESSOR = new Transform();
 var SIZE_PROCESSOR = new Size();
@@ -141,7 +140,7 @@ Node.prototype.getId = Node.prototype.getLocation;
 
 // THIS WILL BE DEPRICATED
 Node.prototype.sendDrawCommand = function sendDrawCommand (message) {
-    Famous.message(message);
+    this._globalUpdater.message(message);
     return this;
 };
 
@@ -695,7 +694,7 @@ Node.prototype._sizeChanged = function _sizeChanged (size) {
 
 // DEPRICATE
 Node.prototype.getFrame = function getFrame () {
-    return Famous.getFrame();
+    return this._globalUpdater.getFrame();
 };
 
 Node.prototype.onUpdate = function onUpdate (time) {

@@ -1,43 +1,27 @@
+'use strict';
 
-var Famous = require('./Famous');
 var Dispatch = require('./Dispatcher');
 var Node = require('./Node');
 var Size = require('./Size');
 
-var IDENT = new Float32Array([
-    1, 0, 0, 0,
-    0, 1, 0, 0,
-    0, 0, 1, 0,
-    0, 0, 0, 1
-]);
-
-var ZEROS = new Float32Array(3);
-
-var BOTTOM = {
-    getTransform: function getTransform () {
-        return IDENT;
-    },
-    getSize: function getSize () {
-        return ZEROS;
-    },
-    getUpdater: function getUpdater () {
-        return Famous;
-    }
-};
-
-function Context (selector) {
+function Context (selector, famous) {
     Node.call(this);
+    this._famous = famous;
+
     this._dispatch = new Dispatch(this);
     this._selector = selector;
 
-    this.onMount(BOTTOM, selector);
-    Famous.registerContext(selector, this);
-    Famous.message('NEED_SIZE_FOR').message(selector);
+    this.onMount(this, selector);
+    this._famous.message('NEED_SIZE_FOR').message(selector);
     this.show();
 }
 
 Context.prototype = Object.create(Node.prototype);
 Context.prototype.constructor = Context;
+
+Context.prototype.getUpdater = function getUpdater () {
+    return this._famous;
+};
 
 Context.prototype.getSelector = function getSelector () {
     return this._selector;
