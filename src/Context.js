@@ -3,6 +3,7 @@ var Camera = require('famous-components').Camera;
 var DOMRenderer = require('famous-dom-renderers').DOMRenderer;
 
 function Context(selector, compositor) {
+    this._compositor = compositor;
     this._rootEl = document.querySelector(selector);
     if (this._rootEl === document.body) {
         window.addEventListener('resize', this.updateSize.bind(this));
@@ -12,7 +13,7 @@ function Context(selector, compositor) {
     DOMLayerEl.style.width = '100%';
     DOMLayerEl.style.height = '100%';
     this._rootEl.appendChild(DOMLayerEl);
-    this.DOMRenderer = new DOMRenderer(DOMLayerEl, selector); 
+    this.DOMRenderer = new DOMRenderer(DOMLayerEl, selector, compositor); 
  
     this.WebGLRenderer;
     this.canvas = document.createElement('canvas');
@@ -81,6 +82,7 @@ Context.prototype.receive = function receive(pathArr, path, commands) {
     this.DOMRenderer.findTarget();
 
     while (command) {
+
         switch (command) {
             case 'INIT_DOM':
                 this.DOMRenderer.insertEl(commands[commands.index++]);
@@ -135,17 +137,10 @@ Context.prototype.receive = function receive(pathArr, path, commands) {
                 break;
 
             case 'ADD_EVENT_LISTENER':
-                if (!element) element = this._elementHash[path];
                 if (this.WebGLRenderer) this.WebGLRenderer.getOrSetCutout(path);
-                var ev = commands[commands.index++];
-                var methods;
-                var properties;
-                var c;
-                while ((c = commands[commands.index++]) !== 'EVENT_PROPERTIES') methods = c;
-                while ((c = commands[commands.index++]) !== 'EVENT_END') properties = c;
-                methods = methods || [];
-                properties = properties || [];
-                element.addEventListener(ev, element.dispatchEvent.bind(element, ev, methods, properties));
+                var type = commands[commands.index++];
+                commands.index++;
+                this.DOMRenderer.addEventListener(path, type);
                 break;
 
             case 'RECALL':
