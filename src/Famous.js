@@ -3,6 +3,7 @@
 var isWorker = typeof self !== 'undefined' && self.window !== self;
 
 var Clock = require('./Clock');
+var Context = require('./Context');
 
 function Famous (config) {
     this._nextUpdateQueue = [];
@@ -105,12 +106,6 @@ Famous.prototype.step = function step (time) {
     return this;
 };
 
-Famous.prototype.registerContext = function registerContext (selector, context) {
-    if (this._contexts[selector]) this._contexts[selector].onDismount();
-    this._contexts[selector] = context;
-    return this;
-};
-
 Famous.prototype.getContext = function getContext (selector) {
     return this._contexts[selector.split('/')[0]];
 };
@@ -124,11 +119,10 @@ Famous.prototype.message = function message (messages) {
     return this;
 };
 
-Famous.prototype.createContext = function createContext () {
-    console.error(
-        'Famous#createContext is deprecated!' + 
-        'Use new Context instead!'
-    );
+Famous.prototype.createContext = function createContext (selector) {
+    if (this._contexts[selector]) this._contexts[selector].onDismount();
+    this._contexts[selector] = new Context(selector, this);
+    return this._contexts[selector];
 };
 
 module.exports = new Famous();
