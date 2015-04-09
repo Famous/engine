@@ -4,7 +4,8 @@ var ElementCache = require('./ElementCache');
 
 var TRANSFORM = 'transform';
 
-function DOMRenderer (element, selector) {
+function DOMRenderer (element, selector, compositor) {
+    this._compositor = compositor;
     this._target = null;
     this._parent = null;
     this._path = null;
@@ -13,7 +14,26 @@ function DOMRenderer (element, selector) {
     this._selector = selector;
     this._elements = {};
     this._elements[selector] = this._root;
+    this._eventListeners = {};
 }
+
+DOMRenderer.prototype.addEventListener = function addEventListener(path, type) {
+    if (!this._eventListeners[type]) {
+        this._eventListeners[type] = {};
+        this._root.element.addEventListener(type, this._triggerEvent.bind(this, type));
+    }
+    this._eventListeners[type][path] = true;
+};
+
+DOMRenderer.prototype._triggerEvent = function _triggerEvent(type, ev) {
+    for (var i = 0; i < ev.path.length; i++) {
+        if (!ev.path[i].dataset) continue;
+        var path = ev.path[i].dataset.faPath;
+        if (this._eventListeners[type][path]) {
+            this._compositor.sendEvent(path, type, ev);
+        }
+    }
+};
 
 DOMRenderer.prototype.getSize = function getSize () {
     return [this._root.element.offsetWidth, this._root.element.offsetHeight];
