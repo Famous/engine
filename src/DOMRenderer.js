@@ -135,13 +135,14 @@ DOMRenderer.prototype.setContent = function setContent (content) {
     this.findChildren(this._path);
 
     // Temporary solution
-    for (var i = 0 ; i < this._children.length ; i++)
-        this._target.element.removeChild(this._children[i]);
+    for (var i = 0 ; i < this._children.length ; i++) {
+        this._target.element.removeChild(this._children[i].element);
+    }
 
     this._target.element.innerHTML = content;
 
     for (var i = 0 ; i < this._children.length ; i++)
-        this._target.element.appendChild(this._children[i]);
+        this._target.element.appendChild(this._children[i].element);
 };
 
 DOMRenderer.prototype.setMatrix = function setMatrix (transform) { 
