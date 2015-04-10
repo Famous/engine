@@ -43,7 +43,15 @@ function Famous () {
 }
 
 /**
- * _update is the body of the update loop. The frame 
+ * _update is the body of the update loop. The frame consists of
+ * pulling in appending the nextUpdateQueue to the currentUpdate queue
+ * then moving through the updateQueue and calling onUpdate with the current
+ * time on all nodes. While _update is called _inUpdate is set to true and 
+ * all requests to be placed in the update queue will be forwarded to the 
+ * nextUpdateQueue.
+ *
+ * @param {Number} The current time
+ */
 Famous.prototype._update = function _update (time) {
     this._inUpdate = true;
     var nextQueue = this._nextUpdateQueue;
