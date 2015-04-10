@@ -1,0 +1,972 @@
+[{
+   "parentSize": [
+       105,
+       69,
+       183
+   ],
+   "spec": {
+       "size": {
+           "sizeMode": [
+               0,
+               0,
+               0
+           ],
+           "proportional": [
+               0.38,
+               0.61,
+               0.99
+           ],
+           "differential": [
+               31,
+               89,
+               16
+           ],
+           "absolute": [
+               44,
+               21,
+               51
+           ]
+       }
+   },
+   "expectedResult": {
+       "0": 70.9000015258789,
+       "1": 131.08999633789062,
+       "2": 197.1699981689453
+   }
+},
+{
+   "parentSize": [
+       16,
+       174,
+       110
+   ],
+   "spec": {
+       "size": {
+           "sizeMode": [
+               0,
+               0,
+               1
+           ],
+           "proportional": [
+               0.15,
+               0.07,
+               0.46
+           ],
+           "differential": [
+               21,
+               84,
+               30
+           ],
+           "absolute": [
+               2,
+               39,
+               24
+           ]
+       }
+   },
+   "expectedResult": {
+       "0": 23.399999618530273,
+       "1": 96.18000030517578,
+       "2": 24
+   }
+},
+{
+   "parentSize": [
+       34,
+       125,
+       30
+   ],
+   "spec": {
+       "size": {
+           "sizeMode": [
+               0,
+               0,
+               2
+           ],
+           "proportional": [
+               0.26,
+               0.48,
+               0.52
+           ],
+           "differential": [
+               77,
+               35,
+               64
+           ],
+           "absolute": [
+               52,
+               45,
+               68
+           ]
+       }
+   },
+   "expectedResult": {
+       "0": 85.83999633789062,
+       "1": 95,
+       "2": 0
+   }
+},
+{
+   "parentSize": [
+       31,
+       194,
+       63
+   ],
+   "spec": {
+       "size": {
+           "sizeMode": [
+               0,
+               1,
+               0
+           ],
+           "proportional": [
+               0.59,
+               0.66,
+               0.42
+           ],
+           "differential": [
+               13,
+               80,
+               42
+           ],
+           "absolute": [
+               42,
+               19,
+               0
+           ]
+       }
+   },
+   "expectedResult": {
+       "0": 31.290000915527344,
+       "1": 19,
+       "2": 68.45999908447266
+   }
+},
+{
+   "parentSize": [
+       42,
+       101,
+       52
+   ],
+   "spec": {
+       "size": {
+           "sizeMode": [
+               0,
+               1,
+               1
+           ],
+           "proportional": [
+               0.52,
+               0.14,
+               0.22
+           ],
+           "differential": [
+               33,
+               25,
+               6
+           ],
+           "absolute": [
+               12,
+               13,
+               69
+           ]
+       }
+   },
+   "expectedResult": {
+       "0": 54.84000015258789,
+       "1": 13,
+       "2": 69
+   }
+},
+{
+   "parentSize": [
+       21,
+       65,
+       170
+   ],
+   "spec": {
+       "size": {
+           "sizeMode": [
+               0,
+               1,
+               2
+           ],
+           "proportional": [
+               0.45,
+               0.5,
+               0.48
+           ],
+           "differential": [
+               2,
+               50,
+               3
+           ],
+           "absolute": [
+               63,
+               24,
+               23
+           ]
+       }
+   },
+   "expectedResult": {
+       "0": 11.449999809265137,
+       "1": 24,
+       "2": 0
+   }
+},
+{
+   "parentSize": [
+       11,
+       17,
+       151
+   ],
+   "spec": {
+       "size": {
+           "sizeMode": [
+               0,
+               2,
+               0
+           ],
+           "proportional": [
+               0.29,
+               0.72,
+               0.92
+           ],
+           "differential": [
+               68,
+               65,
+               88
+           ],
+           "absolute": [
+               44,
+               20,
+               22
+           ]
+       }
+   },
+   "expectedResult": {
+       "0": 71.19000244140625,
+       "1": 0,
+       "2": 226.9199981689453
+   }
+},
+{
+   "parentSize": [
+       80,
+       36,
+       99
+   ],
+   "spec": {
+       "size": {
+           "sizeMode": [
+               0,
+               2,
+               1
+           ],
+           "proportional": [
+               0.33,
+               0.5,
+               0.29
+           ],
+           "differential": [
+               37,
+               4,
+               18
+           ],
+           "absolute": [
+               25,
+               9,
+               78
+           ]
+       }
+   },
+   "expectedResult": {
+       "0": 63.400001525878906,
+       "1": 0,
+       "2": 78
+   }
+},
+{
+   "parentSize": [
+       79,
+       87,
+       9
+   ],
+   "spec": {
+       "size": {
+           "sizeMode": [
+               0,
+               2,
+               2
+           ],
+           "proportional": [
+               0.55,
+               0.36,
+               0.65
+           ],
+           "differential": [
+               59,
+               3,
+               91
+           ],
+           "absolute": [
+               26,
+               96,
+               29
+           ]
+       }
+   },
+   "expectedResult": {
+       "0": 102.44999694824219,
+       "1": 0,
+       "2": 0
+   }
+},
+{
+   "parentSize": [
+       198,
+       1,
+       72
+   ],
+   "spec": {
+       "size": {
+           "sizeMode": [
+               1,
+               0,
+               0
+           ],
+           "proportional": [
+               0.1,
+               0.04,
+               0.74
+           ],
+           "differential": [
+               52,
+               66,
+               40
+           ],
+           "absolute": [
+               38,
+               2,
+               61
+           ]
+       }
+   },
+   "expectedResult": {
+       "0": 38,
+       "1": 66.04000091552734,
+       "2": 93.27999877929688
+   }
+},
+{
+   "parentSize": [
+       133,
+       191,
+       137
+   ],
+   "spec": {
+       "size": {
+           "sizeMode": [
+               1,
+               0,
+               1
+           ],
+           "proportional": [
+               0.5,
+               0.98,
+               0.48
+           ],
+           "differential": [
+               45,
+               39,
+               8
+           ],
+           "absolute": [
+               81,
+               90,
+               90
+           ]
+       }
+   },
+   "expectedResult": {
+       "0": 81,
+       "1": 226.17999267578125,
+       "2": 90
+   }
+},
+{
+   "parentSize": [
+       42,
+       30,
+       0
+   ],
+   "spec": {
+       "size": {
+           "sizeMode": [
+               1,
+               0,
+               2
+           ],
+           "proportional": [
+               0.27,
+               0.55,
+               0.7
+           ],
+           "differential": [
+               41,
+               54,
+               67
+           ],
+           "absolute": [
+               22,
+               13,
+               82
+           ]
+       }
+   },
+   "expectedResult": {
+       "0": 22,
+       "1": 70.5,
+       "2": 0
+   }
+},
+{
+   "parentSize": [
+       80,
+       56,
+       108
+   ],
+   "spec": {
+       "size": {
+           "sizeMode": [
+               1,
+               1,
+               0
+           ],
+           "proportional": [
+               0.95,
+               0.1,
+               0.45
+           ],
+           "differential": [
+               10,
+               36,
+               6
+           ],
+           "absolute": [
+               66,
+               26,
+               42
+           ]
+       }
+   },
+   "expectedResult": {
+       "0": 66,
+       "1": 26,
+       "2": 54.599998474121094
+   }
+},
+{
+   "parentSize": [
+       145,
+       28,
+       2
+   ],
+   "spec": {
+       "size": {
+           "sizeMode": [
+               1,
+               1,
+               1
+           ],
+           "proportional": [
+               0.08,
+               0.5,
+               0.75
+           ],
+           "differential": [
+               46,
+               60,
+               46
+           ],
+           "absolute": [
+               74,
+               27,
+               4
+           ]
+       }
+   },
+   "expectedResult": {
+       "0": 74,
+       "1": 27,
+       "2": 4
+   }
+},
+{
+   "parentSize": [
+       36,
+       116,
+       77
+   ],
+   "spec": {
+       "size": {
+           "sizeMode": [
+               1,
+               1,
+               2
+           ],
+           "proportional": [
+               0.11,
+               0.18,
+               0.11
+           ],
+           "differential": [
+               36,
+               98,
+               20
+           ],
+           "absolute": [
+               55,
+               18,
+               44
+           ]
+       }
+   },
+   "expectedResult": {
+       "0": 55,
+       "1": 18,
+       "2": 0
+   }
+},
+{
+   "parentSize": [
+       6,
+       103,
+       40
+   ],
+   "spec": {
+       "size": {
+           "sizeMode": [
+               1,
+               2,
+               0
+           ],
+           "proportional": [
+               0.56,
+               0.83,
+               0.59
+           ],
+           "differential": [
+               53,
+               66,
+               92
+           ],
+           "absolute": [
+               99,
+               34,
+               40
+           ]
+       }
+   },
+   "expectedResult": {
+       "0": 99,
+       "1": 0,
+       "2": 115.5999984741211
+   }
+},
+{
+   "parentSize": [
+       51,
+       79,
+       179
+   ],
+   "spec": {
+       "size": {
+           "sizeMode": [
+               1,
+               2,
+               1
+           ],
+           "proportional": [
+               0.39,
+               0.01,
+               0.6
+           ],
+           "differential": [
+               41,
+               71,
+               94
+           ],
+           "absolute": [
+               98,
+               68,
+               0
+           ]
+       }
+   },
+   "expectedResult": {
+       "0": 98,
+       "1": 0,
+       "2": 0
+   }
+},
+{
+   "parentSize": [
+       87,
+       74,
+       156
+   ],
+   "spec": {
+       "size": {
+           "sizeMode": [
+               1,
+               2,
+               2
+           ],
+           "proportional": [
+               0.73,
+               0.77,
+               0.45
+           ],
+           "differential": [
+               84,
+               61,
+               94
+           ],
+           "absolute": [
+               49,
+               19,
+               87
+           ]
+       }
+   },
+   "expectedResult": {
+       "0": 49,
+       "1": 0,
+       "2": 0
+   }
+},
+{
+   "parentSize": [
+       58,
+       62,
+       59
+   ],
+   "spec": {
+       "size": {
+           "sizeMode": [
+               2,
+               0,
+               0
+           ],
+           "proportional": [
+               0.93,
+               0.31,
+               0.82
+           ],
+           "differential": [
+               68,
+               73,
+               55
+           ],
+           "absolute": [
+               42,
+               63,
+               33
+           ]
+       }
+   },
+   "expectedResult": {
+       "0": 0,
+       "1": 92.22000122070312,
+       "2": 103.37999725341797
+   }
+},
+{
+   "parentSize": [
+       169,
+       61,
+       128
+   ],
+   "spec": {
+       "size": {
+           "sizeMode": [
+               2,
+               0,
+               1
+           ],
+           "proportional": [
+               0.38,
+               0.18,
+               0.39
+           ],
+           "differential": [
+               25,
+               40,
+               59
+           ],
+           "absolute": [
+               50,
+               83,
+               32
+           ]
+       }
+   },
+   "expectedResult": {
+       "0": 0,
+       "1": 50.97999954223633,
+       "2": 32
+   }
+},
+{
+   "parentSize": [
+       34,
+       9,
+       41
+   ],
+   "spec": {
+       "size": {
+           "sizeMode": [
+               2,
+               0,
+               2
+           ],
+           "proportional": [
+               0.3,
+               0.75,
+               0.16
+           ],
+           "differential": [
+               44,
+               42,
+               28
+           ],
+           "absolute": [
+               87,
+               73,
+               24
+           ]
+       }
+   },
+   "expectedResult": {
+       "0": 0,
+       "1": 48.75,
+       "2": 0
+   }
+},
+{
+   "parentSize": [
+       163,
+       56,
+       63
+   ],
+   "spec": {
+       "size": {
+           "sizeMode": [
+               2,
+               1,
+               0
+           ],
+           "proportional": [
+               0.71,
+               0.05,
+               0.57
+           ],
+           "differential": [
+               2,
+               36,
+               75
+           ],
+           "absolute": [
+               86,
+               89,
+               38
+           ]
+       }
+   },
+   "expectedResult": {
+       "0": 0,
+       "1": 89,
+       "2": 110.91000366210938
+   }
+},
+{
+   "parentSize": [
+       186,
+       39,
+       11
+   ],
+   "spec": {
+       "size": {
+           "sizeMode": [
+               2,
+               1,
+               1
+           ],
+           "proportional": [
+               0.88,
+               0.29,
+               0.69
+           ],
+           "differential": [
+               13,
+               62,
+               5
+           ],
+           "absolute": [
+               59,
+               55,
+               75
+           ]
+       }
+   },
+   "expectedResult": {
+       "0": 0,
+       "1": 55,
+       "2": 75
+   }
+},
+{
+   "parentSize": [
+       106,
+       51,
+       141
+   ],
+   "spec": {
+       "size": {
+           "sizeMode": [
+               2,
+               1,
+               2
+           ],
+           "proportional": [
+               0.08,
+               0.71,
+               0.83
+           ],
+           "differential": [
+               89,
+               97,
+               52
+           ],
+           "absolute": [
+               13,
+               0,
+               69
+           ]
+       }
+   },
+   "expectedResult": {
+       "0": 0,
+       "1": 0,
+       "2": 0
+   }
+},
+{
+   "parentSize": [
+       143,
+       181,
+       51
+   ],
+   "spec": {
+       "size": {
+           "sizeMode": [
+               2,
+               2,
+               0
+           ],
+           "proportional": [
+               0.05,
+               0.54,
+               0.3
+           ],
+           "differential": [
+               60,
+               81,
+               37
+           ],
+           "absolute": [
+               55,
+               55,
+               4
+           ]
+       }
+   },
+   "expectedResult": {
+       "0": 0,
+       "1": 0,
+       "2": 52.29999923706055
+   }
+},
+{
+   "parentSize": [
+       32,
+       18,
+       63
+   ],
+   "spec": {
+       "size": {
+           "sizeMode": [
+               2,
+               2,
+               1
+           ],
+           "proportional": [
+               0.42,
+               0.27,
+               0.72
+           ],
+           "differential": [
+               47,
+               71,
+               92
+           ],
+           "absolute": [
+               61,
+               47,
+               56
+           ]
+       }
+   },
+   "expectedResult": {
+       "0": 0,
+       "1": 0,
+       "2": 56
+   }
+},
+{
+   "parentSize": [
+       70,
+       70,
+       130
+   ],
+   "spec": {
+       "size": {
+           "sizeMode": [
+               2,
+               2,
+               2
+           ],
+           "proportional": [
+               0.49,
+               0.26,
+               0.58
+           ],
+           "differential": [
+               9,
+               28,
+               80
+           ],
+           "absolute": [
+               42,
+               9,
+               89
+           ]
+       }
+   },
+   "expectedResult": {
+       "0": 0,
+       "1": 0,
+       "2": 0
+   }
+}]
