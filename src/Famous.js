@@ -5,7 +5,7 @@ var isWorker = typeof self !== 'undefined' && self.window !== self;
 var Clock = require('./Clock');
 var Context = require('./Context');
 
-function Famous (config) {
+function Famous () {
     this._nextUpdateQueue = [];
     this._updateQueue = [];
 
