@@ -120,7 +120,7 @@ Node.prototype.getRenderProxy = function getRenderProxy () {
  * @method getRenderPath
  * @chainable
  *
- * @deprecated getRenderPath
+ * @deprecated Use #getLocation()
  * @return {string} render path
  */
 Node.prototype.getRenderPath = function getRenderPath () {
@@ -128,8 +128,23 @@ Node.prototype.getRenderPath = function getRenderPath () {
         'Node#getRenderPath is deprecated!\n' +
         'Use Node#getLocation instead!'
     );
-    return this.getLocation;
+    return this.getLocation();
 }
+
+/**
+ * @method addRenderable
+ * @chainable
+ *
+ * @deprecated Use addComponent
+ * @param {*} component component to be added
+ * @return this
+ */
+Node.prototype.addRenderable = function addRenderable (component) {
+    console.warn("Node#addRenderable is depricated!\n use node.addComponent instead");
+    this.addComponent(component);
+    return this;
+};
+
 
 Node.prototype.getLocation = function getLocation () {
     return this.value.location;
@@ -314,11 +329,6 @@ Node.prototype.addComponent = function addComponent (component) {
     }
 
     return index;
-};
-
-Node.prototype.addRenderable = function addRenderable (component) {
-    console.warn("Node#addRenderable is depricated!\n use node.addComponent instead");
-    this.addComponent(component);
 };
 
 Node.prototype.removeComponent = function removeComponent (component) {
@@ -702,7 +712,7 @@ Node.prototype.getFrame = function getFrame () {
     return this._globalUpdater.getFrame();
 };
 
-Node.prototype.onUpdate = function onUpdate (time) {
+Node.prototype.update = function update (time){
     this._inUpdate = true;
     var nextQueue = this._nextUpdateQueue;
     var queue = this._updateQueue;
@@ -813,6 +823,8 @@ Node.prototype.receive = function receive (type, ev) {
         if (item && item.onReceive) item.onReceive(type, ev);
     }
 };
+
+Node.prototype.onUpdate = Node.prototype.update;
 
 Node.prototype.onParentShow = Node.prototype.show;
 
