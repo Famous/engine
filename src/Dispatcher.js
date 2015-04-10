@@ -11,6 +11,8 @@
  * @param {Context} Context on which it operates
  */
 function Dispatcher (context) {
+
+    if (!context) throw new Error('Dispatch needs to be instantiated on a node');
     
     this._context = context; // A reference to the context
                              // on which the dispatcher
@@ -34,6 +36,8 @@ function Dispatcher (context) {
  * @return {Node | undefined} The node at the requested path
  */
 Dispatcher.prototype.lookupNode = function lookupNode (location) {
+    if (!location) throw new Error('lookupNode must be called with a path');
+
     var path = this._queue;
 
     _splitTo(location, path);
@@ -66,6 +70,8 @@ Dispatcher.prototype.lookupNode = function lookupNode (location) {
  * @param {Any} payload
  */
 Dispatcher.prototype.dispatch = function dispatch (event, payload) {
+    if (!event) throw new Error('dispatch requires an event name as it\'s first argument');
+
     var queue = this._queue;
     var item;
     var i;
@@ -74,7 +80,7 @@ Dispatcher.prototype.dispatch = function dispatch (event, payload) {
 
     queue.length = 0;
     queue.push(this._context);
-    
+
     while (queue.length) {
         item = queue.shift();
         if (item.onReceive) item.onReceive(event, payload);
@@ -94,6 +100,9 @@ Dispatcher.prototype.dispatch = function dispatch (event, payload) {
  * @param {Any} the payload
  */
 Dispatcher.prototype.dispatchUIEvent = function dispatchUIEvent (path, event, payload) {
+    if (!path) throw new Error('dispatchUIEvent needs a valid path to dispatch to');
+    if (!event) throw new Error('dispatchUIEvent needs an event name as its second argument');
+
     var queue = this._queue;
     var node;
 

@@ -69,6 +69,11 @@ Famous.prototype._update = function _update (time) {
 };
 
 Famous.prototype.requestUpdate = function requestUpdate (requester) {
+    if (!requester)
+        throw new Error(
+            'requestUpdate must be called with a class to be updated'
+        );
+
     if (this._inUpdate) this.requestUpdateOnNextTick(requester);
     else this._updateQueue.push(requester);
 };
@@ -78,6 +83,11 @@ Famous.prototype.requestUpdateOnNextTick = function requestUpdateOnNextTick (req
 };
 
 Famous.prototype.postMessage = function postMessage (messages) {
+    if (!messages)
+        throw new Error(
+            'postMessage must be called with an array of messages'
+        );
+
     while (messages.length > 0) {
         var command = messages.shift();
         switch (command) {
@@ -88,7 +98,7 @@ Famous.prototype.postMessage = function postMessage (messages) {
                 this.handleFrame(messages);
                 break;
             default:
-                console.error('Unknown command ' + command);
+                throw new Error('received unknown command: ' + command);
                 break;
         }
     }
@@ -109,18 +119,23 @@ Famous.prototype.handleWith = function handleWith (messages) {
             this.getContext(path).getDispatch().dispatchUIEvent(path, type, ev);
             break;
         default:
-            console.error('Unknown command ' + command);
+            throw new Error('received unknown command: ' + command);
             break;
     }
     return this;
 };
 
 Famous.prototype.handleFrame = function handleFrame (messages) {
+    if (!messages) throw new Error('handleFrame must be called with an array of messages');
+    if (!messages.length) throw new Error('FRAME must be sent with a time');
+
     this.step(messages.shift());
     return this;
 };
 
 Famous.prototype.step = function step (time) {
+    if (time == null) throw new Error('step must be called with a time');
+
     this._clock.step(time);
 
     this._update(time);
@@ -136,6 +151,8 @@ Famous.prototype.step = function step (time) {
 };
 
 Famous.prototype.getContext = function getContext (selector) {
+    if (!selector) throw new Error('getContext must be called with a selector');
+
     return this._contexts[selector.split('/')[0]];
 };
 
@@ -143,15 +160,18 @@ Famous.prototype.getClock = function getClock () {
     return this._clock;
 };
 
-Famous.prototype.message = function message (messages) {
-    this._messages.push(messages);
+Famous.prototype.message = function message (command) {
+    this._messages.push(command);
     return this;
 };
 
 Famous.prototype.createContext = function createContext (selector) {
-    if (this._contexts[selector]) this._contexts[selector].onDismount();
+    if (!selector) throw new Error('create context must be called with a selector');
+
+    if (this._contexts[selector]) this._contexts[selector].dismount();
     this._contexts[selector] = new Context(selector, this);
     return this._contexts[selector];
 };
 
 module.exports = new Famous();
+

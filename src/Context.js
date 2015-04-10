@@ -19,6 +19,9 @@ var Size = require('./Size');
  *                 the renderers and update nodes in the scene graph
  */
 function Context (selector, updater) {
+    if (!selector) throw new Error('Context needs to be created with a DOM selector');
+    if (!updater) throw new Error('Context needs to be created with a class like Famous');
+
     Node.call(this);         // Context inherits from node
 
     this._updater = updater; // The updater that will both
@@ -91,8 +94,15 @@ Context.prototype.onReceive = function onReceive (event, payload) {
     // and the context would receive its size the same way that any render size
     // component receives its size.
     if (event === 'CONTEXT_RESIZE') {
+        
+        if (payload.length != 2) 
+            throw new Error(
+                    'CONTEXT_RESIZE\'s payload needs to be a pair' +
+                    ' of pixel sizes'
+            );
+
         this.setSizeMode(Size.ABSOLUTE, Size.ABSOLUTE, Size.ABSOLUTE);
-        this.setAbsoluteSize(payload[0], payload[1], payload[2]);
+        this.setAbsoluteSize(payload[0], payload[1]);
     }
 };
 
