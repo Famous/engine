@@ -68,6 +68,7 @@ Node.Spec = function Spec () {
         absolute: new Float32Array(3),
         render: new Float32Array(3)
     };
+    this.uiEvents = [];
 };
 
 /**
@@ -332,6 +333,20 @@ Node.prototype.removeComponent = function removeComponent (component) {
             component.onDismount();
 
         this._components[index] = null;
+    }
+};
+
+Node.prototype.addUIEvent = function addUIEvent (eventName) {
+    var UIEvents = this.getUIEvents();
+    var components = this._compontents;
+    var component;
+
+    if (UIEvents.indexOf(eventName) > -1) {
+        UIEvents.push(eventName);
+        for (var i = 0, len = components.length ; i < len ; i++) {
+            component = components[i];
+            if (component.onAddUIEvent) component.onAddUIEvent(eventName);
+        }
     }
 };
 
