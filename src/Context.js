@@ -18,16 +18,31 @@ var Size = require('./Size');
  *                 it needs to be able to send methods to
  *                 the renderers and update nodes in the scene graph
  */
-function Context (selector, famous) {
-    Node.call(this);
-    this._famous = famous;
+function Context (selector, updater) {
+    Node.call(this);         // Context inherits from node
 
-    this._dispatch = new Dispatch(this);
-    this._selector = selector;
+    this._updater = updater; // The updater that will both
+                             // send messages to the renderers
+                             // and update dirty nodes 
 
-    this.onMount(this, selector);
-    this._famous.message('NEED_SIZE_FOR').message(selector);
-    this.show();
+    this._dispatch = new Dispatch(this); // instantiates a dispatcher
+                                         // to send events to the scene
+                                         // graph below this context
+    
+    this._selector = selector; // reference to the DOM selector
+                               // that represents the elemnent
+                               // in the dom that this context
+                               // inhabits
+
+    this.onMount(this, selector); // Mount the context to itself
+                                  // (it is its own parent)
+    
+    this._updater                  // message a request for the dom
+        .message('NEED_SIZE_FOR')  // size of the context so that
+        .message(selector);        // the scene graph has a total size
+
+    this.show(); // the context begins shown (it's already present in the dom)
+
 }
 
 // Context inherits from node
@@ -40,7 +55,7 @@ Context.prototype.constructor = Context;
  * @return {Famous} the updater for this Context
  */
 Context.prototype.getUpdater = function getUpdater () {
-    return this._famous;
+    return this._updater;
 };
 
 /**
@@ -71,6 +86,10 @@ Context.prototype.getDispatch = function getDispatch () {
  * @param {*} payload
  */
 Context.prototype.onReceive = function onReceive (event, payload) {
+    // TODO: In the future the dom element that the context is attached to
+    // should have a representation as a component. It would be render sized
+    // and the context would receive its size the same way that any render size
+    // component receives its size.
     if (event === 'CONTEXT_RESIZE') {
         this.setSizeMode(Size.ABSOLUTE, Size.ABSOLUTE, Size.ABSOLUTE);
         this.setAbsoluteSize(payload[0], payload[1], payload[2]);

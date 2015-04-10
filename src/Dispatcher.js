@@ -25,14 +25,26 @@ function Dispatcher (context) {
                       //    traversal of the scene graph.
 }
 
+/**
+ * lookupNode takes a path and returns the node at the location specified
+ * by the path, if one exists. If not, it returns undefined.
+ *
+ * @param {String} The location of the node specified by its path
+ * 
+ * @return {Node | undefined} The node at the requested path
+ */
 Dispatcher.prototype.lookupNode = function lookupNode (location) {
     var path = this._queue;
+
     _splitTo(location, path);
+    
     if (path[0] !== this._context.getSelector()) return void 0;
+
     var children = this._context.getChildren();
-    path[0] = this._context;
     var child;
     var i = 1;
+    path[0] = this._context;
+
     while (i < path.length) {
         child = children[path[i]];
         path[i] = child;
@@ -40,9 +52,19 @@ Dispatcher.prototype.lookupNode = function lookupNode (location) {
         else return void 0;
         i++;
     }
+
     return child;
 };
 
+/**
+ * dispatch takes an event name and a payload and dispatches it to the
+ * entire scene graph below the node that the dispatcher is on. The nodes
+ * receive the events in a breadth first traversal, meaning that parents
+ * have the opportunity to react to the event before children.
+ *
+ * @param {String} event name
+ * @param {Any} payload
+ */
 Dispatcher.prototype.dispatch = function dispatch (event, payload) {
     var queue = this._queue;
     var item;
@@ -61,27 +83,50 @@ Dispatcher.prototype.dispatch = function dispatch (event, payload) {
     }
 };
 
+/**
+ * dispatchUIevent takes a path, an event name, and a payload and dispatches them in
+ * a manner anologous to DOM bubbling. It first traverses down to the node specified at
+ * the path. That node receives the event first, and then every ancestor receives the event
+ * until the context.
+ *
+ * @param {String} the path of the node
+ * @param {String} the event name
+ * @param {Any} the payload
+ */
 Dispatcher.prototype.dispatchUIEvent = function dispatchUIEvent (path, event, payload) {
     var queue = this._queue;
     var node;
 
-    this.lookupNode(path);
+    this.lookupNode(path); // After this call, the path is loaded into the queue
+                           // (lookUp node doesn't clear the queue after the lookup)
+
     while (queue.length) {
-        node = queue.pop();
+        node = queue.pop(); // pop nodes off of the queue to move up the ancestor chain.
         if (node.onReceive) node.onReceive(event, payload);
     }
 };
 
+/**
+ * _splitTo is a private method which takes a path and splits it at every '/'
+ * pushing the result into the supplied array. This is a destructive change.
+ *
+ * @private
+ * @param {String} the specified path
+ * @param {Array} the array to which the result should be written
+ */
 function _splitTo (string, target) {
-    target.length = 0;
+    target.length = 0; // clears the array first.
     var last = 0;
+
     for (var i = 0, len = string.length ; i < len ; i++) {
         if (string[i] === '/') {
             target.push(string.substring(last, i));
             last = i + 1;
         }
     }
+
     if (i - last > 0) target.push(string.substring(last, i));
+
     return target;
 }
 
