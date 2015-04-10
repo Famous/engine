@@ -123,11 +123,7 @@ DOMElement.prototype.onAddUIEvent = function onAddUIEvent (UIEvent) {
 };
 
 DOMElement.prototype.onSizeModeChange = function onSizeModeChange (sizeMode) {
-    var size = this._node.getSize();
-    var sizedX = sizeMode[0] !== Node.RENDER_SIZE;
-    var sizedY = sizeMode[1] !== Node.RENDER_SIZE;
-    if (sizedX) this.setProperty('width', size[0] + 'px');
-    if (sizedY) this.setProperty('height', size[1] + 'px');
+    this.onSizeChange(this._node.getSize());
 }; 
 
 DOMElement.prototype._requestUpdate = function _requestUpdate () {
