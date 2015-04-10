@@ -2,7 +2,7 @@
 
 var test = require('tape');
 var Size = require('../src/Size');
-var SizeTestCases = require('./SizeTestCases');
+var SizeTestCases = require('./expected/Size');
 
 test('Size', function(t) {
     t.test('constructor', function(t) {
