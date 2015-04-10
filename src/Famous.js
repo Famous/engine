@@ -1,21 +1,39 @@
 'use strict';
 
+// Check to see if we're in a worker
 var isWorker = typeof self !== 'undefined' && self.window !== self;
 
 var Clock = require('./Clock');
 var Context = require('./Context');
 
+/**
+ * Famous has two responsibilities, one to act as the highest level
+ * updater and another to send messages over to the renderers. It is
+ * a singleton.
+ */
 function Famous () {
-    this._nextUpdateQueue = [];
-    this._updateQueue = [];
+    this._updateQueue = []; // The updateQueue is a place where nodes
+                            // can place themselves in order to be
+                            // updated on the frame.
+    
+    this._nextUpdateQueue = []; // the nextUpdateQueue is used to queue
+                                // updates for the next tick.
+                                // this prevents infinite loops where during
+                                // an update a node continuously puts itself
+                                // back in the update queue.
 
-    this._contexts = {};
+    this._contexts = {}; // a hash of all of the context's that this famous
+                         // is responsible for.
 
-    this._messages = [];
+    this._messages = []; // a queue of all of the draw commands to send to the
+                         // the renderers this frame.
 
-    this._inUpdate = false;
+    this._inUpdate = false; // when the famous is updating this is true.
+                            // all requests for updates will get put in the
+                            // nextUpdateQueue
 
-    this._clock = new Clock();
+    this._clock = new Clock(); // a clock to keep track of time for the scene
+                               // graph.
 
     var _this = this;
     if (isWorker)
@@ -24,6 +42,8 @@ function Famous () {
         });
 }
 
+/**
+ * _update is the body of the update loop. The frame 
 Famous.prototype._update = function _update (time) {
     this._inUpdate = true;
     var nextQueue = this._nextUpdateQueue;
