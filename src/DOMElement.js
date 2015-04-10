@@ -114,12 +114,9 @@ DOMElement.prototype.onSizeChange = function onSizeChange (size) {
     return this;
 };
 
-DOMElement.prototype.onAddUIEvent = function onAddUIEvent (UIEvent, methods, properties) {
-    this._changeQueue.push('ADD_EVENT_LISTERNER', UIEvent);
-    if (methods != null) this._changeQueue.push(methods);
-    if (properties != null) this._changeQueue.push(properties);
+DOMElement.prototype.onAddUIEvent = function onAddUIEvent (UIEvent) {
+    this._changeQueue.push('ADD_EVENT_LISTERNER', UIEvent, void 0, true, 'EVENT_END');
     if (!this._requestingUpdate) this._requestUpdate();
-    this._changeQueue.push('EVENT_END');
 };
 
 DOMElement.prototype.onSizeModeChange = function onSizeModeChange (sizeMode) {
@@ -203,6 +200,10 @@ DOMElement.prototype.setContent = function setContent (content) {
         if (!this._requestingUpdate) this._requestUpdate();
     }
     return this;
+};
+
+DOMElement.prototype.onReceive = function onReceive (event, payload) {
+    console.log(event, payload);
 };
 
 DOMElement.prototype.draw = function draw () {
