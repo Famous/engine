@@ -1,3 +1,4 @@
+var CallbackStore = require('famous-utilities').CallbackStore;
 
 function DOMElement (node, options) {
     if (typeof options === 'string') {
@@ -22,10 +23,12 @@ function DOMElement (node, options) {
         display: 'none' 
     };
     this._attributes = {};
-    this._content = null;
+    this._content = '';
 
     this._tagName = options && options.tagName ? options.tagName : 'div';
     this._id = node.addComponent(this);
+
+    this._callbacks = new CallbackStore();
 
     if (!options) return;
 
@@ -115,7 +118,7 @@ DOMElement.prototype.onSizeChange = function onSizeChange (size) {
 };
 
 DOMElement.prototype.onAddUIEvent = function onAddUIEvent (UIEvent) {
-    this._changeQueue.push('ADD_EVENT_LISTERNER', UIEvent, void 0, true, 'EVENT_END');
+    this._changeQueue.push('ADD_EVENT_LISTENER', UIEvent, void 0, true, 'EVENT_END');
     if (!this._requestingUpdate) this._requestUpdate();
 };
 
@@ -202,8 +205,12 @@ DOMElement.prototype.setContent = function setContent (content) {
     return this;
 };
 
+DOMElement.prototype.on = function on (event, listener) {
+    return this._callbacks.on(event, listener);
+};
+
 DOMElement.prototype.onReceive = function onReceive (event, payload) {
-    console.log(event, payload);
+    this._callbacks.trigger(event, payload);
 };
 
 DOMElement.prototype.draw = function draw () {
