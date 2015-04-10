@@ -1,6 +1,6 @@
 {
   "name": "famous-components",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Famous Components",
   "main": "src/index.js",
   "scripts": {
@@ -25,8 +25,8 @@
     "tape": "^3.0.3"
   },
   "dependencies": {
-    "famous-transitions": "git+ssh://git@github.famo.us/platform/transitions#v0.1.1",
-    "famous-math": "git+ssh://git@github.famo.us/platform/math#v0.1.0",
-    "famous-utilities": "git+ssh://git@github.famo.us/platform/utilities#v0.2.0"
+    "famous-transitions": "git+ssh://git@github.famo.us/platform/transitions#v0.2.0",
+    "famous-math": "git+ssh://git@github.famo.us/platform/math#v0.2.0",
+    "famous-utilities": "git+ssh://git@github.famo.us/platform/utilities#v0.3.0"
   }
 }
