@@ -1,6 +1,6 @@
 {
   "name": "famous-physics",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Famous Physics",
   "main": "src/index.js",
   "scripts": {
