@@ -27,6 +27,6 @@
     "tape": "^3.0.3"
   },
   "dependencies": {
-    "famous-utilities": "git+ssh://git@github.famo.us/platform/utilities#v0.2.0"
+    "famous-utilities": "git+ssh://git@github.famo.us/platform/utilities#v0.3.0"
   }
 }

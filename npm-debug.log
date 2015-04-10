@@ -1,0 +1,29 @@
+0 info it worked if it ends with ok
+1 verbose cli [ '/Users/mike/.nvm/v0.10.36/bin/node',
+1 verbose cli   '/Users/mike/.nvm/v0.10.36/bin/npm',
+1 verbose cli   'run',
+1 verbose cli   'cover' ]
+2 info using npm@1.4.28
+3 info using node@v0.10.36
+4 verbose run-script [ 'precover', 'cover', 'postcover' ]
+5 info precover famous-core@0.2.0
+6 info cover famous-core@0.2.0
+7 verbose unsafe-perm in lifecycle true
+8 info famous-core@0.2.0 Failed to exec cover script
+9 error famous-core@0.2.0 cover: `browserify -t coverify test/*.js | node | coverify`
+9 error Exit status 1
+10 error Failed at the famous-core@0.2.0 cover script.
+10 error This is most likely a problem with the famous-core package,
+10 error not with npm itself.
+10 error Tell the author that this fails on your system:
+10 error     browserify -t coverify test/*.js | node | coverify
+10 error You can get their info via:
+10 error     npm owner ls famous-core
+10 error There is likely additional logging output above.
+11 error System Darwin 13.4.0
+12 error command "/Users/mike/.nvm/v0.10.36/bin/node" "/Users/mike/.nvm/v0.10.36/bin/npm" "run" "cover"
+13 error cwd /Users/mike/famous/platform/core
+14 error node -v v0.10.36
+15 error npm -v 1.4.28
+16 error code ELIFECYCLE
+17 verbose exit [ 1, true ]
