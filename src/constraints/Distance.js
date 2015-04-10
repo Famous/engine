@@ -40,9 +40,8 @@ Distance.prototype.constructor = Distance;
  * Initialize the Distance. Sets defaults if a property was not already set.
  *
  * @method init
- * @param {Object} options The options hash.
  */
-Distance.prototype.init = function(options) {
+Distance.prototype.init = function() {
     this.length = this.length || Vec3.subtract(this.b.position, this.a.position, P_REGISTER).length();
     this.minLength = this.minLength || 0;
     this.period = this.period || 0.2;
@@ -66,11 +65,6 @@ Distance.prototype.update = function(time, dt) {
     var n = NORMAL_REGISTER;
     var diffP = P_REGISTER;
     var impulse = IMPULSE_REGISTER;
-
-    var period = this.period;
-    var dampingRatio = this.dampingRatio;
-
-    var minLength = this.minLength;
 
     var length = this.length;
 
@@ -124,18 +118,14 @@ Distance.prototype.update = function(time, dt) {
  * Apply impulses to resolve the constraint.
  *
  * @method resolve
- * @param {Number} time The current time in the physics engine.
- * @param {Number} dt The physics engine frame delta.
  */
-Distance.prototype.resolve = function resolve(time, dt) {
+Distance.prototype.resolve = function resolve() {
     var a = this.a;
     var b = this.b;
 
     var impulse = IMPULSE_REGISTER;
     var diffV = V_REGISTER;
 
-    var dampingRatio = this.dampingRatio;
-    var period = this.period;
     var minLength = this.minLength;
 
     var dist = this.distance;

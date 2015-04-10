@@ -6,9 +6,6 @@ var Mat33 = require('famous-math').Mat33;
 
 var DELTA_REGISTER = new Vec3();
 
-/** @const */
-var PI = Math.PI;
-
 /**
  *  A constraint that keeps a physics body a given direction away from a given
  *  anchor, or another attached body.
@@ -39,7 +36,7 @@ Angle.prototype.constructor = Angle;
  * @method init
  * @param {Object} options The options hash.
  */
-Angle.prototype.init = function(options) {
+Angle.prototype.init = function() {
     this.cosAngle = this.cosAngle || this.a.orientation.dot(this.b.orientation);
 };
 
@@ -47,10 +44,8 @@ Angle.prototype.init = function(options) {
  * Warmstart the constraint and prepare calculations used in .resolve.
  *
  * @method update
- * @param {Number} time The current time in the physics engine.
- * @param {Number} dt The physics engine frame delta.
  */
-Angle.prototype.update = function update(time, dt) {
+Angle.prototype.update = function update() {
     var a = this.a;
     var b = this.b;
 
@@ -76,10 +71,8 @@ Angle.prototype.update = function update(time, dt) {
  * Adds an angular impulse to a physics body's angular velocity.
  *
  * @method resolve
- * @param {Number} time The current time in the physics engine.
- * @param {Number} dt The physics engine frame delta.
  */
-Angle.prototype.resolve = function update(time, dt) {
+Angle.prototype.resolve = function update() {
     var a = this.a;
     var b = this.b;
 

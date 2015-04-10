@@ -1,7 +1,6 @@
 'use strict';
 
 var Vec3 = require('famous-math').Vec3;
-var Geometry = require('../../Geometry');
 var ObjectManager = require('famous-utilities').ObjectManager;
 
 ObjectManager.register('GJK_EPASupportPoint', GJK_EPASupportPoint);
@@ -57,14 +56,15 @@ GJK_EPASupportPoint.prototype.reset = function reset(vertex, worldVertexA, world
  */
 function freeGJK_EPADynamicGeometry(geometry) {
     var vertices = geometry.vertices;
-    var i = vertices.length;
+    var i;
+    i = vertices.length;
     while (i--) {
         var v = vertices.pop();
         if (v !== null) OMFreeGJK_EPASupportPoint(v);
     }
     geometry.numVertices = 0;
     var features = geometry.features;
-    var i = features.length
+    i = features.length;
     while (i--) {
         var f = features.pop();
         if (f !== null) OMFreeDynamicGeometryFeature(f);

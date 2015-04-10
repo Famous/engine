@@ -72,7 +72,7 @@ function PhysicsEngine(options) {
  * @param {Number} y The y component.
  * @param {Number} z The z component.
  */
-PhysicsEngine.prototype.setOrigin = function(x, y, z) {
+PhysicsEngine.prototype.setOrigin = function setOrigin(x, y, z) {
     this.origin.set(x, y, z);
     return this;
 };
@@ -87,10 +87,10 @@ PhysicsEngine.prototype.setOrigin = function(x, y, z) {
  * @param {Number} y The y component.
  * @param {Number} z The z component.
  */
-PhysicsEngine.prototype.setOrientation = function(w, x, y, z) {
+PhysicsEngine.prototype.setOrientation = function setOrientation(w, x, y, z) {
     this.orientation.set(w, x, y, z).normalize();
     return this;
-}
+};
 
 /**
  * Private helper method to store an element in a library array.
@@ -212,7 +212,7 @@ PhysicsEngine.prototype.addConstraint = function addConstraint(constraint) {
  * @param {Particle} body The body to stop tracking.
  */
 PhysicsEngine.prototype.removeBody = function removeBody(body) {
-    _removeElement(this, body, 'bodies')
+    _removeElement(this, body, 'bodies');
 };
 
 /**
@@ -222,7 +222,7 @@ PhysicsEngine.prototype.removeBody = function removeBody(body) {
  * @param {Force} force The force to stop tracking.
  */
 PhysicsEngine.prototype.removeForce = function removeForce(force) {
-    _removeElement(this, force, 'forces')
+    _removeElement(this, force, 'forces');
 };
 
 /**
@@ -232,7 +232,7 @@ PhysicsEngine.prototype.removeForce = function removeForce(force) {
  * @param {Constraint} constraint The constraint to stop tracking.
  */
 PhysicsEngine.prototype.removeConstraint = function removeConstraint(constraint) {
-    _removeElement(this, constraint, 'constraints')
+    _removeElement(this, constraint, 'constraints');
 };
 
 /**
@@ -258,49 +258,52 @@ PhysicsEngine.prototype.update = function update(time) {
     delta += (time - this.time) * speed;
     this.time = time;
 
+    var i, len;
+    var force, body, constraint;
+
     while(delta > step) {
-        for (var i = 0, len = this.prestep.length; i < len; i++) {
+        for (i = 0, len = this.prestep.length; i < len; i++) {
             this.prestep[i](time, dt);
         }
 
         // Update Forces on particles
-        for (var i = 0, numForces = forces.length; i < numForces; i++) {
-            var force = forces[i];
+        for (i = 0, len = forces.length; i < len; i++) {
+            force = forces[i];
             if (force === null) continue;
             force.update(time, dt);
         }
 
         // Tentatively update velocities
-        for (var i = 0, numBodies = bodies.length; i < numBodies; i++) {
-            var body = bodies[i];
+        for (i = 0, len = bodies.length; i < len; i++) {
+            body = bodies[i];
             if (body === null) continue;
             _integrateVelocity(body, dt);
         }
 
         // Prep constraints for solver
-        for (var i = 0, numConstraints = constraints.length; i < numConstraints; i++) {
-            var constraint = constraints[i];
+        for (i = 0, len = constraints.length; i < len; i++) {
+            constraint = constraints[i];
             if (constraint === null) continue;
             constraint.update(time, dt);
         }
 
         // Iteratively resolve constraints
         for (var j = 0, numIterations = this.iterations; j < numIterations; j++) {
-            for (var i = 0; i < numConstraints; i++) {
-                var constraint = constraints[i];
+            for (i = 0, len = constraints.length; i < len; i++) {
+                constraint = constraints[i];
                 if (constraint === null) continue;
                 constraint.resolve(time, dt);
             }
         }
 
         // Increment positions and orientations
-        for (var i = 0; i < numBodies; i++) {
-            var body = bodies[i];
+        for (i = 0, len = bodies.length; i < len; i++) {
+            body = bodies[i];
             if (body === null) continue;
             _integratePose(body, dt);
         }
 
-        for (var i = 0, len = this.poststep.length; i < len; i++) {
+        for (i = 0, len = this.poststep.length; i < len; i++) {
             this.poststep[i](time, dt);
         }
 
@@ -327,7 +330,6 @@ PhysicsEngine.prototype.getTransform = function getTransform(body) {
     var q = body.orientation;
     var rot = q;
     var loc = p;
-    var ZYX;
 
     if (oq.w !== 1) {
         rot = Quaternion.multiply(q, oq, QUAT_REGISTER);
@@ -361,7 +363,7 @@ function _integrateVelocity(body, dt) {
     body.inverseInertia.vectorMultiply(body.angularMomentum, body.angularVelocity);
     body.force.clear();
     body.torque.clear();
-};
+}
 
 /**
  * Update the Particle position and orientation based off current translational and angular velocities.
@@ -414,6 +416,6 @@ function _integratePose(body, dt) {
     q.normalize();
 
     body.updateInertia();
-};
+}
 
 module.exports = PhysicsEngine;

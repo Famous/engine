@@ -1,7 +1,6 @@
 'use strict';
 
 var Vec3 = require('famous-math').Vec3;
-var Quaternion = require('famous-math').Quaternion;
 var Constraint = require('./Constraint');
 
 var SweepAndPrune = require('./collision/SweepAndPrune');
@@ -49,7 +48,7 @@ function CollisionData(penetration, normal, worldContactA, worldContactB, localC
     this.worldContactB = worldContactB;
     this.localContactA = localContactA;
     this.localContactB = localContactB;
-};
+}
 
 /**
  * Used by ObjectManager to reset the object with different data.
@@ -91,7 +90,7 @@ Collision.prototype.constructor = Collision;
  * @method init
  * @param {Object} options The options hash.
  */
-Collision.prototype.init = function(options) {
+Collision.prototype.init = function() {
     if (this.broadPhase) {
         if (this.broadPhase instanceof Function) this.broadPhase = new this.broadPhase(this.targets);
     }
@@ -111,12 +110,13 @@ Collision.prototype.init = function(options) {
  Collision.prototype.update = function update(time, dt) {
     this.contactManifoldTable.update(dt);
     if (this.targets.length === 0) return;
-    for (var i = 0, len = this.targets.length; i < len; i++) {
+    var i, len;
+    for (i = 0, len = this.targets.length; i < len; i++) {
         this.targets[i].updateShape();
     }
     var potentialCollisions = this.broadPhase.update();
     var pair;
-    for (var i = 0, len = potentialCollisions.length; i < len; i++) {
+    for (i = 0, len = potentialCollisions.length; i < len; i++) {
         (pair = potentialCollisions[i]) && this.applyNarrowPhase(pair);
     }
     this.contactManifoldTable.prepContacts(dt);
@@ -218,7 +218,6 @@ Collision.prototype.applyNarrowPhase = function applyNarrowPhase(targets) {
  * @param {Sphere} sphere2
  */
 function sphereIntersectSphere(context, sphere1, sphere2) {
-    var options = context.options;
     var p1 = sphere1.position;
     var p2 = sphere2.position;
     var relativePosition = Vec3.subtract(p2, p1, new Vec3());

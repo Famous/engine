@@ -9,7 +9,6 @@ var CallbackStore = require('famous-utilities').CallbackStore;
 var ZERO_VECTOR = new Vec3();
 
 var MAT1_REGISTER = new Mat33();
-var QUAT_REGISTER = new Mat33();
 
 var _ID = 0;
 /**
@@ -395,7 +394,7 @@ Particle.prototype.applyTorque = function applyTorque(torque) {
  * @param {Vec3} impulse
  */
 Particle.prototype.applyImpulse = function applyImpulse(impulse) {
-    this.momentum.add(impulse)
+    this.momentum.add(impulse);
     Vec3.scale(this.momentum, this.inverseMass, this.velocity);
     return this;
 };
@@ -413,14 +412,14 @@ Particle.prototype.applyAngularImpulse = function applyAngularImpulse(angularImp
 };
 
 /**
- * Used in collision detection. The support function should take in a Vec3 direction
- * and return the point on the body's shape furthest in that direction.
+ * Used in collision detection. The support function should accept a Vec3 direction
+ * and return the point on the body's shape furthest in that direction. For point particles,
+ * this returns the zero vector.
  *
  * @method support
- * @param {Vec3} direction
  * @return {Vec3}
  */
-Particle.prototype.support = function support(direction) {
+Particle.prototype.support = function support() {
     return ZERO_VECTOR;
 };
 

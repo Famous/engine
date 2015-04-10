@@ -41,10 +41,9 @@ Curve.prototype.constructor = Curve;
  * Initialize the Curve. Sets defaults if a property was not already set.
  *
  * @method init
- * @param {Object} options The options hash.
  */
-Curve.prototype.init = function(options) {
-    this.equation1 = this.equation1 || function(x, y, z) {
+Curve.prototype.init = function() {
+    this.equation1 = this.equation1 || function() {
         return 0;
     };
     this.equation2 = this.equation2 || function(x, y, z) {
@@ -77,8 +76,6 @@ Curve.prototype.update = function update(time, dt) {
 
     var f = this.equation1;
     var g = this.equation2;
-    var dampingRatio = this.dampingRatio;
-    var period = this.period;
 
     var _c = this.damping;
     var _k = this.stiffness;
@@ -88,7 +85,6 @@ Curve.prototype.update = function update(time, dt) {
         var ID = body._ID;
         if (body.immune) continue;
 
-        var v = body.velocity;
         var p = body.position;
         var m = body.mass;
 
@@ -142,10 +138,8 @@ Curve.prototype.update = function update(time, dt) {
  * Adds a curve impulse to a physics body.
  *
  * @method resolve
- * @param {Number} time The current time in the physics engine.
- * @param {Number} dt The physics engine frame delta.
  */
-Curve.prototype.resolve = function resolve(time, dt) {
+Curve.prototype.resolve = function resolve() {
     var targets = this.targets;
 
     var normals = this.normals;

@@ -56,10 +56,8 @@ RotationalSpring.prototype.init = function init(options) {
  * Adds a torque force to a physics body's torque accumulator.
  *
  * @method update
- * @param {Number} time The current time in the physics engine.
- * @param {Number} dt The physics engine frame delta.
  */
-RotationalSpring.prototype.update = function update(time, dt) {
+RotationalSpring.prototype.update = function update() {
     var source = this.source;
     var targets = this.targets;
 

@@ -3,10 +3,6 @@
 var Vec3 = require('famous-math').Vec3;
 var ObjectManager = require('famous-utilities').ObjectManager;
 
-var MANIFOLD = 'Manifold';
-var CONTACT = 'Contact';
-var COLLISIONDATA = 'CollisionData';
-
 ObjectManager.register('Manifold', Manifold);
 ObjectManager.register('Contact', Contact);
 var OMRequestManifold = ObjectManager.requestManifold;
@@ -53,7 +49,7 @@ function ContactManifoldTable() {
     this.manifolds = [];
     this.collisionMatrix = {};
     this._IDPool = [];
-};
+}
 
 /**
  * Create a new contact manifold. Tracked by the collisionMatrix according to
@@ -67,7 +63,7 @@ function ContactManifoldTable() {
  * @return {ContactManifold}
  */
 ContactManifoldTable.prototype.addManifold = function addManifold(lowID, highID, bodyA, bodyB) {
-    var collisionMatrix = this.collisionMatrix
+    var collisionMatrix = this.collisionMatrix;
     collisionMatrix[lowID] = collisionMatrix[lowID] || {};
 
     var index = this._IDPool.length ? this._IDPool.pop() : this.manifolds.length;
@@ -139,14 +135,13 @@ ContactManifoldTable.prototype.prepContacts = function prepContacts(dt) {
  * Resolve all contact manifolds.
  *
  * @method resolveManifolds
- * @param {Number} dt
  */
-ContactManifoldTable.prototype.resolveManifolds = function resolveManifolds(dt) {
+ContactManifoldTable.prototype.resolveManifolds = function resolveManifolds() {
     var manifolds = this.manifolds;
     for (var i = 0, len = manifolds.length; i < len; i++) {
         var manifold = manifolds[i];
         if (!manifold) continue;
-        manifold.resolveContacts(dt);
+        manifold.resolveContacts();
     }
 };
 
@@ -180,7 +175,7 @@ ContactManifoldTable.prototype.registerContact = function registerContact(bodyA,
         bodyB.events.trigger('collision:start', manifold);
     } else {
         manifold = manifolds[ collisionMatrix[lowID][highID] ];
-        manifold.contains(collisionData)
+        manifold.contains(collisionData);
         manifold.addContact(bodyA, bodyB, collisionData);
     }
 };
@@ -206,7 +201,7 @@ function Manifold(lowID, highID, bodyA, bodyB) {
     this.bodyB = bodyB;
 
     this.lru = 0;
-};
+}
 
 /**
  * Used by ObjectManager to reset the object with different data.
@@ -315,8 +310,8 @@ Manifold.prototype.update = function update(dt) {
         var rA = data.localContactA;
         var rB = data.localContactB;
 
-        var cached_wA = data.worldContactA
-        var cached_wB = data.worldContactB
+        var cached_wA = data.worldContactA;
+        var cached_wB = data.worldContactB;
 
         var wA = Vec3.add(posA, rA, WA_REGISTER);
         var wB = Vec3.add(posB, rB, WB_REGISTER);
@@ -340,13 +335,12 @@ Manifold.prototype.update = function update(dt) {
  * Resolve all contacts.
  *
  * @method resolveContacts
- * @param {Number} dt
  */
-Manifold.prototype.resolveContacts = function resolveContacts(dt) {
+Manifold.prototype.resolveContacts = function resolveContacts() {
     var contacts = this.contacts;
     for (var i = 0, len = contacts.length; i < len; i++) {
         if (!contacts[i]) continue;
-        contacts[i].resolve(dt);
+        contacts[i].resolve();
     }
 };
 
@@ -373,7 +367,7 @@ function Contact(bodyA, bodyB, collisionData) {
     this.angImpulseB = new Vec3();
 
     if (collisionData) this.init();
-};
+}
 
 /**
  * Used by ObjectManager to reset the object with different data.
@@ -466,8 +460,6 @@ Contact.prototype.update = function update(dt) {
     var rBodyB = data.localContactB;
 
     var n = data.normal;
-    var t1 = this.tangent1;
-    var t2 = this.tangent2;
 
     var vb1 = Vec3.add(bodyA.velocity, Vec3.cross(bodyA.angularVelocity, rBodyA, WxR_REGISTER), VB1_REGISTER);
     var vb2 = Vec3.add(bodyB.velocity, Vec3.cross(bodyB.angularVelocity, rBodyB, WxR_REGISTER), VB2_REGISTER);
@@ -505,9 +497,8 @@ Contact.prototype.update = function update(dt) {
  * Apply impulses to resolve the contact and simulate friction.
  *
  * @method resolve
- * @param {Number} dt
  */
-Contact.prototype.resolve = function resolve(dt) {
+Contact.prototype.resolve = function resolve() {
     var data = this.data;
     var bodyA = this.bodyA;
     var bodyB = this.bodyB;

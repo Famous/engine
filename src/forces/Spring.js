@@ -35,10 +35,10 @@ var PI = Math.PI;
  * @return {Number} unscaled force
  */
 Spring.FENE = function(dist, rMax) {
-    var rMaxSmall = rMax * .99;
+    var rMaxSmall = rMax * 0.99;
     var r = Math.max(Math.min(dist, rMaxSmall), -rMaxSmall);
     return r / (1 - r * r/(rMax * rMax));
-},
+};
 
 /**
  * A Hookean spring force, linear in the displacement
@@ -48,9 +48,9 @@ Spring.FENE = function(dist, rMax) {
  * @param {Number} dist current distance target is from source body
  * @return {Number} unscaled force
  */
-Spring.HOOKE = function(dist, rMax) {
+Spring.HOOKE = function(dist) {
     return dist;
-}
+};
 
 /**
  * Initialize the Force. Sets defaults if a property was not already set.
@@ -83,10 +83,8 @@ Spring.prototype.init = function(options) {
  * Apply the force.
  *
  * @method update
- * @param {Number} time The current time in the physics engine.
- * @param {Number} dt The physics engine frame delta.
  */
-Spring.prototype.update = function(time, dt) {
+Spring.prototype.update = function() {
     var source = this.source;
     var targets = this.targets;
 

@@ -24,9 +24,8 @@ Gravity3D.prototype.constructor = Gravity3D;
  * Initialize the Force. Sets defaults if a property was not already set.
  *
  * @method init
- * @param {Object} options The options hash.
  */
-Gravity3D.prototype.init = function(options) {
+Gravity3D.prototype.init = function() {
     this.max = this.max || Infinity;
     this.strength = this.strength || 200;
 };
@@ -35,10 +34,8 @@ Gravity3D.prototype.init = function(options) {
  * Apply the force.
  *
  * @method update
- * @param {Number} time The current time in the physics engine.
- * @param {Number} dt The physics engine frame delta.
  */
-Gravity3D.prototype.update = function(time, dt) {
+Gravity3D.prototype.update = function() {
     var source = this.source;
     var targets = this.targets;
 

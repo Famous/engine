@@ -114,12 +114,13 @@ function ConvexBodyFactory(hull) {
      */
     ConvexBody.prototype.support = function support(direction) {
         var vertices = this.vertices;
+        var vertex, dot, furthest;
         var max = -Infinity;
         for (var i = 0, len = vertices.length; i < len; i++) {
-            var vertex = vertices[i];
-            var dot = Vec3.dot(vertex,direction);
+            vertex = vertices[i];
+            dot = Vec3.dot(vertex,direction);
             if (dot > max) {
-                var furthest = vertex;
+                furthest = vertex;
                 max = dot;
             }
         }
