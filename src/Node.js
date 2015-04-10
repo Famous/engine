@@ -68,7 +68,7 @@ Node.Spec = function Spec () {
         absolute: new Float32Array(3),
         render: new Float32Array(3)
     };
-    this.uiEvents = [];
+    this.UIEvents = [];
 };
 
 /**
@@ -267,6 +267,10 @@ Node.prototype.getTransform = function getTransform () {
     return this._calculatedValues.transform;
 };
 
+Node.prototype.getUIEvents = function getUIEvents () {
+    return this.value.UIEvents;
+};
+
 Node.prototype.addChild = function addChild (child) {
     var index = child ? this._children.indexOf(child) : -1;
     child = child ? child : new Node();
@@ -338,10 +342,10 @@ Node.prototype.removeComponent = function removeComponent (component) {
 
 Node.prototype.addUIEvent = function addUIEvent (eventName) {
     var UIEvents = this.getUIEvents();
-    var components = this._compontents;
+    var components = this._components;
     var component;
 
-    if (UIEvents.indexOf(eventName) > -1) {
+    if (UIEvents.indexOf(eventName) === -1) {
         UIEvents.push(eventName);
         for (var i = 0, len = components.length ; i < len ; i++) {
             component = components[i];
