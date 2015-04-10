@@ -219,7 +219,10 @@ Program.prototype.resetProgram = function resetProgram() {
     this.cachedUniforms = {};
 
     fragmentHeader.push('uniform sampler2D image;\n');
-    vertexHeader.push('uniform sampler2D image;\n');
+
+    if (this.applicationVert.length > 1) {
+        vertexHeader.push('uniform sampler2D image;\n');
+    }
 
     for(i = 0; i < this.uniformNames.length; i++) {
         name = this.uniformNames[i], value = this.uniformValues[i];
