@@ -131,9 +131,8 @@ Context.prototype.receive = function receive(pathArr, path, commands) {
                 break;
 
             case 'REMOVE_CLASS':
-                if (!element) element = this._elementHash[path];
                 if (this.WebGLRenderer) this.WebGLRenderer.getOrSetCutout(path);
-                element.removeClass(commands[commands.index++]);
+                this.DOMRenderer.removeClass(commands[commands.index++]);
                 break;
 
             case 'ADD_EVENT_LISTENER':
