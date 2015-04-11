@@ -48,12 +48,10 @@ Compositor.prototype.sendEvent = function sendEvent(path, ev, payload) {
  *                              WebWorker, used to shift single messages from
  */
 Compositor.prototype.handleWith = function handleWith (iterator, commands) {
-    var localIterator = iterator;
-    var path = commands[localIterator++];
+    var path = commands[iterator];
     var pathArr = path.split('/');
     var context = this.getOrSetContext(pathArr.shift());
-
-    return context.receive(pathArr, path, commands, localIterator);
+    return context.receive(pathArr, path, commands, iterator);
 };
 
 /**
@@ -86,9 +84,7 @@ Compositor.prototype.getOrSetContext = function getOrSetContext(selector) {
  *                              WebWorker, used to shift single messages from
  */
 Compositor.prototype.giveSizeFor = function giveSizeFor(iterator, commands) {
-    var localIterator = iterator;
-    var selector = commands[localIterator++];
-
+    var selector = commands[iterator];
     var size = this.getOrSetContext(selector).getRootSize();
     this.sendResize(selector, size);
     var _this = this;
@@ -98,8 +94,6 @@ Compositor.prototype.giveSizeFor = function giveSizeFor(iterator, commands) {
                 _this.sendResize(selector, _this.getOrSetContext(selector).getRootSize());
             }
         });
-
-    return localIterator;
 };
 
 /**
@@ -157,29 +151,27 @@ Compositor.prototype.invoke = function invoke (target, methodName, args, functio
 Compositor.prototype.drawCommands = function drawCommands() {
     var commands = this._inCommands;
     var localIterator = 0;
-    var command = commands[localIterator++];
-
+    var command = commands[localIterator];
     while (command) {
         switch (command) {
             case 'WITH':
-                localIterator = this.handleWith(localIterator, commands);
+                localIterator = this.handleWith(++localIterator, commands);
                 break;
 
             case 'INVOKE':
                 this.invoke(
-                    commands[localIterator++],
-                    commands[localIterator++],
-                    commands[localIterator++],
-                    commands[localIterator++]
+                    commands[++localIterator],
+                    commands[++localIterator],
+                    commands[++localIterator],
+                    commands[++localIterator]
                 );
                 break;
 
             case 'NEED_SIZE_FOR':
-                localIterator = this.giveSizeFor(localIterator, commands);
+                this.giveSizeFor(++localIterator, commands);
                 break;
         }
-
-        command = commands[localIterator++];
+        command = commands[++localIterator];
     }
 
     // TODO: Switch to associative arrays here...
