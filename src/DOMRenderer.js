@@ -2,9 +2,22 @@
 
 var ElementCache = require('./ElementCache');
 
-var TRANSFORM = 'transform';
+var VENDOR_PREFIXES = ['', '-ms-', '-webkit-', '-moz-', '-o-'];
 
-function DOMRenderer (element, selector) {
+function vendorPrefix(property) {
+    for (var i = 0; i < VENDOR_PREFIXES.length; i++) {
+        var prefixed = VENDOR_PREFIXES[i] + property;
+        if (document.documentElement.style[prefixed] === '') {
+            return prefixed;
+        }
+    }
+    return property;
+}
+
+var TRANSFORM = vendorPrefix('transform');
+
+function DOMRenderer (element, selector, compositor) {
+    this._compositor = compositor;
     this._target = null;
     this._parent = null;
     this._path = null;
@@ -13,9 +26,105 @@ function DOMRenderer (element, selector) {
     this._selector = selector;
     this._elements = {};
     this._elements[selector] = this._root;
+
     this.perspectiveTransform = new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
     this._VPtransform = new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
+
+    this._eventListeners = {};
 }
+
+DOMRenderer.prototype.addEventListener = function addEventListener(path, type, properties, preventDefault) {
+    if (!this._eventListeners[type]) {
+        this._eventListeners[type] = {};
+        this._root.element.addEventListener(type, this._triggerEvent.bind(this));
+    }
+
+    this._eventListeners[type][path] = {
+        properties: properties,
+        preventDefault: preventDefault
+    };
+};
+
+function _mirror(item, target, reference) {
+    var i, len;
+    var key, keys;
+    if (typeof item === 'string' || typeof item === 'number') target[item] = reference[item];
+    else if (Array.isArray(item)) {
+        for (i = 0, len = item.length; i < len; i++) {
+            _mirror(item[i], target, reference);
+        }
+    }
+    else {
+        keys = Object.keys(item);
+        for (i = 0, len = keys.length; i < len; i++) {
+            key = keys[i];
+            if (reference[key]) {
+                target[key] = {};
+                _mirror(item[key], target[key], reference[key])
+            }
+        }
+    }
+}
+
+function _makeTarget (ev) {
+    var target = ev.target;
+    var result = {
+        tagName: target.tagName,
+        id: target.getAttribute('id'),
+        classes: []
+    };
+    for (var i = 0, len = target.classList.length ; i < len ; i++)
+        result.classes[i] = target.classList[i];
+    return result;
+}
+
+function _stripEvent (ev, properties, path) {
+    var result = {
+        path: path,
+        target: _makeTarget(ev),
+        node: null
+    };
+    var i, len;
+    for (i = 0, len = properties ? properties.length : 0; i < len; i++) {
+        var prop = properties[i];
+        _mirror(prop, result, ev);
+    }
+    switch (ev.type) {
+        case 'mousedown':
+        case 'mouseup':
+        case 'click':
+            result.x = ev.x;
+            result.y = ev.y;
+            result.timeStamp = ev.timeStamp;
+            break;
+        case 'mousemove':
+            result.x = ev.x;
+            result.y = ev.y;
+            result.movementX = ev.movementX;
+            result.movementY = ev.movementY;
+            break;
+        case 'wheel':
+            result.deltaX = ev.deltaX;
+            result.deltaY = ev.deltaY;
+            break;
+    }
+    return result;
+}
+
+DOMRenderer.prototype._triggerEvent = function _triggerEvent(ev) {
+    for (var i = 0; i < ev.path.length; i++) {
+        if (!ev.path[i].dataset) continue;
+        var path = ev.path[i].dataset.faPath;
+        if (this._eventListeners[ev.type][path]) {
+            this._compositor.sendEvent(path, ev.type, _stripEvent(ev, this._eventListeners[ev.type][path].properties, path));
+            ev.stopPropagation();
+            if (this._eventListeners[ev.type][path].preventDefault) {
+                ev.preventDefault();
+            }
+            break;
+        }
+    }
+};
 
 DOMRenderer.prototype.getSize = function getSize () {
     return [this._root.element.offsetWidth, this._root.element.offsetHeight];
@@ -168,13 +277,14 @@ DOMRenderer.prototype.setContent = function setContent (content) {
     this.findChildren(this._path);
 
     // Temporary solution
-    for (var i = 0 ; i < this._children.length ; i++)
-        this._target.element.removeChild(this._children[i]);
+    for (var i = 0 ; i < this._children.length ; i++) {
+        this._target.element.removeChild(this._children[i].element);
+    }
 
     this._target.element.innerHTML = content;
 
     for (var i = 0 ; i < this._children.length ; i++)
-        this._target.element.appendChild(this._children[i]);
+        this._target.element.appendChild(this._children[i].element);
 };
 
 DOMRenderer.prototype.setMatrix = function setMatrix (transform) { 
@@ -192,6 +302,11 @@ DOMRenderer.prototype.setMatrix = function setMatrix (transform) {
 DOMRenderer.prototype.addClass = function addClass (domClass) {
     this._assertTargetLoaded();
     this._target.element.classList.add(domClass);
+};
+
+DOMRenderer.prototype.removeClass = function removeClass (domClass) {
+    this._assertTargetLoaded();
+    this._target.element.classList.remove(domClass);
 };
 
 function stringifyMatrix(m) {
