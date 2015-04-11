@@ -47,7 +47,7 @@ DOMRenderer.prototype.draw = function draw (renderState) {
         this.perspectiveTransform[14] = renderState.perspectiveTransform[14];
         this.perspectiveTransform[15] = renderState.perspectiveTransform[15];
     }
-    
+
     if (renderState.viewDirty || renderState.perspectiveDirty) {
         multiply(this._VPtransform, this.perspectiveTransform, renderState.viewTransform);
         this._root.element.style[TRANSFORM] = stringifyMatrix(this._VPtransform);
@@ -154,8 +154,8 @@ DOMRenderer.prototype.setProperty = function setProperty (name, value) {
 
 DOMRenderer.prototype.setSize = function setSize (width, height) {
     this._assertTargetLoaded();
-    if (width != null && width !== true) this._target.element.style.width = width + 'px';
-    if (height != null && height !== true) this._target.element.style.height = height + 'px';
+    this._target.element.style.width = (width === true) ? '' : width + 'px';
+    this._target.element.style.height = (height === true) ? '' : height + 'px';
 };
 
 DOMRenderer.prototype.setAttribute = function setAttribute (name, value) {
