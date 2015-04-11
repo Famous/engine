@@ -26,11 +26,11 @@ Rotation.toString = function toString() {
 Rotation.prototype = Object.create(Position.prototype);
 Rotation.prototype.constructor = Rotation;
 
-Rotation.prototype.onUpdate = function onUpdate() {
+Rotation.prototype.update = function update() {
     this._node.setRotation(this._x.get(), this._y.get(), this._z.get());
-    
-    if (this.isActive()) this._node.requestUpdateOnNextTick(this._id);
-    else this._requestingUpdate = false;
+    this._checkUpdate();
 };
+
+Rotation.prototype.onUpdate = Rotation.prototype.update;
 
 module.exports = Rotation;

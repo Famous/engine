@@ -14,9 +14,11 @@ function Position(node) {
   
     this._requestingUpdate = false;
     
-    this._x = new Transitionable(0);
-    this._y = new Transitionable(0);
-    this._z = new Transitionable(0);
+    var initialPosition = node.getPosition();
+
+    this._x = new Transitionable(initialPosition[0]);
+    this._y = new Transitionable(initialPosition[1]);
+    this._z = new Transitionable(initialPosition[2]);
 }
 
 /** 
@@ -37,7 +39,7 @@ Position.toString = function toString() {
 * @method
 * @return {Object}
 */
-Position.prototype.getState = function getState() {
+Position.prototype.getValue = function getValue() {
     return {
         component: this.constructor.toString(),
         x: this._x.get(),
@@ -106,18 +108,24 @@ Position.prototype.isActive = function isActive() {
     return this._x.isActive() || this._y.isActive() || this._z.isActive();
 };
 
+Position.prototype._checkUpdate = function _checkUpdate() {
+    if (this.isActive()) this._node.requestUpdateOnNextTick(this._id);
+    else this._requestingUpdate = false;
+};
+
+
+Position.prototype.update = function update () {
+    this._node.setPosition(this._x.get(), this._y.get(), this._z.get());
+    this._checkUpdate();
+};
+
 /** 
 *
 * If true, component is to be updated on next engine tick
 *
 * @method
 */
-Position.prototype.onUpdate = function onUpdate() {
-    this._node.setPosition(this._x.get(), this._y.get(), this._z.get());
-    
-    if (this.isActive()) this._node.requestUpdateOnNextTick(this._id);
-    else this._requestingUpdate = false;
-};
+Position.prototype.onUpdate = Position.prototype.update;
 
 /** 
 *
@@ -197,10 +205,25 @@ Position.prototype.set = function set(x, y, z, options, callback) {
         this._node.requestUpdate(this._id);
         this._requestingUpdate = true;
     }
-   
-    this._x.set(x, options);
-    this._y.set(y, options);
-    this._z.set(z, options, callback);
+
+    var xCallback;
+    var yCallback;
+    var zCallback;
+
+    if (z != null) {
+        zCallback = callback;
+    }
+    else if (y != null) {
+        yCallback = callback;
+    }
+    else if (x != null) {
+        xCallback = callback;
+    }
+
+    if (x != null) this._x.set(x, options, xCallback);
+    if (y != null) this._y.set(y, options, yCallback);
+    if (z != null) this._z.set(z, options, zCallback);
+
     return this;
 };
 
