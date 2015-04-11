@@ -29,10 +29,9 @@ Origin.prototype.constructor = Origin;
 
 Origin.prototype.onUpdate = function onUpdate() {
     this._node.setOrigin(this._x.get(), this._y.get(), this._z.get());
-    
-    if (this.isActive()) this._node.requestUpdateOnNextTick(this._id);
-    else this._requestingUpdate = false;
+    this._checkUpdate();
 };
 
+Origin.prototype.onUpdate = Origin.prototype.update;
 
 module.exports = Origin;

@@ -27,11 +27,11 @@ Align.toString = function toString() {
 Align.prototype = Object.create(Position.prototype);
 Align.prototype.constructor = Align;
 
-Align.prototype.onUpdate = function onUpdate() {
+Align.prototype.update = function update() {
     this._node.setAlign(this._x.get(), this._y.get(), this._z.get());
-
-    if (this.isActive()) this._node.requestUpdateOnNextTick(this._id);
-    else this._requestingUpdate = false;
+    this._checkUpdate();
 };
+
+Align.prototype.onUpdate = Align.prototype.update;
 
 module.exports = Align;
