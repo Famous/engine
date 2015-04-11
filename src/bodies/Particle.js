@@ -290,7 +290,7 @@ Particle.prototype.getAngularVelocity = function getAngularVelocity() {
  */
 Particle.prototype.setAngularVelocity = function setAngularVelocity(x,y,z) {
     this.angularVelocity.set(x,y,z);
-    var I = Mat33.inverse(this.inverseInertia, MAT1_REGISTER)
+    var I = Mat33.inverse(this.inverseInertia, MAT1_REGISTER);
     if (I) I.vectorMultiply(this.angularVelocity, this.angularMomentum);
     else this.angularMomentum.clear();
     return this;

@@ -87,7 +87,7 @@ Distance.prototype.update = function(time, dt) {
     var gamma;
     var beta;
 
-    if (period === 0) {
+    if (this.period === 0) {
         gamma = 0;
         beta  = 1;
     }

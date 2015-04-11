@@ -291,10 +291,9 @@ Manifold.prototype.contains = function contains(collisionData) {
  * Return true or false to indicate that the Manifold still contains at least one Contact.
  *
  * @method update
- * @param {Number} dt
  * @return {Boolean} whether or not the manifold persists
  */
-Manifold.prototype.update = function update(dt) {
+Manifold.prototype.update = function update() {
     var contacts = this.contacts;
     var bodyA = this.bodyA;
     var bodyB = this.bodyB;
@@ -443,7 +442,7 @@ Contact.prototype.init = function init() {
 
     this.restitution = Math.min(bodyA.restitution, bodyB.restitution);
     this.friction = bodyA.friction * bodyB.friction;
-}
+};
 
 /**
  * Warm start the Contact, prepare for the iterative solver, and reset impulses.

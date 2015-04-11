@@ -36,10 +36,9 @@ RotationalDrag.QUADRATIC = function QUADRATIC(omega) {
  *
  * @attribute LINEAR
  * @type Function
- * @param {Vec3} omega
  * @return {Number}
  */
-RotationalDrag.LINEAR = function LINEAR(omega) {
+RotationalDrag.LINEAR = function LINEAR() {
     return 1;
 };
 

@@ -270,11 +270,13 @@ DynamicGeometry.prototype.reshape = function(referencePoint) {
     var vertexOnFeature;
     var featureVertices;
 
+    var i, j, len;
+
     // The removal of features creates a hole in the polyhedron -- frontierEdges maintains the edges
     // of this hole, each of which will form one edge of a new feature to be created
     var frontierEdges = [];
 
-    for (var i = 0, len = features.length; i < len; i++) {
+    for (i = 0, len = features.length; i < len; i++) {
         if (!features[i]) continue;
         featureVertices = features[i].vertexIndices;
         vertexOnFeature = vertices[featureVertices[0]].vertex;
@@ -289,7 +291,7 @@ DynamicGeometry.prototype.reshape = function(referencePoint) {
 
     var A = point;
     var a = this.lastVertexIndex;
-    for (var j = 0, len = frontierEdges.length; j < len; j++) {
+    for (j = 0, len = frontierEdges.length; j < len; j++) {
         if (!frontierEdges[j]) continue;
         var b = frontierEdges[j][0];
         var c = frontierEdges[j][1];

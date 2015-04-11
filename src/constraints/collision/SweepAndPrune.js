@@ -69,20 +69,21 @@ SweepAndPrune.prototype.remove = function remove(body) {
     }
     this._sweepVolumes.splice(index, 1);
     var endpoints = this.endpoints;
+    var point;
 
     var xs = [];
     for (i = 0, len = endpoints.x.length; i < len; i++) {
-        var point = endpoints.x[i];
+        point = endpoints.x[i];
         if (point._ID !== body._ID) xs.push(point);
     }
     var ys = [];
     for (i = 0, len = endpoints.y.length; i < len; i++) {
-        var point = endpoints.y[i];
+        point = endpoints.y[i];
         if (point._ID !== body._ID) ys.push(point);
     }
     var zs = [];
     for (i = 0, len = endpoints.z.length; i < len; i++) {
-        var point = endpoints.z[i];
+        point = endpoints.z[i];
         if (point._ID !== body._ID) zs.push(point);
     }
     endpoints.x = xs;
@@ -121,7 +122,6 @@ SweepAndPrune.prototype.update = function() {
         for (j = 1, len = endpointAxis.length; j < len; j++) {
             var current = endpointAxis[j];
             var val = current.value;
-            var i = j - 1;
             var swap;
             var row;
             var index;
@@ -129,6 +129,8 @@ SweepAndPrune.prototype.update = function() {
             var highID;
             var cID;
             var sID;
+
+            i = j - 1;
             while (i >= 0 && (swap = endpointAxis[i]).value > val) {
                 // A swap occurence indicates that current and swap either just started or just stopped overlapping
 
@@ -187,9 +189,9 @@ function SweepVolume(boundingVolume) {
         x: [{_ID: boundingVolume._ID, side: 0, value: null}, {_ID: boundingVolume._ID, side: 1, value: null}],
         y: [{_ID: boundingVolume._ID, side: 0, value: null}, {_ID: boundingVolume._ID, side: 1, value: null}],
         z: [{_ID: boundingVolume._ID, side: 0, value: null}, {_ID: boundingVolume._ID, side: 1, value: null}]
-    }
+    };
     this.update();
-};
+}
 
 /**
  * Update the endpoints to reflect the current location of the AABB.

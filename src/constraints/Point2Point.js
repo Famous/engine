@@ -90,7 +90,7 @@ Point2Point.prototype.update = function(time, dt) {
 
     var invEffMass = new Mat33([imA + imB,0,0,0,imA + imB,0,0,0,imA + imB]);
 
-    Mat33.add(invEffInertia, invEffMass, this.effMassMatrix)
+    Mat33.add(invEffInertia, invEffMass, this.effMassMatrix);
     this.effMassMatrix.inverse();
 
     var impulse = this.impulse;
