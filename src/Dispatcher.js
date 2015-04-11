@@ -106,8 +106,8 @@ Dispatcher.prototype.dispatchUIEvent = function dispatchUIEvent (path, event, pa
     var queue = this._queue;
     var node;
 
-    this.lookupNode(path); // After this call, the path is loaded into the queue
-                           // (lookUp node doesn't clear the queue after the lookup)
+    payload.node = this.lookupNode(path); // After this call, the path is loaded into the queue
+                                          // (lookUp node doesn't clear the queue after the lookup)
 
     while (queue.length) {
         node = queue.pop(); // pop nodes off of the queue to move up the ancestor chain.
