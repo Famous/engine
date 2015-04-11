@@ -2,7 +2,19 @@
 
 var ElementCache = require('./ElementCache');
 
-var TRANSFORM = 'transform';
+var VENDOR_PREFIXES = ['', '-ms-', '-webkit-', '-moz-', '-o-'];
+
+function vendorPrefix(property) {
+    for (var i = 0; i < VENDOR_PREFIXES.length; i++) {
+        var prefixed = VENDOR_PREFIXES[i] + property;
+        if (document.documentElement.style[prefixed] === '') {
+            return prefixed;
+        }
+    }
+    return property;
+}
+
+var TRANSFORM = vendorPrefix('transform');
 
 function DOMRenderer (element, selector, compositor) {
     this._compositor = compositor;
