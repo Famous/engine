@@ -15,6 +15,8 @@ function Camera(node) {
     this._requestingUpdate = false;
     this._id = node.addComponent(this);
     this._viewTransform = new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
+    this._viewDirty = false;
+    this._perspectiveDrty = false;
     this.setFlat();
 }
 
@@ -62,6 +64,7 @@ Camera.prototype.setDepth = function setDepth(depth) {
         this._node.requestUpdate(this._id);
         this._requestingUpdate = true;
     }
+    this._perspectiveDirty = true;
     this._projectionType = Camera.PINHOLE_PROJECTION;
     this._focalDepth = depth;
     this._near = 0;
@@ -75,6 +78,7 @@ Camera.prototype.setFrustum = function setFrustum(near, far) {
         this._node.requestUpdate(this._id);
         this._requestingUpdate = true;
     }
+    this._perspectiveDirty = true;
     this._projectionType = Camera.FRUSTUM_PROJECTION;
     this._focalDepth = 0;
     this._near = near;
@@ -88,6 +92,7 @@ Camera.prototype.setFlat = function setFlat() {
         this._node.requestUpdate(this._id);
         this._requestingUpdate = true;
     }
+    this._perspectiveDirty = true;
     this._projectionType = Camera.ORTHOGRAPHIC_PROJECTION;
     this._focalDepth = 0;
     this._near = 0;
@@ -103,27 +108,30 @@ Camera.prototype.onUpdate = function onUpdate() {
 
     this._node
         .sendDrawCommand('WITH')
-        .sendDrawCommand(path)
-        .sendDrawCommand('*');
+        .sendDrawCommand(path);
 
-    switch (this._projectionType) {
-        case Camera.FRUSTUM_PROJECTION:
-            this._node.sendDrawCommand('FRUSTUM_PROJECTION');
-            this._node.sendDrawCommand(this._near);
-            this._node.sendDrawCommand(this._far);
-            break;
-        case Camera.PINHOLE_PROJECTION:
-            this._node.sendDrawCommand('PINHOLE_PROJECTION');
-            this._node.sendDrawCommand(this._focalDepth);
-            break;
-        case Camera.ORTHOGRAPHIC_PROJECTION:
-            this._node.sendDrawCommand('ORTHOGRAPHIC_PROJECTION');
-            break;
+    if (this._perspectiveDirty) {
+        this._perspectiveDirty = true;
+        
+        switch (this._projectionType) {
+            case Camera.FRUSTUM_PROJECTION:
+                this._node.sendDrawCommand('FRUSTUM_PROJECTION');
+                this._node.sendDrawCommand(this._near);
+                this._node.sendDrawCommand(this._far);
+                break;
+            case Camera.PINHOLE_PROJECTION:
+                this._node.sendDrawCommand('PINHOLE_PROJECTION');
+                this._node.sendDrawCommand(this._focalDepth);
+                break;
+            case Camera.ORTHOGRAPHIC_PROJECTION:
+                this._node.sendDrawCommand('ORTHOGRAPHIC_PROJECTION');
+                break;
+        }
     }
 
     if (this._viewDirty) {
         this._viewDirty = false;
-        
+
         this._node.sendDrawCommand('CHANGE_VIEW_TRANSFORM');
         this._node.sendDrawCommand(this._viewTransform[0]);
         this._node.sendDrawCommand(this._viewTransform[1]);
@@ -152,10 +160,10 @@ Camera.prototype.onTransformChange = function onTransformChange(transform) {
     var a = transform;
     this._viewDirty = true;
 
-    // if (!this._requestingUpdate) {
-    //     this._node.requestUpdate(this._id);
-    //     this._requestingUpdate = true;
-    // }
+    if (!this._requestingUpdate) {
+        this._node.requestUpdate(this._id);
+        this._requestingUpdate = true;
+    }
 
     var a00 = a[0], a01 = a[1], a02 = a[2], a03 = a[3],
     a10 = a[4], a11 = a[5], a12 = a[6], a13 = a[7],
