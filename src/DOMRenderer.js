@@ -258,6 +258,11 @@ DOMRenderer.prototype.addClass = function addClass (domClass) {
     this._target.element.classList.add(domClass);
 };
 
+DOMRenderer.prototype.removeClass = function removeClass (domClass) {
+    this._assertTargetLoaded();
+    this._target.element.classList.remove(domClass);
+};
+
 function stringifyMatrix(m) {
     var r = 'matrix3d(';
 
