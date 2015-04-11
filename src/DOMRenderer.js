@@ -50,9 +50,23 @@ function _mirror(item, target, reference) {
     }
 }
 
+function _makeTarget (ev) {
+    var target = ev.target;
+    var result = {
+        tagName: target.tagName,
+        id: target.getAttribute('id'),
+        classes: []
+    };
+    for (var i = 0, len = target.classList.length ; i < len ; i++)
+        result.classes[i] = target.classList[i];
+    return result;
+}
+
 function _stripEvent (ev, properties, path) {
     var result = {
-        path: path 
+        path: path,
+        target: _makeTarget(ev),
+        node: null
     };
     var i, len;
     for (i = 0, len = properties ? properties.length : 0; i < len; i++) {
