@@ -50,8 +50,10 @@ function _mirror(item, target, reference) {
     }
 }
 
-function _stripEvent (ev, properties) {
-    var result = {};
+function _stripEvent (ev, properties, path) {
+    var result = {
+        path: path 
+    };
     var i, len;
     for (i = 0, len = properties ? properties.length : 0; i < len; i++) {
         var prop = properties[i];
@@ -84,7 +86,7 @@ DOMRenderer.prototype._triggerEvent = function _triggerEvent(ev) {
         if (!ev.path[i].dataset) continue;
         var path = ev.path[i].dataset.faPath;
         if (this._eventListeners[ev.type][path]) {
-            this._compositor.sendEvent(path, ev.type, _stripEvent(ev, this._eventListeners[ev.type][path].properties));
+            this._compositor.sendEvent(path, ev.type, _stripEvent(ev, this._eventListeners[ev.type][path].properties, path));
             ev.stopPropagation();
             if (this._eventListeners[ev.type][path].preventDefault) {
                 ev.preventDefault();
