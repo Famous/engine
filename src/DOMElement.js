@@ -20,7 +20,7 @@ function DOMElement (node, options) {
     this._classes = ['fa-surface'];
     this._requestingEventListeners = [];
     this._styles = {
-        display: 'none' 
+        display: node.isShown() 
     };
     this._attributes = {};
     this._content = '';
