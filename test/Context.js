@@ -63,10 +63,10 @@ test('Context', function(t) {
         };
         var context = new Context('.context-on-receive', mockFamous);
         t.equal(typeof context.onReceive, 'function', 'context.onReceive should be a function');
-        context.onReceive('CONTEXT_RESIZE', [100, 200, 300]);
+        context.onReceive('CONTEXT_RESIZE', [100, 200]);
         t.deepEqual(context.getComputedValue().computedValues.size, [0, 0, 0]);
         context.onUpdate(100);
-        t.deepEqual(context.getComputedValue().computedValues.size, [100, 200, 300]);
+        t.deepEqual(context.getComputedValue().computedValues.size, [100, 200, 0]);
         t.end();
     });
 });
