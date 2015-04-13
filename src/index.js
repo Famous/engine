@@ -2,6 +2,7 @@
 
 var polyfills = require('famous-polyfills');
 var rAF = polyfills.requestAnimationFrame;
+var cAF = polyfills.cancelAnimationFrame;
 
 var _now;
 if (typeof performance !== 'undefined') {
@@ -47,18 +48,19 @@ if (typeof document !== 'undefined') {
 function Engine() {
     this._updates = [];
     var _this = this;
-    this.looper = function(time) {
+    this._looper = function(time) {
         _this.loop(time);
     };
     this._stoppedAt = _now();
     this._sleep = 0;
     this._startOnVisibilityChange = true;
+    this._rAF = null;
     this.start();
-    rAF(this.looper);
 
     if (typeof document !== 'undefined') {
         document.addEventListener(VENDOR_VISIBILITY_CHANGE, function() {
             if (document[VENDOR_HIDDEN]) {
+                cAF(this._rAF);
                 var startOnVisibilityChange = _this._startOnVisibilityChange;
                 _this.stop();
                 _this._startOnVisibilityChange = startOnVisibilityChange;
@@ -81,9 +83,12 @@ function Engine() {
  * @return {Engine} this
  */
 Engine.prototype.start = function start() {
-    this._startOnVisibilityChange = true;
-    this._running = true;
-    this._sleep += _now() - this._stoppedAt;
+    if (!this._running) {
+        this._startOnVisibilityChange = true;
+        this._running = true;
+        this._sleep += _now() - this._stoppedAt;
+        this._rAF = rAF(this._looper);
+    }
     return this;
 };
 
@@ -96,9 +101,12 @@ Engine.prototype.start = function start() {
  * @return {Engine} this
  */
 Engine.prototype.stop = function stop() {
-    this._startOnVisibilityChange = false;
-    this._running = false;
-    this._stoppedAt = _now();
+    if (this._running) {
+        this._startOnVisibilityChange = false;
+        this._running = false;
+        this._stoppedAt = _now();
+        cAF(this._rAF);
+    }
     return this;
 };
 
@@ -144,9 +152,7 @@ Engine.prototype.step = function step (time) {
  */
 Engine.prototype.loop = function loop(time) {
     this.step(time - this._sleep);
-    if (this._running) {
-        rAF(this.looper);
-    }
+    this._rAF = rAF(this._looper);
     return this;
 };
 
