@@ -2,8 +2,15 @@
 
 var ElementCache = require('./ElementCache');
 
+// an enumeration of potential vendor prefixes.
 var VENDOR_PREFIXES = ['', '-ms-', '-webkit-', '-moz-', '-o-'];
 
+/**
+ * A private function for determining if a css property
+ * has a vendor prefix.
+ *
+ * @param {String} property
+ */
 function vendorPrefix(property) {
     for (var i = 0; i < VENDOR_PREFIXES.length; i++) {
         var prefixed = VENDOR_PREFIXES[i] + property;
@@ -14,18 +21,51 @@ function vendorPrefix(property) {
     return property;
 }
 
+// the prefixed transform property.
 var TRANSFORM = vendorPrefix('transform');
 
+/**
+ * DOMRenderer is a class responsible for adding elements
+ * to the DOM and writing to those elements.
+ * there is a DOMRenderer per context, represented as an
+ * element and a selector. It is instantiated in the 
+ * context class.
+ *
+ * @class DOMRenderer
+ * 
+ * @param {HTMLElement} an element.
+ * @param {String} the selector of the element.
+ * @param {Compositor}
+ */
 function DOMRenderer (element, selector, compositor) {
-    this._compositor = compositor;
-    this._target = null;
-    this._parent = null;
-    this._path = null;
-    this._children = [];
-    this._root = new ElementCache(element, selector);
+    this._compositor = compositor; // a reference to the compositor
+
+    this._target = null; // a register for holding the current
+                         // element that the Renderer is operating
+                         // upon
+
+    this._parent = null; // a register for holding the parent
+                         // of the target
+
+    this._path = null; // a register for holding the path of the target
+                       // this register must be set first, and then
+                       // children, target, and parent are all looked
+                       // up from that.
+
+    this._children = []; // a register for holding the children of the
+                         // current target.
+
+    this._root = new ElementCache(element, selector); // the root
+                                                      // of the dom tree that this
+                                                      // renderer is responsible
+                                                      // for
+
     this._selector = selector;
+    
     this._elements = {};
+
     this._elements[selector] = this._root;
+
     this._eventListeners = {};
 }
 
@@ -154,13 +194,14 @@ DOMRenderer.prototype.findParent = function findParent () {
     return parent;
 };
 
-DOMRenderer.prototype.findChildren = function findChildren () {
+DOMRenderer.prototype.findChildren = function findChildren (array) {
     this._assertPathLoaded();
     
     var path = this._path;
     var keys = Object.keys(this._elements);
     var i = 0;
     var len;
+    array = array ? array : this._children;
 
     this._children.length = 0;
 
@@ -180,9 +221,9 @@ DOMRenderer.prototype.findChildren = function findChildren () {
         }
     }
     for (i = 0, len = keys.length ; i < len ; i++)
-        this._children[i] = this._elements[keys[i]];
+        array[i] = this._elements[keys[i]];
 
-    return this._children;
+    return array;
 };
 
 DOMRenderer.prototype.findTarget = function findTarget () {
@@ -256,20 +297,26 @@ DOMRenderer.prototype.setMatrix = function setMatrix (transform) {
     this._assertTargetLoaded();
     this.findParent();
     var worldTransform = this._target.worldTransform;
+    var changed = false
 
     if (transform)
-        for (var i = 0, len = 16 ; i < len ; i++)
+        for (var i = 0, len = 16 ; i < len ; i++) {
+            changed = changed ? changed : worldTransform[i] === transform[i];
             worldTransform[i] = transform[i];
-
-    invert(this._target.invertedParent, this._parent.worldTransform);
-    var changed = multiply(this._target.finalTransform, this._target.invertedParent, worldTransform);
+        }
+    else changed = true;
 
     if (changed) {
-        this.findChildren();
+        invert(this._target.invertedParent, this._parent.worldTransform);
+        multiply(this._target.finalTransform, this._target.invertedParent, worldTransform);
+
+        // TODO: this is a temporary fix for draw commands
+        // coming in out of order
+        var children = this.findChildren([]);
+        var previousPath = this._path;
         var previousTarget = this._target;
-        var previousPath = this._path
-        for (i = 0, len = this._children.length ; i < len ; i++) { 
-            this._target = this._children[i];
+        for (i = 0, len = children.length ; i < len ; i++) {
+            this._target = children[i];
             this._path = this._target.path;
             this.setMatrix();
         }
