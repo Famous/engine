@@ -28,9 +28,9 @@ MountPoint.prototype.constructor = MountPoint;
 
 MountPoint.prototype.onUpdate = function onUpdate() {
     this._node.setMountPoint(this._x.get(), this._y.get(), this._z.get());
-
-    if (this.isActive()) this._node.requestUpdateOnNextTick(this._id);
-    else this._requestingUpdate = false;
+    this._checkUpdate();
 };
+
+MountPoint.prototype.onUpdate = MountPoint.prototype.update;
 
 module.exports = MountPoint;

@@ -31,10 +31,9 @@ Scale.prototype.constructor = Scale;
 
 Scale.prototype.onUpdate = function onUpdate() {
     this._node.setScale(this._x.get(), this._y.get(), this._z.get());
-    
-    if (this.isActive()) this._node.requestUpdateOnNextTick(this._id);
-    else this._requestingUpdate = false;
+    this._checkUpdate();
 };
 
+Scale.prototype.onUpdate = Scale.prototype.update;
 
 module.exports = Scale;

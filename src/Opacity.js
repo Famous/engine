@@ -106,11 +106,11 @@ Opacity.prototype.isActive = function isActive(){
     return this._value.isActive();
 };
 
-Opacity.prototype.onUpdate = function onUpdate() {
+Opacity.prototype.update = function update () {
     this._node.setOpacity(this._value.get());
-    
-    if (this.isActive()) this._node.requestUpdateOnNextTick(this._id);
-    else this._requestingUpdate = false;
+    this._checkUpdate();    
 };
+
+Opacity.prototype.onUpdate = Opacity.prototype.update;
 
 module.exports = Opacity;
