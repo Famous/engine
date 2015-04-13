@@ -7,8 +7,9 @@ var ident = [
     0, 0, 0, 1
 ];
 
-function ElementCache (element) {
+function ElementCache (element, path) {
     this.element = element;
+    this.path = path;
     this.worldTransform = new Float32Array(ident);
     this.invertedParent = new Float32Array(ident);
     this.finalTransform = new Float32Array(ident);

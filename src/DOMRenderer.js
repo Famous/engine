@@ -22,7 +22,7 @@ function DOMRenderer (element, selector, compositor) {
     this._parent = null;
     this._path = null;
     this._children = [];
-    this._root = new ElementCache(element);
+    this._root = new ElementCache(element, selector);
     this._selector = selector;
     this._elements = {};
     this._elements[selector] = this._root;
@@ -206,8 +206,8 @@ DOMRenderer.prototype.insertEl = function insertEl (tagName) {
         this._assertChildrenLoaded();
 
         if (this._target) this._parent.element.removeChild(this._target.element);
-        
-        this._target = new ElementCache(document.createElement(tagName));
+ 
+        this._target = new ElementCache(document.createElement(tagName), this._path);
         this._parent.element.appendChild(this._target.element);
         this._elements[this._path] = this._target;
         
@@ -256,11 +256,26 @@ DOMRenderer.prototype.setMatrix = function setMatrix (transform) {
     this._assertTargetLoaded();
     this.findParent();
     var worldTransform = this._target.worldTransform;
-    for (var i = 0 ; i < 16 ; i++) worldTransform[i] = transform[i];
+
+    if (transform)
+        for (var i = 0, len = 16 ; i < len ; i++)
+            worldTransform[i] = transform[i];
 
     invert(this._target.invertedParent, this._parent.worldTransform);
-    multiply(this._target.finalTransform, this._target.invertedParent, worldTransform);
+    var changed = multiply(this._target.finalTransform, this._target.invertedParent, worldTransform);
 
+    if (changed) {
+        this.findChildren();
+        var previousTarget = this._target;
+        var previousPath = this._path
+        for (i = 0, len = this._children.length ; i < len ; i++) { 
+            this._target = this._children[i];
+            this._path = this._target.path;
+            this.setMatrix();
+        }
+        this._path = previousPath;
+        this._target = previousTarget;
+    }
 
     this._target.element.style[TRANSFORM] = stringifyMatrix(this._target.finalTransform);
 };
@@ -356,28 +371,75 @@ function multiply (out, a, b) {
         b8 = b[8], b9 = b[9], b10 = b[10], b11 = b[11],
         b12 = b[12], b13 = b[13], b14 = b[14], b15 = b[15];
 
-    out[0] = b0*a00 + b1*a10 + b2*a20 + b3*a30;
-    out[1] = b0*a01 + b1*a11 + b2*a21 + b3*a31;
-    out[2] = b0*a02 + b1*a12 + b2*a22 + b3*a32;
-    out[3] = b0*a03 + b1*a13 + b2*a23 + b3*a33;
+    var changed = false;
+    var out0, out1, out2, out3;
+
+    out0 = b0*a00 + b1*a10 + b2*a20 + b3*a30;
+    out1 = b0*a01 + b1*a11 + b2*a21 + b3*a31;
+    out2 = b0*a02 + b1*a12 + b2*a22 + b3*a32;
+    out3 = b0*a03 + b1*a13 + b2*a23 + b3*a33;
+
+    changed = changed ?
+              changed : out0 == out[0] ||
+                        out1 == out[1] ||
+                        out2 == out[2] ||
+                        out3 == out[3];
+
+    out[0] = out0;
+    out[1] = out1;
+    out[2] = out2;
+    out[3] = out3;
 
     b0 = b4; b1 = b5; b2 = b6; b3 = b7;
-    out[4] = b0*a00 + b1*a10 + b2*a20 + b3*a30;
-    out[5] = b0*a01 + b1*a11 + b2*a21 + b3*a31;
-    out[6] = b0*a02 + b1*a12 + b2*a22 + b3*a32;
-    out[7] = b0*a03 + b1*a13 + b2*a23 + b3*a33;
+    out0 = b0*a00 + b1*a10 + b2*a20 + b3*a30;
+    out1 = b0*a01 + b1*a11 + b2*a21 + b3*a31;
+    out2 = b0*a02 + b1*a12 + b2*a22 + b3*a32;
+    out3 = b0*a03 + b1*a13 + b2*a23 + b3*a33;
+
+    changed = changed ?
+              changed : out0 == out[4] ||
+                        out1 == out[5] ||
+                        out2 == out[6] ||
+                        out3 == out[7];
+
+    out[4] = out0;
+    out[5] = out1;
+    out[6] = out2;
+    out[7] = out3;
 
     b0 = b8; b1 = b9; b2 = b10; b3 = b11;
-    out[8] = b0*a00 + b1*a10 + b2*a20 + b3*a30;
-    out[9] = b0*a01 + b1*a11 + b2*a21 + b3*a31;
-    out[10] = b0*a02 + b1*a12 + b2*a22 + b3*a32;
-    out[11] = b0*a03 + b1*a13 + b2*a23 + b3*a33;
+    out0 = b0*a00 + b1*a10 + b2*a20 + b3*a30;
+    out1 = b0*a01 + b1*a11 + b2*a21 + b3*a31;
+    out2 = b0*a02 + b1*a12 + b2*a22 + b3*a32;
+    out3 = b0*a03 + b1*a13 + b2*a23 + b3*a33;
+
+    changed = changed ?
+              changed : out0 == out[8] ||
+                        out1 == out[9] ||
+                        out2 == out[10] ||
+                        out3 == out[11];
+
+    out[8] = out0;
+    out[9] = out1;
+    out[10] = out2;
+    out[11] = out3;
 
     b0 = b12; b1 = b13; b2 = b14; b3 = b15;
-    out[12] = b0*a00 + b1*a10 + b2*a20 + b3*a30;
-    out[13] = b0*a01 + b1*a11 + b2*a21 + b3*a31;
-    out[14] = b0*a02 + b1*a12 + b2*a22 + b3*a32;
-    out[15] = b0*a03 + b1*a13 + b2*a23 + b3*a33;
+    out0 = b0*a00 + b1*a10 + b2*a20 + b3*a30;
+    out1 = b0*a01 + b1*a11 + b2*a21 + b3*a31;
+    out2 = b0*a02 + b1*a12 + b2*a22 + b3*a32;
+    out3 = b0*a03 + b1*a13 + b2*a23 + b3*a33;
+
+    changed = changed ?
+              changed : out0 == out[12] ||
+                        out1 == out[13] ||
+                        out2 == out[14] ||
+                        out3 == out[15];
+
+    out[12] = out0;
+    out[13] = out1;
+    out[14] = out2;
+    out[15] = out3;
 
     return out;
 }
