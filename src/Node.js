@@ -153,6 +153,11 @@ Node.prototype.getLocation = function getLocation () {
 
 Node.prototype.getId = Node.prototype.getLocation;
 
+Node.prototype.emit = function emit (event, payload) {
+    var p = this.getParent();
+    while ((p = p.getParent()) !== p);
+    p.getDispatch().dispatch(event, payload);
+};
 
 // THIS WILL BE DEPRICATED
 Node.prototype.sendDrawCommand = function sendDrawCommand (message) {
