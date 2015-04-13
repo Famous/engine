@@ -1,25 +1,19 @@
 'use strict';
 
-var Transitionable = require('famous-transitions/src/Transitionable');
-var Quaternion = require('famous-math/src/Quaternion');
+var Transitionable = require('famous-transitions').Transitionable;
+var Quaternion = require('famous-math').Quaternion;
 
 var Q_REGISTER = new Quaternion();
 var Q2_REGISTER = new Quaternion();
 
-function Vec3Transitionable() {
+function Vec3Transitionable(manager) {
+    this._manager = manager;
     this._dirty = false;
     this._x = new Transitionable(0);
     this._y = new Transitionable(0);
     this._z = new Transitionable(0);
 }
 
-/**
- *
- * Gets object containing x, y, z coordinates
- *
- * @method
- * @return {Object}
- */
 Vec3Transitionable.prototype.get = function get() {
     return {
         x: this._x.get(),
@@ -29,6 +23,7 @@ Vec3Transitionable.prototype.get = function get() {
 };
 
 Vec3Transitionable.prototype.set = function set(x, y, z, options, callback) {
+    this._manager._dispatch.dirtyComponent(this._manager._id);
     this._dirty = true;
 
     var cbX = null;
@@ -57,7 +52,8 @@ Vec3Transitionable.prototype.halt = function halt() {
     return this;
 };
 
-function QuatTransitionable() {
+function QuatTransitionable(manager) {
+    this._manager = manager;
     this._queue = [];
     this._front = 0;
     this._end = 0;
@@ -88,6 +84,7 @@ QuatTransitionable.prototype.get = function get() {
 };
 
 QuatTransitionable.prototype.set = function set(q, options, callback) {
+    this._manager._dispatch.dirtyComponent(this._manager._id);
     this._dirty = true;
     if (this._queue.length === 0) this._toQ.copy(q);
     this._queue.push(q.w, q.x, q.y, q.z);
@@ -109,14 +106,6 @@ QuatTransitionable.prototype.halt = function halt() {
     return this;
 };
 
-/**
- * Interface to manage various aspects of the transform and facilitate transitions.
- *
- * @class Transform
- * @constructor
- * @component
- * @param {LocalDispatch} dispatch LocalDispatch to be retrieved from corresponding Render Node of the Transform component.
- */
 function Transform(dispatch) {
     this._dispatch = dispatch;
     this._id = dispatch.addComponent(this);
@@ -128,23 +117,10 @@ function Transform(dispatch) {
     this.rotation = null;
 }
 
-/**
-* The String form of the Transform component.
-*
-* @method
-* @return {String} 'Transform'
-*/
 Transform.toString = function toString() {
     return 'Transform';
 };
 
-/**
- *
- * Gets object containing state of individual components.
- *
- * @method
- * @return {Object}
- */
 Transform.prototype.getState = function getState() {
     return {
         component: this.constructor.toString(),
@@ -157,14 +133,6 @@ Transform.prototype.getState = function getState() {
     };
 };
 
-/**
- *
- * Setter for transform state.
- *
- * @method
- * @param {Object} state Object -- component: stringified constructor, x: number, y: number, z: number
- * @return {Boolean} true on success
- */
 Transform.prototype.setState = function setState(state) {
     if (state.component === this.constructor.toString()) {
         state.origin && this.setOrigin(state.origin.x, state.origin.y, state.origin.z);
@@ -179,45 +147,38 @@ Transform.prototype.setState = function setState(state) {
 };
 
 Transform.prototype.setOrigin = function setOrigin(x, y, z, options, callback) {
-    this._dispatch.dirtyComponent(this._id);
-    if (!this.origin) this.origin = new Vec3Transitionable();
+    if (!this.origin) this.origin = new Vec3Transitionable(this);
     this.origin.set(x, y, z, options, callback);
 };
 
 Transform.prototype.setMountPoint = function setMountPoint(x, y, z, options, callback) {
-    this._dispatch.dirtyComponent(this._id);
-    if (!this.mountPoint) this.mountPoint = new Vec3Transitionable();
+    if (!this.mountPoint) this.mountPoint = new Vec3Transitionable(this);
     this.mountPoint.set(x, y, z, options, callback);
 };
 
 Transform.prototype.setAlign = function setAlign(x, y, z, options, callback) {
-    this._dispatch.dirtyComponent(this._id);
-    if (!this.align) this.align = new Vec3Transitionable();
+    if (!this.align) this.align = new Vec3Transitionable(this);
     this.align.set(x, y, z, options, callback);
 };
 
 Transform.prototype.setScale = function setScale(x, y, z, options, callback) {
-    this._dispatch.dirtyComponent(this._id);
-    if (!this.scale) this.scale = new Vec3Transitionable();
+    if (!this.scale) this.scale = new Vec3Transitionable(this);
     this.scale.set(x, y, z, options, callback);
 };
 
 Transform.prototype.setPosition = function setPosition(x, y, z, options, callback) {
-    this._dispatch.dirtyComponent(this._id);
-    if (!this.position) this.position = new Vec3Transitionable();
+    if (!this.position) this.position = new Vec3Transitionable(this);
     this.position.set(x, y, z, options, callback);
 };
 
-Transform.prototype.setRotation = function setRotation(x, y, z, options, callback, bool) {
-    this._dispatch.dirtyComponent(this._id);
-    if (!this.rotation) this.rotation = new QuatTransitionable();
+Transform.prototype.setRotation = function setRotation(x, y, z, options, callback) {
+    if (!this.rotation) this.rotation = new QuatTransitionable(this);
     var q = Q_REGISTER.fromEuler(x, y, z);
     this.rotation.set(q, options, callback);
 };
 
 Transform.prototype.rotate = function rotate(x, y, z, options, callback) {
-    this._dispatch.dirtyComponent(this._id);
-    if (!this.rotation) this.rotation = new QuatTransitionable();
+    if (!this.rotation) this.rotation = new QuatTransitionable(this);
     var queue = this.rotation._queue;
     var len = this.rotation._queue.length;
     var referenceQ;
