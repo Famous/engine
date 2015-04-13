@@ -307,10 +307,8 @@ DOMRenderer.prototype.setMatrix = function setMatrix (transform) {
     else changed = true;
 
     if (changed) {
-        if (this._parent !== this._root) {
-            invert(this._target.invertedParent, this._parent.worldTransform);
-            multiply(this._target.finalTransform, this._target.invertedParent, worldTransform);
-        }
+        invert(this._target.invertedParent, this._parent.worldTransform);
+        multiply(this._target.finalTransform, this._target.invertedParent, worldTransform);
 
         // TODO: this is a temporary fix for draw commands
         // coming in out of order
