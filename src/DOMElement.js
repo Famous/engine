@@ -109,7 +109,8 @@ DOMElement.prototype.onSizeChange = function onSizeChange (size) {
     var sizeMode = this._node.getSizeMode();
     var sizedX = sizeMode[0] !== Node.RENDER_SIZE;
     var sizedY = sizeMode[1] !== Node.RENDER_SIZE;
-    this._changeQueue.push('CHANGE_SIZE',
+    if (this._initialized) 
+        this._changeQueue.push('CHANGE_SIZE',
             sizedX ? size[0] : sizedX,
             sizedY ? size[1] : sizedY);
 
