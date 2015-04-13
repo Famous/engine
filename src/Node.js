@@ -304,8 +304,7 @@ Node.prototype.addChild = function addChild (child) {
             var childId = myId + '/' + index;
             child.onMount(this, childId);
         }
-
-        if (this.isShown() && child.onShow) child.onShow();
+    
     }
 
     return child;
@@ -315,8 +314,6 @@ Node.prototype.removeChild = function removeChild (child) {
     var index = this._children.indexOf(child);
     if (index !== -1) {
         this._freedChildIndicies.push(index);
-        if (this.isShown() && child.onHide)
-            child.onHide();
 
         if (this.isMounted() && child.onDismount)
             child.onDismount();
