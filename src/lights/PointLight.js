@@ -12,11 +12,10 @@ var Light = require('./Light');
  * @param {LocalDispatch} dispatch LocalDispatch to be retrieved
  * from the corresponding Render Node
  */
-function PointLight(dispatch) {
-    Light.call(this, dispatch);
+function PointLight(node) {
+    Light.call(this, node);
     this.commands.position = 'GL_LIGHT_POSITION';
-    this._receiveTransformChange(this._dispatch.getContext()._transform);
-    this._dispatch.onTransformChange(this._receiveTransformChange.bind(this));
+    this.onTransformChange(node.getTransform());
 };
 
 /**
@@ -44,13 +43,15 @@ PointLight.prototype.constructor = PointLight;
  *
  * @private
  */
-PointLight.prototype._receiveTransformChange = function _receiveTransformChange(transform) {
-    this._dispatch.dirtyComponent(this._id);
-
+PointLight.prototype.onTransformChange = function onTransformChange (transform) {
+    if (!this._requestingUpdate) {
+        this._node.requestUpdate(this._id);
+        this._requestingUpdate = true;
+    }
     this.queue.push(this.commands.position);
-    this.queue.push(transform._matrix[12]);
-    this.queue.push(transform._matrix[13]);
-    this.queue.push(transform._matrix[14]);
+    this.queue.push(transform[12]);
+    this.queue.push(transform[13]);
+    this.queue.push(transform[14]);
 };
 
 module.exports = PointLight;
