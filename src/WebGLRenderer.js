@@ -141,6 +141,7 @@ WebGLRenderer.prototype.createMesh = function createMesh(path) {
     };
 };
 
+
 WebGLRenderer.prototype.getOrSetCutout = function getOrSetCutout(path) {
     var geometry;
 
