@@ -3,6 +3,7 @@ var Camera = require('famous-components').Camera;
 var DOMRenderer = require('famous-dom-renderers').DOMRenderer;
 
 function Context(selector, compositor) {
+    this._compositor = compositor;
     this._rootEl = document.querySelector(selector);
     if (this._rootEl === document.body) {
         window.addEventListener('resize', this.updateSize.bind(this));
@@ -14,7 +15,7 @@ function Context(selector, compositor) {
     DOMLayerEl.style.transformStyle = 'preserve-3d';
     DOMLayerEl.style.webkitTransformStyle = 'preserve-3d';
     this._rootEl.appendChild(DOMLayerEl);
-    this.DOMRenderer = new DOMRenderer(DOMLayerEl, selector); 
+    this.DOMRenderer = new DOMRenderer(DOMLayerEl, selector, compositor); 
  
     this.WebGLRenderer = null;
     this.canvas = null;
@@ -66,7 +67,7 @@ Context.prototype.draw = function draw() {
 };
 
 Context.prototype.getRootSize = function getRootSize() {
-    return this._size;
+    return this.DOMRenderer.getSize();
 };
 
 Context.prototype.initWebGL = function initWebGL() {
@@ -87,6 +88,7 @@ Context.prototype.receive = function receive(pathArr, path, commands, iterator) 
     this.DOMRenderer.loadPath(path);
     this.DOMRenderer.findTarget();
     while (command) {
+
         switch (command) {
             case 'INIT_DOM':
                 this.DOMRenderer.insertEl(commands[++localIterator]);
@@ -135,23 +137,18 @@ Context.prototype.receive = function receive(pathArr, path, commands, iterator) 
                 break;
 
             case 'REMOVE_CLASS':
-                if (!element) element = this._elementHash[path];
                 if (this.WebGLRenderer) this.WebGLRenderer.getOrSetCutout(path);
-                element.removeClass(commands[++localIterator]);
+                this.DOMRenderer.removeClass(commands[++localIterator]);
                 break;
 
             case 'ADD_EVENT_LISTENER':
-                if (!element) element = this._elementHash[path];
                 if (this.WebGLRenderer) this.WebGLRenderer.getOrSetCutout(path);
-                var ev = commands[++localIterator];
-                var methods;
-                var properties;
-                var c;
-                while ((c = commands[++localIterator]) !== 'EVENT_PROPERTIES') methods = c;
-                while ((c = commands[++localIterator]) !== 'EVENT_END') properties = c;
-                methods = methods || [];
-                properties = properties || [];
-                element.addEventListener(ev, element.dispatchEvent.bind(element, ev, methods, properties));
+
+                var type = commands[++localIterator];
+                var properties = commands[++localIterator];
+                var preventDefault = commands[++localIterator];
+
+                this.DOMRenderer.addEventListener(path, type, properties, preventDefault);
                 break;
 
             case 'GL_SET_DRAW_OPTIONS': 
