@@ -181,7 +181,8 @@ Node.prototype.getValue = function getValue () {
         value.children[i] = this._children[i].getValue();
 
     for (i = 0 ; i < numberOfComponents ; i++)
-        value.components[i] = this._components[i].getValue();
+        if (this._components[i].getValue) 
+            value.components[i] = this._components[i].getValue();
 
     return value;
 };
