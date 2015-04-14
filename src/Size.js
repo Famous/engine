@@ -204,7 +204,6 @@ Size.prototype.setAbsolute = function setAbsolute(x, y, z, options, callback) {
     if (z != null) {
         abs.z.set(z, options, callback);
     }
-    return this;
 };
 
 /**

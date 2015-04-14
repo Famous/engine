@@ -44,15 +44,15 @@ function GestureHandler (node, events) {
     this.centerVelocity = new Vec2();
 
     this.pointer1 = {
-            position: this.last1,
-            delta: this.delta1,
-            velocity: this.velocity1,
+        position: this.last1,
+        delta: this.delta1,
+        velocity: this.velocity1,
     };
 
     this.pointer2 = {
-            position: this.last2,
-            delta: this.delta2,
-            velocity: this.velocity2,
+        position: this.last2,
+        delta: this.delta2,
+        velocity: this.velocity2,
     };
 
     this.event = {
@@ -76,15 +76,9 @@ function GestureHandler (node, events) {
     this.options = {};
     this.trackedGestures = {};
 
-    this._events = new CallbackStore();
-    for (var i = 0, len = events.length; i < len; i++) {
-        var gesture = events[i].event;
-        var callback = events[i].callback;
-        if (gestures[gesture]) {
-            this.trackedGestures[gesture] = true;
-            this.gestures.push(gesture);
-            if (events[i].event) this.options[gesture] = events[i];
-            this._events.on(gesture, callback);
+    if (events) {
+        for (var i = 0, len = events.length; i < len; i++) {
+            this.on(events[i], events[i].callback);
         }
     }
 
@@ -115,6 +109,34 @@ GestureHandler.prototype.onReceive = function onReceive (event, payload) {
  */
 GestureHandler.toString = function toString() {
     return 'GestureHandler';
+};
+
+/**
+ * Register a callback to be invoked on an event.
+ *
+ * @method on
+ * @param {Object|String} ev The event object or event name.
+ * @param {Function} cb The callback.
+ */
+GestureHandler.prototype.on = function on(ev, cb) {
+    var gesture = ev.event || ev;
+    if (gestures[gesture]) {
+        this.trackedGestures[gesture] = true;
+        this.gestures.push(gesture);
+        if (ev.event) this.options[gesture] = ev;
+        this._events.on(gesture, cb);
+    }
+};
+
+/**
+ * Deregister a callback from an event.
+ *
+ * @method on
+ * @param {String} ev The event name.
+ * @param {Function} cb The callback.
+ */
+GestureHandler.prototype.off = function off(ev, cb) {
+    this._events.off(gesture, cb);
 };
 
 /**
