@@ -2,8 +2,15 @@
 
 var ElementCache = require('./ElementCache');
 
+// an enumeration of potential vendor prefixes.
 var VENDOR_PREFIXES = ['', '-ms-', '-webkit-', '-moz-', '-o-'];
 
+/**
+ * A private function for determining if a css property
+ * has a vendor prefix.
+ *
+ * @param {String} property
+ */
 function vendorPrefix(property) {
     for (var i = 0; i < VENDOR_PREFIXES.length; i++) {
         var prefixed = VENDOR_PREFIXES[i] + property;
@@ -14,17 +21,49 @@ function vendorPrefix(property) {
     return property;
 }
 
+// the prefixed transform property.
 var TRANSFORM = vendorPrefix('transform');
 
+/**
+ * DOMRenderer is a class responsible for adding elements
+ * to the DOM and writing to those elements.
+ * there is a DOMRenderer per context, represented as an
+ * element and a selector. It is instantiated in the 
+ * context class.
+ *
+ * @class DOMRenderer
+ * 
+ * @param {HTMLElement} an element.
+ * @param {String} the selector of the element.
+ * @param {Compositor}
+ */
 function DOMRenderer (element, selector, compositor) {
-    this._compositor = compositor;
-    this._target = null;
-    this._parent = null;
-    this._path = null;
-    this._children = [];
-    this._root = new ElementCache(element);
+    this._compositor = compositor; // a reference to the compositor
+
+    this._target = null; // a register for holding the current
+                         // element that the Renderer is operating
+                         // upon
+
+    this._parent = null; // a register for holding the parent
+                         // of the target
+
+    this._path = null; // a register for holding the path of the target
+                       // this register must be set first, and then
+                       // children, target, and parent are all looked
+                       // up from that.
+
+    this._children = []; // a register for holding the children of the
+                         // current target.
+
+    this._root = new ElementCache(element, selector); // the root
+                                                      // of the dom tree that this
+                                                      // renderer is responsible
+                                                      // for
+
     this._selector = selector;
+    
     this._elements = {};
+
     this._elements[selector] = this._root;
 
     this.perspectiveTransform = new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
@@ -89,32 +128,44 @@ function _stripEvent (ev, properties, path) {
         var prop = properties[i];
         _mirror(prop, result, ev);
     }
+    result.timeStamp = ev.timeStamp;
+    result.time = ev.timeStamp;
     switch (ev.type) {
         case 'mousedown':
         case 'mouseup':
         case 'click':
-            result.x = ev.x;
-            result.y = ev.y;
-            result.timeStamp = ev.timeStamp;
-            break;
         case 'mousemove':
             result.x = ev.x;
             result.y = ev.y;
-            result.movementX = ev.movementX;
-            result.movementY = ev.movementY;
+            result.timeStamp = ev.timeStamp;
+            result.pageX = ev.pageX;
+            result.pageY = ev.pageY;
             break;
         case 'wheel':
             result.deltaX = ev.deltaX;
             result.deltaY = ev.deltaY;
             break;
+        case 'touchstart':
+        case 'touchmove':
+        case 'touchend':
+           result.targetTouches = [];
+           for (var i = 0 ; i < ev.targetTouches.length ; i++) {
+               result.targetTouches.push({
+                   pageX: ev.targetTouches[i].pageX,
+                   pageY: ev.targetTouches[i].pageY,
+                   identifier: ev.targetTouches[i].identifier
+               });
+           }
     }
+    
     return result;
 }
 
 DOMRenderer.prototype._triggerEvent = function _triggerEvent(ev) {
-    for (var i = 0; i < ev.path.length; i++) {
-        if (!ev.path[i].dataset) continue;
-        var path = ev.path[i].dataset.faPath;
+    var evPath = ev.path ? ev.path : _getPath(ev);
+    for (var i = 0; i < evPath.length; i++) {
+        if (!evPath[i].dataset) continue;
+        var path = evPath[i].dataset.faPath;
         if (this._eventListeners[ev.type][path]) {
             this._compositor.sendEvent(path, ev.type, _stripEvent(ev, this._eventListeners[ev.type][path].properties, path));
             ev.stopPropagation();
@@ -125,6 +176,16 @@ DOMRenderer.prototype._triggerEvent = function _triggerEvent(ev) {
         }
     }
 };
+
+function _getPath (ev) {
+    var path = [];
+    var node = ev.target;
+    while (node != document.body) {
+        path.push(node);
+        node = node.parentNode;
+    }
+    return path;
+}
 
 DOMRenderer.prototype.getSize = function getSize () {
     return [this._root.element.offsetWidth, this._root.element.offsetHeight];
@@ -189,13 +250,14 @@ DOMRenderer.prototype.findParent = function findParent () {
     return parent;
 };
 
-DOMRenderer.prototype.findChildren = function findChildren () {
+DOMRenderer.prototype.findChildren = function findChildren (array) {
     this._assertPathLoaded();
     
     var path = this._path;
     var keys = Object.keys(this._elements);
     var i = 0;
     var len;
+    array = array ? array : this._children;
 
     this._children.length = 0;
 
@@ -215,9 +277,9 @@ DOMRenderer.prototype.findChildren = function findChildren () {
         }
     }
     for (i = 0, len = keys.length ; i < len ; i++)
-        this._children[i] = this._elements[keys[i]];
+        array[i] = this._elements[keys[i]];
 
-    return this._children;
+    return array;
 };
 
 DOMRenderer.prototype.findTarget = function findTarget () {
@@ -241,8 +303,8 @@ DOMRenderer.prototype.insertEl = function insertEl (tagName) {
         this._assertChildrenLoaded();
 
         if (this._target) this._parent.element.removeChild(this._target.element);
-        
-        this._target = new ElementCache(document.createElement(tagName));
+ 
+        this._target = new ElementCache(document.createElement(tagName), this._path);
         this._parent.element.appendChild(this._target.element);
         this._elements[this._path] = this._target;
         
@@ -291,6 +353,7 @@ DOMRenderer.prototype.setMatrix = function setMatrix (transform) {
     this._assertTargetLoaded();
     this.findParent();
     var worldTransform = this._target.worldTransform;
+<<<<<<< HEAD
     for (var i = 0 ; i < 16 ; i++) worldTransform[i] = transform[i];
     if (this._parent !== this._root) {
         invert(this._target.invertedParent, this._parent.worldTransform);
@@ -300,6 +363,35 @@ DOMRenderer.prototype.setMatrix = function setMatrix (transform) {
         this._target.element.style[TRANSFORM] = stringifyMatrix(worldTransform);
     }
 
+=======
+    var changed = false
+
+    if (transform)
+        for (var i = 0, len = 16 ; i < len ; i++) {
+            changed = changed ? changed : worldTransform[i] === transform[i];
+            worldTransform[i] = transform[i];
+        }
+    else changed = true;
+
+    if (changed) {
+        invert(this._target.invertedParent, this._parent.worldTransform);
+        multiply(this._target.finalTransform, this._target.invertedParent, worldTransform);
+
+        // TODO: this is a temporary fix for draw commands
+        // coming in out of order
+        var children = this.findChildren([]);
+        var previousPath = this._path;
+        var previousTarget = this._target;
+        for (i = 0, len = children.length ; i < len ; i++) {
+            this._target = children[i];
+            this._path = this._target.path;
+            this.setMatrix();
+        }
+        this._path = previousPath;
+        this._target = previousTarget;
+    }
+
+    this._target.element.style[TRANSFORM] = stringifyMatrix(this._target.finalTransform);
 };
 
 DOMRenderer.prototype.addClass = function addClass (domClass) {
@@ -393,28 +485,75 @@ function multiply (out, a, b) {
         b8 = b[8], b9 = b[9], b10 = b[10], b11 = b[11],
         b12 = b[12], b13 = b[13], b14 = b[14], b15 = b[15];
 
-    out[0] = b0*a00 + b1*a10 + b2*a20 + b3*a30;
-    out[1] = b0*a01 + b1*a11 + b2*a21 + b3*a31;
-    out[2] = b0*a02 + b1*a12 + b2*a22 + b3*a32;
-    out[3] = b0*a03 + b1*a13 + b2*a23 + b3*a33;
+    var changed = false;
+    var out0, out1, out2, out3;
+
+    out0 = b0*a00 + b1*a10 + b2*a20 + b3*a30;
+    out1 = b0*a01 + b1*a11 + b2*a21 + b3*a31;
+    out2 = b0*a02 + b1*a12 + b2*a22 + b3*a32;
+    out3 = b0*a03 + b1*a13 + b2*a23 + b3*a33;
+
+    changed = changed ?
+              changed : out0 == out[0] ||
+                        out1 == out[1] ||
+                        out2 == out[2] ||
+                        out3 == out[3];
+
+    out[0] = out0;
+    out[1] = out1;
+    out[2] = out2;
+    out[3] = out3;
 
     b0 = b4; b1 = b5; b2 = b6; b3 = b7;
-    out[4] = b0*a00 + b1*a10 + b2*a20 + b3*a30;
-    out[5] = b0*a01 + b1*a11 + b2*a21 + b3*a31;
-    out[6] = b0*a02 + b1*a12 + b2*a22 + b3*a32;
-    out[7] = b0*a03 + b1*a13 + b2*a23 + b3*a33;
+    out0 = b0*a00 + b1*a10 + b2*a20 + b3*a30;
+    out1 = b0*a01 + b1*a11 + b2*a21 + b3*a31;
+    out2 = b0*a02 + b1*a12 + b2*a22 + b3*a32;
+    out3 = b0*a03 + b1*a13 + b2*a23 + b3*a33;
+
+    changed = changed ?
+              changed : out0 == out[4] ||
+                        out1 == out[5] ||
+                        out2 == out[6] ||
+                        out3 == out[7];
+
+    out[4] = out0;
+    out[5] = out1;
+    out[6] = out2;
+    out[7] = out3;
 
     b0 = b8; b1 = b9; b2 = b10; b3 = b11;
-    out[8] = b0*a00 + b1*a10 + b2*a20 + b3*a30;
-    out[9] = b0*a01 + b1*a11 + b2*a21 + b3*a31;
-    out[10] = b0*a02 + b1*a12 + b2*a22 + b3*a32;
-    out[11] = b0*a03 + b1*a13 + b2*a23 + b3*a33;
+    out0 = b0*a00 + b1*a10 + b2*a20 + b3*a30;
+    out1 = b0*a01 + b1*a11 + b2*a21 + b3*a31;
+    out2 = b0*a02 + b1*a12 + b2*a22 + b3*a32;
+    out3 = b0*a03 + b1*a13 + b2*a23 + b3*a33;
+
+    changed = changed ?
+              changed : out0 == out[8] ||
+                        out1 == out[9] ||
+                        out2 == out[10] ||
+                        out3 == out[11];
+
+    out[8] = out0;
+    out[9] = out1;
+    out[10] = out2;
+    out[11] = out3;
 
     b0 = b12; b1 = b13; b2 = b14; b3 = b15;
-    out[12] = b0*a00 + b1*a10 + b2*a20 + b3*a30;
-    out[13] = b0*a01 + b1*a11 + b2*a21 + b3*a31;
-    out[14] = b0*a02 + b1*a12 + b2*a22 + b3*a32;
-    out[15] = b0*a03 + b1*a13 + b2*a23 + b3*a33;
+    out0 = b0*a00 + b1*a10 + b2*a20 + b3*a30;
+    out1 = b0*a01 + b1*a11 + b2*a21 + b3*a31;
+    out2 = b0*a02 + b1*a12 + b2*a22 + b3*a32;
+    out3 = b0*a03 + b1*a13 + b2*a23 + b3*a33;
+
+    changed = changed ?
+              changed : out0 == out[12] ||
+                        out1 == out[13] ||
+                        out2 == out[14] ||
+                        out3 == out[15];
+
+    out[12] = out0;
+    out[13] = out1;
+    out[14] = out2;
+    out[15] = out3;
 
     return out;
 }
