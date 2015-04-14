@@ -29,7 +29,7 @@ Scale.toString = function toString() {
 Scale.prototype = Object.create(Position.prototype);
 Scale.prototype.constructor = Scale;
 
-Scale.prototype.update = function onUpdate() {
+Scale.prototype.update = function update() {
     this._node.setScale(this._x.get(), this._y.get(), this._z.get());
     this._checkUpdate();
 };
