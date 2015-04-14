@@ -2,9 +2,6 @@
 
 var CallbackStore = require('famous-utilities').CallbackStore;
 
-var ELEMENT = 'element';
-var ID = 'id';
-var OPACITY = 'opacity';
 var WITH = 'WITH';
 var CHANGE_TRANSFORM = 'CHANGE_TRANSFORM';
 var CHANGE_PROPERTY = 'CHANGE_PROPERTY';
@@ -45,7 +42,22 @@ function HTMLElement(node, tagName) {
 
 // Return the name of the Element Class: 'element'
 HTMLElement.toString = function toString() {
-    return ELEMENT;
+    return 'element';
+};
+
+HTMLElement.prototype.getState = function getState() {
+    return {
+        renderable: this.constructor.toString(),
+        tagName: this._tagName,
+        transform: this._transform,
+        size: this._size,
+        trueSized: this._trueSized,
+        opacity: this._opacity,
+        properties: this._properties,
+        classes: this._classes,
+        attributes: this._attributes,
+        content: this._content
+    };
 };
 
 HTMLElement.prototype.getValue = function getValue () {
@@ -76,8 +88,7 @@ HTMLElement.prototype.onUpdate = function onUpdate () {
         var path = this._node.getLocation();
     	this._node //node.sendDrawCommand will be depricated.
             .sendDrawCommand(WITH)
-            .sendDrawCommand(path)
-            .sendDrawCommand('DOM');
+            .sendDrawCommand(path);
 
     	for (var i = 0 ; i < len ; i++) // node.sendDrawCommand will be depricated.
     	    this._node.sendDrawCommand(this._queue.shift());
@@ -234,7 +245,7 @@ HTMLElement.prototype.removeClass = function removeClass(value) {
 HTMLElement.prototype.id = function id(value) {
     if (!this._requestingUpdate) this._requestUpdate();
     this._queue.push(CHANGE_ATTRIBUTE);
-    this._queue.push(ID);
+    this._queue.push('id');
     this._queue.push(value);
     return this;
 };
