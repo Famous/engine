@@ -25,6 +25,7 @@ var mouseProperties = ['pageX', 'pageY'];
 
 function GestureHandler (node, events) {
     this.node = node;
+    this.id = node.addComponent(this);
 
     this.last1 = new Vec2();
     this.last2 = new Vec2();
@@ -88,35 +89,19 @@ function GestureHandler (node, events) {
     }
 
     for (var i = 0 ; i < 3 ; i++) {
-        var touchEvent = touchEvents[j];
-        var mouseEvents = mouseEvents[j];
+        var touchEvent = touchEvents[i];
+        var mouseEvent = mouseEvents[i];
         node.addUIEvent(touchEvent);
         node.addUIEvent(mouseEvent);
     }
 
     node.addUIEvent('mouseleave');
-    
-    /*
-    var renderables = node.getRenderables();
-    for (var i = 0, len = renderables.length; i < len; i++) {
-        for (var j = 0; j < 3; j++) {
-            var touchEvent = touchEvents[j];
-            var mouseEvent = mouseEvents[j];
-            if (renderables[i].on) renderables[i].on(touchEvent, methods, touchProperties);
-            node.registerTargetedEvent(touchEvent, progressbacks[j].bind(this));
-            if (renderables[i].on) renderables[i].on(mouseEvent, methods, mouseProperties);
-            node.registerTargetedEvent(mouseEvent, progressbacks[j].bind(this));
-        }
-        if (renderables[i].on) renderables[i].on('mouseleave', methods, mouseProperties);
-        node.registerTargetedEvent('mouseleave', _processMouseLeave.bind(this));
-    }
-    */
 }
 
 GestureHandler.prototype.onReceive = function onReceive (event, payload) {
     var index = mouseEvents.indexOf(event);
     index = index !== -1 ? index : touchEvents.indexOf(event);
-
+    
     if (index !== -1) progressbacks[index].call(this, payload);
     else if (event === 'mouseleave') _processMouseLeave.call(this, payload);
 };
@@ -181,6 +166,7 @@ GestureHandler.prototype.trigger = function trigger (ev, payload) {
  * @param {Object} e The event object.
  */
 function _processPointerStart(e) {
+    console.log(e); 
     var t;
     if (!e.targetTouches) {
         this.mice[0] = e;
@@ -274,6 +260,7 @@ function _processPointerStart(e) {
  * @param {Object} e The event object.
  */
 function _processPointerMove(e) {
+    console.log(e);
     var t;
     if (!e.targetTouches) {
         if (!this.event.current) return;

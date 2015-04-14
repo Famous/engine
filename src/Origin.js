@@ -27,7 +27,7 @@ Origin.toString = function toString() {
 Origin.prototype = Object.create(Position.prototype);
 Origin.prototype.constructor = Origin;
 
-Origin.prototype.onUpdate = function onUpdate() {
+Origin.prototype.update = function update() {
     this._node.setOrigin(this._x.get(), this._y.get(), this._z.get());
     this._checkUpdate();
 };
