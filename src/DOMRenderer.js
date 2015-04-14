@@ -292,11 +292,14 @@ DOMRenderer.prototype.setMatrix = function setMatrix (transform) {
     this.findParent();
     var worldTransform = this._target.worldTransform;
     for (var i = 0 ; i < 16 ; i++) worldTransform[i] = transform[i];
+    if (this._parent !== this._root) {
+        invert(this._target.invertedParent, this._parent.worldTransform);
+        multiply(this._target.finalTransform, this._target.invertedParent, worldTransform);
+        this._target.element.style[TRANSFORM] = stringifyMatrix(this._target.finalTransform);
+    } else {
+        this._target.element.style[TRANSFORM] = stringifyMatrix(worldTransform);
+    }
 
-    invert(this._target.invertedParent, this._parent.worldTransform);
-    multiply(this._target.finalTransform, this._target.invertedParent, worldTransform);
-
-    this._target.element.style[TRANSFORM] = stringifyMatrix(this._target.finalTransform);
 };
 
 DOMRenderer.prototype.addClass = function addClass (domClass) {
