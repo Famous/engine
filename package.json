@@ -1,6 +1,6 @@
 {
   "name": "famous-renderers",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Famous Renderers",
   "main": "src/index.js",
   "scripts": {
@@ -24,9 +24,9 @@
     "tape": "^3.0.3"
   },
   "dependencies": {
-    "famous-components": "git+ssh://git@github.famo.us/dan/components#feature-render-specs",
-    "famous-dom-renderers": "git+ssh://git@github.famo.us/dan/dom-renderers#feature-render-specs",
-    "famous-webgl-renderers": "git+ssh://git@github.famo.us/platform/webgl-renderers#v0.2.0",
-    "famous-utilities": "git+ssh://git@github.famo.us/platform/utilities#v0.2.0"
+    "famous-components": "git+ssh://git@github.famo.us/platform/components#v0.3.0",
+    "famous-dom-renderers": "git+ssh://git@github.famo.us/platform/dom-renderers#v0.4.0",
+    "famous-webgl-renderers": "git+ssh://git@github.famo.us/platform/webgl-renderers#v0.3.0",
+    "famous-utilities": "git+ssh://git@github.famo.us/platform/utilities#v0.3.0"
   }
 }
