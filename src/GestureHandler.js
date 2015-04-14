@@ -166,7 +166,6 @@ GestureHandler.prototype.trigger = function trigger (ev, payload) {
  * @param {Object} e The event object.
  */
 function _processPointerStart(e) {
-    console.log(e); 
     var t;
     if (!e.targetTouches) {
         this.mice[0] = e;
