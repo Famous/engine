@@ -26,7 +26,7 @@ MountPoint.toString = function toString() {
 MountPoint.prototype = Object.create(Position.prototype);
 MountPoint.prototype.constructor = MountPoint;
 
-MountPoint.prototype.onUpdate = function onUpdate() {
+MountPoint.prototype.update = function update() {
     this._node.setMountPoint(this._x.get(), this._y.get(), this._z.get());
     this._checkUpdate();
 };
