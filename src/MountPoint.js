@@ -31,6 +31,6 @@ MountPoint.prototype.onUpdate = function onUpdate() {
     this._checkUpdate();
 };
 
-MountPoint.prototype.onUpdate = MountPoint.prototype.update;
+MountPoint.prototype.update = MountPoint.prototype.update;
 
 module.exports = MountPoint;

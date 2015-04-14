@@ -278,7 +278,7 @@ Size.prototype.setDifferential = function setDifferential(x, y, z, options, call
 * @return {Number[]} size three dimensional computed size
 */
 Size.prototype.get = function get () {
-    return this._node.getContext().getSize();
+    return this._node.getSize();
 };
 
 /**
