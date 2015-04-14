@@ -95,14 +95,17 @@ Context.prototype.onReceive = function onReceive (event, payload) {
     // component receives its size.
     if (event === 'CONTEXT_RESIZE') {
         
-        if (payload.length != 2) 
+        if (payload.length < 2) 
             throw new Error(
-                    'CONTEXT_RESIZE\'s payload needs to be a pair' +
+                    'CONTEXT_RESIZE\'s payload needs to be at least a pair' +
                     ' of pixel sizes'
             );
 
         this.setSizeMode(Size.ABSOLUTE, Size.ABSOLUTE, Size.ABSOLUTE);
-        this.setAbsoluteSize(payload[0], payload[1]);
+        this.setAbsoluteSize(payload[0],
+                             payload[1],
+                             payload[2] ? payload[2] : 0);
+
     }
 };
 
