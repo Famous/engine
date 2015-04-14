@@ -185,7 +185,7 @@ Transform.prototype.rotate = function rotate(x, y, z, options, callback) {
     if (len !== 0) {
         referenceQ = Q2_REGISTER.set(queue[len - 4], queue[len - 3], queue[len - 2], queue[len - 1]);
     }
-    else referenceQ = this.rotation._q;
+    else referenceQ = Q2_REGISTER.copy(this.rotation._q);
     var q = referenceQ.multiply(Q_REGISTER.fromEuler(x, y, z));
     this.rotation.set(q, options, callback);
 };
