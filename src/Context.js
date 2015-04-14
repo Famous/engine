@@ -74,7 +74,8 @@ Context.prototype.initWebGL = function initWebGL() {
     this.canvas = document.createElement('canvas');
     this.canvas.className = 'famous-webgl';
     this._rootEl.appendChild(this.canvas);
-    this.WebGLRenderer.updateSize(this._size);
+    this.WebGLRenderer = new WebGLRenderer(this.canvas);
+    this.updateSize();
 };
 
 Context.prototype.receive = function receive(pathArr, path, commands, iterator) {
