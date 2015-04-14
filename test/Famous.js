@@ -54,9 +54,9 @@ test('Famous', function(t) {
             executionOrder.push(1);
         }));
 
-        Famous.step();
-        Famous.step();
-        Famous.step();
+        Famous.step(0);
+        Famous.step(1);
+        Famous.step(2);
 
         t.deepEqual(executionOrder, [ 0, 1, 2, 3 ]);
     });
@@ -115,7 +115,7 @@ test('Famous', function(t) {
         t.notEqual(context0, context1, 'Famous.createContext being invoked on two different selectors should return different context instances');
 
         Famous.onmessage = function() {};
-        Famous.step();
+        Famous.step(0);
         t.end();
     });
 
