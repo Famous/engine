@@ -24,7 +24,7 @@
     "tape": "^3.0.3"
   },
   "dependencies": {
-    "famous-transitions": "git+ssh://git@github.famo.us/platform/transitions#v0.1.1",
+    "famous-transitions": "git+ssh://git@github.famo.us/platform/transitions#v0.2.0",
     "famous-core": "git+ssh://git@github.famo.us/platform/core"
   }
 }
