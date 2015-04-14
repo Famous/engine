@@ -1,11 +1,12 @@
 {
   "name": "famous-components",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Famous Components",
   "main": "src/index.js",
   "scripts": {
     "test": "tape test/*.js | tap-spec",
-    "lint": "jshint --reporter node_modules/jshint-stylish/stylish.js src/"
+    "watch": "nodemon --ignore node_modules/ -e js,json --exec 'npm test'",
+    "lint": "jshint --reporter node_modules/jshint-stylish/stylish.js src; true"
   },
   "repository": {
     "type": "git",
@@ -25,6 +26,7 @@
   },
   "dependencies": {
     "famous-transitions": "git+ssh://git@github.famo.us/platform/transitions#v0.2.0",
-    "famous-core": "git+ssh://git@github.famo.us/platform/core"
+    "famous-math": "git+ssh://git@github.famo.us/platform/math#v0.2.0",
+    "famous-utilities": "git+ssh://git@github.famo.us/platform/utilities#v0.3.0"
   }
 }
