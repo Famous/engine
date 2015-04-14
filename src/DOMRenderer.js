@@ -125,32 +125,44 @@ function _stripEvent (ev, properties, path) {
         var prop = properties[i];
         _mirror(prop, result, ev);
     }
+    result.timeStamp = ev.timeStamp;
+    result.time = ev.timeStamp;
     switch (ev.type) {
         case 'mousedown':
         case 'mouseup':
         case 'click':
-            result.x = ev.x;
-            result.y = ev.y;
-            result.timeStamp = ev.timeStamp;
-            break;
         case 'mousemove':
             result.x = ev.x;
             result.y = ev.y;
-            result.movementX = ev.movementX;
-            result.movementY = ev.movementY;
+            result.timeStamp = ev.timeStamp;
+            result.pageX = ev.pageX;
+            result.pageY = ev.pageY;
             break;
         case 'wheel':
             result.deltaX = ev.deltaX;
             result.deltaY = ev.deltaY;
             break;
+        case 'touchstart':
+        case 'touchmove':
+        case 'touchend':
+           result.targetTouches = [];
+           for (var i = 0 ; i < ev.targetTouches.length ; i++) {
+               result.targetTouches.push({
+                   pageX: ev.targetTouches[i].pageX,
+                   pageY: ev.targetTouches[i].pageY,
+                   identifier: ev.targetTouches[i].identifier
+               });
+           }
     }
+    
     return result;
 }
 
 DOMRenderer.prototype._triggerEvent = function _triggerEvent(ev) {
-    for (var i = 0; i < ev.path.length; i++) {
-        if (!ev.path[i].dataset) continue;
-        var path = ev.path[i].dataset.faPath;
+    var evPath = ev.path ? ev.path : _getPath(ev);
+    for (var i = 0; i < evPath.length; i++) {
+        if (!evPath[i].dataset) continue;
+        var path = evPath[i].dataset.faPath;
         if (this._eventListeners[ev.type][path]) {
             this._compositor.sendEvent(path, ev.type, _stripEvent(ev, this._eventListeners[ev.type][path].properties, path));
             ev.stopPropagation();
@@ -161,6 +173,16 @@ DOMRenderer.prototype._triggerEvent = function _triggerEvent(ev) {
         }
     }
 };
+
+function _getPath (ev) {
+    var path = [];
+    var node = ev.target;
+    while (node != document.body) {
+        path.push(node);
+        node = node.parentNode;
+    }
+    return path;
+}
 
 DOMRenderer.prototype.getSize = function getSize () {
     return [this._root.element.offsetWidth, this._root.element.offsetHeight];
