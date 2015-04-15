@@ -283,7 +283,6 @@ function _processPointerStart(e) {
  * @param {Object} e The event object.
  */
 function _processPointerMove(e) {
-    console.log(e);
     var t;
     if (!e.targetTouches) {
         if (!this.event.current) return;
