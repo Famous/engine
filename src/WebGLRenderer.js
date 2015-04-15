@@ -127,7 +127,7 @@ WebGLRenderer.prototype.createLight = function createLight(path) {
  *
  * @param {String} path Path used as id of new mesh in meshRegistry.
  *
- * @return {Object} Newly create mesh spec.
+ * @return {Object} Newly created mesh spec.
  */
 WebGLRenderer.prototype.createMesh = function createMesh(path) {
     this.meshRegistryKeys.push(path);
@@ -141,6 +141,16 @@ WebGLRenderer.prototype.createMesh = function createMesh(path) {
     };
 };
 
+
+/**
+ * Creates or retreives cutout
+ *
+ * @method getOrSetCutout
+ *
+ * @param {String} path Path used as id of new mesh in meshRegistry.
+ *
+ * @return {Object} Newly created cutout spec.
+ */
 
 WebGLRenderer.prototype.getOrSetCutout = function getOrSetCutout(path) {
     var geometry;
@@ -170,13 +180,24 @@ WebGLRenderer.prototype.getOrSetCutout = function getOrSetCutout(path) {
 
 };
 
+/**
+ * Creates or retreives cutout
+ *
+ * @method getOrSetCutout
+ *
+ * @param {String} 
+ * @param {String} uniformLocation identifier used to upload value
+ * @param {Array} value of uniform data 
+ *
+ */
+
 WebGLRenderer.prototype.setCutoutUniform = function setCutoutUniform(path, uniformName, uniformValue) {
     var cutout = this.getOrSetCutout(path);
 
     var index = cutout.uniformKeys.indexOf(uniformName);
 
     cutout.uniformValues[index] = uniformValue;
-}
+};
 
 WebGLRenderer.prototype.setMeshOptions = function(path, options) {
     var mesh = this.meshRegistry[path] || this.createMesh(path);
@@ -242,6 +263,16 @@ WebGLRenderer.prototype.setMeshUniform = function setMeshUniform(path, uniformNa
         mesh.uniformValues[index] = uniformValue;
     }
 }
+
+/**
+ * Triggers the 'draw' phase of the WebGLRenderer.  Iterates through registries
+ * to set uniforms, set attributes and issue draw commands for renderables.
+ *
+ * @method draw
+ *
+ * @param {Object} renderState Parameters provided by the compositor, that
+ */
+
 
 WebGLRenderer.prototype.bufferData = function bufferData(path, geometryId, bufferName, bufferValue, bufferSpacing) {
     this.bufferRegistry.allocate(geometryId, bufferName, bufferValue, bufferSpacing);
@@ -435,7 +466,7 @@ WebGLRenderer.prototype.drawBuffers = function drawBuffers(vertexBuffers, mode, 
 };
 
 /**
- * Allocates an array buffer where vertex data is sent to via compile.
+ * Wraps draw methods in bound frame buffer
  *
  * @method renderOffscreen
  *
