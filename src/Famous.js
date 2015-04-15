@@ -169,7 +169,7 @@ Famous.prototype.message = function message (command) {
 };
 
 Famous.prototype.createContext = function createContext (selector) {
-    if (!selector) throw new Error('create context must be called with a selector');
+    selector = selector || 'body';
 
     if (this._contexts[selector]) this._contexts[selector].dismount();
     this._contexts[selector] = new Context(selector, this);
