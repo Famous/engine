@@ -852,9 +852,9 @@ Node.prototype.onParentShow = Node.prototype.show;
 
 Node.prototype.onParentHide = Node.prototype.hide;
 
-Node.prototype.onParentTransformChange = Node.prototype._requestUpdate; 
+Node.prototype.onParentTransformChange = _requestUpdateWithoutArgs;
 
-Node.prototype.onParentSizeChange = Node.prototype._requestUpdate;
+Node.prototype.onParentSizeChange = _requestUpdateWithoutArgs;
 
 Node.prototype.onShow = Node.prototype.show;
 
@@ -865,5 +865,9 @@ Node.prototype.onMount = Node.prototype.mount;
 Node.prototype.onDismount = Node.prototype.dismount;
 
 Node.prototype.onReceive = Node.prototype.receive;
+
+function _requestUpdateWithoutArgs () {
+    if (!this._requestingUpdate) this._requestUpdate();
+}
 
 module.exports = Node;
