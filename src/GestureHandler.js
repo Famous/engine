@@ -27,6 +27,8 @@ function GestureHandler (node, events) {
     this.node = node;
     this.id = node.addComponent(this);
 
+    this._events = new CallbackStore();
+
     this.last1 = new Vec2();
     this.last2 = new Vec2();
 
