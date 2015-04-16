@@ -397,14 +397,14 @@ var Easing = {
      * @throws {Error} Will throw an error when attempting to overwrite default
      *    curve.
      * @throws {Error} Will throw an error if curve has already been registered.
-     * 
+     *
      * @param {String} name unique name for later access
      * @param {Function} curve function of one numeric variable mapping [0,1]
      *    to range inside [0,1]
      * @return {Easing} this
      */
     registerCurve: function(name, curve) {
-        console.warn('Easing is deprecated! Use transitions.curves instead!');
+        console.warn('Easing is deprecated! Use transitions.Curves instead!');
         if (_defaultCurves[name]) throw new Error('Default curves can not be overwritten');
         if (_curves[name]) throw new Error('Curve has already been registered');
         _curves[name] = curve;
@@ -425,7 +425,7 @@ var Easing = {
      * @return {Easing} this
      */
     unregisterCurve: function(name) {
-        console.warn('Easing is deprecated! Use transitions.curves instead!');
+        console.warn('Easing is deprecated! Use transitions.Curves instead!');
         if (_defaultCurves[name]) throw new Error('Default curves can not be unregistered');
         if (!_curves[name]) throw new Error('Curve has not been registered');
         delete _curves[name];
@@ -437,31 +437,31 @@ var Easing = {
      *
      * @method getCurve
      * @static
-     * 
+     *
      * @param {String} name name of curve
      * @return {Function} curve function of one numeric variable mapping [0,1]
      *    to range inside [0,1]
      */
     getCurve: function(name) {
-        console.warn('Easing is deprecated! Use transitions.curves instead!');
+        console.warn('Easing is deprecated! Use transitions.Curves instead!');
         return _curves[name];
     },
 
     /**
      * Retrieves the names of all previously registered easing curves.
-     * 
+     *
      * @method getCurves
      * @static
-     * 
+     *
      * @return {String[]} array of registered easing curves
      */
     getCurves: function() {
-        console.warn('Easing is deprecated! Use transitions.curves instead!');
+        console.warn('Easing is deprecated! Use transitions.Curves instead!');
         return Object.keys(_defaultCurves).concat(Object.keys(_curves));
     },
 
     createBezierCurve: function(v1, v2) {
-        console.warn('Easing is deprecated! Use transitions.curves instead!');
+        console.warn('Easing is deprecated! Use transitions.Curves instead!');
         v1 = v1 || 0; v2 = v2 || 0;
         return function(t) {
             return v1*t + (-2*v1 - v2 + 3)*t*t + (v1 + v2 - 2)*t*t*t;

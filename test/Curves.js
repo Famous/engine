@@ -1,9 +1,9 @@
 'use strict';
 
 var test = require('tape');
-var curves = require('../src/curves');
+var curves = require('../src/Curves');
 
-test('curves', function(t) {
+test('Curves', function(t) {
     var curveNames = [
         'linear',
         'easeIn',
@@ -45,8 +45,8 @@ test('curves', function(t) {
         var curve = curves[name];
         t.equal(typeof curve, 'function', name + ' should be a default curve');
 
-        t.equal(Math.round(curve(0)*1000)/1000, 0, 'curves.' + name + ' should start with 0');
-        t.equal(Math.round(curve(1)*1000)/1000, 1, 'curves.' + name + ' should end with 1');
+        t.equal(Math.round(curve(0)*1000)/1000, 0, 'Curves.' + name + ' should start with 0');
+        t.equal(Math.round(curve(1)*1000)/1000, 1, 'Curves.' + name + ' should end with 1');
     }
 
     t.end();
