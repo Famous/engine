@@ -19,12 +19,14 @@ var mouseProperties = ['pageX', 'pageY'];
  * as-requested basis.
  *
  * @class GestureHandler
- * @param {LocalDispatch} dispatch The dispatch with which to register the handler.
+ * @param {LocalDispatch} node The node with which to register the handler.
  * @param {Object[]} events An array of event objects specifying .event and .callback properties.
  */
 
-function GestureHandler (dispatch, events) {
-    this.dispatch = dispatch;
+function GestureHandler (node, events) {
+    this.node = node;
+    this.id = node.addComponent(this);
+
     this._events = new CallbackStore();
 
     this.last1 = new Vec2();
@@ -82,20 +84,23 @@ function GestureHandler (dispatch, events) {
         }
     }
 
-    var renderables = dispatch.getRenderables();
-    for (var i = 0, len = renderables.length; i < len; i++) {
-        for (var j = 0; j < 3; j++) {
-            var touchEvent = touchEvents[j];
-            var mouseEvent = mouseEvents[j];
-            if (renderables[i].on) renderables[i].on(touchEvent, methods, touchProperties);
-            dispatch.registerTargetedEvent(touchEvent, progressbacks[j].bind(this));
-            if (renderables[i].on) renderables[i].on(mouseEvent, methods, mouseProperties);
-            dispatch.registerTargetedEvent(mouseEvent, progressbacks[j].bind(this));
-        }
-        if (renderables[i].on) renderables[i].on('mouseleave', methods, mouseProperties);
-        dispatch.registerTargetedEvent('mouseleave', _processMouseLeave.bind(this));
+    for (var i = 0 ; i < 3 ; i++) {
+        var touchEvent = touchEvents[i];
+        var mouseEvent = mouseEvents[i];
+        node.addUIEvent(touchEvent);
+        node.addUIEvent(mouseEvent);
     }
+
+    node.addUIEvent('mouseleave');
 }
+
+GestureHandler.prototype.onReceive = function onReceive (event, payload) {
+    var index = mouseEvents.indexOf(event);
+    index = index !== -1 ? index : touchEvents.indexOf(event);
+    
+    if (index !== -1) progressbacks[index].call(this, payload);
+    else if (event === 'mouseleave') _processMouseLeave.call(this, payload);
+};
 
 /**
  * Returns the name of GestureHandler as a string.

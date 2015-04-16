@@ -8,9 +8,8 @@ var Position = require('./Position');
  * @component
  * @param {LocalDispatch} dispatch LocalDispatch to be retrieved from corresponding Render Node of the Scale component
  */
-
-function Scale(dispatch) {
-    Position.call(this, dispatch);
+function Scale(node) {
+    Position.call(this, node);
     this._x.set(1);
     this._y.set(1);
     this._z.set(1);
@@ -30,17 +29,11 @@ Scale.toString = function toString() {
 Scale.prototype = Object.create(Position.prototype);
 Scale.prototype.constructor = Scale;
 
-/**
-*
-* If true, component is to be updated on next engine tick
-*
-* @method
-* @return {Boolean}
-*/
-Scale.prototype.clean = function clean() {
-    var context = this._dispatch._context;
-    context.setScale(this._x.get(), this._y.get(), this._z.get());
-    return this._x.isActive() || this._y.isActive() || this._z.isActive();
+Scale.prototype.update = function update() {
+    this._node.setScale(this._x.get(), this._y.get(), this._z.get());
+    this._checkUpdate();
 };
+
+Scale.prototype.onUpdate = Scale.prototype.update;
 
 module.exports = Scale;

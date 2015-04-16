@@ -8,8 +8,8 @@ var Position = require('./Position');
  * @component
  * @param {LocalDispatch} dispatch LocalDispatch to be retrieved from corresponding Render Node of the MountPoint component
  */
-function MountPoint(dispatch) {
-    Position.call(this, dispatch);
+function MountPoint(node) {
+    Position.call(this, node);
 }
 
 /**
@@ -26,17 +26,11 @@ MountPoint.toString = function toString() {
 MountPoint.prototype = Object.create(Position.prototype);
 MountPoint.prototype.constructor = MountPoint;
 
-/**
-*
-* If true, component is to be updated on next engine tick
-*
-* @method
-* @return {Boolean} 
-*/
-MountPoint.prototype.clean = function clean() {
-    var context = this._dispatch._context;
-    context.setMountPoint(this._x.get(), this._y.get(), this._z.get());
-    return this._x.isActive() || this._y.isActive() || this._z.isActive();
+MountPoint.prototype.update = function update() {
+    this._node.setMountPoint(this._x.get(), this._y.get(), this._z.get());
+    this._checkUpdate();
 };
+
+MountPoint.prototype.onUpdate = MountPoint.prototype.update;
 
 module.exports = MountPoint;

@@ -4,10 +4,10 @@
  * Component to manage general event emission.
  *
  * @class EventEmitter
- * @param {LocalDispatch} dispatch The dispatch with which to register the handler.
+ * @param {Node} node The node to send events through.
  */
-function EventEmitter(dispatch) {
-    this.dispatch = dispatch;
+function EventEmitter(node) {
+    this.node = node;
 }
 
 /**
@@ -29,7 +29,7 @@ EventEmitter.toString = function toString() {
  * @param {Object} payload The event payload.
  */
 EventEmitter.prototype.emit = function emit(event, payload) {
-    this.dispatch.emit(event, payload);
+    this.node.emit(event, payload);
     return this;
 };
 

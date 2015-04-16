@@ -8,12 +8,17 @@ var Transitionable = require('famous-transitions').Transitionable;
  * @component
  * @param {LocalDispatch} dispatch LocalDispatch to be retrieved from corresponding Render Node of the Position component
  */
-function Position(dispatch) {
-    this._dispatch = dispatch;
-    this._id = dispatch.addComponent(this);
-    this._x = new Transitionable(0);
-    this._y = new Transitionable(0);
-    this._z = new Transitionable(0);
+function Position(node) {
+    this._node = node;
+    this._id = node.addComponent(this);
+  
+    this._requestingUpdate = false;
+    
+    var initialPosition = node.getPosition();
+
+    this._x = new Transitionable(initialPosition[0]);
+    this._y = new Transitionable(initialPosition[1]);
+    this._z = new Transitionable(initialPosition[2]);
 }
 
 /** 
@@ -34,7 +39,7 @@ Position.toString = function toString() {
 * @method
 * @return {Object}
 */
-Position.prototype.getState = function getState() {
+Position.prototype.getValue = function getValue() {
     return {
         component: this.constructor.toString(),
         x: this._x.get(),
@@ -103,18 +108,24 @@ Position.prototype.isActive = function isActive() {
     return this._x.isActive() || this._y.isActive() || this._z.isActive();
 };
 
+Position.prototype._checkUpdate = function _checkUpdate() {
+    if (this.isActive()) this._node.requestUpdateOnNextTick(this._id);
+    else this._requestingUpdate = false;
+};
+
+
+Position.prototype.update = function update () {
+    this._node.setPosition(this._x.get(), this._y.get(), this._z.get());
+    this._checkUpdate();
+};
+
 /** 
 *
 * If true, component is to be updated on next engine tick
 *
 * @method
-* @return {Boolean}
 */
-Position.prototype.clean = function clean() {
-    var context = this._dispatch.getContext();
-    context.setPosition(this._x.get(), this._y.get(), this._z.get());
-    return this.isActive();
-};
+Position.prototype.onUpdate = Position.prototype.update;
 
 /** 
 *
@@ -127,7 +138,11 @@ Position.prototype.clean = function clean() {
 * @chainable
 */
 Position.prototype.setX = function setX(val, options, callback) {
-    this._dispatch.dirtyComponent(this._id);
+    if (!this._requestingUpdate) {
+        this._node.requestUpdate(this._id);
+        this._requestingUpdate = true;
+    }
+
     this._x.set(val, options, callback);
     return this;
 };
@@ -143,7 +158,11 @@ Position.prototype.setX = function setX(val, options, callback) {
 * @chainable
 */
 Position.prototype.setY = function setY(val, options, callback) {
-    this._dispatch.dirtyComponent(this._id);
+    if (!this._requestingUpdate) {
+        this._node.requestUpdate(this._id);
+        this._requestingUpdate = true;
+    }
+
     this._y.set(val, options, callback);
     return this;
 };
@@ -159,7 +178,11 @@ Position.prototype.setY = function setY(val, options, callback) {
 * @chainable
 */
 Position.prototype.setZ = function setZ(val, options, callback) {
-    this._dispatch.dirtyComponent(this._id);
+    if (!this._requestingUpdate) {
+        this._node.requestUpdate(this._id);
+        this._requestingUpdate = true;
+    }
+
     this._z.set(val, options, callback);
     return this;
 };
@@ -178,18 +201,29 @@ Position.prototype.setZ = function setZ(val, options, callback) {
 * @chainable
 */
 Position.prototype.set = function set(x, y, z, options, callback) {
-    this._dispatch.dirtyComponent(this._id);
-    var cbX = null;
-    var cbY = null;
-    var cbZ = null;
+    if (!this._requestingUpdate) {
+        this._node.requestUpdate(this._id);
+        this._requestingUpdate = true;
+    }
 
-    if (z != null) cbZ = callback;
-    else if (y != null) cbY = callback;
-    else if (x != null) cbX = callback;
+    var xCallback;
+    var yCallback;
+    var zCallback;
 
-    if (x != null) this._x.set(x, options, cbX);
-    if (y != null) this._y.set(y, options, cbY);
-    if (z != null) this._z.set(z, options, cbZ);
+    if (z != null) {
+        zCallback = callback;
+    }
+    else if (y != null) {
+        yCallback = callback;
+    }
+    else if (x != null) {
+        xCallback = callback;
+    }
+
+    if (x != null) this._x.set(x, options, xCallback);
+    if (y != null) this._y.set(y, options, yCallback);
+    if (z != null) this._z.set(z, options, zCallback);
+
     return this;
 };
 

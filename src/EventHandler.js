@@ -6,20 +6,12 @@ var CallbackStore = require('famous-utilities').CallbackStore;
  * Component to handle general events.
  *
  * @class EventHandler
- * @param {LocalDispatch} dispatch The dispatch with which to register the handler.
- * @param {Object[]} events An array of event objects specifying .event and .callback properties.
+ * @param {Node} node The node on which this component is registered.
  */
-function EventHandler (dispatch, events) {
-    this.dispatch = dispatch;
+function EventHandler (node, events) {
+    this.node = node;
+    this.id = node.addComponent(this);
     this._events = new CallbackStore();
-
-    if (events) {
-        for (var i = 0, len = events.length; i < len; i++) {
-            var eventName = events[i].event;
-            var callback = events[i].callback;
-            this.on(eventName, callback);
-        }
-    }
 }
 
 /**
@@ -42,7 +34,6 @@ EventHandler.toString = function toString() {
  */
 EventHandler.prototype.on = function on (ev, cb) {
     this._events.on(ev, cb);
-    this.dispatch.registerGlobalEvent(ev, this.trigger.bind(this, ev));
 };
 
 /**
@@ -54,7 +45,6 @@ EventHandler.prototype.on = function on (ev, cb) {
  */
 EventHandler.prototype.off = function off (ev, cb) {
     this._events.off(ev, cb);
-    this.dispatch.deregisterGlobalEvent(ev, this.trigger.bind(this, ev))
 };
 
 /**
@@ -67,5 +57,7 @@ EventHandler.prototype.off = function off (ev, cb) {
 EventHandler.prototype.trigger = function trigger (ev, payload) {
     this._events.trigger(ev, payload);
 };
+
+EventHandler.prototype.onReceive = EventHandler.prototype.trigger;
 
 module.exports = EventHandler;
