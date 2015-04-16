@@ -38,7 +38,7 @@
     "watchify": "^2.1.1"
   },
   "dependencies": {
-    "famous-webgl-geometries": "git+ssh://git@github.famo.us/platform/webgl-geometries#v0.1.1",
-    "famous-transitions": "git+ssh://git@github.famo.us/platform/transitions#v0.2.0"
+    "famous-webgl-geometries": "git+ssh://git@github.famo.us/platform/webgl-geometries#v0.1.2",
+    "famous-transitions": "git+ssh://git@github.famo.us/platform/transitions#v0.3.0"
   }
 }
