@@ -82,7 +82,7 @@ Mesh.prototype.setGeometry = function setGeometry (geometry, options) {
             this._changeQueue.push(geometry.spec.type);
             this._changeQueue.push(geometry.spec.dynamic);
         }
-        if (!this._requestingUpdate) this._requestUpdate();
+        this._requestUpdate();
         this.value.geometry = geometry;
     }
 
@@ -133,7 +133,7 @@ Mesh.prototype.setBaseColor = function setBaseColor (color) {
         this._changeQueue.push(uniformValue);
     }
 
-    if (!this._requestingUpdate) this._requestUpdate();
+    this._requestUpdate();
 
     return this;
 };
@@ -157,13 +157,13 @@ Mesh.prototype.getBaseColor = function getBaseColor () {
  */
 Mesh.prototype.setFlatShading = function setFlatShading (bool) {
     if (this._inDraw || this.value.flatShading !== bool) {
+        this.value.flatShading = bool;
         if (this._initialized) {
             this._changeQueue.push('GL_UNIFORMS');
-            this._changeQueue.push('u_flatShading');
-            this._changeQueue.push(this.value.flatShading ? 1 : 0);        
+            this._changeQueue.push('u_FlatShading');
+            this._changeQueue.push(bool ? 1 : 0);        
         }
-        this.value.flatShading = bool;
-        if (!this._requestingUpdate) this._requestUpdate();
+        this._requestUpdate();
     }
 
     return this;
@@ -203,7 +203,7 @@ Mesh.prototype.setNormals = function setNormals (materialExpression) {
         this._changeQueue.push(materialExpression);
     }
 
-    if (!this._requestingUpdate) this._requestUpdate();
+    this._requestUpdate();
 
     return this;
 };
@@ -247,7 +247,7 @@ Mesh.prototype.setGlossiness = function setGlossiness (materialExpression, trans
         this._changeQueue.push(glossiness);
     }
 
-    if (!this._requestingUpdate) this._requestUpdate();
+    this._requestUpdate();
 
     return this;
 };
@@ -293,7 +293,7 @@ Mesh.prototype.setPositionOffset = function positionOffset (materialExpression, 
         this._changeQueue.push(uniformValue);
     }
 
-    if (!this._requestingUpdate) this._requestUpdate();
+    this._requestUpdate();
 
     return this;
 };
@@ -417,7 +417,7 @@ Mesh.prototype.onTransformChange = function onTransformChange (transform) {
         this._changeQueue.push(transform);        
     }
 
-    if (!this._requestingUpdate) this._requestUpdate();
+    this._requestUpdate();
 };
 
 /**
@@ -432,7 +432,7 @@ Mesh.prototype.onSizeChange = function onSizeChange (size) {
         this._changeQueue.push(size);
     }
 
-    if (!this._requestingUpdate) this._requestUpdate();
+    this._requestUpdate();
 };
 
 /**
@@ -447,7 +447,7 @@ Mesh.prototype.onOpacityChange = function onOpacityChange (opacity) {
         this._changeQueue.push(opacity);
     }
     
-    if (!this._requestingUpdate) this._requestUpdate();
+    this._requestUpdate();
 };
 
 Mesh.prototype.onAddUIEvent = function onAddUIEvent (UIEvent, methods, properties) {
@@ -466,7 +466,7 @@ Mesh.prototype.init = function init () {
     this.onTransformChange(this._node.getTransform());
     this.onSizeChange(this._node.getSize());
     this.onOpacityChange(this._node.getOpacity());
-    if (!this._requestingUpdate) this._requestUpdate();
+    this._requestUpdate();
 };
 
 Mesh.prototype.draw = function draw () {
