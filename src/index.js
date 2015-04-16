@@ -1,5 +1,6 @@
 'use strict';
 
 module.exports = {
-    requestAnimationFrame: require('./requestAnimationFrame')
+    requestAnimationFrame: require('./animationFrame').requestAnimationFrame,
+    cancelAnimationFrame: require('./animationFrame').cancelAnimationFrame
 };
