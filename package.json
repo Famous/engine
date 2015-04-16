@@ -22,7 +22,7 @@
     "famous-math": "git+ssh://git@github.famo.us/platform/math#v0.2.1",
     "famous-physics": "git+ssh://git@github.famo.us/platform/physics#v0.2.2",
     "famous-polyfills": "git+ssh://git@github.famo.us/platform/polyfills#v0.1.2",
-    "famous-renderers": "git+ssh://git@github.famo.us/platform/renderers#v0.3.2",
+    "famous-renderers": "git+ssh://git@github.famo.us/platform/renderers#v0.3.3",
     "famous-router": "git+ssh://git@github.famo.us/platform/router#v0.1.2",
     "famous-stylesheets": "git+ssh://git@github.famo.us/platform/stylesheets#v0.3.0",
     "famous-transitions": "git+ssh://git@github.famo.us/platform/transitions#v0.3.0",
@@ -30,7 +30,7 @@
     "famous-webgl-geometries": "git+ssh://git@github.famo.us/platform/webgl-geometries#v0.1.2",
     "famous-webgl-materials": "git+ssh://git@github.famo.us/platform/webgl-materials#v0.1.2",
     "famous-webgl-renderables": "git+ssh://git@github.famo.us/platform/webgl-renderables#v0.3.1",
-    "famous-webgl-renderers": "git+ssh://git@github.famo.us/platform/webgl-renderers#v0.3.1",
+    "famous-webgl-renderers": "git+ssh://git@github.famo.us/platform/webgl-renderers#v0.3.2",
     "famous-webgl-shaders": "git+ssh://git@github.famo.us/platform/webgl-shaders#v0.1.3"
   },
   "devDependencies": {
