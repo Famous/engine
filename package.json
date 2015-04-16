@@ -1,6 +1,6 @@
 {
   "name": "famous-dom-renderables",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "Famous DOM Renderables",
   "main": "src/index.js",
   "scripts": {
