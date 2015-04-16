@@ -9,7 +9,7 @@ test('Texture', function(t) {
         var texture = new Texture(testingContext);
 
         t.ok(texture.id instanceof Object, 'should create a texture object');
-        
+
         t.ok(testingContext.texImage2D.callCount === 1, 'should call texImage2D');
         t.ok(testingContext.texImage2D.history[0][8] === null, 'should call texImage2D with a null value');
 
@@ -98,7 +98,7 @@ test('Texture', function(t) {
         texture.readBack(5, 10, 15, 20);
         t.ok(
             testingContext.readPixels.history[1][0] === 5 &&
-                testingContext.readPixels.history[1][1] === 10 && 
+                testingContext.readPixels.history[1][1] === 10 &&
                 testingContext.readPixels.history[1][2] === 15 &&
                 testingContext.readPixels.history[1][3] === 20,
             'should use input values as arguments to readBack'

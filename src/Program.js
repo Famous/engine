@@ -57,8 +57,6 @@ var uniforms = Utility.keyValueToArrays({
     u_FlatShading: 0,
     u_NumLights: 0
 });
-var uniformNames = uniforms.keys;
-var uniformValues = uniforms.values;
 
 /**
  * Attributes keys and values
@@ -68,8 +66,6 @@ var attributes = Utility.keyValueToArrays({
     texCoord: 2,
     normals: 3
 });
-var attributeNames = attributes.keys;
-var attributeValues = attributes.values;
 
 /**
  * Varyings keys and values
@@ -79,8 +75,6 @@ var varyings = Utility.keyValueToArrays({
     v_Normal: 3,
     v_Position: 3
 });
-var varyingNames = varyings.keys;
-var varyingValues = varyings.values;
 
 /**
  * A class that handles interactions with the WebGL shader program
@@ -93,11 +87,10 @@ var varyingValues = varyings.values;
  *
  * @param {WebGL_Context} gl Context to be used to create the shader program.
  */
-
 function Program(gl, options) {
     this.gl = gl;
     this.textureSlots = 1;
-    this.options = options;
+    this.options = options || {};
 
     this.registeredMaterials = {};
     this.flaggedUniforms = [];
@@ -124,7 +117,6 @@ function Program(gl, options) {
  *
  * @return {Object} Current program.
  */
-
 Program.prototype.registerMaterial = function registerMaterial(name, material) {
     var compiled = material;
     var type = inputTypes[name];
@@ -133,23 +125,23 @@ Program.prototype.registerMaterial = function registerMaterial(name, material) {
     if ((this.registeredMaterials[material._id] & mask) === mask) return;
 
     for (var k in compiled.uniforms) {
-        if (uniformNames.indexOf(k) === -1) {
-            uniformNames.push(k);
-            uniformValues.push(compiled.uniforms[k]);
+        if (uniforms.keys.indexOf(k) === -1) {
+            uniforms.keys.push(k);
+            uniforms.values.push(compiled.uniforms[k]);
         }
     }
 
     for (var k in compiled.varyings) {
-        if (varyingNames.indexOf(k) === -1) {
-            varyingNames.push(k);
-            varyingValues.push(compiled.varyings[k].length);
+        if (varyings.keys.indexOf(k) === -1) {
+            varyings.keys.push(k);
+            varyings.values.push(compiled.varyings[k]);
         }
     }
 
     for (var k in compiled.attributes) {
-        if (attributeNames.indexOf(k) === -1) {
-            attributeNames.push(k);
-            attributeValues.push(compiled.attributes[k].length);
+        if (attributes.keys.indexOf(k) === -1) {
+            attributes.keys.push(k);
+            attributes.values.push(compiled.attributes[k]);
         }
     }
 
@@ -208,14 +200,14 @@ Program.prototype.resetProgram = function resetProgram() {
     this.uniformLocations   = [];
     this.attributeLocations = {};
 
-    this.attributeNames = Utility.clone(attributeNames);
-    this.attributeValues = Utility.clone(attributeValues);
+    this.attributeNames = Utility.clone(attributes.keys);
+    this.attributeValues = Utility.clone(attributes.values);
 
-    this.varyingNames = Utility.clone(varyingNames);
-    this.varyingValues = Utility.clone(varyingValues);
+    this.varyingNames = Utility.clone(varyings.keys);
+    this.varyingValues = Utility.clone(varyings.values);
 
-    this.uniformNames = Utility.clone(uniformNames);
-    this.uniformValues = Utility.clone(uniformValues);
+    this.uniformNames = Utility.clone(uniforms.keys);
+    this.uniformValues = Utility.clone(uniforms.values);
 
     this.flaggedUniforms = [];
     this.cachedUniforms = {};
@@ -293,7 +285,7 @@ Program.prototype.resetProgram = function resetProgram() {
  * @return {Boolean} Value indicating whether the uniform being set
  * is cached.
  */
-Program.prototype.uniformIsCached = function (targetName, value) {
+Program.prototype.uniformIsCached = function(targetName, value) {
     if(this.cachedUniforms[targetName] == null) {
         if (value.length) {
             this.cachedUniforms[targetName] = new Float32Array(value);

@@ -4,7 +4,7 @@
   "description": "Famous WebGL",
   "main": "src/index.js",
   "scripts": {
-    "test": "tape test/*.js | tap-spec",
+    "test": "browserify test/*.js | node | tap-spec",
     "watch-tests": "nodemon test/*.js --exec 'npm run test'",
     "watch": "nodemon --ignore node_modules/ -e js,json --exec 'npm test'",
     "lint": "jshint --reporter node_modules/jshint-stylish/stylish.js src; true"
