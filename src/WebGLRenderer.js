@@ -107,9 +107,9 @@ WebGLRenderer.prototype.getWebGLContext = function getWebGLContext(canvas) {
  *
  * @method createLight
  *
- * @param {String} path Path used as id of new light in lightRegistry.
+ * @param {String} Path used as id of new light in lightRegistry.
  *
- * @return {Object} Newly create light spec.
+ * @return {Object} Newly created light spec.
  */
 WebGLRenderer.prototype.createLight = function createLight(path) {
     this.numLights++;
@@ -125,9 +125,9 @@ WebGLRenderer.prototype.createLight = function createLight(path) {
  *
  * @method createMesh
  *
- * @param {String} path Path used as id of new mesh in meshRegistry.
+ * @param {String} Path used as id of new mesh in meshRegistry.
  *
- * @return {Object} Newly create mesh spec.
+ * @return {Object} Newly created mesh spec.
  */
 WebGLRenderer.prototype.createMesh = function createMesh(path) {
     this.meshRegistryKeys.push(path);
@@ -140,6 +140,17 @@ WebGLRenderer.prototype.createMesh = function createMesh(path) {
         texture: null
     };
 };
+
+
+/**
+ * Creates or retreives cutout
+ *
+ * @method getOrSetCutout
+ *
+ * @param {String} Path used as id of new mesh in meshRegistry.
+ *
+ * @return {Object} Newly created cutout spec.
+ */
 
 WebGLRenderer.prototype.getOrSetCutout = function getOrSetCutout(path) {
     var geometry;
@@ -169,14 +180,35 @@ WebGLRenderer.prototype.getOrSetCutout = function getOrSetCutout(path) {
 
 };
 
+/**
+ * Creates or retreives cutout
+ *
+ * @method setCutoutUniform
+ *
+ * @param {String} Path used as id of cutout in cutout registry.
+ * @param {String} uniformLocation identifier used to upload value
+ * @param {Array} value of uniform data 
+ *
+ */
+
 WebGLRenderer.prototype.setCutoutUniform = function setCutoutUniform(path, uniformName, uniformValue) {
     var cutout = this.getOrSetCutout(path);
 
     var index = cutout.uniformKeys.indexOf(uniformName);
 
     cutout.uniformValues[index] = uniformValue;
-}
+};
 
+
+/**
+ * Edits the options field on a mesh
+ *
+ * @method setMeshOptions
+ *
+ * @param {String} Path used as id of cutout in cutout registry.
+ * @param {Object} map of draw options for mesh
+ *
+**/
 WebGLRenderer.prototype.setMeshOptions = function(path, options) {
     var mesh = this.meshRegistry[path] || this.createMesh(path);
 
@@ -184,6 +216,18 @@ WebGLRenderer.prototype.setMeshOptions = function(path, options) {
     return this;
 };
 
+
+/**
+ * Changes the color of the fixed intensity lighting in the scene
+ *
+ * @method setAmbientLightColor
+ *
+ * @param {String} path used as id of light
+ * @param {Number} red channel
+ * @param {Number} green channel
+ * @param {Number} blue channel
+ *
+**/
 WebGLRenderer.prototype.setAmbientLightColor = function setAmbientLightColor(path, r, g, b) {
     this.ambientLightColor[0] = r;
     this.ambientLightColor[1] = g;
@@ -191,6 +235,18 @@ WebGLRenderer.prototype.setAmbientLightColor = function setAmbientLightColor(pat
     return this;
 };
 
+
+/**
+ * Changes the location of the light in the scene
+ *
+ * @method setLightPosition
+ *
+ * @param {String} path used as id of light
+ * @param {Number} x position
+ * @param {Number} y position
+ * @param {Number} z position
+ *
+**/
 WebGLRenderer.prototype.setLightPosition = function setLightPosition(path, x, y, z) {
     var light = this.lightRegistry[path] || this.createLight(path);
 
@@ -200,6 +256,18 @@ WebGLRenderer.prototype.setLightPosition = function setLightPosition(path, x, y,
     return this;
 };
 
+
+/**
+ * Changes the color of a dynamic intensity lighting in the scene
+ *
+ * @method setLightColor
+ *
+ * @param {String} path used as id of light in light Registry.
+ * @param {Number} red channel
+ * @param {Number} green channel
+ * @param {Number} blue channel
+ *
+**/
 WebGLRenderer.prototype.setLightColor = function setLightColor(path, r, g, b) {
     var light = this.lightRegistry[path] || this.createLight(path);
 
@@ -208,7 +276,16 @@ WebGLRenderer.prototype.setLightColor = function setLightColor(path, r, g, b) {
     light.color[2] = b;
     return this;
 };
-
+/**
+ * Compiles material spec into program shader
+ *
+ * @method handleMateriaInput
+ *
+ * @param {String} Path used as id of cutout in cutout registry.
+ * @param {String} which rendering input the material is bound to
+ * @param {Object} material spec
+ *
+**/
 WebGLRenderer.prototype.handleMaterialInput = function handleMaterialInput(path, name, material) {
     var mesh = this.meshRegistry[path] || this.createMesh(path);
 
@@ -218,6 +295,18 @@ WebGLRenderer.prototype.handleMaterialInput = function handleMaterialInput(path,
     return this.updateSize();
 };
 
+/**
+ * Changes the geometry data of a mesh
+ *
+ * @method setGeometry
+ *
+ * @param {String} Path used as id of cutout in cutout registry.
+ * @param {Object} Geometry object containing vertex data to be drawn
+ * @param {Number} primitive identifier
+ * @param {Boolean} will the geometry data change?
+ *
+**/
+
 WebGLRenderer.prototype.setGeometry = function setGeometry(path, geometry, drawType, dynamic) {
     var mesh = this.meshRegistry[path] || this.createMesh(path);
 
@@ -226,8 +315,18 @@ WebGLRenderer.prototype.setGeometry = function setGeometry(path, geometry, drawT
     mesh.dynamic = dynamic;
 
     return this;
-}
+};
 
+/**
+ * Uploads a new value for the uniform data when the mesh is being drawn
+ *
+ * @method setMeshUniform
+ *
+ * @param {String} Path used as id of mesh in mesh registry
+ * @param {String} uniformLocation identifier used to upload value
+ * @param {Array} value of uniform data 
+ *
+**/
 WebGLRenderer.prototype.setMeshUniform = function setMeshUniform(path, uniformName, uniformValue) {
     var mesh = this.meshRegistry[path] || this.createMesh(path);
 
@@ -241,6 +340,20 @@ WebGLRenderer.prototype.setMeshUniform = function setMeshUniform(path, uniformNa
         mesh.uniformValues[index] = uniformValue;
     }
 }
+
+/**
+ * Triggers the 'draw' phase of the WebGLRenderer.  Iterates through registries
+ * to set uniforms, set attributes and issue draw commands for renderables.
+ *
+ * @method bufferData
+ *
+ * @param {String} Path used as id of mesh in mesh registry
+ * @param {Number} Id of geometry in geometry registry
+ * @param {String} Attribute location name
+ * @param {Array} Vertex data 
+ * @param {Number} The dimensions of the vertex
+ */
+
 
 WebGLRenderer.prototype.bufferData = function bufferData(path, geometryId, bufferName, bufferValue, bufferSpacing) {
     this.bufferRegistry.allocate(geometryId, bufferName, bufferValue, bufferSpacing);
@@ -434,7 +547,7 @@ WebGLRenderer.prototype.drawBuffers = function drawBuffers(vertexBuffers, mode, 
 };
 
 /**
- * Allocates an array buffer where vertex data is sent to via compile.
+ * Wraps draw methods in bound frame buffer
  *
  * @method renderOffscreen
  *
@@ -500,6 +613,9 @@ function checkFrameBufferStatus(gl) {
  * Size is retreived from the container object of the renderer.
  *
  * @method updateSize
+ * 
+ * @param {Array} width, height and depth of canvas
+ * 
  */
 WebGLRenderer.prototype.updateSize = function updateSize(size) {
     if (size) {
