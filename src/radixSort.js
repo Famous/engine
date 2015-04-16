@@ -4,31 +4,45 @@ var radixBits = 11,
     buckets = new Array(maxRadix * Math.ceil(64 / radixBits)),
     msbMask = 1 << ((32 - 1) % radixBits),
     lastMask = (msbMask << 1) - 1,
-    passes = ((32 / radixBits) + 0.999999999999999) | 0,
-    maxOffset = maxRadix * (passes - 1),
+    passCount = ((32 / radixBits) + 0.999999999999999) | 0,
+    maxOffset = maxRadix * (passCount - 1),
     normalizer = Math.pow(20, 6);
 
 var buffer = new ArrayBuffer(4);
 var floatView = new Float32Array(buffer, 0, 1);
 var intView = new Int32Array(buffer, 0, 1);
-var out = [];
 
-/**
- * radixSort is a function that arranges a list of mesh paths
- * in order of the depth of their transform.
- * 
- * @param {Array} sequence of identifiers in registry
- * @param {Object} map of objects to be drawn to screen
- * 
- */
+function comp(list, registry, i) {
+    var key = list[i];
+    return registry[key].uniformValues[1][14] + normalizer;
+}
 
-function radixSort(list, registry) {
-    var pass = out.length = 0;
-    var count = passes;
+function mutator(list, registry, i, value) {
+    var key = list[i];
+    registry[key].uniformValues[1][14] = intToFloat(value) - normalizer;
+    return key;
+}
+
+
+function floatToInt(k) {
+    floatView[0] = k;
+    return intView[0];
+}
+
+function intToFloat(k) {
+    intView[0] = k;
+    return floatView[0];
+}
+
+function sort(list, registry) {
+    var pass = 0;
+    var out = [];
 
     var i, j, k, n, div, offset, swap, id, sum, tsum, size;
 
-     for (i = 0, n = maxRadix * count; i < n; i++) buckets[i] = 0;
+    passCount = ((32 / radixBits) + 0.999999999999999) | 0;
+
+    for (i = 0, n = maxRadix * passCount; i < n; i++) buckets[i] = 0;
 
     for (i = 0, n = list.length; i < n; i++) {
         div = floatToInt(comp(list, registry, i));
@@ -46,13 +60,13 @@ function radixSort(list, registry) {
             sum = tsum;
         }
     }
-    if (--count) {
+    if (--passCount) {
         for (i = 0, n = list.length; i < n; i++) {
             div = floatToInt(comp(list, registry, i));
             out[++buckets[div & radixMask]] = mutator(list, registry, i, div ^= div >> 31 | 0x80000000);
         }
         swap = out, out = list, list = swap;
-        while (++pass < count) {
+        while (++pass < passCount) {
             for (i = 0, n = list.length, offset = pass * maxRadix, size = pass * radixBits; i < n; i++) {
                 div = floatToInt(comp(list, registry, i));
                 out[++buckets[offset + (div >>> size & radixMask)]] = list[i];
@@ -67,27 +81,7 @@ function radixSort(list, registry) {
     }
 
     return out;
+
 }
 
-function comp(list, registry, i) {
-    var key = list[i];
-    return registry[key].uniformValues[1][14] + normalizer;
-}
-
-function mutator(list, registry, i, value) {
-    var key = list[i];
-    registry[key].uniformValues[1][14] = intToFloat(value) - normalizer;
-    return key;
-}
-
-function floatToInt(k) {
-    floatView[0] = k;
-    return intView[0];
-}
-
-function intToFloat(k) {
-    intView[0] = k;
-    return floatView[0];
-}
-
-module.exports = radixSort;
+module.exports = sort;
