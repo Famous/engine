@@ -1,4 +1,8 @@
+'use strict';
+
 var CallbackStore = require('famous-utilities').CallbackStore;
+
+var RENDER_SIZE = 2;
 
 function DOMElement (node, options) {
     if (typeof options === 'string') {
@@ -107,8 +111,8 @@ DOMElement.prototype.onTransformChange = function onTransformChange (transform) 
 
 DOMElement.prototype.onSizeChange = function onSizeChange (size) {
     var sizeMode = this._node.getSizeMode();
-    var sizedX = sizeMode[0] !== Node.RENDER_SIZE;
-    var sizedY = sizeMode[1] !== Node.RENDER_SIZE;
+    var sizedX = sizeMode[0] !== RENDER_SIZE;
+    var sizedY = sizeMode[1] !== RENDER_SIZE;
     if (this._initialized) 
         this._changeQueue.push('CHANGE_SIZE',
             sizedX ? size[0] : sizedX,
