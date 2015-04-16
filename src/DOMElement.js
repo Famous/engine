@@ -1,0 +1,239 @@
+var CallbackStore = require('famous-utilities').CallbackStore;
+
+function DOMElement (node, options) {
+    if (typeof options === 'string') {
+        console.warn(
+            'HTMLElement constructor signature changed!\n' +
+            'Pass in an options object with {tagName: ' + options + '} instead.'
+        );
+        options = {
+            tagName: options
+        };
+    }
+
+    this._node = node;
+
+    this._requestingUpdate = false;
+
+    this._changeQueue = [];
+    
+    this._classes = ['fa-surface'];
+    this._requestingEventListeners = [];
+    this._styles = {
+        display: node.isShown() 
+    };
+    this._attributes = {};
+    this._content = '';
+
+    this._tagName = options && options.tagName ? options.tagName : 'div';
+    this._id = node.addComponent(this);
+
+    this._callbacks = new CallbackStore();
+
+    if (!options) return;
+
+    if (options.classes) {
+        for (var i = 0; i < options.classes.length; i++)
+            this.addClass(options.classes[i]);
+    }
+
+    if (options.attributes) {
+        for (var key in options.attributes)
+            this.setAttribute(key, options.attributes[key]);
+    }
+
+    if (options.properties) {
+        for (var key in options.properties)
+            this.setProperty(key, options.properties[key]);
+    }
+
+    if (options.id) this.setId(options.id);
+    if (options.content) this.setContent(options.content);
+}
+
+DOMElement.prototype.getValue = function getValue () {
+    return {
+        classes: this._classes,
+        styles: this._styles,
+        attributes: this._attributes,
+        content: this._content
+    };
+};
+
+DOMElement.prototype.onUpdate = function onUpdate () {
+    var node = this._node;
+    var queue = this._changeQueue;
+    var len = queue.length;
+
+    if (len && node) {
+        node.sendDrawCommand('WITH');
+        node.sendDrawCommand(node.getLocation());
+        node.sendDrawCommand('DOM');
+
+        while (len--) node.sendDrawCommand(queue.shift());
+    }
+
+    this._requestingUpdate = false;
+};
+
+DOMElement.prototype.onMount = function onMount (node, id) {
+    this._node = node;
+    this._id = id;
+    this.draw();
+    this.setAttribute('data-fa-path', node.getLocation());
+};
+
+DOMElement.prototype.onDismount = function onDismount () {
+    this.setProperty('display', 'none');
+    this.setAttribute('data-fa-path', '');
+    this._initialized = false;
+};
+
+DOMElement.prototype.onShow = function onShow () {
+    this.setProperty('display', 'block');
+};
+
+DOMElement.prototype.onHide = function onHide () {
+    this.setProperty('display', 'none');
+};
+
+DOMElement.prototype.onTransformChange = function onTransformChange (transform) {
+    this._changeQueue.push('CHANGE_TRANSFORM');
+    for (var i = 0, len = transform.length ; i < len ; i++)
+        this._changeQueue.push(transform[i]);
+
+    if (!this._requestingUpdate) this._requestUpdate();
+};
+
+DOMElement.prototype.onSizeChange = function onSizeChange (size) {
+    var sizeMode = this._node.getSizeMode();
+    var sizedX = sizeMode[0] !== Node.RENDER_SIZE;
+    var sizedY = sizeMode[1] !== Node.RENDER_SIZE;
+    if (this._initialized) 
+        this._changeQueue.push('CHANGE_SIZE',
+            sizedX ? size[0] : sizedX,
+            sizedY ? size[1] : sizedY);
+
+    if (!this._requestingUpdate) this._requestUpdate();
+    return this;
+};
+
+DOMElement.prototype.onAddUIEvent = function onAddUIEvent (UIEvent) {
+    this._changeQueue.push('ADD_EVENT_LISTENER', UIEvent, void 0, true, 'EVENT_END');
+    if (!this._requestingUpdate) this._requestUpdate();
+};
+
+DOMElement.prototype.onSizeModeChange = function onSizeModeChange (sizeMode) {
+    this.onSizeChange(this._node.getSize());
+}; 
+
+DOMElement.prototype._requestUpdate = function _requestUpdate () {
+    if (!this._requestingUpdate) {
+        this._node.requestUpdate(this._id);
+        this._requestingUpdate = true;
+    }
+};
+
+DOMElement.prototype.init = function init () {
+    this._changeQueue.push('INIT_DOM', this._tagName);
+    this._initialized = true;
+    this.onTransformChange(this._node.getTransform());
+    this.onSizeChange(this._node.getSize());
+    if (!this._requestingUpdate) this._requestUpdate();
+};
+
+DOMElement.prototype.setId = function setId (id) {
+    this.setAttribute('id', id);
+    return this;
+};
+
+DOMElement.prototype.addClass = function addClass (value) {
+    if (this._classes.indexOf(value) < 0) {
+        if (this._initialized) this._changeQueue.push('ADD_CLASS', value);
+        this._classes.push(value);
+        if (!this._requestingUpdate) this._requestUpdate();
+        return this;
+    }
+
+    if (this._inDraw) {
+        if (this._initialized) this._changeQueue.push('ADD_CLASS', value);
+        if (!this._requestingUpdate) this._requestUpdate();
+    }
+    return this;
+};
+
+DOMElement.prototype.removeClass = function removeClass (value) {
+    var index = this._classes.indexOf(value);
+
+    if (index < 0) return this;
+
+    this._changeQueue.push('REMOVE_CLASS', value);
+
+    this._classes.splice(index, 1);
+
+    if (!this._requestingUpdate) this._requestUpdate();
+    return this;
+};
+
+DOMElement.prototype.setAttribute = function setAttribute (name, value) {
+    if (this._attributes[name] !== value || this._inDraw) {
+        this._attributes[name] = value;
+        if (this._initialized) this._changeQueue.push('CHANGE_ATTRIBUTE', name, value);
+        if (!this._requestUpdate) this._requestUpdate();
+    }
+    return this;
+};
+
+DOMElement.prototype.setProperty = function setProperty (name, value) {
+    if (this._styles[name] !== value || this._inDraw) {
+        this._styles[name] = value;
+        if (this._initialized) this._changeQueue.push('CHANGE_PROPERTY', name, value);
+        if (!this._requestingUpdate) this._requestUpdate();
+    }
+    return this;
+};
+
+DOMElement.prototype.setContent = function setContent (content) {
+    if (this._content !== content || this._inDraw) {
+        this._content = content;
+        if (this._initialized) this._changeQueue.push('CHANGE_CONTENT', content);
+        if (!this._requestingUpdate) this._requestUpdate();
+    }
+    return this;
+};
+
+DOMElement.prototype.on = function on (event, listener) {
+    return this._callbacks.on(event, listener);
+};
+
+DOMElement.prototype.onReceive = function onReceive (event, payload) {
+    this._callbacks.trigger(event, payload);
+};
+
+DOMElement.prototype.draw = function draw () {
+    var key;
+    var i;
+    var len;
+
+    this._inDraw = true;
+
+    this.init();
+
+    for (i = 0, len = this._classes.length ; i < len ; i++)
+        this.addClass(this._classes[i]);
+
+    this.setContent(this._content);
+
+    for (key in this._styles) 
+        if (this._styles[key])
+            this.setProperty(key, this._styles[key]);
+
+    for (key in this._attributes)
+        if (this._attributes[key])
+            this.setAttribute(key, this._attributes[key]);
+
+    this._inDraw = false;
+};
+
+module.exports = DOMElement;
+
