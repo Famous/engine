@@ -1,3 +1,13 @@
+/**
+ * Calculates a matrix that creates the identity when multiplied by m
+ * 
+ * @method inverse
+ * @private
+ *
+ *
+ */
+
+
 float inverse(float m) {
     return 1.0 / m;
 }
