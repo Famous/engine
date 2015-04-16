@@ -41,13 +41,12 @@ Direction.prototype.constructor = Direction;
  * Initialize the Direction. Sets defaults if a property was not already set.
  *
  * @method init
- * @param {Object} options The options hash.
  */
-Direction.prototype.init = function(options) {
+Direction.prototype.init = function() {
     this.direction = this.direction || Vec3.subtract(this.b.position, this.a.position, new Vec3());
     this.direction.normalize();
     this.minLength = this.minLength || 0;
-    this.period = this.period || .2;
+    this.period = this.period || 0.2;
     this.dampingRatio = this.dampingRatio || 0.5;
 
     this.stiffness = 4 * PI * PI / (this.period * this.period);
@@ -70,9 +69,6 @@ Direction.prototype.update = function update(time, dt) {
     var impulse = IMPULSE_REGISTER;
     var directionVector = DIRECTION_REGISTER;
 
-    var dampingRatio = this.dampingRatio;
-    var period = this.period;
-
     var p1 = a.position;
     var w1 = a.inverseMass;
 
@@ -94,7 +90,7 @@ Direction.prototype.update = function update(time, dt) {
     var gamma;
     var beta;
 
-    if (period === 0) {
+    if (this.period === 0) {
         gamma = 0;
         beta  = 1;
     }
@@ -125,10 +121,8 @@ Direction.prototype.update = function update(time, dt) {
  * Adds an impulse to a physics body's velocity due to the constraint
  *
  * @method resolve
- * @param {Number} time The current time in the physics engine.
- * @param {Number} dt The physics engine frame delta.
  */
-Direction.prototype.resolve = function update(time, dt) {
+Direction.prototype.resolve = function update() {
     var a = this.a;
     var b = this.b;
 

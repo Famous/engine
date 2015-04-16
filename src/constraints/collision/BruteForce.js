@@ -10,13 +10,13 @@ var AABB = require('./AABB');
  * @param {Particles[]} targets
  * @param {Object} options
  */
-function BruteForceAABB(targets, options) {
+function BruteForceAABB(targets) {
     this._volumes = [];
     this._entityRegistry = {};
     for (var i = 0; i < targets.length; i++) {
         this.add(targets[i]);
     }
-};
+}
 
 /**
  * Start tracking a Particle.
@@ -24,7 +24,7 @@ function BruteForceAABB(targets, options) {
  * @method add
  * @param {Particle} body
  */
-BruteForceAABB.prototype.add = function(body) {
+BruteForceAABB.prototype.add = function add(body) {
     var boundingVolume = new AABB(body);
 
     this._entityRegistry[body._ID] = body;
@@ -37,7 +37,7 @@ BruteForceAABB.prototype.add = function(body) {
  * @method update
  * @return {Particle[][]}
  */
-BruteForceAABB.prototype.update = function() {
+BruteForceAABB.prototype.update = function update() {
     var _volumes = this._volumes;
     var _entityRegistry = this._entityRegistry;
 
@@ -54,7 +54,7 @@ BruteForceAABB.prototype.update = function() {
         }
     }
     return result;
-}
+};
 
 /**
  * The most simple yet computationally intensive broad-phase. Immediately passes its targets to the narrow-phase,
@@ -62,9 +62,8 @@ BruteForceAABB.prototype.update = function() {
  *
  * @class BruteForce
  * @param {Particle[]} targets
- * @param {Object} options
  */
-function BruteForce(targets, options) {
+function BruteForce(targets) {
     this.targets = targets;
 }
 
@@ -74,7 +73,7 @@ function BruteForce(targets, options) {
  * @method add
  * @param {Particle} body
  */
-BruteForce.prototype.add = function(body) {
+BruteForce.prototype.add = function add(body) {
     this.targets.push(body);
 };
 
@@ -84,7 +83,7 @@ BruteForce.prototype.add = function(body) {
  * @method update
  * @return {Particle[][]}
  */
-BruteForce.prototype.update = function() {
+BruteForce.prototype.update = function update() {
     return [this.targets];
 };
 

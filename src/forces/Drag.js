@@ -49,7 +49,7 @@ Drag.LINEAR = function LINEAR(v) {
  * @method init
  * @param {Object} options The options hash.
  */
-Drag.prototype.init = function(options) {
+Drag.prototype.init = function() {
     this.max = this.max || Infinity;
     this.strength = this.strength || 1;
     this.type = this.type || Drag.LINEAR;
@@ -59,10 +59,8 @@ Drag.prototype.init = function(options) {
  * Apply the force.
  *
  * @method update
- * @param {Number} time The current time in the physics engine.
- * @param {Number} dt The physics engine frame delta.
  */
-Drag.prototype.update = function update(time, dt) {
+Drag.prototype.update = function update() {
     var targets = this.targets;
     var type = this.type;
 

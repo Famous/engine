@@ -73,10 +73,8 @@ Gravity1D.prototype.init = function(options) {
  * Apply the force.
  *
  * @method update
- * @param {Number} time The current time in the physics engine.
- * @param {Number} dt The physics engine frame delta.
  */
-Gravity1D.prototype.update = function(time, dt) {
+Gravity1D.prototype.update = function() {
     var targets = this.targets;
 
     var force = FORCE_REGISTER;
@@ -88,7 +86,7 @@ Gravity1D.prototype.update = function(time, dt) {
     for (var i = 0, len = targets.length; i < len; i++) {
         var target = targets[i];
         var magnitude = a * target.mass;
-        Vec3.scale(acceleration, (magnitude > max ? max : magnitude) * invA, force)
+        Vec3.scale(acceleration, (magnitude > max ? max : magnitude) * invA, force);
         target.applyForce(force);
     }
 };

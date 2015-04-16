@@ -7,14 +7,9 @@ var Quaternion = require('famous-math').Quaternion;
 
 var VEC1_REGISTER = new Vec3();
 var VEC2_REGISTER = new Vec3();
-var NORMAL_REGISTER = new Vec3();
-var IMPULSE_REGISTER = new Vec3();
 var VB1_REGISTER = new Vec3();
 var VB2_REGISTER = new Vec3();
 var WxR_REGISTER = new Vec3();
-
-/** @const */
-var PI = Math.PI;
 
 /**
  *  A constraint that maintains positions and orientations with respect to a specific anchor point.
@@ -45,9 +40,8 @@ Point2Point.prototype.constructor = Point2Point;
  * Initialize the Point2Point. Sets defaults if a property was not already set.
  *
  * @method init
- * @param {Object} options The options hash.
  */
-Point2Point.prototype.init = function(options) {
+Point2Point.prototype.init = function() {
     var w = this.anchor;
 
     var a = this.a;
@@ -74,9 +68,6 @@ Point2Point.prototype.update = function(time, dt) {
     var a = this.a;
     var b = this.b;
 
-    var period = this.period;
-    var dampingRatio = this.dampingRatio;
-
     var rA = a.orientation.rotateVector(this.bodyRA, this.rA);
     var rB = b.orientation.rotateVector(this.bodyRB, this.rB);
 
@@ -99,7 +90,7 @@ Point2Point.prototype.update = function(time, dt) {
 
     var invEffMass = new Mat33([imA + imB,0,0,0,imA + imB,0,0,0,imA + imB]);
 
-    Mat33.add(invEffInertia, invEffMass, this.effMassMatrix)
+    Mat33.add(invEffInertia, invEffMass, this.effMassMatrix);
     this.effMassMatrix.inverse();
 
     var impulse = this.impulse;
@@ -121,10 +112,8 @@ Point2Point.prototype.update = function(time, dt) {
  * Apply impulses to resolve the constraint.
  *
  * @method resolve
- * @param {Number} time The current time in the physics engine.
- * @param {Number} dt The physics engine frame delta.
  */
-Point2Point.prototype.resolve = function resolve(time, dt) {
+Point2Point.prototype.resolve = function resolve() {
     var a = this.a;
     var b = this.b;
 

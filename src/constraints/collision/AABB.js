@@ -15,11 +15,8 @@ function AABB(body) {
         z: []
     };
     this.update();
-};
+}
 
-
-var CONVEX = 1 << 0;
-var BOX = 1 << 1;
 var SPHERE = 1 << 2;
 var WALL = 1 << 3;
 
@@ -115,9 +112,6 @@ AABB.prototype.update = function() {
  * @param {AABB} aabb2
  */
 AABB.checkOverlap = function(aabb1, aabb2) {
-    var pos1 = aabb1.position;
-    var pos2 = aabb2.position;
-
     var vertices1 = aabb1.vertices;
     var vertices2 = aabb2.vertices;
 

@@ -14,9 +14,6 @@ var VB2_REGISTER = new Vec3();
 var WxR_REGISTER = new Vec3();
 var DELTA_REGISTER = new Vec3();
 
-/** @const */
-var PI = Math.PI;
-
 /**
  *  A constraint that confines two bodies to the plane defined by the axis of the hinge.
  *
@@ -47,9 +44,8 @@ Hinge.prototype.constructor = Hinge;
  * Initialize the Hinge. Sets defaults if a property was not already set.
  *
  * @method init
- * @param {Object} options The options hash.
  */
-Hinge.prototype.init = function(options) {
+Hinge.prototype.init = function() {
     var w = this.anchor;
 
     var u = this.axis.normalize();
@@ -89,9 +85,6 @@ Hinge.prototype.init = function(options) {
 Hinge.prototype.update = function(time, dt) {
     var a = this.a;
     var b = this.b;
-
-    var period = this.period;
-    var dampingRatio = this.dampingRatio;
 
     var axisA = a.orientation.rotateVector(this.bodyAxisA, this.axisA);
     var axisB = b.orientation.rotateVector(this.bodyAxisB, this.axisB);
@@ -136,7 +129,7 @@ Hinge.prototype.update = function(time, dt) {
 
     var invEffMass = new Mat33([imA + imB,0,0,0,imA + imB,0,0,0,imA + imB]);
 
-    Mat33.add(invEffInertia, invEffMass, this.effMassMatrix)
+    Mat33.add(invEffInertia, invEffMass, this.effMassMatrix);
     this.effMassMatrix.inverse();
 
     var invIAt1xA = a.inverseInertia.vectorMultiply(t1xA, VEC1_REGISTER);
@@ -178,10 +171,8 @@ Hinge.prototype.update = function(time, dt) {
  * Apply impulses to resolve the constraint.
  *
  * @method resolve
- * @param {Number} time The current time in the physics engine.
- * @param {Number} dt The physics engine frame delta.
  */
-Hinge.prototype.resolve = function resolve(time, dt) {
+Hinge.prototype.resolve = function resolve() {
     var a = this.a;
     var b = this.b;
 

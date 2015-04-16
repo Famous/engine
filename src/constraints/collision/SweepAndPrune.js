@@ -14,9 +14,8 @@ var AXES = ['x', 'y', 'z'];
  *
  * @class SweepAndPrune
  * @param {Body[]} targets
- * @param {Object} options
  */
-function SweepAndPrune(targets, options) {
+function SweepAndPrune(targets) {
     this._sweepVolumes = [];
     this._entityRegistry = {};
     this._boundingVolumeRegistry = {};
@@ -29,7 +28,7 @@ function SweepAndPrune(targets, options) {
     for (var i = 0; i < targets.length; i++) {
         this.add(targets[i]);
     }
-};
+}
 
 /**
  * Start tracking a body in the broad-phase.
@@ -60,8 +59,9 @@ SweepAndPrune.prototype.add = function(body) {
 SweepAndPrune.prototype.remove = function remove(body) {
     this._entityRegistry[body._ID] = null;
     this._boundingVolumeRegistry[body._ID] = null;
+    var i, len;
     var index;
-    for (var i = 0, len = this._sweepVolumes.length; i < len; i++) {
+    for (i = 0, len = this._sweepVolumes.length; i < len; i++) {
         if (this._sweepVolumes[i]._ID === body._ID) {
             index = i;
             break;
@@ -69,24 +69,25 @@ SweepAndPrune.prototype.remove = function remove(body) {
     }
     this._sweepVolumes.splice(index, 1);
     var endpoints = this.endpoints;
+    var point;
 
     var xs = [];
-    for (var i = 0, len = endpoints.x.length; i < len; i++) {
-        var point = endpoints.x[i];
-        if (point._ID !== body._ID) xs.push(point)
+    for (i = 0, len = endpoints.x.length; i < len; i++) {
+        point = endpoints.x[i];
+        if (point._ID !== body._ID) xs.push(point);
     }
     var ys = [];
-    for (var i = 0, len = endpoints.y.length; i < len; i++) {
-        var point = endpoints.y[i];
-        if (point._ID !== body._ID) ys.push(point)
+    for (i = 0, len = endpoints.y.length; i < len; i++) {
+        point = endpoints.y[i];
+        if (point._ID !== body._ID) ys.push(point);
     }
     var zs = [];
-    for (var i = 0, len = endpoints.z.length; i < len; i++) {
-        var point = endpoints.z[i];
-        if (point._ID !== body._ID) zs.push(point)
+    for (i = 0, len = endpoints.z.length; i < len; i++) {
+        point = endpoints.z[i];
+        if (point._ID !== body._ID) zs.push(point);
     }
     endpoints.x = xs;
-    endpoints.y = yz;
+    endpoints.y = ys;
     endpoints.z = zs;
 };
 
@@ -103,7 +104,9 @@ SweepAndPrune.prototype.update = function() {
     var _entityRegistry = this._entityRegistry;
     var _boundingVolumeRegistry = this._boundingVolumeRegistry;
 
-    for (var j = 0, len = _sweepVolumes.length; j < len; j++) {
+    var i, j, k, len;
+
+    for (j = 0, len = _sweepVolumes.length; j < len; j++) {
         _sweepVolumes[j].update();
     }
 
@@ -112,14 +115,13 @@ SweepAndPrune.prototype.update = function() {
     var overlapsMatrix = this.overlapsMatrix;
     var _IDPool = this._IDPool;
 
-    for (var k = 0; k < 3; k++) {
+    for (k = 0; k < 3; k++) {
         var axis = AXES[k];
         // Insertion sort:
         var endpointAxis = endpoints[axis];
-        for (var j = 1, len = endpointAxis.length; j < len; j++) {
+        for (j = 1, len = endpointAxis.length; j < len; j++) {
             var current = endpointAxis[j];
             var val = current.value;
-            var i = j - 1;
             var swap;
             var row;
             var index;
@@ -127,6 +129,8 @@ SweepAndPrune.prototype.update = function() {
             var highID;
             var cID;
             var sID;
+
+            i = j - 1;
             while (i >= 0 && (swap = endpointAxis[i]).value > val) {
                 // A swap occurence indicates that current and swap either just started or just stopped overlapping
 
@@ -185,9 +189,9 @@ function SweepVolume(boundingVolume) {
         x: [{_ID: boundingVolume._ID, side: 0, value: null}, {_ID: boundingVolume._ID, side: 1, value: null}],
         y: [{_ID: boundingVolume._ID, side: 0, value: null}, {_ID: boundingVolume._ID, side: 1, value: null}],
         z: [{_ID: boundingVolume._ID, side: 0, value: null}, {_ID: boundingVolume._ID, side: 1, value: null}]
-    }
+    };
     this.update();
-};
+}
 
 /**
  * Update the endpoints to reflect the current location of the AABB.
@@ -198,7 +202,6 @@ SweepVolume.prototype.update = function() {
     var boundingVolume = this._boundingVolume;
     boundingVolume.update();
 
-    var pos = boundingVolume.position;
     var points = this.points;
 
     for (var i = 0; i < 3; i++) {

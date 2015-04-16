@@ -1,7 +1,6 @@
 'use strict';
 
 var Particle = require('./Particle');
-var Mat33 = require('famous-math').Mat33;
 var Vec3 = require('famous-math').Vec3;
 
 /**

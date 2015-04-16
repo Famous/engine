@@ -13,7 +13,7 @@ function Constraint(options) {
     this.setOptions(options);
 
     this._ID = _ID++;
-};
+}
 
 /**
  * Decorates the Constraint with the options object.
@@ -41,7 +41,7 @@ Constraint.prototype.init = function init(options) {};
  * @param {Number} time The current time in the physics engine.
  * @param {Number} dt The physics engine frame delta.
  */
-Constraint.prototype.update = function update(time, dt) {}
+Constraint.prototype.update = function update(time, dt) {};
 
 /**
  * Apply impulses to resolve the constraint.
@@ -50,6 +50,6 @@ Constraint.prototype.update = function update(time, dt) {}
  * @param {Number} time The current time in the physics engine.
  * @param {Number} dt The physics engine frame delta.
  */
-Constraint.prototype.resolve = function resolve(time, dt) {}
+Constraint.prototype.resolve = function resolve(time, dt) {};
 
 module.exports = Constraint;

@@ -138,7 +138,7 @@ DynamicGeometry.prototype.reset = function reset() {
     };
 
     return this;
-}
+};
 
 /**
  * Add a vertex to the polyhedron.
@@ -222,7 +222,7 @@ DynamicGeometry.prototype.getFeatureClosestToOrigin = function() {
         if (!feature) continue;
         if (feature.distance < min) {
             min = feature.distance;
-            closest = feature
+            closest = feature;
         }
     }
     return closest;
@@ -270,11 +270,13 @@ DynamicGeometry.prototype.reshape = function(referencePoint) {
     var vertexOnFeature;
     var featureVertices;
 
+    var i, j, len;
+
     // The removal of features creates a hole in the polyhedron -- frontierEdges maintains the edges
     // of this hole, each of which will form one edge of a new feature to be created
     var frontierEdges = [];
 
-    for (var i = 0, len = features.length; i < len; i++) {
+    for (i = 0, len = features.length; i < len; i++) {
         if (!features[i]) continue;
         featureVertices = features[i].vertexIndices;
         vertexOnFeature = vertices[featureVertices[0]].vertex;
@@ -289,7 +291,7 @@ DynamicGeometry.prototype.reshape = function(referencePoint) {
 
     var A = point;
     var a = this.lastVertexIndex;
-    for (var j = 0, len = frontierEdges.length; j < len; j++) {
+    for (j = 0, len = frontierEdges.length; j < len; j++) {
         if (!frontierEdges[j]) continue;
         var b = frontierEdges[j][0];
         var c = frontierEdges[j][1];
@@ -298,7 +300,7 @@ DynamicGeometry.prototype.reshape = function(referencePoint) {
 
         var AB = Vec3.subtract(B, A, AB_REGISTER);
         var AC = Vec3.subtract(C, A, AC_REGISTER);
-        var ABC = Vec3.cross(AB, AC, new Vec3())
+        var ABC = Vec3.cross(AB, AC, new Vec3());
         ABC.normalize();
 
         if (!referencePoint) {
@@ -330,7 +332,7 @@ DynamicGeometry.prototype.reshape = function(referencePoint) {
  * @return {Boolean} The result of the containment check.
  */
 DynamicGeometry.prototype.simplexContainsOrigin = function(direction, callback) {
-    var numVertices = this.vertices.length
+    var numVertices = this.vertices.length;
 
     var a = this.lastVertexIndex;
     var b = a - 1;
@@ -348,17 +350,20 @@ DynamicGeometry.prototype.simplexContainsOrigin = function(direction, callback) 
 
     var AO = Vec3.scale(A, -1, AO_REGISTER);
     var AB = Vec3.subtract(B, A, AB_REGISTER);
+    var AC, AD, BC, BD;
+    var ABC, ACD, ABD, BCD;
+    var distanceABC, distanceACD, distanceABD, distanceBCD;
 
     var vertexToRemove;
 
     if (numVertices === 4) {
         // Tetrahedron
-        var AC = Vec3.subtract(C, A, AC_REGISTER);
-        var AD = Vec3.subtract(D, A, AD_REGISTER);
+        AC = Vec3.subtract(C, A, AC_REGISTER);
+        AD = Vec3.subtract(D, A, AD_REGISTER);
 
-        var ABC = Vec3.cross(AB, AC, new Vec3());
-        var ACD = Vec3.cross(AC, AD, new Vec3());
-        var ABD = Vec3.cross(AB, AD, new Vec3());
+        ABC = Vec3.cross(AB, AC, new Vec3());
+        ACD = Vec3.cross(AC, AD, new Vec3());
+        ABD = Vec3.cross(AB, AD, new Vec3());
         ABC.normalize();
         ACD.normalize();
         ABD.normalize();
@@ -368,20 +373,18 @@ DynamicGeometry.prototype.simplexContainsOrigin = function(direction, callback) 
         // Don't need to check BCD because we would have just checked that in the previous iteration
         // -- we added A to the BCD triangle because A was in the direction of the origin.
 
-        var distanceABC = Vec3.dot(ABC, AO);
-        var distanceACD = Vec3.dot(ACD, AO);
-        var distanceABD = Vec3.dot(ABD, AO);
-
-        var EPSILON = 0.001;
+        distanceABC = Vec3.dot(ABC, AO);
+        distanceACD = Vec3.dot(ACD, AO);
+        distanceABD = Vec3.dot(ABD, AO);
 
         // Norms point away from origin -> origin is inside tetrahedron
-        if (distanceABC < EPSILON && distanceABD < EPSILON && distanceACD < EPSILON) {
-            var BC = Vec3.subtract(C, B, BC_REGISTER);
-            var BD = Vec3.subtract(D, B, BD_REGISTER);
-            var BCD = Vec3.cross(BC, BD, new Vec3());
+        if (distanceABC < 0.001 && distanceABD < 0.001 && distanceACD < 0.001) {
+            BC = Vec3.subtract(C, B, BC_REGISTER);
+            BD = Vec3.subtract(D, B, BD_REGISTER);
+            BCD = Vec3.cross(BC, BD, new Vec3());
             BCD.normalize();
             if (Vec3.dot(BCD, AB) <= 0) BCD.invert();
-            var distanceBCD = -1 * Vec3.dot(BCD,B)
+            distanceBCD = -1 * Vec3.dot(BCD,B);
             // Prep features for EPA
             this.addFeature(-distanceABC, ABC, [a,b,c]);
             this.addFeature(-distanceACD, ACD, [a,c,d]);
@@ -404,7 +407,7 @@ DynamicGeometry.prototype.simplexContainsOrigin = function(direction, callback) 
     }
     else if (numVertices === 3) {
         // Triangle
-        var AC = Vec3.subtract(C, A, AC_REGISTER);
+        AC = Vec3.subtract(C, A, AC_REGISTER);
         Vec3.cross(AB, AC, direction);
         if (Vec3.dot(direction, AO) <= 0) direction.invert();
     }
@@ -429,8 +432,10 @@ function ConvexHull(vertices, iterations) {
     iterations = iterations || 1e3;
     var hull = _computeConvexHull(vertices, iterations);
 
+    var i, len;
+
     var indices = [];
-    for (var i = 0, len = hull.features.length; i < len; i++) {
+    for (i = 0, len = hull.features.length; i < len; i++) {
         var f = hull.features[i];
         if (f) indices.push(f.vertexIndices);
     }
@@ -439,18 +444,18 @@ function ConvexHull(vertices, iterations) {
     var centroid = polyhedralProperties.centroid;
 
     var worldVertices = [];
-    for (var i = 0, len = hull.vertices.length; i < len; i++) {
+    for (i = 0, len = hull.vertices.length; i < len; i++) {
         worldVertices.push(Vec3.subtract(hull.vertices[i].vertex, centroid, new Vec3()));
     }
 
     var normals = [];
-    for (var i = 0, len = worldVertices.length; i < len; i++) {
+    for (i = 0, len = worldVertices.length; i < len; i++) {
         normals.push(Vec3.normalize(worldVertices[i], new Vec3()));
     }
 
     var graph = {};
     var _neighborMatrix = {};
-    for (var i = 0; i < indices.length; i++) {
+    for (i = 0; i < indices.length; i++) {
         var a = indices[i][0];
         var b = indices[i][1];
         var c = indices[i][2];
@@ -494,7 +499,7 @@ function ConvexHull(vertices, iterations) {
     this.normals = normals;
     this.polyhedralProperties = polyhedralProperties;
     this.graph = graph;
-};
+}
 
 /**
  * Performs the actual computation of the convex hull.
@@ -518,8 +523,10 @@ function _computeConvexHull(vertices, maxIterations) {
     var vertex;
     var furthest;
     var index;
+    var i, len;
+
     var max = -Infinity;
-    for (var i = 0; i < vertices.length; i++) {
+    for (i = 0; i < vertices.length; i++) {
         vertex = vertices[i];
         if (vertex === A || vertex === B) continue;
         var AV = Vec3.subtract(vertex, A, VEC_REGISTER);
@@ -541,12 +548,8 @@ function _computeConvexHull(vertices, maxIterations) {
     var ABC = Vec3.cross(AB, AC, new Vec3());
     ABC.normalize();
 
-    var dot;
-    var vertex;
-    var furthest;
-    var index;
-    var max = -Infinity;
-    for (var i = 0; i < vertices.length; i++) {
+    max = -Infinity;
+    for (i = 0; i < vertices.length; i++) {
         vertex = vertices[i];
         if (vertex === A || vertex === B || vertex === C) continue;
         dot = Vec3.dot(Vec3.subtract(vertex, A, VEC_REGISTER), ABC);
@@ -589,7 +592,7 @@ function _computeConvexHull(vertices, maxIterations) {
     hull.addFeature(null, BCD, [b, c, d]);
 
     var assigned = {};
-    for (var i = 0, len = hull.vertices.length; i < len; i++) {
+    for (i = 0, len = hull.vertices.length; i < len; i++) {
        assigned[hull.vertices[i].index] = true;
     }
 
@@ -604,12 +607,12 @@ function _computeConvexHull(vertices, maxIterations) {
     var iteration = 0;
     while (iteration++ < maxIterations) {
         var currentFeature = null;
-        for (var i = 0; i < features.length; i++) {
+        for (i = 0, len = features.length; i < len; i++) {
             if (!features[i] || features[i].done) continue;
             currentFeature = features[i];
-            var furthest = null;
-            var index = null;
-            var A = hull.vertices[currentFeature.vertexIndices[0]].vertex;
+            furthest = null;
+            index = null;
+            A = hull.vertices[currentFeature.vertexIndices[0]].vertex;
             var s = _hullSupport(vertices, currentFeature.normal);
             furthest = s.vertex;
             index = s.index;
@@ -675,7 +678,9 @@ function _computePolyhedralProperties(vertices, indices) {
     var gy = [];
     var gz = [];
 
-    for (var i = 0, len = indices.length; i < len; i++) {
+    var i, len;
+
+    for (i = 0, len = indices.length; i < len; i++) {
         var A = vertices[indices[i][0]].vertex;
         var B = vertices[indices[i][1]].vertex;
         var C = vertices[indices[i][2]].vertex;
@@ -729,7 +734,7 @@ function _computePolyhedralProperties(vertices, indices) {
     var minY = Infinity, maxY = -Infinity;
     var minZ = Infinity, maxZ = -Infinity;
 
-    for (var i = 0, len = vertices.length; i < len; i++) {
+    for (i = 0, len = vertices.length; i < len; i++) {
         var vertex = vertices[i].vertex;
         if (vertex.x < minX) minX = vertex.x;
         if (vertex.x > maxX) maxX = vertex.x;
@@ -755,7 +760,7 @@ function _computePolyhedralProperties(vertices, indices) {
         volume: volume,
         centroid: centroid,
         eulerTensor: eulerTensor
-    }
+    };
 }
 
 module.exports = {

@@ -36,10 +36,9 @@ RotationalDrag.QUADRATIC = function QUADRATIC(omega) {
  *
  * @attribute LINEAR
  * @type Function
- * @param {Vec3} omega
  * @return {Number}
  */
-RotationalDrag.LINEAR = function LINEAR(omega) {
+RotationalDrag.LINEAR = function LINEAR() {
     return 1;
 };
 
@@ -47,9 +46,8 @@ RotationalDrag.LINEAR = function LINEAR(omega) {
  * Initialize the Force. Sets defaults if a property was not already set.
  *
  * @method init
- * @param {Object} options The options hash.
  */
-RotationalDrag.prototype.init = function init(options) {
+RotationalDrag.prototype.init = function init() {
     this.max = this.max || Infinity;
     this.strength = this.strength || 1;
     this.type = this.type || RotationalDrag.LINEAR;
@@ -59,10 +57,8 @@ RotationalDrag.prototype.init = function init(options) {
  * Adds a rotational drag force to a physics body's torque accumulator.
  *
  * @method update
- * @param {Number} time The current time in the physics engine.
- * @param {Number} dt The physics engine frame delta.
  */
-RotationalDrag.prototype.update = function update(time, dt) {
+RotationalDrag.prototype.update = function update() {
     var targets = this.targets;
     var type = this.type;
 
@@ -78,9 +74,5 @@ RotationalDrag.prototype.update = function update(time, dt) {
         target.applyTorque(torque);
     }
 };
-
-function clamp(value, lower, upper) {
-    return value < lower ? lower : value > upper ? upper : value;
-}
 
 module.exports = RotationalDrag;
