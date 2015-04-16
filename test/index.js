@@ -2,22 +2,6 @@
 
 var test = require('tape');
 
-
-// requestAnimationFrame mock
-var requestAnimationFrameCallbacks = [];
-
-function frame(t) {
-    while (requestAnimationFrameCallbacks.length > 0) {
-        requestAnimationFrameCallbacks.shift().call(null, t);
-    }
-}
-
-global.window = {
-    requestAnimationFrame: function(callback) {
-        requestAnimationFrameCallbacks.push(callback);
-    }
-};
-
 var Engine = require('../src');
 
 test('Engine', function(t) {
@@ -36,7 +20,6 @@ test('Engine', function(t) {
             }
         };
         engine.update(updateable);
-        process.nextTick(frame);
     });
 
     t.test('start method', function(t) {
@@ -84,17 +67,17 @@ test('Engine', function(t) {
     });
 
     t.test('noLongerUpdate method', function(t) {
-        t.plan(6);
+        t.plan(8);
         var engine = new Engine();
         t.equal(typeof engine.noLongerUpdate, 'function', 'engine.noLongerUpdate should be a function');
 
         var c = 0;
         var updateable = {
             update: function(time) {
-                t.equal(time, 42, 'engine.loop should pass in the requestAnimationFrame timestamp');
+                t.equal(typeof time, 'number', 'engine.loop should pass in the requestAnimationFrame timestamp');
                 t.pass('engine should keep running until engine.noLongerUpdate has been invoked');
 
-                if (c++ === 1) {
+                if (c++ === 2) {
                     t.pass('engine.noLongerUpdate should prevent any further engine updates');
                     engine.noLongerUpdate(updateable);
                     engine.stop();
@@ -102,6 +85,5 @@ test('Engine', function(t) {
             }
         };
         engine.update(updateable);
-        process.nextTick(frame.bind(null, 42));
     });
 });
