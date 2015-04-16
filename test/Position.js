@@ -195,23 +195,46 @@ test('Position', function(t) {
 
         t.equal(typeof position.halt, 'function', 'position.halt should be a function');
 
-        // TODO
+        t.equal(position.isActive(), false);
+        position.setX(100, {
+            duration: 1000,
+            curve: function(t) {
+                return t;
+            }
+        });
+        t.equal(position.isActive(), true);
+
         t.end();
     });
 
-    t.test('onUpdate method', function(t) {
+    t.test('onUpdate, update method', function(t) {
+        t.plan(5);
+
         var position = new Position({
             addComponent: function() {},
             getPosition: function() {
                 return [0, 0, 0];
             },
             requestUpdate: function() {},
-            setPosition: function() {}
+            setPosition: function(x, y, z) {
+                t.equal(x, 10);
+                t.equal(y, 20);
+                t.equal(z, 30);
+            },
+            requestUpdateOnNextTick: function() {
+                t.fail('position.update should check for active transition and NOT schedule requestUpdateOnNextTick');
+            }
         });
 
         t.equal(typeof position.onUpdate, 'function', 'position.onUpdate should be a function');
+        t.equal(position.onUpdate, position.update, 'position.onUpdate should be an alias of update');
 
-        // TODO
+        position.setX(10);
+        position.setY(20);
+        position.setZ(30);
+
+        position.update();
+
         t.end();
     });
 
@@ -227,7 +250,17 @@ test('Position', function(t) {
 
         t.equal(typeof position.isActive, 'function', 'position.isActive should be a function');
 
-        // TODO
+        t.equal(position.isActive(), false);
+
+        position.set(10, 20, 30, {
+            duration: 500,
+            curve: function(t) {
+                return t;
+            }
+        });
+
+        t.equal(position.isActive(), true);
+
         t.end();
     });
 });
