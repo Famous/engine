@@ -6,12 +6,13 @@
  * @class Light
  * @constructor
  * @component
- * @param {LocalDispatch} dispatch LocalDispatch to be retrieved
+ * @param {Node} node The controlling node
  * from the corresponding Render Node
  */
-function Light(dispatch) {
-    this._dispatch = dispatch;
-    this._id = dispatch.addComponent(this);
+function Light(node) {
+    this._node = node;
+    this._id = node.addComponent(this);
+    this._requestingUpdate = false;
     this.queue = [];
     this._color;
     this.commands = { color: 'GL_LIGHT_COLOR' };
@@ -36,7 +37,10 @@ Light.toString = function toString() {
 */
 Light.prototype.setColor = function setColor(color) {
     if (!color.getNormalizedRGB) return false;
-    this._dispatch.dirtyComponent(this._id);
+    if (!this._requestingUpdate) {
+        this._node.requestUpdate(this._id);
+        this._requestingUpdate = true;
+    }
     this._color = color;
     this.queue.push(this.commands.color);
     var rgb = this._color.getNormalizedRGB();
@@ -57,34 +61,33 @@ Light.prototype.getColor = function getColor(option) {
 };
 
 /**
-* Returns boolean: if true, component is to be updated on next engine tick
+* Sends draw commands to the renderer
 *
 * @private
-* @method clean
-* @returns {Boolean} Boolean
+* @method onUpdate
 */
-Light.prototype.clean = function clean() {
-    var path = this._dispatch.getRenderPath();
+Light.prototype.onUpdate = function clean() {
+    var path = this._node.getLocation();
 
-    this._dispatch
+    this._node
         .sendDrawCommand('WITH')
         .sendDrawCommand(path);
 
     var i = this.queue.length;
     while (i--) {
-        this._dispatch.sendDrawCommand(this.queue.shift());
+        this._node.sendDrawCommand(this.queue.shift());
     }
 
     if (this._color && this._color.isActive()) {
-        this._dispatch.sendDrawCommand(this.commands.color);
+        this._node.sendDrawCommand(this.commands.color);
         var rgb = this._color.getNormalizedRGB();
-        this._dispatch.sendDrawCommand(rgb[0]);
-        this._dispatch.sendDrawCommand(rgb[1]);
-        this._dispatch.sendDrawCommand(rgb[2]);
-        return true;
+        this._node.sendDrawCommand(rgb[0]);
+        this._node.sendDrawCommand(rgb[1]);
+        this._node.sendDrawCommand(rgb[2]);
+        this._node.requestUpdateOnNextTick(this._id);
+    } else {
+        this._requestingUpdate = false;
     }
-
-    return this.queue.length;
 };
 
 module.exports = Light;

@@ -1,6 +1,4 @@
 'use strict';
-
-var Transitionable = require('famous-transitions').Transitionable;
 var Geometry = require('famous-webgl-geometries');
 
 /**
@@ -14,107 +12,51 @@ var Geometry = require('famous-webgl-geometries');
  * @param {LocalDispatch} dispatch LocalDispatch to be retrieved
  * @param {object} Options Optional params for configuring Mesh
  */
-function Mesh (dispatch, options) {
-    this.dispatch = dispatch;
-    this.queue = [];
-    this._id = dispatch.addRenderable(this);
+function Mesh (node, options) {
+    this._node = node;
+    this._changeQueue = [];
+    this._initialized = false;
+    this._requestingUpdate = false;
+    this._inDraw = false;
+    this.value = {
+        drawOptions: {},
+        color: null,
+        expressions: {},
+        geometry: null,
+        flatShading: false
+    }
 
-    this._glossiness = new Transitionable(0);
-    this._positionOffset = new Transitionable([0, 0, 0]);
-
-    this._size = [];
-    this._expressions = {};
-    this._flatShading = false;
-    this._geometry;
-    this._color;
-
-    this.dispatch.onTransformChange(this._receiveTransformChange.bind(this));
-    this.dispatch.onSizeChange(this._receiveSizeChange.bind(this));
-    this.dispatch.onOpacityChange(this._receiveOpacityChange.bind(this));
-
-    this._receiveTransformChange(this.dispatch.getContext()._transform);
-    this._receiveSizeChange(this.dispatch.getContext()._size);
-    this._receiveOpacityChange(this.dispatch.getContext()._opacity);
-
-    if (options) this.setOptions(options);
+    if (options) this.setDrawOptions(options);
+    this._id = node.addComponent(this);
 }
-
-/**
-* Returns the definition of the Class: 'Mesh'
-*
-* @method toString
-* @return {string} definition
-*/
-Mesh.toString = function toString() {
-    return 'Mesh';
-};
 
 /**
  * Pass custom options to Mesh, such as a 3 element map
  * which displaces the position of each vertex in world space.
  *
- * @method setOptions
+ * @method setDrawOptions
  * @chainable
  *
  * @param {Object} Options
  * @chainable
  */
-Mesh.prototype.setOptions = function setOptions(options) {
-    this.queue.push('GL_SET_DRAW_OPTIONS');
-    this.queue.push(options);
+Mesh.prototype.setDrawOptions = function setOptions (options) {
+    if (this.value.drawOptions.blendMode) {
+        this.value.drawOptions.blendMode = options.blendMode;
+        this._changeQueue.push('GL_SET_DRAW_OPTIONS');
+        this._changeQueue.push(options);
+    }
     return this;
 };
 
 /**
- * Receives transform change updates from the scene graph.
+ * Get the mesh's custom options.
  *
- * @private
+ * @method getDrawOptions
+ * @returns {Object} Options
  */
-Mesh.prototype._receiveTransformChange = function _receiveTransformChange(transform) {
-    this.dispatch.dirtyRenderable(this._id);
-    this.queue.push('GL_UNIFORMS');
-    this.queue.push('transform');
-    this.queue.push(transform._matrix);
-};
-
-/**
- * Receives size change updates from the scene graph.
- *
- * @private
- */
-Mesh.prototype._receiveSizeChange = function _receiveSizeChange(size) {
-    var size = size.getTopDownSize();
-    this.dispatch.dirtyRenderable(this._id);
-
-    this._size[0] = size[0];
-    this._size[1] = size[1];
-    this._size[2] = size[2];
-
-    this.queue.push('GL_UNIFORMS');
-    this.queue.push('size');
-    this.queue.push(size);
- };
-
-/**
- * Receives opacity change updates from the scene graph.
- *
- * @private
- */
-Mesh.prototype._receiveOpacityChange = function _receiveOpacityChange(opacity) {
-    this.dispatch.dirtyRenderable(this._id);
-    this.queue.push('GL_UNIFORMS');
-    this.queue.push('opacity');
-    this.queue.push(opacity.value);
-};
-
-/**
- * Returns the size of Mesh.
- *
- * @method getSize
- * @returns {array} Size Returns size
- */
-Mesh.prototype.getSize = function getSize() {
-    return this._size;
+Mesh.prototype.getDrawOptions = function getDrawOptions () {
+    return this.value.drawOptions;
 };
 
 /**
@@ -127,23 +69,21 @@ Mesh.prototype.getSize = function getSize() {
  * @param {Object} Options Various configurations for geometries.
  * @chainable
  */
-Mesh.prototype.setGeometry = function setGeometry(geometry, options) {
-    var i;
-    var key;
-    var buffers;
-    var bufferIndex;
-
+Mesh.prototype.setGeometry = function setGeometry (geometry, options) {
     if (typeof geometry === 'string') {
         if (!Geometry[geometry]) throw 'Invalid geometry: "' + geometry + '".';
         else geometry = new Geometry[geometry](options);
     }
 
-    if (this._geometry !== geometry) {
-        this.queue.push('GL_SET_GEOMETRY');
-        this.queue.push(geometry.id);
-        this.queue.push(geometry.spec.type);
-        this.queue.push(geometry.spec.dynamic);
-        this._geometry = geometry;
+    if (this.value.geometry !== geometry || this._inDraw) {
+        if (this._initialized) {
+            this._changeQueue.push('GL_SET_GEOMETRY');
+            this._changeQueue.push(geometry.id);
+            this._changeQueue.push(geometry.spec.type);
+            this._changeQueue.push(geometry.spec.dynamic);
+        }
+        if (!this._requestingUpdate) this._requestUpdate();
+        this.value.geometry = geometry;
     }
 
     return this;
@@ -155,88 +95,8 @@ Mesh.prototype.setGeometry = function setGeometry(geometry, options) {
  * @method getGeometry
  * @returns {Geometry} geometry Geometry of mesh
  */
-Mesh.prototype.getGeometry = function getGeometry() {
-    return this._geometry;
-};
-
-/**
-* Pushes invalidations commands, if any exist
-*
-* @private
-* @method _pushInvalidations
-*/
-Mesh.prototype._pushInvalidations = function _pushInvalidations(expressionName) {
-    var uniformKey;
-    var expression = this._expressions[expressionName];
-    if (expression) {
-        var i = expression.invalidations.length;
-        while (i--) {
-            uniformKey = expression.invalidations.pop();
-            this.dispatch.sendDrawCommand('GL_UNIFORMS');
-            this.dispatch.sendDrawCommand(uniformKey);
-            this.dispatch.sendDrawCommand(expression.uniforms[uniformKey]);
-        }
-    }
-};
-
-/**
-* Pushes active commands for any values that are in transition (active) state
-*
-* @private
-* @method _pushActiveCommands
-*/
-Mesh.prototype._pushActiveCommands = function _pushActiveCommands(property, command, value) {
-    if (this[property] && this[property].isActive()) {
-        this.dispatch.sendDrawCommand('GL_UNIFORMS');
-        this.dispatch.sendDrawCommand(command);
-        this.dispatch.sendDrawCommand(this[property][value || 'get']());
-        return true;
-    }
-};
-
-/**
-* Returns boolean: if true, renderable is to be updated on next engine tick
-*
-* @private
-* @method clean
-* @returns {boolean} Boolean
-*/
-Mesh.prototype.clean = function clean() {
-    var path = this.dispatch.getRenderPath();
-    var bufferIndex;
-    var i;
-
-    this.dispatch
-        .sendDrawCommand('WITH')
-        .sendDrawCommand(path);
-
-    if (this._geometry) {
-        i = this._geometry.spec.invalidations.length;
-        while (i--) {
-            bufferIndex = this._geometry.spec.invalidations.pop();
-            this.dispatch.sendDrawCommand('GL_BUFFER_DATA');
-            this.dispatch.sendDrawCommand(this._geometry.id);
-            this.dispatch.sendDrawCommand(this._geometry.spec.bufferNames[i]);
-            this.dispatch.sendDrawCommand(this._geometry.spec.bufferValues[i]);
-            this.dispatch.sendDrawCommand(this._geometry.spec.bufferSpacings[i]);
-        }
-    }
-
-    // If any invalidations exist, push them into the queue
-    this._pushInvalidations('baseColor');
-    this._pushInvalidations('positionOffset');
-
-    // If any values are active, push them into the queue
-    this._pushActiveCommands('_color', 'baseColor', 'getNormalizedRGB');
-    this._pushActiveCommands('_glossiness', 'glossiness');
-    this._pushActiveCommands('_positionOffset', 'positionOffset');
-
-    i = this.queue.length;
-    while (i--) {
-        this.dispatch.sendDrawCommand(this.queue.shift());
-    }
-
-    return this.queue.length;
+Mesh.prototype.getGeometry = function getGeometry () {
+    return this.value.geometry;
 };
 
 /**
@@ -247,28 +107,36 @@ Mesh.prototype.clean = function clean() {
 * @param {Object|Color} Material, image, vec3, or Color instance
 * @chainable
 */
-Mesh.prototype.setBaseColor = function setBaseColor(color) {
-    this.dispatch.dirtyRenderable(this._id);
+Mesh.prototype.setBaseColor = function setBaseColor (color) {
+    var uniformValue;
 
-    // If a material expression
     if (color._compile) {
-        this.queue.push('MATERIAL_INPUT');
-        this._expressions.baseColor = color;
-        color = color._compile();
-    }
-    // If a color component
-    else if (color.getNormalizedRGB) {
-        this.queue.push('GL_UNIFORMS');
-        this._expressions.baseColor = null;
-        this._color = color;
-        color = color.getNormalizedRGB();
+        this.value.expressions.baseColor = color;
+        uniformValue = color._compile(); 
+    } else if (color.getNormalizedRGB) {
+        this.value.expressions.baseColor = null;
+        this.value.color = color;
+        uniformValue = color.getNormalizedRGB();
     }
 
-    this.queue.push('baseColor');
-    this.queue.push(color);
+    if (this._initialized) {
+        // If a material expression
+        if (color._compile) {
+            this._changeQueue.push('MATERIAL_INPUT');
+        }
+
+        // If a color component
+        else if (color.getNormalizedRGB) {
+            this._changeQueue.push('GL_UNIFORMS');
+        }
+        this._changeQueue.push('baseColor');
+        this._changeQueue.push(uniformValue);
+    }
+
+    if (!this._requestingUpdate) this._requestUpdate();
+
     return this;
 };
-
 
 /**
  * Returns either the material expression or the color instance of Mesh.
@@ -276,8 +144,8 @@ Mesh.prototype.setBaseColor = function setBaseColor(color) {
  * @method getBaseColor
  * @returns {MaterialExpress|Color}
  */
-Mesh.prototype.getBaseColor = function getBaseColor() {
-    return this._expressions.baseColor || this._color;
+Mesh.prototype.getBaseColor = function getBaseColor () {
+    return this.value.expressions.baseColor || this.value.color;
 };
 
 /**
@@ -287,12 +155,17 @@ Mesh.prototype.getBaseColor = function getBaseColor() {
  * @param {boolean} Boolean
  * @chainable
  */
-Mesh.prototype.setFlatShading = function setFlatShading(bool) {
-    this.dispatch.dirtyRenderable(this._id);
-    this._flatShading = bool;
-    this.queue.push('GL_UNIFORMS');
-    this.queue.push('u_FlatShading');
-    this.queue.push(this._flatShading ? 1 : 0);
+Mesh.prototype.setFlatShading = function setFlatShading (bool) {
+    if (this._inDraw || this.value.flatShading !== bool) {
+        if (this._initialized) {
+            this._changeQueue.push('GL_UNIFORMS');
+            this._changeQueue.push('u_flatShading');
+            this._changeQueue.push(this.value.flatShading ? 1 : 0);        
+        }
+        this.value.flatShading = bool;
+        if (!this._requestingUpdate) this._requestUpdate();
+    }
+
     return this;
 };
 
@@ -302,8 +175,8 @@ Mesh.prototype.setFlatShading = function setFlatShading(bool) {
  * @method getFlatShading
  * @returns {Boolean} Boolean
  */
-Mesh.prototype.getFlatShading = function getFlatShading() {
-    return this._flatShading;
+Mesh.prototype.getFlatShading = function getFlatShading () {
+    return this.value.flatShading;
 };
 
 
@@ -318,15 +191,20 @@ Mesh.prototype.getFlatShading = function getFlatShading() {
  * @param {Object|Array} Material, Image or vec3
  * @return {Element} current Mesh
  */
-Mesh.prototype.setNormals = function setNormals(materialExpression) {
-    this.dispatch.dirtyRenderable(this._id);
+Mesh.prototype.setNormals = function setNormals (materialExpression) {
     if (materialExpression._compile) {
-        this._expressions.normals = materialExpression;
+        this.value.expressions.normals = materialExpression;
         materialExpression = materialExpression._compile();
     }
-    this.queue.push(typeof materialExpression === 'number' ? 'UNIFORM_INPUT' : 'MATERIAL_INPUT');
-    this.queue.push('normal');
-    this.queue.push(materialExpression);
+
+    if (this._initialized) {
+        this._changeQueue.push(typeof materialExpression === 'number' ? 'UNIFORM_INPUT' : 'MATERIAL_INPUT');
+        this._changeQueue.push('normal');
+        this._changeQueue.push(materialExpression);
+    }
+
+    if (!this._requestingUpdate) this._requestUpdate();
+
     return this;
 };
 
@@ -336,8 +214,8 @@ Mesh.prototype.setNormals = function setNormals(materialExpression) {
  * @method getNormals
  * @returns The normals expression for Mesh
  */
-Mesh.prototype.getNormals = function getNormals(materialExpression) {
-    return this._expressions.normals;
+Mesh.prototype.getNormals = function getNormals (materialExpression) {
+    return this.value.expressions.normals;
 };
 
 /**
@@ -350,23 +228,27 @@ Mesh.prototype.getNormals = function getNormals(materialExpression) {
  * @param {Function} Callback
  * @chainable
  */
-Mesh.prototype.setGlossiness = function setGlossiness(materialExpression, transition, cb) {
-    this.dispatch.dirtyRenderable(this._id);
+Mesh.prototype.setGlossiness = function setGlossiness (materialExpression, transition, cb) {
+    var glossiness;
 
     if (materialExpression._compile) {
-        this.queue.push('MATERIAL_INPUT');
-        this._expressions.glossiness = materialExpression;
-        materialExpression = materialExpression._compile();
+        this.value.expressions.glossiness = materialExpression;
+        glossiness = materialExpression._compile();
     }
     else {
-        this.queue.push('GL_UNIFORMS');
-        this._expressions.glossiness = null;
-        this._glossiness.set(materialExpression, transition, cb);
-        materialExpression = this._glossiness.get();
+        this.value.expressions.glossiness = null;
+        this.value.glossiness = materialExpression;
+        glossiness = this.value.glossiness;
     }
 
-    this.queue.push('glossiness');
-    this.queue.push(materialExpression);
+    if (this._initialized) {
+        this._changeQueue.push(materialExpression._compile ? 'GL_UNIFORMS' : 'MATERIAL_INPUT');
+        this._changeQueue.push('glossiness');
+        this._changeQueue.push(glossiness);
+    }
+
+    if (!this._requestingUpdate) this._requestUpdate();
+
     return this;
 };
 
@@ -376,8 +258,8 @@ Mesh.prototype.setGlossiness = function setGlossiness(materialExpression, transi
  * @method getGlossiness
  * @returns {MaterialExpress|Number}
  */
-Mesh.prototype.getGlossiness = function getGlossiness() {
-    return this._expressions.glossiness || this._glossiness.get();
+Mesh.prototype.getGlossiness = function getGlossiness () {
+    return this.value.expressions.glossiness || this.value.glossiness;
 };
 
 /**
@@ -392,23 +274,27 @@ Mesh.prototype.getGlossiness = function getGlossiness() {
  * @param {Function} Callback
  * @chainable
  */
-Mesh.prototype.setPositionOffset = function positionOffset(materialExpression, transition, cb) {
-    this.dispatch.dirtyRenderable(this._id);
+Mesh.prototype.setPositionOffset = function positionOffset (materialExpression, transition, cb) {
+    var uniformValue;
 
     if (materialExpression._compile) {
-        this.queue.push('MATERIAL_INPUT');
-        this._expressions.positionOffset = materialExpression;
-        materialExpression = materialExpression._compile();
+        this.value.expressions.positionOffset = materialExpression;
+        uniformValue = materialExpression._compile();
     }
     else {
-        this.queue.push('GL_UNIFORMS');
-        this._expressions.positionOffset = null;
-        this._positionOffset.set(materialExpression, transition, cb);
-        materialExpression = this._positionOffset.get();
+        this.value.expressions.positionOffset = null;
+        this.value.positionOffset = materialExpression;
+        uniformValue = this.value.positionOffset;
     }
 
-    this.queue.push('positionOffset');
-    this.queue.push(materialExpression);
+    if (this._initialized) {
+        this._changeQueue.push(materialExpression._compile ? 'MATERIAL_INPUT' : 'GL_UNIFORMS');
+        this._changeQueue.push('positionOffset');
+        this._changeQueue.push(uniformValue);
+    }
+
+    if (!this._requestingUpdate) this._requestUpdate();
+
     return this;
 };
 
@@ -418,8 +304,190 @@ Mesh.prototype.setPositionOffset = function positionOffset(materialExpression, t
  * @method getPositionOffset
  * @returns {MaterialExpress|Number}
  */
-Mesh.prototype.getPositionOffset = function getPositionOffset(materialExpression) {
-    return this._expressions.positionOffset || this._positionOffset.get();
+Mesh.prototype.getPositionOffset = function getPositionOffset (materialExpression) {
+    return this.value.expressions.positionOffset || this.value.positionOffset;
+};
+
+/**
+ * Get the mesh's custom options.
+ *
+ * @method getDrawOptions
+ * @returns {Object} Options
+ */
+Mesh.prototype.getMaterialExpressions = function getMaterialExpressions () {
+    return this.value.expressions;
+};
+
+Mesh.prototype.getValue = function getValue () {
+    return this.value;
+};
+
+Mesh.prototype._pushInvalidations = function pushInvalidations (expressionName) {
+    var uniformKey;
+    var expression = this.value.expressions[expressionName];
+    if (expression) {
+        var i = expression.invalidations.length;
+        while (i--) {
+            uniformKey = expression.invalidations.pop();
+            this._node.sendDrawCommand('GL_UNIFORMS');
+            this._node.sendDrawCommand(uniformKey);
+            this._node.sendDrawCommand(expression.uniforms[uniformKey]);
+        }
+    }
+};
+
+/**
+* Sends draw commands to the renderer
+*
+* @private
+* @method onUpdate
+*/
+Mesh.prototype.onUpdate = function onUpdate () {
+    var node = this._node;
+    var queue = this._changeQueue;
+
+    if (node) {
+        node.sendDrawCommand('WITH');
+        node.sendDrawCommand(node.getLocation());
+
+        if (this.value.geometry) {
+        i = this.value.geometry.spec.invalidations.length;
+            while (i--) {
+                var bufferIndex = this.value.geometry.spec.invalidations.pop();
+                node.sendDrawCommand('GL_BUFFER_DATA');
+                node.sendDrawCommand(this.value.geometry.id);
+                node.sendDrawCommand(this.value.geometry.spec.bufferNames[i]);
+                node.sendDrawCommand(this.value.geometry.spec.bufferValues[i]);
+                node.sendDrawCommand(this.value.geometry.spec.bufferSpacings[i]);
+            }
+        }
+
+        // If any invalidations exist, push them into the queue
+        if (this.value.color && this.value.color.isActive()) {
+            this._node.sendDrawCommand('GL_UNIFORMS');
+            this._node.sendDrawCommand('baseColor');
+            this._node.sendDrawCommand(this.value.color.getNormalizedRGB());
+            this._node.requestUpdateOnNextTick(this._id);
+        } else {
+            this._requestingUpdate = false;
+        }
+
+        // If any invalidations exist, push them into the queue
+        this._pushInvalidations('baseColor');
+        this._pushInvalidations('positionOffset');
+
+        for (var i = 0; i < queue.length; i++) {
+            node.sendDrawCommand(queue[i]);
+        }
+
+        queue.length = 0;
+    }
+
+};
+
+Mesh.prototype.onMount = function onMount (node, id) {
+    this._node = node;
+    this._id = id;
+
+    this.draw();
+};
+
+Mesh.prototype.onDismount = function onDismount () {
+    this._initialized = false;
+    this.onHide();
+};
+
+Mesh.prototype.onShow = function onShow () {
+    //TODO
+};
+
+Mesh.prototype.onHide = function onHide () {
+    //TODO
+};
+
+/**
+ * Receives transform change updates from the scene graph.
+ *
+ * @private
+ */
+Mesh.prototype.onTransformChange = function onTransformChange (transform) {
+    if (this._initialized) {
+        this._changeQueue.push('GL_UNIFORMS');
+        this._changeQueue.push('transform');
+        this._changeQueue.push(transform);        
+    }
+
+    if (!this._requestingUpdate) this._requestUpdate();
+};
+
+/**
+ * Receives size change updates from the scene graph.
+ *
+ * @private
+ */
+Mesh.prototype.onSizeChange = function onSizeChange (size) {
+    if (this._initialized) {
+        this._changeQueue.push('GL_UNIFORMS');
+        this._changeQueue.push('size');
+        this._changeQueue.push(size);
+    }
+
+    if (!this._requestingUpdate) this._requestUpdate();
+};
+
+/**
+ * Receives opacity change updates from the scene graph.
+ *
+ * @private
+ */
+Mesh.prototype.onOpacityChange = function onOpacityChange (opacity) {
+    if (this._initialized) {
+        this._changeQueue.push('GL_UNIFORMS');
+        this._changeQueue.push('opacity');
+        this._changeQueue.push(opacity);
+    }
+    
+    if (!this._requestingUpdate) this._requestUpdate();
+};
+
+Mesh.prototype.onAddUIEvent = function onAddUIEvent (UIEvent, methods, properties) {
+    //TODO
+};
+
+Mesh.prototype._requestUpdate = function _requestUpdate () {
+    if (!this._requestingUpdate) {
+        this._node.requestUpdate(this._id);
+        this._requestingUpdate = true;
+    }
+};
+
+Mesh.prototype.init = function init () {
+    this._initialized = true;
+    this.onTransformChange(this._node.getTransform());
+    this.onSizeChange(this._node.getSize());
+    this.onOpacityChange(this._node.getOpacity());
+    if (!this._requestingUpdate) this._requestUpdate();
+};
+
+Mesh.prototype.draw = function draw () {
+    var key;
+    var i;
+    var len;
+
+    this._inDraw = true;
+
+    this.init();
+
+    var value = this.getValue();
+    if (value.geometry != null) this.setGeometry(value.geometry);
+    if (value.color != null) this.setBaseColor(value.color);
+    if (value.drawOptions != null) this.setDrawOptions(value.drawOptions);
+    if (value.flatShading != null) this.setFlatShading(value.flatShading);
+    if (value.normals != null) this.setNormals(value.normals);
+    if (value.glossiness != null) this.setGlossiness(value.glossiness);
+    if (value.positionOffset != null) this.setPositionOffset(value.positionOffset);
+
+    this._inDraw = false;
 };
 
 module.exports = Mesh;
