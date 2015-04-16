@@ -29,7 +29,7 @@ Camera.toString = function toString() {
     return 'Camera';
 };
 
-Camera.prototype.getState = function getState() {
+Camera.prototype.getValue = function getValue() {
     return {
         component: this.constructor.toString(),
         projectionType: this._projectionType,
@@ -39,8 +39,7 @@ Camera.prototype.getState = function getState() {
     };
 };
 
-
-Camera.prototype.setState = function setState(state) {
+Camera.prototype.setValue = function setValue(state) {
     if (state.component === this.constructor.toString()) {
         this.set(state.projectionType, state.focalDepth, state.near, state.far);
         return true;

@@ -58,7 +58,7 @@ Size.toString = function toString() {
 };
 
 /**
- * @typedef absoluteSizeState
+ * @typedef absoluteSizeValue
  * @type {Object}
  * @property {String} type current type of sizing being applied ('absolute')
  * @property {String} component component name ('Size')
@@ -68,7 +68,7 @@ Size.toString = function toString() {
  */
 
 /**
- * @typedef relativeSizeState
+ * @typedef relativeSizeValue
  * @type {Object}
  * @property {String} type current type of sizing being applied ('relative')
  * @property {String} component component name ('Size')
@@ -85,11 +85,11 @@ Size.toString = function toString() {
 /**
 * Returns serialized state of the component.
 *
-* @method getState
+* @method getValue
 * 
-* @return {absoluteSizeState|relativeSizeState}
+* @return {absoluteSizeValue|relativeSizeValue}
 */
-Size.prototype.getState = function getState() {
+Size.prototype.getValue = function getValue() {
     return {
         sizeMode: this._node.value.sizeMode,
         absolute: {
@@ -113,16 +113,16 @@ Size.prototype.getState = function getState() {
 /**
 * Updates state of component.
 *
-* @method setState
+* @method setValue
 * 
-* @param {absoluteSizeState|relativeSizeState} state state encoded in same
+* @param {absoluteSizeValue|relativeSizeValue} state state encoded in same
 *                                                    format as state retrieved
-*                                                    through `getState`
+*                                                    through `getValue`
 * @return {Boolean}                                  boolean indicating
 *                                                    whether the new state has
 *                                                    been applied
 */
-Size.prototype.setState = function setState(state) {
+Size.prototype.setValue = function setValue(state) {
     if (state.component === this.constructor.toString()) {
         this.setMode.apply(this, state.sizeMode);
         if (state.absolute) {

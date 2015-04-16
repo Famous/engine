@@ -6,7 +6,6 @@ module.exports = {
     EventEmitter: require('./EventEmitter'),
     EventHandler: require('./EventHandler'),
     GestureHandler: require('./GestureHandler'),
-    UIEventHandler: require('./UIEventHandler'),
     MountPoint: require('./MountPoint'),
     Opacity: require('./Opacity'),
     Origin: require('./Origin'),
@@ -14,5 +13,6 @@ module.exports = {
     Rotation: require('./Rotation'),
     Scale: require('./Scale'),
     Size: require('./Size'),
-    Transform: require('./Transform')
+    Transform: require('./Transform'),
+    UIEventHandler: require('./UIEventHandler')
 };

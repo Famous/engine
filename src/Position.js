@@ -56,7 +56,7 @@ Position.prototype.getValue = function getValue() {
 * @param {Object} state Object -- component: stringified constructor, x: number, y: number, z: number
 * @return {Boolean} true on success
 */
-Position.prototype.setState = function setState(state) {
+Position.prototype.setValue = function setValue(state) {
     if (state.component === this.constructor.toString()) {
         this.set(state.x, state.y, state.z);
         return true;

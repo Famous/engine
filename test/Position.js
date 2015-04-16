@@ -36,7 +36,7 @@ test('Position', function(t) {
         t.end();
     });
 
-    t.test('getState method', function(t) {
+    t.test('getValue method', function(t) {
         var addedComponent = null;
         var requestedUpdate = null;
         var id = 123;
@@ -52,8 +52,8 @@ test('Position', function(t) {
                 requestedUpdate = id;
             }
         });
-        t.equal(typeof position.getState, 'function', 'position.getState should be a function');
-        t.deepEqual(position.getState(), {
+        t.equal(typeof position.getValue, 'function', 'position.getValue should be a function');
+        t.deepEqual(position.getValue(), {
             component: 'Position',
             x: 1,
             y: 1,
@@ -62,7 +62,7 @@ test('Position', function(t) {
         position.setX(4);
         position.setY(5);
         position.setZ(96);
-        t.deepEqual(position.getState(), {
+        t.deepEqual(position.getValue(), {
             component: 'Position',
             x: 4,
             y: 5,
@@ -73,7 +73,7 @@ test('Position', function(t) {
         t.end();
     });
 
-    t.test('setState method', function(t) {
+    t.test('setValue method', function(t) {
         var addedComponent = null;
         var requestedUpdate = null;
         var id = 123;
@@ -90,7 +90,7 @@ test('Position', function(t) {
             }
         });
 
-        t.equal(typeof position.setState, 'function', 'position.setState should be a function');
+        t.equal(typeof position.setValue, 'function', 'position.setValue should be a function');
 
         var state = {
             component: 'Position',
@@ -98,18 +98,18 @@ test('Position', function(t) {
             y: 2,
             z: 3
         };
-        t.equal(position.setState(state), true, 'position.setState should return true when passed in state is valid');
-        t.deepEqual(position.getState(), state, 'position.setState should set new state');
+        t.equal(position.setValue(state), true, 'position.setValue should return true when passed in state is valid');
+        t.deepEqual(position.getValue(), state, 'position.setValue should set new state');
 
-        var invalidState = {
+        var invalidValue = {
             component: 'NotPosition',
             x: 1,
             y: 2,
             z: 3
         };
-        t.equal(position.setState(invalidState), false, 'position.setState should return false when passed in state is invalid');
-        t.notDeepEqual(position.getState(), invalidState, 'position.setState should ignore invalid states');
-        t.deepEqual(position.getState(), state, 'position.setState should ignore invalid states');
+        t.equal(position.setValue(invalidValue), false, 'position.setValue should return false when passed in state is invalid');
+        t.notDeepEqual(position.getValue(), invalidValue, 'position.setValue should ignore invalid states');
+        t.deepEqual(position.getValue(), state, 'position.setValue should ignore invalid states');
 
         t.end();
     });
