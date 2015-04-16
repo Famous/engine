@@ -1,147 +1,873 @@
 'use strict';
 
-var LocalDispatch = require('./LocalDispatch');
+var Transform = require('./Transform');
+var Size = require('./Size');
+
+var TRANSFORM_PROCESSOR = new Transform();
+var SIZE_PROCESSOR = new Size();
+
+var IDENT = [
+    1, 0, 0, 0,
+    0, 1, 0, 0,
+    0, 0, 1, 0,
+    0, 0, 0, 1
+];
+
+var ONES = [1, 1, 1];
+
+function Node () {
+    this._calculatedValues = {
+        transform: new Float32Array(IDENT),
+        size: new Float32Array(3)
+    };
+
+    this._requestingUpdate = false;
+    this._inUpdate = false;
+
+    this._updateQueue = [];
+    this._nextUpdateQueue = [];
+
+    this._freedComponentIndicies = [];
+    this._components = [];
+
+    this._freedChildIndicies = [];
+    this._children = [];
+
+    this._parent = null;
+    this._globalUpdater = null;
+
+    this.value = new Node.Spec();
+}
+
+Node.RELATIVE_SIZE = Size.RELATIVE;
+Node.ABSOLUTE_SIZE = Size.ABSOLUTE;
+Node.RENDER_SIZE = Size.RENDER;
+Node.DEFAULT_SIZE = Size.DEFAULT;
+
+Node.Spec = function Spec () {
+    this.location = null;
+    this.showState = {
+        mounted: false,
+        shown: false,
+        opacity: 1
+    };
+    this.offsets = {
+        mountPoint: new Float32Array(3),
+        align: new Float32Array(3),
+        origin: new Float32Array(3)
+    };
+    this.vectors = {
+        position: new Float32Array(3),
+        rotation: new Float32Array(3),
+        scale: new Float32Array(ONES)
+    };
+    this.size = {
+        sizeMode: new Float32Array([Size.RELATIVE, Size.RELATIVE, Size.RELATIVE]),
+        proportional: new Float32Array(ONES),
+        differential: new Float32Array(3),
+        absolute: new Float32Array(3),
+        render: new Float32Array(3)
+    };
+    this.UIEvents = [];
+};
 
 /**
- * Nodes define hierarchy in the scene graph.
- *
- * @class  Node
- * @constructor
+ * @method getContext
+ * @chainable
  * 
- * @param {RenderProxy}     [proxy]             proxy used for creating a new
- *                                              LocalDispatch if none has been provided
- * @param {GlobalDispatch}  globalDispatch      GlobalDispatch consecutively
- *                                              passed down from the Context
- * @param {LocalDispatch}   [localDispatch]     LocalDispatch
+ * @deprecated Node can be used directly instead!
+ * @return {Node} this
  */
-function Node (proxy, globalDispatch, localDispatch) {
-    this._localDispatch = localDispatch != null ? localDispatch : new LocalDispatch(this, proxy);
-    this._globalDispatch = globalDispatch;
-    this._children = [];
+Node.prototype.getContext = function getContext () {
+    console.warn(
+        'Node#getContext is deprecated!\n' +
+        'Nodes can be used directly!'
+    );
+    return this;
+};
+
+/**
+ * @method getDispatch
+ * @chainable
+ * 
+ * @deprecated Node can be used directly instead!
+ * @return {Node} this
+ */
+Node.prototype.getDispatch = function getDispatch () {
+    console.warn(
+        'Node#getDispatch is deprecated!\n' +
+        'Component constructors accept a Node instead!' +
+        'Use new Component(node) instead of new Component(node.getDispatch())!'
+    );
+    return this;
+};
+
+/**
+ * @method getRenderProxy
+ * @chainable
+ * 
+ * @deprecated Node can be used directly instead!
+ * @return {Node} this
+ */
+Node.prototype.getRenderProxy = function getRenderProxy () {
+    console.warn(
+        'Node#getRenderProxy is deprecated!\n' +
+        'RenderProxy functionality has been merged into Node!'
+    );
+    return this;
+};
+
+/**
+ * @method getRenderPath
+ * @chainable
+ *
+ * @deprecated Use #getLocation()
+ * @return {string} render path
+ */
+Node.prototype.getRenderPath = function getRenderPath () {
+    console.warn(
+        'Node#getRenderPath is deprecated!\n' +
+        'Use Node#getLocation instead!'
+    );
+    return this.getLocation();
 }
 
 /**
- * Adds a child at the specified index. If index is `undefined`, the child
- * will be pushed to the end of the internal children array.
- *
- * @method  addChild
+ * @method addRenderable
  * @chainable
- * 
- * @param   {Number} [index]    index the child should be inserted at
- * @return  {Node} added        new child node
- */
-Node.prototype.addChild = function addChild (index) {
-    var child = new this.constructor(this._localDispatch.getRenderProxy(), this._globalDispatch);
-    if (index == null) this._children.push(child);
-    else this._children.splice(index, 0, child);
-    return child;
-};
-
-/**
- * Removes the passed in node from the node's children. If the node is not an
- * immediate child of the node the method is being called on, the method will
- * fail silently.
  *
- * @method  removeChild
- * @chainable
- * 
- * @param  {Node} node   child node to be removed
- * @return {Node}        this
+ * @deprecated Use addComponent
+ * @param {*} component component to be added
+ * @return this
  */
-Node.prototype.removeChild = function removeChild (node) {
-    var index = this._children.indexOf(node);
-    if (index !== -1) {
-        var result = this._children.splice(index, 1);
-        result[0].kill();
-    }
+Node.prototype.addRenderable = function addRenderable (component) {
+    console.warn("Node#addRenderable is depricated!\n use node.addComponent instead");
+    this.addComponent(component);
     return this;
 };
 
-/**
- * Removes the child node at the specified index. E.g. removeChild(0) removes
- * the node's first child, which consequently changes all remanining indices.
- *
- * @method  removeChildAtIndex
- * @chainable
- * 
- * @param  {Number} index index of the node to be removed in the internal
- *                        children array
- * @return {Node}       this
- */
-Node.prototype.removeChildAtIndex = function removeChildAtIndex (index) {
-    var result = this._children.splice(index, 1);
-    if (result.length) result[0].kill();
+
+Node.prototype.getLocation = function getLocation () {
+    return this.value.location;
+};
+
+Node.prototype.getId = Node.prototype.getLocation;
+
+Node.prototype.emit = function emit (event, payload) {
+    var p = this.getParent();
+    while ((p = p.getParent()) !== p);
+    p.getDispatch().dispatch(event, payload);
+};
+
+// THIS WILL BE DEPRICATED
+Node.prototype.sendDrawCommand = function sendDrawCommand (message) {
+    this._globalUpdater.message(message);
     return this;
 };
 
-/**
- * Removes all children attached to this node.
- *
- * @method  removeAllChildren
- * @chainable
- * 
- * @return {Node} this
- */
-Node.prototype.removeAllChildren = function removeAllChildren () {
-    for (var i = 0, len = this._children.length ; i < len ; i++) {
-        this._children.pop().kill();
-    }
-    return this;
+Node.prototype.getValue = function getValue () {
+    var numberOfChildren = this._children.length;
+    var numberOfComponents = this._components.length;
+    var i = 0;
+
+    var value = {
+        location: this.value.location,
+        spec: this.value,
+        components: new Array(numberOfComponents),
+        children: new Array(numberOfChildren)
+    };
+
+    for (; i < numberOfChildren ; i++)
+        value.children[i] = this._children[i].getValue();
+
+    for (i = 0 ; i < numberOfComponents ; i++)
+        if (this._components[i].getValue) 
+            value.components[i] = this._components[i].getValue();
+
+    return value;
 };
 
-/**
- * Kills the Node by killing its local dispatch and removing all its children.
- * Used internally whenever a child is being removed.
- * 
- * @method  kill
- * @chainable
- * @private
- * 
- * @return {Node} this
- */
-Node.prototype.kill = function kill () {
-    this._localDispatch.kill();
-    this.removeAllChildren();
-    return this;
+Node.prototype.getComputedValue = function getComputedValue () {
+    var numberOfChildren = this._children.length;
+
+    var value = {
+        location: this.value.location,
+        computedValues: this._calculatedValues,
+        children: new Array(numberOfChildren)
+    };
+
+    for (var i = 0 ; i < numberOfChildren ; i++)
+        value.children[i] = this._children[i].getComputedValue();
+
+    return value;
 };
 
-/**
- * Returns the local dispatch attached to this node.
- *
- * @method  getDispatch
- * 
- * @return {LocalDispatch} dispatch
- */
-Node.prototype.getDispatch = function getDispatch () {
-    return this._localDispatch;
-};
-
-
-/**
- * Returns the Node's children.
- *
- * @method getChildren
- * 
- * @return {Node[]} children of this Node
- */
 Node.prototype.getChildren = function getChildren () {
     return this._children;
 };
 
-/**
- * Recursively updates the node and all its children.
- *
- * @method  update
- * @chainable
- * 
- * @param  {Node} parent    parent node
- * @return {Node}           this
- */
-Node.prototype.update = function update (parent) {
-    this._localDispatch.update(parent);
-    for (var i = 0, len = this._children.length ; i < len ; i++)
-        this._children[i].update(this);
+Node.prototype.getParent = function getParent () {
+    return this._parent;
+};
+
+Node.prototype.requestUpdate = function requestUpdate (id) {
+    if (this._inUpdate) return this.requestUpdateOnNextTick(id);
+    this._updateQueue.push(id);
+    if (!this._requestingUpdate) this._requestUpdate();
+};
+
+Node.prototype.requestUpdateOnNextTick = function requestUpdateOnNextTick (id) {
+    this._nextUpdateQueue.push(id);
+};
+
+Node.prototype.getUpdater = function getUpdater () {
+    return this._globalUpdater;
+};
+
+Node.prototype.isMounted = function isMounted () {
+    return this.value.showState.mounted;
+};
+
+Node.prototype.isShown = function isShown () {
+    return this.value.showState.shown;
+};
+
+Node.prototype.getOpacity = function getOpacity () {
+    return this.value.showState.opacity;
+};
+
+Node.prototype.getMountPoint = function getMountPoint () {
+    return this.value.offsets.mountPoint;
+};
+
+Node.prototype.getAlign = function getAlign () {
+    return this.value.offsets.align;
+};
+
+Node.prototype.getOrigin = function getOrigin () {
+    return this.value.offsets.origin;
+};
+
+Node.prototype.getPosition = function getPosition () {
+    return this.value.vectors.position;
+};
+
+Node.prototype.getRotation = function getRotation () {
+    return this.value.vectors.rotation;
+};
+
+Node.prototype.getScale = function getScale () {
+    return this.value.vectors.scale;
+};
+
+Node.prototype.getSizeMode = function getSizeMode () {
+    return this.value.size.sizeMode;
+};
+
+Node.prototype.getProportionalSize = function getProportionalSize () {
+    return this.value.size.proportional;
+};
+
+Node.prototype.getDifferentialSize = function getDifferentialSize () {
+    return this.value.size.differential;
+};
+
+Node.prototype.getAbsoluteSize = function getAbsoluteSize () {
+    return this.value.size.absolute;
+};
+
+Node.prototype.getRenderSize = function getRenderSize () {
+    return this.value.size.render;
+};
+
+Node.prototype.getSize = function getSize () {
+    return this._calculatedValues.size;
+};
+
+Node.prototype.getTransform = function getTransform () {
+    return this._calculatedValues.transform;
+};
+
+Node.prototype.getUIEvents = function getUIEvents () {
+    return this.value.UIEvents;
+};
+
+Node.prototype.addChild = function addChild (child) {
+    var index = child ? this._children.indexOf(child) : -1;
+    child = child ? child : new Node();
+
+    if (index === -1) {
+        index = this._freedChildIndicies.length ? this._freedChildIndicies.pop() : this._children.length;
+        this._children[index] = child;
+
+        if (this.isMounted() && child.onMount) {
+            var myId = this.getId();
+            var childId = myId + '/' + index;
+            child.onMount(this, childId);
+        }
+    
+    }
+
+    return child;
+};
+
+Node.prototype.removeChild = function removeChild (child) {
+    var index = this._children.indexOf(child);
+    if (index !== -1) {
+        this._freedChildIndicies.push(index);
+
+        if (this.isMounted() && child.onDismount)
+            child.onDismount();
+
+        this._children[index] = null;
+    }
+};
+
+Node.prototype.addComponent = function addComponent (component) {
+    var index = this._components.indexOf(component);
+    if (index === -1) {
+        index = this._freedComponentIndicies.length ? this._freedComponentIndicies.pop() : this._components.length;
+        this._components[index] = component;
+
+        if (this.isMounted() && component.onMount)
+            component.onMount(this, index);
+
+        if (this.isShown() && component.onShow)
+            component.onShow();
+    }
+
+    return index;
+};
+
+Node.prototype.removeComponent = function removeComponent (component) {
+    var index = this._components.indexOf(component);
+    if (index !== -1) {
+        this._freedComponentIndicies.push(index);
+        if (this.isShown() && component.onHide)
+            component.onHide();
+
+        if (this.isMounted() && component.onDismount)
+            component.onDismount();
+
+        this._components[index] = null;
+    }
+};
+
+Node.prototype.addUIEvent = function addUIEvent (eventName) {
+    var UIEvents = this.getUIEvents();
+    var components = this._components;
+    var component;
+
+    if (UIEvents.indexOf(eventName) === -1) {
+        UIEvents.push(eventName);
+        for (var i = 0, len = components.length ; i < len ; i++) {
+            component = components[i];
+            if (component.onAddUIEvent) component.onAddUIEvent(eventName);
+        }
+    }
+};
+
+Node.prototype._requestUpdate = function _requestUpdate (force) {
+    if (force || (!this._requestingUpdate && this._globalUpdater)) {
+        this._globalUpdater.requestUpdate(this);
+        this._requestingUpdate = true;
+    }
+};
+
+Node.prototype._vec3OptionalSet = function _vec3OptionalSet (vec3, index, val) {
+    if (val != null && vec3[index] !== val) {
+        vec3[index] = val;
+        if (!this._requestingUpdate) this._requestUpdate();
+        return true;
+    }
+    return false;
+};
+
+Node.prototype.show = function show () {
+    var i = 0;
+    var items = this._components;
+    var len = items.length;
+    var item;
+
+    this.value.showState.shown = true;
+
+    for (; i < len ; i++) {
+        item = items[i];
+        if (item && item.onShow) item.onShow();
+    }
+
+    i = 0;
+    items = this._children;
+    len = items.length;
+
+    for (; i < len ; i++) {
+        item = items[i];
+        if (item && item.onParentShow) item.onParentShow();
+    }
+};
+
+Node.prototype.hide = function hide () {
+    var i = 0;
+    var items = this._components;
+    var len = items.length;
+    var item;
+
+    this.value.showState.shown = false;
+
+    for (; i < len ; i++) {
+        item = items[i];
+        if (item && item.onHide) item.onHide();
+    }
+
+    i = 0;
+    items = this._children;
+    len = items.length;
+
+    for (; i < len ; i++) {
+        item = items[i];
+        if (item && item.onParentHide) item.onParentHide();
+    }
+};
+
+Node.prototype.setAlign = function setAlign (x, y, z) {
+    var vec3 = this.value.offsets.align;
+    var propogate = false;
+
+    propogate = this._vec3OptionalSet(vec3, 0, x) || propogate;
+    propogate = this._vec3OptionalSet(vec3, 1, y) || propogate;
+    propogate = this._vec3OptionalSet(vec3, 2, z) || propogate;
+
+    if (propogate) {
+        var i = 0;
+        var list = this._components;
+        var len = list.length;
+        var item;
+        x = vec3[0];
+        y = vec3[1];
+        z = vec3[2];
+        for (; i < len ; i++) {
+            item = list[i];
+            if (item && item.onAlignChange) item.onAlignChange(x, y, z);
+        }
+    }
     return this;
 };
+
+Node.prototype.setMountPoint = function setMountPoint (x, y, z) {
+    var vec3 = this.value.offsets.mountPoint;
+    var propogate = false;
+
+    propogate = this._vec3OptionalSet(vec3, 0, x) || propogate;
+    propogate = this._vec3OptionalSet(vec3, 1, y) || propogate;
+    propogate = this._vec3OptionalSet(vec3, 2, z) || propogate;
+
+    if (propogate) {
+        var i = 0;
+        var list = this._components;
+        var len = list.length;
+        var item;
+        x = vec3[0];
+        y = vec3[1];
+        z = vec3[2];
+        for (; i < len ; i++) {
+            item = list[i];
+            if (item && item.onMountPointChange) item.onMountPointChange(x, y, z);
+        }
+    }
+    return this;
+};
+
+Node.prototype.setOrigin = function setOrigin (x, y, z) {
+    var vec3 = this.value.offsets.origin;
+    var propogate = false;
+
+    propogate = this._vec3OptionalSet(vec3, 0, x) || propogate;
+    propogate = this._vec3OptionalSet(vec3, 1, y) || propogate;
+    propogate = this._vec3OptionalSet(vec3, 2, z) || propogate;
+
+    if (propogate) {
+        var i = 0;
+        var list = this._components;
+        var len = list.length;
+        var item;
+        x = vec3[0];
+        y = vec3[1];
+        z = vec3[2];
+        for (; i < len ; i++) {
+            item = list[i];
+            if (item && item.onOriginChange) item.onOriginChange(x, y, z);
+        }
+    }
+    return this;
+};
+
+
+Node.prototype.setPosition = function setPosition (x, y, z) {
+    var vec3 = this.value.vectors.position;
+    var propogate = false;
+
+    propogate = this._vec3OptionalSet(vec3, 0, x) || propogate;
+    propogate = this._vec3OptionalSet(vec3, 1, y) || propogate;
+    propogate = this._vec3OptionalSet(vec3, 2, z) || propogate;
+
+    if (propogate) {
+        var i = 0;
+        var list = this._components;
+        var len = list.length;
+        var item;
+        x = vec3[0];
+        y = vec3[1];
+        z = vec3[2];
+        for (; i < len ; i++) {
+            item = list[i];
+            if (item && item.onPositionChange) item.onPositionChange(x, y, z);
+        }
+    }
+    return this;
+};
+
+Node.prototype.setRotation = function setRotation (x, y, z) {
+    var vec3 = this.value.vectors.rotation;
+    var propogate = false;
+
+    propogate = this._vec3OptionalSet(vec3, 0, x) || propogate;
+    propogate = this._vec3OptionalSet(vec3, 1, y) || propogate;
+    propogate = this._vec3OptionalSet(vec3, 2, z) || propogate;
+
+    if (propogate) {
+        var i = 0;
+        var list = this._components;
+        var len = list.length;
+        var item;
+        x = vec3[0];
+        y = vec3[1];
+        z = vec3[2];
+        for (; i < len ; i++) {
+            item = list[i];
+            if (item && item.onRotationChange) item.onRotationChange(x, y, z);
+        }
+    }
+    return this;
+};
+
+Node.prototype.setScale = function setScale (x, y, z) {
+    var vec3 = this.value.vectors.scale;
+    var propogate = false;
+
+    propogate = this._vec3OptionalSet(vec3, 0, x) || propogate;
+    propogate = this._vec3OptionalSet(vec3, 1, y) || propogate;
+    propogate = this._vec3OptionalSet(vec3, 2, z) || propogate;
+
+    if (propogate) {
+        var i = 0;
+        var list = this._components;
+        var len = list.length;
+        var item;
+        x = vec3[0];
+        y = vec3[1];
+        z = vec3[2];
+        for (; i < len ; i++) {
+            item = list[i];
+            if (item && item.onScaleChange) item.onScaleChange(x, y, z);
+        }
+    }
+    return this;
+};
+
+Node.prototype.setOpacity = function setOpacity (val) {
+    if (val != this.value.showState.opacity) {
+        this.value.showState.opacity = val;
+        if (!this._requestingUpdate) this._requestUpdate();
+
+        var i = 0;
+        var list = this._components;
+        var len = list.length;
+        var item;
+        for (; i < len ; i++) {
+            item = list[i];
+            if (item && item.onOpacityChange) item.onOpacityChange(val);
+        }
+    }
+    return this;
+};
+
+Node.prototype.setSizeMode = function setSizeMode (x, y, z) {
+    var vec3 = this.value.size.sizeMode;
+    var propogate = false;
+
+    propogate = this._vec3OptionalSet(vec3, 0, x) || propogate;
+    propogate = this._vec3OptionalSet(vec3, 1, y) || propogate;
+    propogate = this._vec3OptionalSet(vec3, 2, z) || propogate;
+
+    if (propogate) {
+        var i = 0;
+        var list = this._components;
+        var len = list.length;
+        var item;
+        x = vec3[0];
+        y = vec3[1];
+        z = vec3[2];
+        for (; i < len ; i++) {
+            item = list[i];
+            if (item && item.onSizeModeChange) item.onSizeModeChange(x, y, z);
+        }
+    }
+    return this;
+};
+
+Node.prototype.setProportionalSize = function setProportionalSize (x, y, z) {
+    var vec3 = this.value.size.proportional;
+    var propogate = false;
+
+    propogate = this._vec3OptionalSet(vec3, 0, x) || propogate;
+    propogate = this._vec3OptionalSet(vec3, 1, y) || propogate;
+    propogate = this._vec3OptionalSet(vec3, 2, z) || propogate;
+
+    if (propogate) {
+        var i = 0;
+        var list = this._components;
+        var len = list.length;
+        var item;
+        x = vec3[0];
+        y = vec3[1];
+        z = vec3[2];
+        for (; i < len ; i++) {
+            item = list[i];
+            if (item && item.onProportionalSizeChange) item.onProportionalSizeChange(x, y, z);
+        }
+    }
+    return this;
+};
+
+Node.prototype.setDifferentialSize = function setDifferentialSize (x, y, z) {
+    var vec3 = this.value.size.differential;
+    var propogate = false;
+
+    propogate = this._vec3OptionalSet(vec3, 0, x) || propogate;
+    propogate = this._vec3OptionalSet(vec3, 1, y) || propogate;
+    propogate = this._vec3OptionalSet(vec3, 2, z) || propogate;
+
+    if (propogate) {
+        var i = 0;
+        var list = this._components;
+        var len = list.length;
+        var item;
+        x = vec3[0];
+        y = vec3[1];
+        z = vec3[2];
+        for (; i < len ; i++) {
+            item = list[i];
+            if (item && item.onDifferentialSizeChange) item.onDifferentialSizeChange(x, y, z);
+        }
+    }
+    return this;
+};
+
+Node.prototype.setAbsoluteSize = function setAbsoluteSize (x, y, z) {
+    var vec3 = this.value.size.absolute;
+    var propogate = false;
+
+    propogate = this._vec3OptionalSet(vec3, 0, x) || propogate;
+    propogate = this._vec3OptionalSet(vec3, 1, y) || propogate;
+    propogate = this._vec3OptionalSet(vec3, 2, z) || propogate;
+
+    if (propogate) {
+        var i = 0;
+        var list = this._components;
+        var len = list.length;
+        var item;
+        x = vec3[0];
+        y = vec3[1];
+        z = vec3[2];
+        for (; i < len ; i++) {
+            item = list[i];
+            if (item && item.onAbsoluteSizeChange) item.onAbsoluteSizeChange(x, y, z);
+        }
+    }
+    return this;
+};
+
+Node.prototype._transformChanged = function _transformChanged (transform) {
+    var i = 0;
+    var items = this._components;
+    var len = items.length;
+    var item;
+
+    for (; i < len ; i++) {
+        item = items[i];
+        if (item && item.onTransformChange) item.onTransformChange(transform);
+    }
+
+    i = 0;
+    items = this._children;
+    len = items.length;
+
+    for (; i < len ; i++) {
+        item = items[i];
+        if (item && item.onParentTransformChange) item.onParentTransformChange(transform);
+    }
+};
+
+Node.prototype._sizeChanged = function _sizeChanged (size) {
+    var i = 0;
+    var items = this._components;
+    var len = items.length;
+    var item;
+
+    for (; i < len ; i++) {
+        item = items[i];
+        if (item && item.onSizeChange) item.onSizeChange(size);
+    }
+
+    i = 0;
+    items = this._children;
+    len = items.length;
+
+    for (; i < len ; i++) {
+        item = items[i];
+        if (item && item.onParentSizeChange) item.onParentSizeChange(size);
+    }
+};
+
+// DEPRICATE
+Node.prototype.getFrame = function getFrame () {
+    return this._globalUpdater.getFrame();
+};
+
+Node.prototype.update = function update (time){
+    this._inUpdate = true;
+    var nextQueue = this._nextUpdateQueue;
+    var queue = this._updateQueue;
+    var item;
+
+    while (nextQueue.length) queue.unshift(nextQueue.pop());
+
+    while (queue.length) {
+        item = this._components[queue.shift()];
+        if (item && item.onUpdate) item.onUpdate(time);
+    }
+
+    var mySize = this.getSize();
+    var parent = this.getParent();
+    var parentSize = parent.getSize();
+    var myTransform = this.getTransform();
+    var parentTransform = parent.getTransform();
+    var sizeChanged = SIZE_PROCESSOR.fromSpecWithParent(parentSize, this.value, mySize);
+    mySize = this.getSize();
+ 
+    var transformChanged = TRANSFORM_PROCESSOR.fromSpecWithParent(this.getParent().getTransform(), this.value, mySize, parentSize, this.getTransform());
+    if (transformChanged) this._transformChanged(this.getTransform());
+    if (sizeChanged) this._sizeChanged(this.getSize());
+
+    this._inUpdate = false;
+    this._requestingUpdate = false;
+
+    if (this._nextUpdateQueue.length) {
+        this._globalUpdater.requestUpdateOnNextTick(this);
+        this._requestingUpdate = true;
+    }
+};
+
+Node.prototype.mount = function mount (parent, myId) {
+    if (this.isMounted()) return; 
+    var i = 0;
+    var list = this._components;
+    var len = list.length;
+    var item;
+
+    this._parent = parent;
+    this._globalUpdater = parent.getUpdater();
+    this.value.location = myId;
+    this.value.showState.mounted = true;
+
+    for (; i < len ; i++) {
+        item = list[i];
+        if (item.onMount) item.onMount(this, i);
+    }
+    
+    i = 0;
+    list = this._children;
+    len = list.length;
+    for (; i < len ; i++) {
+        item = list[i];
+        if (item.onParentMount) item.onParentMount(this, myId, i);
+    }
+
+    if (this._requestingUpdate) this._requestUpdate(true);
+};
+
+Node.prototype.dismount = function dismount () {
+    if (!this.isMounted()) return; 
+    var i = 0;
+    var list = this._components;
+    var len = list.length;
+    var item;
+
+    this.value.showState.mounted = false;
+    this.value.location = null;
+
+    this._parent.removeChild(this);
+
+    this._parent = null;
+
+    for (; i < len ; i++) {
+        item = list[i];
+        if (item.onDismount) item.onDismount();
+    }
+    
+    i = 0;
+    list = this._children;
+    len = list.length;
+    for (; i < len ; i++) {
+        item = list[i];
+        if (item.onParentDismount) item.onParentDismount();
+    }
+
+    if (!this._requestingUpdate) this._requestUpdate();
+    this._globalUpdater = null;
+};
+
+Node.prototype.onParentMount = function onParentMount (parent, parentId, index) {
+    this.mount(parent, parentId + '/' + index);
+};
+
+Node.prototype.onParentDismount = function onParentDismount () {
+    this.dismount();
+};
+
+Node.prototype.receive = function receive (type, ev) {
+    var i = 0;
+    var list = this._components;
+    var len = list.length;
+    var item;
+    for (; i < len ; i++) {
+        item = list[i];
+        if (item && item.onReceive) item.onReceive(type, ev);
+    }
+};
+
+Node.prototype.onUpdate = Node.prototype.update;
+
+Node.prototype.onParentShow = Node.prototype.show;
+
+Node.prototype.onParentHide = Node.prototype.hide;
+
+Node.prototype.onParentTransformChange = _requestUpdateWithoutArgs;
+
+Node.prototype.onParentSizeChange = _requestUpdateWithoutArgs;
+
+Node.prototype.onShow = Node.prototype.show;
+
+Node.prototype.onHide = Node.prototype.hide;
+
+Node.prototype.onMount = Node.prototype.mount;
+
+Node.prototype.onDismount = Node.prototype.dismount;
+
+Node.prototype.onReceive = Node.prototype.receive;
+
+function _requestUpdateWithoutArgs () {
+    if (!this._requestingUpdate) this._requestUpdate();
+}
 
 module.exports = Node;

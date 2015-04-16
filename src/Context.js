@@ -1,127 +1,113 @@
 'use strict';
 
+var Dispatch = require('./Dispatcher');
 var Node = require('./Node');
-var RenderProxy = require('./RenderProxy');
+var Size = require('./Size');
 
 /**
- * Context is the top-level node in the scene graph (= tree node).
- * As such, it populates the internal MessageQueue with commands received by
- * subsequent child-nodes. The Context is being updated by the Clock on every
- * FRAME and therefore recursively updates the scene grpah.
+ * Context is the bottom of the scene graph. It is it's own
+ * parent and provides the global updater to the scene graph.
  *
- * @class  Context
+ * @class Context
  * @constructor
- * 
- * @param {String} [selector=body]  query selector used as container for
- *                                  context
+ *
+ * @param {String} selector a string which is a dom selector
+ *                 signifying which dom element the context
+ *                 should be set upon
+ * @param {Famous} a class which conforms to Famous' interface
+ *                 it needs to be able to send methods to
+ *                 the renderers and update nodes in the scene graph
  */
-function Context (selector, messageQueue, globalDispatch, clock) {
-    this._messageQueue = messageQueue;
-    this._globalDispatch = globalDispatch;
-    this._clock = clock;
+function Context (selector, updater) {
+    if (!selector) throw new Error('Context needs to be created with a DOM selector');
+    if (!updater) throw new Error('Context needs to be created with a class like Famous');
 
-    this._clock.update(this);
+    Node.call(this);         // Context inherits from node
 
-    this.proxy = new RenderProxy(this);
-    this.node = new Node(this.proxy, this._globalDispatch);
-    this.selector = selector || 'body';
-    this.dirty = true;
-    this.dirtyQueue = [];
+    this._updater = updater; // The updater that will both
+                             // send messages to the renderers
+                             // and update dirty nodes 
 
-    this._messageQueue.enqueue('NEED_SIZE_FOR').enqueue(this.selector);
-    this._globalDispatch.targetedOn(this.selector, 'resize', this._receiveContextSize.bind(this));
+    this._dispatch = new Dispatch(this); // instantiates a dispatcher
+                                         // to send events to the scene
+                                         // graph below this context
+    
+    this._selector = selector; // reference to the DOM selector
+                               // that represents the elemnent
+                               // in the dom that this context
+                               // inhabits
+
+    this.onMount(this, selector); // Mount the context to itself
+                                  // (it is its own parent)
+    
+    this._updater                  // message a request for the dom
+        .message('NEED_SIZE_FOR')  // size of the context so that
+        .message(selector);        // the scene graph has a total size
+
+    this.show(); // the context begins shown (it's already present in the dom)
+
 }
 
+// Context inherits from node
+Context.prototype = Object.create(Node.prototype);
+Context.prototype.constructor = Context;
+
 /**
- * Adds a child to the internal list of child-nodes.
+ * Context getUpdater function returns the passed in updater
  *
- * @method addChild
- * @chainable
- *
- * @return {Context}    this
+ * @return {Famous} the updater for this Context
  */
-Context.prototype.addChild = function addChild () {
-    return this.node.addChild();
+Context.prototype.getUpdater = function getUpdater () {
+    return this._updater;
 };
 
 /**
- * Removes a node returned by `addChild` from the Context's immediate children.
+ * Returns the selector that the context was instantiated with
  *
- * @method  removeChild
- * @chainable
- * 
- * @param  {Node} node   node to be removed
- * @return {Context}     this
+ * @return {String} dom selector
  */
-Context.prototype.removeChild = function removeChild (node) {
-    this.node.removeChild(node);
-    return this;
+Context.prototype.getSelector = function getSelector () {
+    return this._selector;
 };
 
 /**
- * Recursively updates all children.
+ * Returns the dispatcher of the context. Used to send events
+ * to the nodes in the scene graph.
  *
- * @method  update
- * @chainable
- * 
- * @return {Context}    this
+ * @return {Dispatcher} the Context's Dispatcher
  */
-Context.prototype.update = function update () {
-    this.node.update();
-    return this;
+Context.prototype.getDispatch = function getDispatch () {
+    return this._dispatch;
 };
 
 /**
- * Returns the selector the Context is attached to. Terminates recursive
- * `getRenderPath` scheduled by `RenderProxy`.
+ * Receives an event. If the event is 'CONTEXT_RESIZE' it sets the size of the scene
+ * graph to the payload, which must be an array of numbers of at least
+ * length three representing the pixel size in 3 dimensions.
  *
- * @method  getRenderPath
- * @private
- * 
- * @return {String} selector
+ * @param {String} event
+ * @param {*} payload
  */
-Context.prototype.getRenderPath = function getRenderPath () {
-    return this.selector;
-};
+Context.prototype.onReceive = function onReceive (event, payload) {
+    // TODO: In the future the dom element that the context is attached to
+    // should have a representation as a component. It would be render sized
+    // and the context would receive its size the same way that any render size
+    // component receives its size.
+    if (event === 'CONTEXT_RESIZE') {
+        
+        if (payload.length < 2) 
+            throw new Error(
+                    'CONTEXT_RESIZE\'s payload needs to be at least a pair' +
+                    ' of pixel sizes'
+            );
 
-/**
- * Appends the passed in command to the internal MessageQueue, thus scheduling
- * it to be sent to the Main Thread on the next FRAME.
- *
- * @method  receive
- * @chainable
- * 
- * @param  {Object} command command to be enqueued
- * @return {Context}        Context
- */
-Context.prototype.receive = function receive (command) {
-    if (this.dirty) this.dirtyQueue.push(command);
-    else this._messageQueue.enqueue(command);
-    return this;
-};
+        this.setSizeMode(Size.ABSOLUTE, Size.ABSOLUTE, Size.ABSOLUTE);
+        this.setAbsoluteSize(payload[0],
+                             payload[1],
+                             payload[2] ? payload[2] : 0);
 
-/**
- * Method being executed whenever the context size changes.
- *
- * @method  _receiveContextSize
- * @chainable
- * @private
- * 
- * @param  {Array} size  new context size in the format `[width, height]`
- * @return {Context}     this
- */
-Context.prototype._receiveContextSize = function _receiveContextSize (size) {
-    this.node
-        .getDispatch()
-        .getContext()
-        .setAbsolute(size[0], size[1], 0);
-
-    if (this.dirty) {
-        this.dirty = false;
-        for (var i = 0, len = this.dirtyQueue.length ; i < len ; i++) this.receive(this.dirtyQueue.shift());
     }
-
-    return this;
 };
 
 module.exports = Context;
+

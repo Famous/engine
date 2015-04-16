@@ -2,190 +2,275 @@
 
 var test = require('tape');
 var Node = require('../src/Node');
+var Size = require('../src/Size');
+var DefaultNodeSpec = require('./expected/DefaultNodeSpec');
 
 test('Node', function(t) {
     t.test('constructor', function(t) {
-        t.equal(typeof Node, 'function', 'Node should be a function');
-
-        t.doesNotThrow(function() {
-            new Node({}, {}, {});
-            new Node({}, {});
-        });
-
+        t.equal(typeof Node, 'function', 'Node should be a constructor function');
+        var node = new Node();
         t.end();
     });
 
-    t.test('addChild method', function(t) {
-        t.plan(11);
-        var node = new Node(null, null, {
-            getRenderProxy: function() {
-                t.pass('node.addChild should getRenderProxy from localDispatch');
-                return '';
-            }
-        });
-        t.equal(typeof node.addChild, 'function', 'node.addChild shoule be a function');
-
-        var child0 = node.addChild();
-        t.equal(child0 instanceof Node, true, 'node.addChild() should return Node');
-
-        var child1 = node.addChild();
-        t.equal(child1 instanceof Node, true, 'node.addChild() should return Node');
-
-        var child2 = node.addChild();
-        t.equal(child1 instanceof Node, true, 'node.addChild() should return Node');
-
-        t.deepEqual(node.getChildren(), [child0, child1, child2]);
-
-        var injectedChild = node.addChild(1);
-        t.equal(injectedChild instanceof Node, true, 'node.addChild(1) should return Node');
-
-        t.deepEqual(node.getChildren(), [child0, injectedChild, child1, child2]);
+    t.test('enum', function(t) {
+        t.equal(Node.RELATIVE_SIZE, Size.RELATIVE, 'Node.RELATIVE should be equivalent to Size.RELATIVE');
+        t.equal(Node.ABSOLUTE_SIZE, Size.ABSOLUTE, 'Node.ABSOLUTE should be equivalent to Size.ABSOLUTE');
+        t.equal(Node.RENDER_SIZE, Size.RENDER, 'Node.RENDER should be equivalent to Size.RENDER');
+        t.equal(Node.DEFAULT_SIZE, Size.DEFAULT, 'Node.DEFAULT should be equivalent to Size.DEFAULT');
+        t.end();
     });
 
-    t.test('removeChild method', function(t) {
-        t.plan(11);
-        var node = new Node(null, null, {
-            getRenderProxy: function() {
-                t.pass();
-                return '';
-            }
-        });
-
-        t.equal(typeof node.removeChild, 'function', 'node.removeChild should be a function');
-
-        var child0 = node.addChild();
-        var child1 = node.addChild();
-        var child2 = node.addChild();
-        var child3 = node.addChild();
-
-        t.deepEqual(node.getChildren(), [child0, child1, child2, child3]);
-
-        t.equal(node.removeChild(child0), node, 'node.removeChild() should be chainable');
-        t.deepEqual(node.getChildren(), [child1, child2, child3]);
-
-        node.removeChild(child3);
-        t.deepEqual(node.getChildren(), [child1, child2]);
-
-        node.removeChild(child1);
-        t.deepEqual(node.getChildren(), [child2]);
-
-        node.removeChild(child2);
-        t.deepEqual(node.getChildren(), []);
+    t.test('Spec constructor', function(t) {
+        t.equal(typeof Node.Spec, 'function', 'Node.Spec should be a constructor function');
+        t.deepEqual(new Node.Spec(), DefaultNodeSpec, 'Node specs need to adhere to certain format');
+        t.end();
     });
 
-    t.test('removeChildAtIndex method', function(t) {
-        t.plan(11);
-        var node = new Node(null, null, {
-            getRenderProxy: function() {
-                t.pass();
-                return '';
-            }
+    t.test('deprecated methods (for backwards compatibility)', function(t) {
+        var node = new Node();
+        var deprecatedMethods = ['getContext', 'getDispatch', 'getRenderProxy', 'getRenderPath', 'addRenderable'];
+        deprecatedMethods.forEach(function (deprecatedMethod) {
+            t.equal(typeof node[deprecatedMethod], 'function', 'node.' + deprecatedMethod + ' should be a function');
         });
-
-        t.equal(typeof node.removeChildAtIndex, 'function', 'node.removeChildAtIndex should be a function');
-
-        var child0 = node.addChild();
-        var child1 = node.addChild();
-        var child2 = node.addChild();
-        var child3 = node.addChild();
-
-        t.deepEqual(node.getChildren(), [child0, child1, child2, child3]);
-
-        t.equal(node.removeChildAtIndex(0), node, 'node.removeChildAtIndex() should be chainable');
-        t.deepEqual(node.getChildren(), [child1, child2, child3]);
-
-        node.removeChildAtIndex(2);
-        t.deepEqual(node.getChildren(), [child1, child2]);
-
-        node.removeChildAtIndex(0);
-        t.deepEqual(node.getChildren(), [child2]);
-
-        node.removeChildAtIndex(0);
-        t.deepEqual(node.getChildren(), []);
+        t.end();
     });
 
-    t.test('removeAllChildren method', function(t) {
-        t.plan(8);
-        var node = new Node(null, null, {
-            getRenderProxy: function() {
-                t.pass();
-                return '';
-            }
-        });
-
-        t.equal(typeof node.removeAllChildren, 'function', 'node.removeChildAtIndex should be a function');
-
-        var child0 = node.addChild();
-        var child1 = node.addChild();
-        var child2 = node.addChild();
-        var child3 = node.addChild();
-
-        t.deepEqual(node.getChildren(), [child0, child1, child2, child3]);
-
-        t.equal(node.removeAllChildren(), node, 'node.removeAllChildren() should be chainable');
-        t.deepEqual(node.getChildren(), [], 'node.removeAllChildren() should be chainable');
-    });
-
-    t.test('kill method', function(t) {
-        t.plan(4);
-        var node = new Node(null, null, {
-            getRenderProxy: function() {
-                return '';
-            },
-            kill: function() {
-                t.pass('node.kill() should kill its localDispatch');
-            }
-        });
-
-        t.equal(typeof node.kill, 'function', 'node.kill should be a function');
-
-        node.addChild();
-        node.addChild();
-        node.addChild();
-
-        t.equal(node.kill(), node, 'node.kill() should be chainable');
-        t.deepEqual(node.getChildren(), [], 'node.removeAllChildren() should remove all children');
-    });
-
-    t.test('getDispatch method', function(t) {
+    t.test('getLocation method', function(t) {
         t.plan(2);
-        var localDispatch = {};
-        var node = new Node(null, null, localDispatch);
+        var node = new Node();
+        t.equal(typeof node.getLocation, 'function', 'node.getLocation should be a function');
+        node.mount(node, 'body/1/2/3');
+        t.equal(node.getLocation(), 'body/1/2/3', 'node.getLocation() should return path');
+    });
 
-        t.equal(typeof node.getDispatch, 'function', 'node.getDispatch should be a function');
-        t.equal(node.getDispatch(), localDispatch, 'node.getDispatch() should return passed in localDispatch');
+    t.test('getId method', function(t) {
+        var node = new Node();
+        t.equal(node.getId, node.getLocation, 'node.getId should be alias for node.getLocation');
+        t.end();
+    });
+
+    t.test('sendDrawCommand method', function(t) {
+        var root = new Node();
+        t.equal(typeof root.sendDrawCommand, 'function', 'root.sendDrawCommand should be a function');
+        var receivedMessages = [];
+        var context = {};
+        context.getUpdater = function getUpdater () {
+            return {
+                message: function(message) {
+                    receivedMessages.push(message)
+                }
+            };
+        };
+        root.mount(context, 'body/0/1/2');
+        var node0 = root.addChild();
+        var node00 = node0.addChild();
+        node00.sendDrawCommand('MESSAGE0');
+        node00.sendDrawCommand('MESSAGE1');
+        t.deepEqual(receivedMessages, ['MESSAGE0', 'MESSAGE1']);
+        t.end();
+    });
+
+    t.test('getValue method', function(t) {
+        var root = new Node();
+        t.equal(typeof root.getValue, 'function', 'node.getValue should be a function');
+
+        var context = {};
+        var receivedMessages = [];
+        var requesters = [];
+        context.getUpdater = function getUpdater () {
+            return {
+                message: function message (message) {
+                    receivedMessages.push(message)
+                },
+                requestUpdate: function requestUpdate (requester) {
+                    requesters.push(requester);
+                }
+            };
+        };
+        root.mount(context, 'body');
+
+        var node0 = root.addChild();
+        var node1 = root.addChild();
+        var node00 = node0.addChild();
+        var node01 = node0.addChild();
+        var node010 = node01.addChild();
+        var node011 = node01.addChild();
+
+        node0.setPosition(10, 20, 30);
+        node0.setAlign(0.5, 0.1, 0.4);
+        node0.setAbsoluteSize(100, 200, 300);
+
+        node1.setPosition(40, 50, 60);
+        node1.setMountPoint(0.1, 0.4, 0.3);
+        node1.setOrigin(0.3, 0.9, 0.8);
+        node1.setOpacity(0.4);
+        node1.setDifferentialSize(10, 20, 30);
+
+        node00.setPosition(5, 7, 8);
+        node00.setOrigin(0.4, 0.1, 0.9);
+        node00.setRotation(Math.PI*0.5, Math.PI*0.1, Math.PI*0.3);
+
+        node01.setPosition(23, 13, 14);
+        node01.setScale(0.5, 0.3, 0.4);
+
+        node010.setPosition(12, 48, 43);
+        node010.setSizeMode(Node.PROPORTIONAL_SIZE, Node.ABSOLUTE_SIZE, Node.DIFFERENTIAL_SIZE);
+        node010.setProportionalSize(0.5, 0.4, 0.1);
+
+        node011.setPosition(11, 93, 21);
+
+        t.equal(requesters[0], node0);
+        t.equal(requesters[1], node1);
+        t.equal(requesters[2], node00);
+        t.equal(requesters[3], node01);
+        t.equal(requesters[4], node010);
+        t.equal(requesters[5], node011);
+        t.equal(requesters.length, 6);
+
+        // console.log(JSON.stringify(root.getValue(), null, 4))
+
+        // TODO
+
+
+        // t.equal(requesters[0], node0);
+        // t.equal(requesters[0], node0);
+        // t.equal(requesters[0], node0);
+        // t.equal(requesters[0], node0);
+
+        t.end();
+    });
+    
+    t.test('getComputedValue method', function(t) {
+        var node = new Node();
+        t.equal(typeof node.getComputedValue, 'function', 'node.getComputedValue should be a function');
+
+        // TODO
+
+        t.end();
     });
 
     t.test('getChildren method', function(t) {
-        var localDispatch = {
-            getRenderProxy: function() {
-            }
-        };
-        var node = new Node(null, null, localDispatch);
+        var root = new Node();
+        t.equal(typeof root.getChildren, 'function', 'root.getChildren should be a function');
 
-        t.equal(typeof node.getChildren, 'function', 'node.getChildren should be a function');
-        t.deepEqual(node.getChildren(), []);
+        var node0 = root.addChild();
+        var node1 = root.addChild();
+        var node2 = root.addChild();
 
-        var child0 = node.addChild();
-        var child1 = node.addChild();
-        var child2 = node.addChild();
+        var node10 = node1.addChild();
+        var node11 = node1.addChild();
 
-        t.deepEqual(node.getChildren(), [child0, child1, child2]);
+        t.deepEqual(root.getChildren(), [node0, node1, node2]);
+        t.deepEqual(node0.getChildren(), []);
+        t.deepEqual(node1.getChildren(), [node10, node11]);
+        t.deepEqual(node2.getChildren(), []);
 
         t.end();
     });
 
-    t.test('update method', function(t) {
-        t.plan(3);
+    t.test('getParent method', function(t) {
+        var parent = new Node();
+        t.equal(typeof parent.getParent, 'function', 'parent.getParent should be a function');
+        var child = parent.addChild();
 
-        var localDispatch = {
-            update: function() {
-                t.pass('node.update() should call update on localDispatch');
+        child.mount(parent);
+        t.equal(child.getParent(), parent);
+        t.end();
+    });
+
+    t.test('requestUpdate method', function(t) {
+        var context = {};
+        var requesters = [];
+        context.getUpdater = function getUpdater () {
+            return {
+                requestUpdate: function requestUpdate (requester) {
+                    requesters.push(requester);
+                }
+            };
+        };
+
+        var root = new Node();
+        root.mount(context, 'body');
+        t.equal(typeof root.requestUpdate, 'function', 'root.requestUpdate should be a function');
+        var node0 = root.addChild();
+        var node1 = root.addChild();
+
+        var node00 = node0.addChild();
+
+        node00.requestUpdate(node00);
+        t.deepEqual(requesters, [node00]);
+
+        node0.requestUpdate(node0);
+        t.deepEqual(requesters, [node00, node0]);
+
+        t.end();
+    });
+
+    t.test('requestUpdateOnNextTick method', function(t) {
+        var context = {};
+        var requesters = [];
+        var onNextTickRequesters = [];
+        context.getUpdater = function getUpdater () {
+            return {
+                requestUpdate: function requestUpdate (requester) {
+                    requesters.push(requester);
+                },
+                requestUpdateOnNextTick: function requestUpdateOnNextTick (requester) {
+                    onNextTickRequesters.push(requester);
+                }
+            };
+        };
+
+        var root = new Node();
+        t.equal(typeof root.requestUpdateOnNextTick, 'function', 'root.requestUpdateOnNextTick should be a function');
+
+        // TODO
+
+        t.end();
+    });
+
+    t.test('getUpdater method', function(t) {
+        var globalUpdater = {};
+        var context = {
+            getUpdater: function() {
+                return globalUpdater;
             }
         };
-        var node = new Node(null, null, localDispatch);
 
-        t.equal(typeof node.update, 'function', 'node.update should be a function');
-        t.equal(node.update(), node, 'node.update should be chainable');
+        var parent = new Node();
+        parent.mount(context, 'body');
+
+        var child = new Node();
+        child.mount(parent, '0');
+
+        t.equal(child.getUpdater(), globalUpdater);
+
+        t.end();
+    });
+
+    t.test('isMounted method', function(t) {
+        var child = new Node();
+        t.equal(typeof child.isMounted, 'function', 'child.isMounted should be a function');
+        t.equal(child.isMounted(), false, 'nodes should not be mounted when being initialized');
+
+        var parent = new Node();
+        child.mount(parent, 'body/0');
+
+        t.equal(child.isMounted(), true, 'node.isMounted should indicate mounted state after node has been mounted');
+
+        t.end();
+    });
+
+    t.test('isShown method', function(t) {
+        var parent = new Node();
+        t.equal(typeof parent.isShown, 'function', 'parent.isShown should be a function');
+        var child = new Node();
+        child.mount(parent, '0');
+
+        t.equal(child.isShown(), false);
+        child.show();
+        t.equal(child.isShown(), true);
+
+        t.end();
     });
 });
