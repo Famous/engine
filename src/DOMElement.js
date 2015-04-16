@@ -56,7 +56,9 @@ DOMElement.prototype.getValue = function getValue () {
         classes: this._classes,
         styles: this._styles,
         attributes: this._attributes,
-        content: this._content
+        content: this._content,
+        id: this._attributes.id,
+        tagName: this._tagName
     };
 };
 
