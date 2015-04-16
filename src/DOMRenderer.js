@@ -70,6 +70,8 @@ function DOMRenderer (element, selector, compositor) {
     this._VPtransform = new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
 
     this._eventListeners = {};
+
+    this._size = [null, null];
 }
 
 DOMRenderer.prototype.addEventListener = function addEventListener(path, type, properties, preventDefault) {
@@ -188,7 +190,9 @@ function _getPath (ev) {
 }
 
 DOMRenderer.prototype.getSize = function getSize () {
-    return [this._root.element.offsetWidth, this._root.element.offsetHeight];
+    this._size[0] = this._root.element.offsetWidth;
+    this._size[1] = this._root.element.offsetHeight;
+    return this._size;
 };
 
 DOMRenderer.prototype._getSize = DOMRenderer.prototype.getSize;
