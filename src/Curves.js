@@ -359,6 +359,14 @@ var Curves = {
         return Curves.outBounce(t*2-1.0) * .5 + .5;
     },
 
+    /**
+     * @property flat
+     *
+     * Useful for delaying the execution of a subsequent transition.
+     * 
+     * @static
+     * @type {Function}
+     */
     flat: function() {
         return 0;
     }
