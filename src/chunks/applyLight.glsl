@@ -1,3 +1,12 @@
+/**
+ * Calculates the intensity of light on a surface.
+ * 
+ * @method transpose
+ * @private
+ *
+ *
+ */
+
 vec3 applyLight(in vec3 material) {
     int numLights = int(u_NumLights);
     float lambertianTerm;

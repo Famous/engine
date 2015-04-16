@@ -1,3 +1,13 @@
+/**
+ * Calculates transpose inverse matrix from transform
+ * 
+ * @method random
+ * @private
+ *
+ *
+ */
+
+
 mat3 getNormalMatrix(in mat4 t) {
    mat3 matNorm;
    mat4 a = t;

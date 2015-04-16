@@ -2,6 +2,16 @@
 #pragma glslify: inverse = require(./chunks/inverse)
 #pragma glslify: transpose = require(./chunks/transpose)
 
+/**
+ * Converts vertex from modelspace to screenspace using transform 
+ * information from context.
+ * 
+ * @method applyTransform
+ * @private
+ *
+ *
+ */
+
 vec4 applyTransform(vec4 pos) {
     mat4 MVMatrix = view * transform;
 
@@ -30,15 +40,31 @@ vec4 applyTransform(vec4 pos) {
     return pos;
 }
 
+/**
+ * Placeholder for positionOffset chunks to be templated in.
+ * Used for mesh deformation.
+ * 
+ * @method calculateOffset
+ * @private
+ *
+ *
+ */
 #vert_definitions
 vec3 calculateOffset(vec3 ID) {
     #vert_applications
     return vec3(0.0);
 }
 
-// Main function of the vertex shader.  Passes texture coordinate
-// and normal attributes as varyings and passes the position
-// attribute through position pipeline
+/**
+ * Writes the position of the vertex onto the screen.
+ * Passes texture coordinate and normal attributes as varyings
+ * and passes the position attribute through position pipeline.
+ * 
+ * @method main
+ * @private
+ *
+ *
+ */
 void main() {
     gl_PointSize = 10.0;
     vec3 invertedNormals = normals;

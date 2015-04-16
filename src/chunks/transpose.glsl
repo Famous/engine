@@ -1,3 +1,13 @@
+/**
+ * Reflects a matrix over its main diagonal.
+ * 
+ * @method transpose
+ * @private
+ *
+ *
+ */
+
+
 float transpose(float m) {
     return m;
 }

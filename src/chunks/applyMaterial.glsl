@@ -1,3 +1,13 @@
+/**
+ * Placeholder for fragmentShader  chunks to be templated in.
+ * Used for normal mapping, gloss mapping and colors.
+ * 
+ * @method applyMaterial
+ * @private
+ *
+ *
+ */
+
 #float_definitions
 float applyMaterial(float ID) {
     #float_applications

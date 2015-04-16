@@ -1,6 +1,16 @@
 #pragma glslify: applyMaterial = require(./chunks/applyMaterial)
 #pragma glslify: applyLight = require(./chunks/applyLight)
 
+
+
+/**
+ * Writes the color of the pixel onto the screen
+ *
+ * @method main
+ * @private
+ *
+ *
+ */
 void main() {
     vec3 material = baseColor.r >= 0.0 ? baseColor : applyMaterial(baseColor);
 
@@ -12,4 +22,5 @@ void main() {
     vec3 color = lightsEnabled ? applyLight(material) : material;
 
     gl_FragColor = vec4(color, opacity);
+    if (int(baseColor.r) == -1) gl_FragColor = texture2D(image, v_TextureCoordinate);
 }

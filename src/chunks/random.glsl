@@ -1,3 +1,12 @@
+/**
+ * Calculates a pseudorandom number 
+ * 
+ * @method random
+ * @private
+ *
+ *
+ */
+
 highp float random(vec2 co) {
     highp float a = 12.9898;
     highp float b = 78.233;
