@@ -202,7 +202,7 @@ DOMRenderer.prototype.draw = function draw (renderState) {
     }
 
     if (renderState.viewDirty || renderState.perspectiveDirty) {
-        multiply(this._VPtransform, this.perspectiveTransform, renderState.viewTransform);
+        math.multiply(this._VPtransform, this.perspectiveTransform, renderState.viewTransform);
         this._root.element.style[TRANSFORM] = this._stringifyMatrix(this._VPtransform);
     }
 };
