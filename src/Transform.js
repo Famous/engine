@@ -188,6 +188,7 @@ Transform.prototype.setOrigin = function setOrigin(x, y, z, options, callback) {
         this.origin = new Vec3Transitionable(v[0], v[1], v[2], this);
     }
     this.origin.set(x, y, z, options, callback);
+    return this;
 };
 
 Transform.prototype.setMountPoint = function setMountPoint(x, y, z, options, callback) {
@@ -196,6 +197,7 @@ Transform.prototype.setMountPoint = function setMountPoint(x, y, z, options, cal
         this.mountPoint = new Vec3Transitionable(v[0], v[1], v[2], this);
     }
     this.mountPoint.set(x, y, z, options, callback);
+    return this;
 };
 
 Transform.prototype.setAlign = function setAlign(x, y, z, options, callback) {
@@ -204,6 +206,7 @@ Transform.prototype.setAlign = function setAlign(x, y, z, options, callback) {
         this.align = new Vec3Transitionable(v[0], v[1], v[2], this);
     }
     this.align.set(x, y, z, options, callback);
+    return this;
 };
 
 Transform.prototype.setScale = function setScale(x, y, z, options, callback) {
@@ -212,6 +215,7 @@ Transform.prototype.setScale = function setScale(x, y, z, options, callback) {
         this.scale = new Vec3Transitionable(v[0], v[1], v[2], this);
     }
     this.scale.set(x, y, z, options, callback);
+    return this;
 };
 
 Transform.prototype.setPosition = function setPosition(x, y, z, options, callback) {
@@ -220,6 +224,7 @@ Transform.prototype.setPosition = function setPosition(x, y, z, options, callbac
         this.position = new Vec3Transitionable(v[0], v[1], v[2], this);
     }
     this.position.set(x, y, z, options, callback);
+    return this;
 };
 
 Transform.prototype.translate = function translate(x, y, z, options, callback) {
@@ -232,6 +237,7 @@ Transform.prototype.translate = function translate(x, y, z, options, callback) {
     var yEnd = p.y._queue.length > 0 ? p.y._queue[p.y._queue.length - 4] : p.y._end;
     var zEnd = p.z._queue.length > 0 ? p.z._queue[p.z._queue.length - 4] : p.z._end;
     this.position.set(xEnd + x, yEnd + y, zEnd + z, options, callback);
+    return this;
 };
 
 Transform.prototype.setRotation = function setRotation(x, y, z, w, options, callback) {
@@ -249,6 +255,7 @@ Transform.prototype.setRotation = function setRotation(x, y, z, w, options, call
         options = w;
     }
     this.rotation.set(q.x, q.y, q.z, q.w, options, callback);
+    return this;
 };
 
 Transform.prototype.rotate = function rotate(x, y, z, w, options, callback) {
@@ -276,6 +283,7 @@ Transform.prototype.rotate = function rotate(x, y, z, w, options, callback) {
 
     var q = referenceQ.multiply(rotQ);
     this.rotation.set(q.x, q.y, q.z, q.w, options, callback);
+    return this;
 };
 
 Transform.prototype.clean = function clean() {
