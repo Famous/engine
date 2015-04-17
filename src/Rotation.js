@@ -10,6 +10,29 @@ var Position = require('./Position');
  */
 function Rotation(node) {
     Position.call(this, node);
+
+    var initial = node.getRotation();
+
+    var x = initial[0];
+    var y = initial[1];
+    var z = initial[2];
+    var w = initial[3];
+
+    var xx = x * x;
+    var yy = y * y;
+    var zz = z * z;
+    var ww = w * w;
+
+    var ty = 2 * (x * z + y * w);
+    ty = ty < -1 ? -1 : ty > 1 ? 1 : ty;
+
+    var rx = Math.atan2(2 * (x * w - y * z), 1 - 2 * (xx + yy));
+    var ry = Math.asin(ty);
+    var rz = Math.atan2(2 * (z * w - x * y), 1 - 2 * (yy + zz));
+
+    this._x = new Transitionable(rx);
+    this._y = new Transitionable(ry);
+    this._z = new Transitionable(rz);
 }
 
 /**

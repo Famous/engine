@@ -11,6 +11,12 @@ var Position = require('./Position');
 
 function Align(node) {
     Position.call(this, node);
+
+    var initial = node.getAlign();
+
+    this._x = new Transitionable(initial[0]);
+    this._y = new Transitionable(initial[1]);
+    this._z = new Transitionable(initial[2]);
 }
 
 /**
