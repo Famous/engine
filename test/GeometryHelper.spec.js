@@ -38,5 +38,154 @@ test('GeometryHelper', function(t) {
         t.end();
     });
 
+    t.test('computeNormals', function(t) {
+        var vertices = [
+            -1,  1, 0,
+             0, -1, 0,
+             1,  1, 0
+        ];
+        var indices = [0, 1, 2];
+
+        var normals = GeometryHelper.computeNormals(vertices, indices);
+        t.equals(normals.length, vertices.length, 'Normals should be length of vertices');
+        t.deepEquals([0, 0, 1], normals.slice(0, 3), 'Should return correct normals');
+        t.deepEquals([0, 0, 1], normals.slice(3, 6), 'Should return correct normals');
+        t.deepEquals([0, 0, 1], normals.slice(6, 9), 'Should return correct normals');
+
+        t.end();
+    });
+
+    t.test('subdivide', function(t) {
+        var vertices = [
+            -1,  1, 0,
+             0, -1, 0,
+             1,  1, 0
+        ];
+        var indices = [0, 1, 2];
+        var texCoords = [
+            0.0, 0.0,
+            0.5, 1.0,
+            1.0, 0.0
+        ];
+
+        GeometryHelper.subdivide(indices, vertices, texCoords);
+
+        t.equals(
+            vertices.length,
+            9 * 2,
+            'Returned vertices should be 2X length!'
+        );
+
+        t.equals(
+            indices.length,
+            3 * 4,
+            'Returned indices should 4X length'
+        );
+
+        var rangeX = [0, 0];
+        var rangeY = [0, 0];
+        var rangeZ = [0, 0];
+        var vectors = [];
+
+        for (var i = 0; i < vertices.length; i+=3) {
+            vectors.push([vertices[i], vertices[i + 1], vertices[i + 2]]);
+        }
+
+        // Get ranges
+        vectors.forEach(function(item, i) {
+            if (item[0] < rangeX[0]) rangeX[0] = item[0];
+            if (item[0] > rangeX[1]) rangeX[1] = item[0];
+            if (item[1] < rangeY[0]) rangeY[0] = item[1];
+            if (item[1] > rangeY[1]) rangeY[1] = item[1];
+            if (item[2] < rangeZ[0]) rangeZ[0] = item[2];
+            if (item[2] > rangeZ[1]) rangeZ[1] = item[2];
+        });
+
+        t.ok(!(rangeX[0] < -1), 'Returned vertices should remain with bounds of triangle');
+        t.ok(!(rangeX[1] >  1), 'Returned vertices should remain with bounds of triangle');
+        t.ok(!(rangeY[0] < -1), 'Returned vertices should remain with bounds of triangle');
+        t.ok(!(rangeY[1] <  1), 'Returned vertices should remain with bounds of triangle');
+        t.ok(!(rangeZ[0] < -1), 'Returned vertices should remain with bounds of triangle');
+        t.ok(!(rangeZ[1] >  1), 'Returned vertices should remain with bounds of triangle');
+
+        t.end();
+    });
+
+    t.test('getUniqueFaces', function(t) {
+        var vertices = [
+            -1,  1, 0,
+             0, -1, 0,
+             1,  1, 0
+        ];
+        var indices = [0, 1, 2];
+
+        GeometryHelper.getUniqueFaces(vertices, indices);
+
+        t.equals(vertices.length, 9, 'Should not duplicate vertices when no duplicate faces are found');
+
+        var indices = [0, 1, 2, 0, 1, 2];
+
+        GeometryHelper.getUniqueFaces(vertices, indices);
+
+        t.equals(vertices.length, 18, 'Should duplicate vertices for duplicate faces');
+
+        t.end();
+    });
+
+    t.test('subdivideSpheroid', function(t) {
+        var vertices = [];
+
+        vertices.push.apply(vertices, new Vec3(-1, 1, 0).normalize().toArray());
+        vertices.push.apply(vertices, new Vec3( 0,-1, 0).normalize().toArray());
+        vertices.push.apply(vertices, new Vec3( 1, 1, 0).normalize().toArray());
+
+        var indices = [0, 1, 2];
+
+        GeometryHelper.subdivideSpheroid(vertices, indices);
+
+        var vectors = [];
+        for (var i = 0; i < vertices.length; i += 3) {
+            vectors.push(new Vec3(vertices[i], vertices[i + 1], vertices[i + 2]));
+        }
+
+        var allLengthOne = vectors.every(function(vec) {
+            return (vec.length() > 0.98) && (vec.length() < 1.02);
+        });
+
+        t.ok(allLengthOne, "All returned vectors should be of length 1");
+
+        t.end();
+    });
+
+    t.test('getSpheroidNormals', function(t) {
+        var vertices = [
+            -1,  1, 0,
+             0, -1, 0,
+             1,  1, 0
+        ];
+
+        var normals = GeometryHelper.getSpheroidNormals(vertices);
+
+        var normalVectors = [];
+        normalVectors.push(normals.slice(0, 3));
+        normalVectors.push(normals.slice(3, 6));
+        normalVectors.push(normals.slice(6, 9));
+
+        var allNormalized = normalVectors.every(function(normal, i) {
+            var vector = new Vec3(vertices[i * 3], vertices[i * 3 + 1], vertices[i * 3 + 2]).normalize();
+
+            return (normal[0] === vector.x) && (normal[1] === vector.y) && (normal[2] === vector.z);
+        });
+
+        t.equals(normals.length, vertices.length, 'Returned normals should have same length as vertices');
+        t.ok(allNormalized, "All output normals should be normalized vertices values");
+
+        t.end();
+    });
+
+    t.test('getSpheroidUV', function(t) {
+
+    });
+
     t.end();
 });
