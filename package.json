@@ -1,6 +1,6 @@
 {
   "name": "famous-dom-renderables",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "Famous DOM Renderables",
   "main": "src/index.js",
   "scripts": {
@@ -24,6 +24,6 @@
     "tape": "^3.0.3"
   },
   "dependencies": {
-    "famous-utilities": "git+ssh://git@github.famo.us/platform/utilities#v0.3.0"
+    "famous-utilities": "git+ssh://git@github.famo.us/platform/utilities#v0.3.1"
   }
 }
