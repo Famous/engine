@@ -30,9 +30,9 @@ function Rotation(node) {
     var ry = Math.asin(ty);
     var rz = Math.atan2(2 * (z * w - x * y), 1 - 2 * (yy + zz));
 
-    this._x = new Transitionable(rx);
-    this._y = new Transitionable(ry);
-    this._z = new Transitionable(rz);
+    this._x.set(rx);
+    this._y.set(ry);
+    this._z.set(rz);
 }
 
 /**

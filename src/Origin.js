@@ -13,9 +13,9 @@ function Origin(node) {
 
     var initial = node.getOrigin();
 
-    this._x = new Transitionable(initial[0]);
-    this._y = new Transitionable(initial[1]);
-    this._z = new Transitionable(initial[2]);
+    this._x.set(initial[0]);
+    this._y.set(initial[1]);
+    this._z.set(initial[2]);
 }
 
 
