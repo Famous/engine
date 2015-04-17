@@ -80,6 +80,7 @@ DOMElement.prototype.onUpdate = function onUpdate () {
 DOMElement.prototype.onMount = function onMount (node, id) {
     this._node = node;
     this._id = id;
+    this._UIEvents = node.getUIEvents().slice(0);
     this.draw();
     this.setAttribute('data-fa-path', node.getLocation());
 };
