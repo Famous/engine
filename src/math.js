@@ -67,10 +67,10 @@ function multiply (out, a, b) {
     out3 = b0*a03 + b1*a13 + b2*a23 + b3*a33;
 
     changed = changed ?
-              changed : out0 == out[0] ||
-                        out1 == out[1] ||
-                        out2 == out[2] ||
-                        out3 == out[3];
+              changed : out0 === out[0] ||
+                        out1 === out[1] ||
+                        out2 === out[2] ||
+                        out3 === out[3];
 
     out[0] = out0;
     out[1] = out1;
@@ -84,10 +84,10 @@ function multiply (out, a, b) {
     out3 = b0*a03 + b1*a13 + b2*a23 + b3*a33;
 
     changed = changed ?
-              changed : out0 == out[4] ||
-                        out1 == out[5] ||
-                        out2 == out[6] ||
-                        out3 == out[7];
+              changed : out0 === out[4] ||
+                        out1 === out[5] ||
+                        out2 === out[6] ||
+                        out3 === out[7];
 
     out[4] = out0;
     out[5] = out1;
@@ -101,10 +101,10 @@ function multiply (out, a, b) {
     out3 = b0*a03 + b1*a13 + b2*a23 + b3*a33;
 
     changed = changed ?
-              changed : out0 == out[8] ||
-                        out1 == out[9] ||
-                        out2 == out[10] ||
-                        out3 == out[11];
+              changed : out0 === out[8] ||
+                        out1 === out[9] ||
+                        out2 === out[10] ||
+                        out3 === out[11];
 
     out[8] = out0;
     out[9] = out1;
@@ -118,10 +118,10 @@ function multiply (out, a, b) {
     out3 = b0*a03 + b1*a13 + b2*a23 + b3*a33;
 
     changed = changed ?
-              changed : out0 == out[12] ||
-                        out1 == out[13] ||
-                        out2 == out[14] ||
-                        out3 == out[15];
+              changed : out0 === out[12] ||
+                        out1 === out[13] ||
+                        out2 === out[14] ||
+                        out3 === out[15];
 
     out[12] = out0;
     out[13] = out1;
