@@ -14,6 +14,7 @@ var IDENT = [
 ];
 
 var ONES = [1, 1, 1];
+var QUAT = [0, 0, 0, 1];
 
 function Node () {
     this._calculatedValues = {
@@ -58,7 +59,7 @@ Node.Spec = function Spec () {
     };
     this.vectors = {
         position: new Float32Array(3),
-        rotation: new Float32Array(3),
+        rotation: new Float32Array(QUAT),
         scale: new Float32Array(ONES)
     };
     this.size = {
@@ -74,7 +75,7 @@ Node.Spec = function Spec () {
 /**
  * @method getContext
  * @chainable
- * 
+ *
  * @deprecated Node can be used directly instead!
  * @return {Node} this
  */
@@ -89,7 +90,7 @@ Node.prototype.getContext = function getContext () {
 /**
  * @method getDispatch
  * @chainable
- * 
+ *
  * @deprecated Node can be used directly instead!
  * @return {Node} this
  */
@@ -105,7 +106,7 @@ Node.prototype.getDispatch = function getDispatch () {
 /**
  * @method getRenderProxy
  * @chainable
- * 
+ *
  * @deprecated Node can be used directly instead!
  * @return {Node} this
  */
@@ -184,7 +185,7 @@ Node.prototype.getValue = function getValue () {
         value.children[i] = this._children[i].getValue();
 
     for (i = 0 ; i < numberOfComponents ; i++)
-        if (this._components[i].getValue) 
+        if (this._components[i].getValue)
             value.components[i] = this._components[i].getValue();
 
     return value;
@@ -308,7 +309,7 @@ Node.prototype.addChild = function addChild (child) {
             var childId = myId + '/' + index;
             child.onMount(this, childId);
         }
-    
+
     }
 
     return child;
@@ -377,9 +378,9 @@ Node.prototype._requestUpdate = function _requestUpdate (force) {
     }
 };
 
-Node.prototype._vec3OptionalSet = function _vec3OptionalSet (vec3, index, val) {
-    if (val != null && vec3[index] !== val) {
-        vec3[index] = val;
+Node.prototype._vecOptionalSet = function _vecOptionalSet (vec, index, val) {
+    if (val != null && vec[index] !== val) {
+        vec[index] = val;
         if (!this._requestingUpdate) this._requestUpdate();
         return true;
     }
@@ -436,9 +437,9 @@ Node.prototype.setAlign = function setAlign (x, y, z) {
     var vec3 = this.value.offsets.align;
     var propogate = false;
 
-    propogate = this._vec3OptionalSet(vec3, 0, x) || propogate;
-    propogate = this._vec3OptionalSet(vec3, 1, y) || propogate;
-    propogate = this._vec3OptionalSet(vec3, 2, z) || propogate;
+    propogate = this._vecOptionalSet(vec3, 0, x) || propogate;
+    propogate = this._vecOptionalSet(vec3, 1, y) || propogate;
+    propogate = this._vecOptionalSet(vec3, 2, z) || propogate;
 
     if (propogate) {
         var i = 0;
@@ -460,9 +461,9 @@ Node.prototype.setMountPoint = function setMountPoint (x, y, z) {
     var vec3 = this.value.offsets.mountPoint;
     var propogate = false;
 
-    propogate = this._vec3OptionalSet(vec3, 0, x) || propogate;
-    propogate = this._vec3OptionalSet(vec3, 1, y) || propogate;
-    propogate = this._vec3OptionalSet(vec3, 2, z) || propogate;
+    propogate = this._vecOptionalSet(vec3, 0, x) || propogate;
+    propogate = this._vecOptionalSet(vec3, 1, y) || propogate;
+    propogate = this._vecOptionalSet(vec3, 2, z) || propogate;
 
     if (propogate) {
         var i = 0;
@@ -484,9 +485,9 @@ Node.prototype.setOrigin = function setOrigin (x, y, z) {
     var vec3 = this.value.offsets.origin;
     var propogate = false;
 
-    propogate = this._vec3OptionalSet(vec3, 0, x) || propogate;
-    propogate = this._vec3OptionalSet(vec3, 1, y) || propogate;
-    propogate = this._vec3OptionalSet(vec3, 2, z) || propogate;
+    propogate = this._vecOptionalSet(vec3, 0, x) || propogate;
+    propogate = this._vecOptionalSet(vec3, 1, y) || propogate;
+    propogate = this._vecOptionalSet(vec3, 2, z) || propogate;
 
     if (propogate) {
         var i = 0;
@@ -509,9 +510,9 @@ Node.prototype.setPosition = function setPosition (x, y, z) {
     var vec3 = this.value.vectors.position;
     var propogate = false;
 
-    propogate = this._vec3OptionalSet(vec3, 0, x) || propogate;
-    propogate = this._vec3OptionalSet(vec3, 1, y) || propogate;
-    propogate = this._vec3OptionalSet(vec3, 2, z) || propogate;
+    propogate = this._vecOptionalSet(vec3, 0, x) || propogate;
+    propogate = this._vecOptionalSet(vec3, 1, y) || propogate;
+    propogate = this._vecOptionalSet(vec3, 2, z) || propogate;
 
     if (propogate) {
         var i = 0;
@@ -529,25 +530,57 @@ Node.prototype.setPosition = function setPosition (x, y, z) {
     return this;
 };
 
-Node.prototype.setRotation = function setRotation (x, y, z) {
-    var vec3 = this.value.vectors.rotation;
+Node.prototype.setRotation = function setRotation (x, y, z, w) {
+    var quat = this.value.vectors.rotation;
     var propogate = false;
+    var qx, qy, qz, qw;
 
-    propogate = this._vec3OptionalSet(vec3, 0, x) || propogate;
-    propogate = this._vec3OptionalSet(vec3, 1, y) || propogate;
-    propogate = this._vec3OptionalSet(vec3, 2, z) || propogate;
+    if (w != null) {
+        qx = x;
+        qy = y;
+        qz = z;
+        qw = w;
+    }
+    else {
+        var hx = x * 0.5;
+        var hy = y * 0.5;
+        var hz = z * 0.5;
+
+        var sx = Math.sin(hx);
+        var sy = Math.sin(hy);
+        var sz = Math.sin(hz);
+        var cx = Math.cos(hx);
+        var cy = Math.cos(hy);
+        var cz = Math.cos(hz);
+
+        var sysz = sy * sz;
+        var cysz = cy * sz;
+        var sycz = sy * cz;
+        var cycz = cy * cz;
+
+        qx = sx * cycz + cx * sysz;
+        qy = cx * sycz - sx * cysz;
+        qz = cx * cysz + sx * sycz;
+        qw = cx * cycz - sx * sysz;
+    }
+
+    propogate = this._vecOptionalSet(quat, 0, qx) || propogate;
+    propogate = this._vecOptionalSet(quat, 1, qy) || propogate;
+    propogate = this._vecOptionalSet(quat, 2, qz) || propogate;
+    propogate = this._vecOptionalSet(quat, 3, qw) || propogate;
 
     if (propogate) {
         var i = 0;
         var list = this._components;
         var len = list.length;
         var item;
-        x = vec3[0];
-        y = vec3[1];
-        z = vec3[2];
+        x = quat[0];
+        y = quat[1];
+        z = quat[2];
+        w = quat[3];
         for (; i < len ; i++) {
             item = list[i];
-            if (item && item.onRotationChange) item.onRotationChange(x, y, z);
+            if (item && item.onRotationChange) item.onRotationChange(x, y, z, w);
         }
     }
     return this;
@@ -557,9 +590,9 @@ Node.prototype.setScale = function setScale (x, y, z) {
     var vec3 = this.value.vectors.scale;
     var propogate = false;
 
-    propogate = this._vec3OptionalSet(vec3, 0, x) || propogate;
-    propogate = this._vec3OptionalSet(vec3, 1, y) || propogate;
-    propogate = this._vec3OptionalSet(vec3, 2, z) || propogate;
+    propogate = this._vecOptionalSet(vec3, 0, x) || propogate;
+    propogate = this._vecOptionalSet(vec3, 1, y) || propogate;
+    propogate = this._vecOptionalSet(vec3, 2, z) || propogate;
 
     if (propogate) {
         var i = 0;
@@ -598,9 +631,9 @@ Node.prototype.setSizeMode = function setSizeMode (x, y, z) {
     var vec3 = this.value.size.sizeMode;
     var propogate = false;
 
-    propogate = this._vec3OptionalSet(vec3, 0, x) || propogate;
-    propogate = this._vec3OptionalSet(vec3, 1, y) || propogate;
-    propogate = this._vec3OptionalSet(vec3, 2, z) || propogate;
+    propogate = this._vecOptionalSet(vec3, 0, x) || propogate;
+    propogate = this._vecOptionalSet(vec3, 1, y) || propogate;
+    propogate = this._vecOptionalSet(vec3, 2, z) || propogate;
 
     if (propogate) {
         var i = 0;
@@ -622,9 +655,9 @@ Node.prototype.setProportionalSize = function setProportionalSize (x, y, z) {
     var vec3 = this.value.size.proportional;
     var propogate = false;
 
-    propogate = this._vec3OptionalSet(vec3, 0, x) || propogate;
-    propogate = this._vec3OptionalSet(vec3, 1, y) || propogate;
-    propogate = this._vec3OptionalSet(vec3, 2, z) || propogate;
+    propogate = this._vecOptionalSet(vec3, 0, x) || propogate;
+    propogate = this._vecOptionalSet(vec3, 1, y) || propogate;
+    propogate = this._vecOptionalSet(vec3, 2, z) || propogate;
 
     if (propogate) {
         var i = 0;
@@ -646,9 +679,9 @@ Node.prototype.setDifferentialSize = function setDifferentialSize (x, y, z) {
     var vec3 = this.value.size.differential;
     var propogate = false;
 
-    propogate = this._vec3OptionalSet(vec3, 0, x) || propogate;
-    propogate = this._vec3OptionalSet(vec3, 1, y) || propogate;
-    propogate = this._vec3OptionalSet(vec3, 2, z) || propogate;
+    propogate = this._vecOptionalSet(vec3, 0, x) || propogate;
+    propogate = this._vecOptionalSet(vec3, 1, y) || propogate;
+    propogate = this._vecOptionalSet(vec3, 2, z) || propogate;
 
     if (propogate) {
         var i = 0;
@@ -670,9 +703,9 @@ Node.prototype.setAbsoluteSize = function setAbsoluteSize (x, y, z) {
     var vec3 = this.value.size.absolute;
     var propogate = false;
 
-    propogate = this._vec3OptionalSet(vec3, 0, x) || propogate;
-    propogate = this._vec3OptionalSet(vec3, 1, y) || propogate;
-    propogate = this._vec3OptionalSet(vec3, 2, z) || propogate;
+    propogate = this._vecOptionalSet(vec3, 0, x) || propogate;
+    propogate = this._vecOptionalSet(vec3, 1, y) || propogate;
+    propogate = this._vecOptionalSet(vec3, 2, z) || propogate;
 
     if (propogate) {
         var i = 0;
@@ -756,7 +789,7 @@ Node.prototype.update = function update (time){
     var parentSize = parent.getSize();
     var parentTransform = parent.getTransform();
     var sizeChanged = SIZE_PROCESSOR.fromSpecWithParent(parentSize, this.value, mySize);
- 
+
     var transformChanged = TRANSFORM_PROCESSOR.fromSpecWithParent(parentTransform, this.value, mySize, parentSize, myTransform);
     if (transformChanged) this._transformChanged(myTransform);
     if (sizeChanged) this._sizeChanged(mySize);
@@ -771,7 +804,7 @@ Node.prototype.update = function update (time){
 };
 
 Node.prototype.mount = function mount (parent, myId) {
-    if (this.isMounted()) return; 
+    if (this.isMounted()) return;
     var i = 0;
     var list = this._components;
     var len = list.length;
@@ -786,7 +819,7 @@ Node.prototype.mount = function mount (parent, myId) {
         item = list[i];
         if (item.onMount) item.onMount(this, i);
     }
-    
+
     i = 0;
     list = this._children;
     len = list.length;
@@ -799,7 +832,7 @@ Node.prototype.mount = function mount (parent, myId) {
 };
 
 Node.prototype.dismount = function dismount () {
-    if (!this.isMounted()) return; 
+    if (!this.isMounted()) return;
     var i = 0;
     var list = this._components;
     var len = list.length;
@@ -816,7 +849,7 @@ Node.prototype.dismount = function dismount () {
         item = list[i];
         if (item.onDismount) item.onDismount();
     }
-    
+
     i = 0;
     list = this._children;
     len = list.length;
