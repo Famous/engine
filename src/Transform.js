@@ -6,25 +6,24 @@ var Quaternion = require('famous-math').Quaternion;
 var Q_REGISTER = new Quaternion();
 var Q2_REGISTER = new Quaternion();
 
-function Vec3Transitionable(manager) {
-    this._manager = manager;
+function Vec3Transitionable(x, y, z, transform) {
+    this._transform = transform;
     this._dirty = false;
-    this._x = new Transitionable(0);
-    this._y = new Transitionable(0);
-    this._z = new Transitionable(0);
+    this.x = new Transitionable(x);
+    this.y = new Transitionable(y);
+    this.z = new Transitionable(z);
+    this._values = {x: x, y: y, z: z};
 }
 
 Vec3Transitionable.prototype.get = function get() {
-    return {
-        x: this._x.get(),
-        y: this._y.get(),
-        z: this._z.get()
-    };
+    this._values.x = this.x.get();
+    this._values.y = this.y.get();
+    this._values.z = this.z.get();
+    return this._values;
 };
 
 Vec3Transitionable.prototype.set = function set(x, y, z, options, callback) {
-    this._manager._dispatch.dirtyComponent(this._manager._id);
-    this._dirty = true;
+    this.dirty();
 
     var cbX = null;
     var cbY = null;
@@ -34,35 +33,57 @@ Vec3Transitionable.prototype.set = function set(x, y, z, options, callback) {
     else if (y != null) cbY = callback;
     else if (x != null) cbX = callback;
 
-    if (x != null) this._x.set(x, options, cbX);
-    if (y != null) this._y.set(y, options, cbY);
-    if (z != null) this._z.set(z, options, cbZ);
+    if (x != null) this.x.set(x, options, cbX);
+    if (y != null) this.y.set(y, options, cbY);
+    if (z != null) this.z.set(z, options, cbZ);
 
     return this;
 };
 
 Vec3Transitionable.prototype.isActive = function isActive() {
-    return this._x.isActive() || this._y.isActive() || this._z.isActive();
+    return this.x.isActive() || this.y.isActive() || this.z.isActive();
 };
 
-Vec3Transitionable.prototype.halt = function halt() {
-    this._x.halt();
-    this._y.halt();
-    this._z.halt();
+Vec3Transitionable.prototype.pause = function pause() {
+    this.x.pause();
+    this.y.pause();
+    this.z.pause();
     return this;
 };
 
-function QuatTransitionable(manager) {
-    this._manager = manager;
+Vec3Transitionable.prototype.resume = function resume() {
+    this.x.resume();
+    this.y.resume();
+    this.z.resume();
+    return this;
+};
+
+Vec3Transitionable.prototype.halt = function halt() {
+    this.x.halt();
+    this.y.halt();
+    this.z.halt();
+    return this;
+};
+
+Vec3Transitionable.prototype.dirty = function dirty() {
+    if (!this._transform._dirty) {
+        this._transform._node.requestUpdate(this._transform._id);
+        this._transform._dirty = true;
+    }
+    this._dirty = true;
+    return this;
+};
+
+function QuatTransitionable(x, y, z, w, transform) {
+    this._transform = transform;
     this._queue = [];
     this._front = 0;
     this._end = 0;
     this._dirty = false;
     this._t = new Transitionable(0);
-    this._fromQ = new Quaternion();
+    this._fromQ = new Quaternion(w, x, y, z);
     this._toQ = new Quaternion();
-    this._q = new Quaternion();
-    this._eulers = {x: 0, y: 0, z: 0};
+    this._q = new Quaternion(w, x, y, z);
 }
 
 QuatTransitionable.prototype.get = function get() {
@@ -80,14 +101,17 @@ QuatTransitionable.prototype.get = function get() {
         if (this._queue.length !== 0) this._toQ.set(queue[0], queue[1], queue[2], queue[3]);
     }
     if (this._queue.length !== 0) this._fromQ.slerp(this._toQ, t - this._front, this._q);
-    return this._q.toEuler(this._eulers);
+    return this._q;
 };
 
-QuatTransitionable.prototype.set = function set(q, options, callback) {
-    this._manager._dispatch.dirtyComponent(this._manager._id);
+QuatTransitionable.prototype.set = function set(x, y, z, w, options, callback) {
+    if (!this._transform._dirty) {
+        this._transform._node.requestUpdate(this._transform._id);
+        this._transform._dirty = true;
+    }
     this._dirty = true;
-    if (this._queue.length === 0) this._toQ.copy(q);
-    this._queue.push(q.w, q.x, q.y, q.z);
+    if (this._queue.length === 0) this._toQ.set(w, x, y, z);
+    this._queue.push(w, x, y, z);
     this._end++;
     this._t.set(this._end, options, callback);
     return this;
@@ -95,6 +119,16 @@ QuatTransitionable.prototype.set = function set(q, options, callback) {
 
 QuatTransitionable.prototype.isActive = function isActive() {
     return this._t.isActive();
+};
+
+QuatTransitionable.prototype.pause = function pause() {
+    this._t.pause();
+    return this;
+};
+
+QuatTransitionable.prototype.resume = function resume() {
+    this._t.resume();
+    return this;
 };
 
 QuatTransitionable.prototype.halt = function halt() {
@@ -106,22 +140,24 @@ QuatTransitionable.prototype.halt = function halt() {
     return this;
 };
 
-function Transform(dispatch) {
-    this._dispatch = dispatch;
-    this._id = dispatch.addComponent(this);
+function Transform(node) {
+    this._node = node;
+    this._id = node.addComponent(this);
     this.origin = null;
     this.mountPoint = null;
     this.align = null;
     this.scale = null;
     this.position = null;
     this.rotation = null;
+
+    this._dirty = false;
 }
 
 Transform.toString = function toString() {
     return 'Transform';
 };
 
-Transform.prototype.getState = function getState() {
+Transform.prototype.getValue = function getValue() {
     return {
         component: this.constructor.toString(),
         origin: this.origin && this.origin.get(),
@@ -140,45 +176,86 @@ Transform.prototype.setState = function setState(state) {
         state.align && this.setAlign(state.align.x, state.align.y, state.align.z);
         state.scale && this.setScale(state.scale.x, state.scale.y, state.scale.z);
         state.position && this.setPosition(state.position.x, state.position.y, state.position.z);
-        state.rotation && this.setRotation(state.rotation.x, state.rotation.y, state.rotation.z);
+        state.rotation && this.setRotation(state.rotation.x, state.rotation.y, state.rotation.z, state.rotation.w);
         return true;
     }
     return false;
 };
 
 Transform.prototype.setOrigin = function setOrigin(x, y, z, options, callback) {
-    if (!this.origin) this.origin = new Vec3Transitionable(this);
+    if (!this.origin) {
+        var v = this._node.getOrigin();
+        this.origin = new Vec3Transitionable(v[0], v[1], v[2], this);
+    }
     this.origin.set(x, y, z, options, callback);
 };
 
 Transform.prototype.setMountPoint = function setMountPoint(x, y, z, options, callback) {
-    if (!this.mountPoint) this.mountPoint = new Vec3Transitionable(this);
+    if (!this.mountPoint) {
+        var v = this._node.getMountPoint();
+        this.mountPoint = new Vec3Transitionable(v[0], v[1], v[2], this);
+    }
     this.mountPoint.set(x, y, z, options, callback);
 };
 
 Transform.prototype.setAlign = function setAlign(x, y, z, options, callback) {
-    if (!this.align) this.align = new Vec3Transitionable(this);
+    if (!this.align) {
+        var v = this._node.getAlign();
+        this.align = new Vec3Transitionable(v[0], v[1], v[2], this);
+    }
     this.align.set(x, y, z, options, callback);
 };
 
 Transform.prototype.setScale = function setScale(x, y, z, options, callback) {
-    if (!this.scale) this.scale = new Vec3Transitionable(this);
+    if (!this.scale) {
+        var v = this._node.getScale();
+        this.scale = new Vec3Transitionable(v[0], v[1], v[2], this);
+    }
     this.scale.set(x, y, z, options, callback);
 };
 
 Transform.prototype.setPosition = function setPosition(x, y, z, options, callback) {
-    if (!this.position) this.position = new Vec3Transitionable(this);
+    if (!this.position) {
+        var v = this._node.getPosition();
+        this.position = new Vec3Transitionable(v[0], v[1], v[2], this);
+    }
     this.position.set(x, y, z, options, callback);
 };
 
-Transform.prototype.setRotation = function setRotation(x, y, z, options, callback) {
-    if (!this.rotation) this.rotation = new QuatTransitionable(this);
-    var q = Q_REGISTER.fromEuler(x, y, z);
-    this.rotation.set(q, options, callback);
+Transform.prototype.translate = function translate(x, y, z, options, callback) {
+    if (!this.position) {
+        var v = this._node.getPosition();
+        this.position = new Vec3Transitionable(v[0], v[1], v[2], this);
+    }
+    var p = this.position;
+    var xEnd = p.x._queue.length > 0 ? p.x._queue[p.x._queue.length - 4] : p.x._end;
+    var yEnd = p.y._queue.length > 0 ? p.y._queue[p.y._queue.length - 4] : p.y._end;
+    var zEnd = p.z._queue.length > 0 ? p.z._queue[p.z._queue.length - 4] : p.z._end;
+    this.position.set(xEnd + x, yEnd + y, zEnd + z, options, callback);
 };
 
-Transform.prototype.rotate = function rotate(x, y, z, options, callback) {
-    if (!this.rotation) this.rotation = new QuatTransitionable(this);
+Transform.prototype.setRotation = function setRotation(x, y, z, w, options, callback) {
+    if (!this.rotation) {
+        var v = this._node.getRotation();
+        this.rotation = new QuatTransitionable(v[0], v[1], v[2], v[3], this);
+    }
+    var q = Q_REGISTER;
+    if (typeof w === 'number') {
+        q.set(w, x, y, z);
+    }
+    else {
+        q.fromEuler(x, y, z);
+        callback = options;
+        options = w;
+    }
+    this.rotation.set(q.x, q.y, q.z, q.w, options, callback);
+};
+
+Transform.prototype.rotate = function rotate(x, y, z, w, options, callback) {
+    if (!this.rotation) {
+        var v = this._node.getRotation();
+        this.rotation = new QuatTransitionable(v[0], v[1], v[2], v[3], this);
+    }
     var queue = this.rotation._queue;
     var len = this.rotation._queue.length;
     var referenceQ;
@@ -186,46 +263,60 @@ Transform.prototype.rotate = function rotate(x, y, z, options, callback) {
         referenceQ = Q2_REGISTER.set(queue[len - 4], queue[len - 3], queue[len - 2], queue[len - 1]);
     }
     else referenceQ = Q2_REGISTER.copy(this.rotation._q);
-    var q = referenceQ.multiply(Q_REGISTER.fromEuler(x, y, z));
-    this.rotation.set(q, options, callback);
+
+    var rotQ = Q_REGISTER;
+    if (typeof w === 'number') {
+        rotQ.set(w, x, y, z);
+    }
+    else {
+        rotQ.fromEuler(x, y, z);
+        callback = options;
+        options = w;
+    }
+
+    var q = referenceQ.multiply(rotQ);
+    this.rotation.set(q.x, q.y, q.z, q.w, options, callback);
 };
 
 Transform.prototype.clean = function clean() {
-    var context = this._dispatch.getContext();
+    var node = this._node;
     var c;
     var isDirty = false;
     if ((c = this.origin) && c._dirty) {
-        context.setOrigin(c._x.get(), c._y.get(), c._z.get());
+        node.setOrigin(c.x.get(), c.y.get(), c.z.get());
         c._dirty = c.isActive();
         isDirty = isDirty || c._dirty;
     }
     if ((c = this.mountPoint) && c._dirty) {
-        context.setMountPoint(c._x.get(), c._y.get(), c._z.get());
+        node.setMountPoint(c.x.get(), c.y.get(), c.z.get());
         c._dirty = c.isActive();
         isDirty = isDirty || c._dirty;
     }
     if ((c = this.align) && c._dirty) {
-        context.setAlign(c._x.get(), c._y.get(), c._z.get());
+        node.setAlign(c.x.get(), c.y.get(), c.z.get());
         c._dirty = c.isActive();
         isDirty = isDirty || c._dirty;
     }
     if ((c = this.scale) && c._dirty) {
-        context.setScale(c._x.get(), c._y.get(), c._z.get());
+        node.setScale(c.x.get(), c.y.get(), c.z.get());
         c._dirty = c.isActive();
         isDirty = isDirty || c._dirty;
     }
     if ((c = this.position) && c._dirty) {
-        context.setPosition(c._x.get(), c._y.get(), c._z.get());
+        node.setPosition(c.x.get(), c.y.get(), c.z.get());
         c._dirty = c.isActive();
         isDirty = isDirty || c._dirty;
     }
     if ((c = this.rotation) && c._dirty) {
         c.get();
-        context.setRotation(c._eulers.x, c._eulers.y, c._eulers.z);
+        node.setRotation(c._q.x, c._q.y, c._q.z, c._q.w);
         c._dirty = c.isActive();
         isDirty = isDirty || c._dirty;
     }
-    return isDirty;
+    if (isDirty) this._node.requestUpdateOnNextTick(this._id);
+    else this._dirty = false;
 };
+
+Transform.prototype.onUpdate = Transform.prototype.clean;
 
 module.exports = Transform;
