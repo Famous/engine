@@ -1,3 +1,5 @@
+'use strict';
+
 var testCases = [];
 for (var sizeModeX = 0; sizeModeX < 3; sizeModeX++) {
     for (var sizeModeY = 0; sizeModeY < 3; sizeModeY++) {

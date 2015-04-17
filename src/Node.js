@@ -130,7 +130,7 @@ Node.prototype.getRenderPath = function getRenderPath () {
         'Use Node#getLocation instead!'
     );
     return this.getLocation();
-}
+};
 
 /**
  * @method addRenderable
@@ -141,7 +141,10 @@ Node.prototype.getRenderPath = function getRenderPath () {
  * @return this
  */
 Node.prototype.addRenderable = function addRenderable (component) {
-    console.warn("Node#addRenderable is depricated!\n use node.addComponent instead");
+    console.warn(
+        'Node#addRenderable is deprecated!\n' +
+        'use node.addComponent instead'
+    );
     this.addComponent(component);
     return this;
 };
@@ -748,16 +751,15 @@ Node.prototype.update = function update (time){
     }
 
     var mySize = this.getSize();
+    var myTransform = this.getTransform();
     var parent = this.getParent();
     var parentSize = parent.getSize();
-    var myTransform = this.getTransform();
     var parentTransform = parent.getTransform();
     var sizeChanged = SIZE_PROCESSOR.fromSpecWithParent(parentSize, this.value, mySize);
-    mySize = this.getSize();
  
-    var transformChanged = TRANSFORM_PROCESSOR.fromSpecWithParent(this.getParent().getTransform(), this.value, mySize, parentSize, this.getTransform());
-    if (transformChanged) this._transformChanged(this.getTransform());
-    if (sizeChanged) this._sizeChanged(this.getSize());
+    var transformChanged = TRANSFORM_PROCESSOR.fromSpecWithParent(parentTransform, this.value, mySize, parentSize, myTransform);
+    if (transformChanged) this._transformChanged(myTransform);
+    if (sizeChanged) this._sizeChanged(mySize);
 
     this._inUpdate = false;
     this._requestingUpdate = false;

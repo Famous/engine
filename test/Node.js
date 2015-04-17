@@ -4,6 +4,7 @@ var test = require('tape');
 var Node = require('../src/Node');
 var Size = require('../src/Size');
 var DefaultNodeSpec = require('./expected/DefaultNodeSpec');
+var ExampleNodeSpec = require('./expected/ExampleNodeSpec');
 
 test('Node', function(t) {
     t.test('constructor', function(t) {
@@ -57,7 +58,7 @@ test('Node', function(t) {
         context.getUpdater = function getUpdater () {
             return {
                 message: function(message) {
-                    receivedMessages.push(message)
+                    receivedMessages.push(message);
                 }
             };
         };
@@ -126,25 +127,30 @@ test('Node', function(t) {
         t.equal(requesters[4], node010);
         t.equal(requesters[5], node011);
         t.equal(requesters.length, 6);
-
-        // console.log(JSON.stringify(root.getValue(), null, 4))
-
-        // TODO
-
-
-        // t.equal(requesters[0], node0);
-        // t.equal(requesters[0], node0);
-        // t.equal(requesters[0], node0);
-        // t.equal(requesters[0], node0);
+        
+        t.deepEqual(root.getValue(), ExampleNodeSpec);
 
         t.end();
     });
     
     t.test('getComputedValue method', function(t) {
-        var node = new Node();
-        t.equal(typeof node.getComputedValue, 'function', 'node.getComputedValue should be a function');
+        var root = new Node();
+        t.equal(typeof root.getComputedValue, 'function', 'root.getComputedValue should be a function');
+
+        var node0 = root.addChild();
+        var node1 = root.addChild();
+
+        root.setSizeMode(Node.ABSOLUTE_SIZE, Node.ABSOLUTE_SIZE, Node.ABSOLUTE_SIZE);
+        root.setAbsoluteSize(100, 200, 300);
+
+        root.mount(root, 0);
+        node0.mount(root, 0);
+        node1.mount(root, 1);
+
+        root.update();
 
         // TODO
+        // @dan This is broken.
 
         t.end();
     });
@@ -193,7 +199,6 @@ test('Node', function(t) {
         root.mount(context, 'body');
         t.equal(typeof root.requestUpdate, 'function', 'root.requestUpdate should be a function');
         var node0 = root.addChild();
-        var node1 = root.addChild();
 
         var node00 = node0.addChild();
 
@@ -207,26 +212,9 @@ test('Node', function(t) {
     });
 
     t.test('requestUpdateOnNextTick method', function(t) {
-        var context = {};
-        var requesters = [];
-        var onNextTickRequesters = [];
-        context.getUpdater = function getUpdater () {
-            return {
-                requestUpdate: function requestUpdate (requester) {
-                    requesters.push(requester);
-                },
-                requestUpdateOnNextTick: function requestUpdateOnNextTick (requester) {
-                    onNextTickRequesters.push(requester);
-                }
-            };
-        };
-
+        t.plan(1);
         var root = new Node();
         t.equal(typeof root.requestUpdateOnNextTick, 'function', 'root.requestUpdateOnNextTick should be a function');
-
-        // TODO
-
-        t.end();
     });
 
     t.test('getUpdater method', function(t) {
@@ -270,6 +258,76 @@ test('Node', function(t) {
         t.equal(child.isShown(), false);
         child.show();
         t.equal(child.isShown(), true);
+
+        t.end();
+    });
+
+    t.test('getOpacity method', function(t) {
+        var parent = new Node();
+        parent.show();
+        parent.onMount(parent, 'body');
+
+        t.equal(typeof parent.getOpacity, 'function', 'parent.getOpacity should be a function');
+        var child = new Node();
+        child.onMount(parent, '0');
+
+        parent.setOpacity(0.5);
+        t.equal(parent.getOpacity(), 0.5);
+        parent.onUpdate();
+        child.onUpdate();
+        t.equal(child.getOpacity(), 1, 'should not multiply opacities');
+
+        t.end(); 
+    });
+
+    t.test('addChild, getChildren method', function(t) {
+        var root = new Node();
+
+        t.equal(typeof root.addChild, 'function', 'root.addChild should be a function');
+        t.equal(typeof root.getChildren, 'function', 'root.getChildren should be a function');
+
+        var child0 = root.addChild();
+        var child00 = child0.addChild();
+        var child01 = child0.addChild();
+
+        var child1 = root.addChild();
+
+        t.deepEqual(root.getChildren(), [child0, child1]);
+        t.deepEqual(child0.getChildren(), [child00, child01]);
+        t.end();
+    });
+
+    t.test('addChild, removeChild method', function(t) {
+        var root = new Node();
+        t.equal(typeof root.addChild, 'function', 'root.addChild should be a function');
+        t.equal(typeof root.removeChild, 'function', 'root.removeChild should be a function');
+        root.mount(root, 'root');
+        var node = root.addChild();
+        t.equal(root.getChildren()[0], node);
+        t.equal(root.getChildren().length, 1);
+        root.removeChild(node);
+        t.deepEqual(root.getChildren(), [null]);
+        t.equal(root.getChildren().indexOf(node), -1);
+        t.end();
+    });
+
+    t.test('addComponent method', function(t) {
+        var root = new Node();
+
+        var events = [];
+
+        t.equal(typeof root.addComponent, 'function', 'root.addComponent should be a function');
+        
+        root.addComponent({
+            onMount: function() {
+                events.push('onMount');
+            },
+        });
+
+        root.onMount(root, 'root');
+        root.onUpdate(1);
+        t.deepEqual(events, ['onMount']);
+        events.length = 0;
 
         t.end();
     });
