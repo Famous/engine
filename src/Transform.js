@@ -233,10 +233,13 @@ Transform.prototype.translate = function translate(x, y, z, options, callback) {
         this.position = new Vec3Transitionable(v[0], v[1], v[2], this);
     }
     var p = this.position;
-    var xEnd = p.x._queue.length > 0 ? p.x._queue[p.x._queue.length - 4] : p.x._end;
-    var yEnd = p.y._queue.length > 0 ? p.y._queue[p.y._queue.length - 4] : p.y._end;
-    var zEnd = p.z._queue.length > 0 ? p.z._queue[p.z._queue.length - 4] : p.z._end;
-    this.position.set(xEnd + x, yEnd + y, zEnd + z, options, callback);
+    var xq = p.x._queue;
+    var yq = p.y._queue;
+    var zq = p.z._queue;
+    var xEnd = x == null ? null : x + (xq.length > 0 ? xq[xq.length - 4] : p.x._end);
+    var yEnd = y == null ? null : y + (yq.length > 0 ? yq[yq.length - 4] : p.y._end);
+    var zEnd = z == null ? null : z + (zq.length > 0 ? zq[zq.length - 4] : p.z._end);
+    this.position.set(xEnd, yEnd, zEnd, options, callback);
     return this;
 };
 
