@@ -144,34 +144,4 @@ Clock.prototype.clearTimer = function (timer) {
     return this;
 };
 
-/**
- * Wraps a function to be invoked after a certain amount of time.
- *  After a set duration has passed, it executes the function and
- *  resets the execution time.
- *
- * @method setInterval
- *
- * @param {Function} callback function to be run after a specified duration
- * @param {Number} duration interval to execute function in milliseconds
- *
- * @return {Function} decorated passed in callback function
- */
-Clock.prototype.setInterval = function setInterval(callback, delay) {
-    var params = Array.prototype.slice.call(arguments, 2);
-    var startedAt = this._time;
-
-    var looper = {
-        update: function update (time) {
-            if (time - startedAt >= delay) {
-                callback.apply(this, params);
-                startedAt = time;
-            }
-        }
-    };
-    callback.__looper = looper;
-    this.update(looper);
-    return callback;
-};
-
-
 module.exports = Clock;
