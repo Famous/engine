@@ -10,6 +10,12 @@ var Position = require('./Position');
  */
 function MountPoint(node) {
     Position.call(this, node);
+
+    var initial = node.getMountPoint();
+
+    this._x.set(initial[0]);
+    this._y.set(initial[1]);
+    this._z.set(initial[2]);
 }
 
 /**

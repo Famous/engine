@@ -13,5 +13,6 @@ module.exports = {
     Position: require('./Position'),
     Rotation: require('./Rotation'),
     Scale: require('./Scale'),
-    Size: require('./Size')
+    Size: require('./Size'),
+    Transform: require('./Transform')
 };
