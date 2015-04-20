@@ -58,4 +58,8 @@ function TouchEvent(ev) {
     this.shiftKey = ev.shiftKey;
 }
 
+
+TouchEvent.prototype = UIEvent.prototype;
+TouchEvent.prototype.constructor = TouchEvent;
+
 module.exports = TouchEvent;

@@ -8,8 +8,11 @@ function CompositionEvent(ev) {
     //     readonly    attribute DOMString data;
     // };
 
-    UIEvent.call(this);
+    UIEvent.call(this, ev);
     this.data = ev.data;
 }
+
+CompositionEvent.prototype = UIEvent.prototype;
+CompositionEvent.prototype.constructor = CompositionEvent;
 
 module.exports = CompositionEvent;

@@ -39,4 +39,7 @@ function KeyboardEvent(ev) {
     this.keyArg = ev.keyArg;
 }
 
+KeyboardEvent.prototype = UIEvent.prototype;
+KeyboardEvent.prototype.constructor = KeyboardEvent;
+
 module.exports = KeyboardEvent;

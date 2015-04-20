@@ -34,4 +34,7 @@ function MouseEvent(ev) {
     this.buttons = ev.buttons;
 }
 
+MouseEvent.prototype = UIEvent.prototype;
+MouseEvent.prototype.constructor = MouseEvent;
+
 module.exports = MouseEvent;

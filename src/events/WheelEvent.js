@@ -2,12 +2,6 @@
 
 var MouseEvent = require('./MouseEvent');
 
-/**
- * @class WheelEvent
- * @constructor
- * 
- * @param {Object} ev raw, vendor-specific DOM Event
- */
 function WheelEvent(ev) {
     // [Constructor(DOMString typeArg, optional WheelEventInit wheelEventInitDict)]
     // interface WheelEvent : MouseEvent {
@@ -30,5 +24,8 @@ function WheelEvent(ev) {
     this.deltaZ = ev.deltaZ;
     this.deltaMode = ev.deltaMode;
 }
+
+WheelEvent.prototype = MouseEvent.prototype;
+WheelEvent.prototype.constructor = WheelEvent;
 
 module.exports = WheelEvent;

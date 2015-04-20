@@ -18,4 +18,7 @@ function InputEvent(ev) {
     this.targetRange = ev.targetRange;
 }
 
+InputEvent.prototype = UIEvent.prototype;
+InputEvent.prototype.constructor = InputEvent;
+
 module.exports = InputEvent;

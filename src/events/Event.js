@@ -34,4 +34,8 @@ function Event(ev) {
     this.timeStamp = ev.timeStamp;
 }
 
+Event.prototype.proxy = function proxy (ev) {
+    this.prototype.constructor.call(this, ev);
+};
+
 module.exports = Event;
