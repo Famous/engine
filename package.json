@@ -1,6 +1,6 @@
 {
   "name": "famous-dom-renderers",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "Famous DOM Renderers",
   "main": "src/index.js",
   "scripts": {
