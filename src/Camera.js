@@ -16,7 +16,7 @@ function Camera(node) {
     this._id = node.addComponent(this);
     this._viewTransform = new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
     this._viewDirty = false;
-    this._perspectiveDrty = false;
+    this._perspectiveDirty = false;
     this.setFlat();
 }
 
@@ -111,7 +111,7 @@ Camera.prototype.onUpdate = function onUpdate() {
 
     if (this._perspectiveDirty) {
         this._perspectiveDirty = true;
-        
+
         switch (this._projectionType) {
             case Camera.FRUSTUM_PROJECTION:
                 this._node.sendDrawCommand('FRUSTUM_PROJECTION');
