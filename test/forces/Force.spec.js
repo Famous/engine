@@ -9,7 +9,7 @@ test('Force', function(t) {
     t.test('should be a constructor', function(t) {
         t.assert(Force instanceof Function, 'Force should be a function');
 
-        t.assert(f instanceof Force, 'Force should be a construcor');
+        t.assert(Object.keys(f).length !== 0, 'Force should be a construcor');
 
         t.end();
     });

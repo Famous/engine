@@ -9,7 +9,7 @@ test('Constraint', function(t) {
     t.test('should be a constructor', function(t) {
         t.assert(Constraint instanceof Function, 'Constraint should be a function');
 
-        t.assert(c instanceof Constraint, 'Constraint should be a construcor');
+        t.assert(Object.keys(c).length !== 0, 'Constraint should be a construcor');
 
         t.end();
     });
