@@ -99,5 +99,131 @@ test('DynamicGeometry', function(t) {
         t.end();
     });
 
+    t.test('DynamicGeometry.prototype.setVertexPositions', function(t) {
+        var geometry = new DynamicGeometry();
+        var vertexPositions = [0, 0, 1, 0, 1, 0, 1, 0, 0];
+
+        geometry.setVertexPositions(vertexPositions);
+
+        t.deepEquals(
+            geometry.spec.bufferValues[geometry.spec.bufferNames.indexOf('pos')],
+            vertexPositions,
+            'Should set vertex data to the pos attribute of the geometry'
+        );
+
+        t.equals(
+            geometry.spec.bufferSpacings[geometry.spec.bufferNames.indexOf('pos')],
+            3,
+            'Should set buffer spacing to 3 for pos attribute'
+        );
+
+        t.end();
+    });
+
+    t.test('DynamicGeometry.prototype.setNormals', function(t) {
+        var geometry = new DynamicGeometry();
+        var vertexNormals = [0, 0, 1, 0, 1, 0, 1, 0, 0];
+
+        geometry.setNormals(vertexNormals);
+
+        t.deepEquals(
+            geometry.spec.bufferValues[geometry.spec.bufferNames.indexOf('normals')],
+            vertexNormals,
+            'Should set vertex data to the "normal" attribute of the geometry'
+        );
+
+        t.equals(
+            geometry.spec.bufferSpacings[geometry.spec.bufferNames.indexOf('normals')],
+            3,
+            'Should set buffer spacing to 3 for normal attribute'
+        );
+
+        t.end();
+    });
+
+    t.test('DynamicGeometry.prototype.setTextureCoords', function(t) {
+        var geometry = new DynamicGeometry();
+        var textureCoords = [0, 0, 0, 1, 1, 0, 1, 1];
+
+        geometry.setTextureCoords(textureCoords);
+
+        t.deepEquals(
+            geometry.spec.bufferValues[geometry.spec.bufferNames.indexOf('texCoord')],
+            textureCoords,
+            'Should set vertex data to the "texCoord" attribute of the geometry'
+        );
+
+        t.equals(
+            geometry.spec.bufferSpacings[geometry.spec.bufferNames.indexOf('texCoord')],
+            2,
+            'Should set buffer spacing to 2 for texCoord attribute'
+        );
+
+        t.end();
+    });
+
+    t.test('DynamicGeometry.prototype.setIndices', function(t) {
+        var geometry = new DynamicGeometry();
+        var indices = [0, 1, 2, 3, 4, 5, 6];
+
+        geometry.setIndices(indices);
+
+        t.deepEquals(
+            geometry.spec.bufferValues[geometry.spec.bufferNames.indexOf('indices')],
+            indices,
+            'Should set vertex data to the "indices" attribute of the geometry'
+        );
+
+        t.equals(
+            geometry.spec.bufferSpacings[geometry.spec.bufferNames.indexOf('indices')],
+            1,
+            'Should set buffer spacing to 1 for indices'
+        );
+
+        t.end();
+    });
+
+    t.test('DynamicGeometry.prototype.getVertexPositions', function(t) {
+        var geometry = new DynamicGeometry();
+        var vertexPositions = [-1, 0, 0, 1, 0, 0];
+        geometry.setVertexPositions(vertexPositions)
+
+        t.deepEquals(
+            vertexPositions,
+            geometry.getVertexPositions(),
+            'Should return vertex position buffer'
+        );
+
+        t.end();
+    });
+
+    t.test('DynamicGeometry.prototype.getNormals', function(t) {
+        var geometry = new DynamicGeometry();
+        var normals = [-1, 0, 0, 1, 0, 0];
+        geometry.setNormals(normals)
+
+        t.deepEquals(
+            normals,
+            geometry.getNormals(),
+            'Should return normal buffer'
+        );
+
+        t.end();
+    });
+
+    t.test('DynamicGeometry.prototype.getTextureCoords', function(t) {
+        var geometry = new DynamicGeometry();
+        var texCoords = [0, 0, 1, 0, 0, 1, 1, 1];
+        geometry.setTextureCoords(texCoords)
+
+        t.deepEquals(
+            texCoords,
+            geometry.getTextureCoords(),
+            'Should return texCoord buffer'
+        );
+
+        t.end();
+    });
+
     t.end();
 });
