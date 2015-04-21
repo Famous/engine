@@ -85,11 +85,8 @@ function freeGJK_EPADynamicGeometry(geometry) {
 function minkowskiSupport(body1, body2, direction) {
     var inverseDirection = Vec3.scale(direction, -1, INVDIRECTION_REGISTER);
 
-    var furthest1 = body1.support(direction);
-    var furthest2 = body2.support(inverseDirection);
-
-    var w1 = Vec3.add(furthest1, body1.position, new Vec3());
-    var w2 = Vec3.add(furthest2, body2.position, new Vec3());
+    var w1 = Vec3.add(body1.support(direction), body1.position, new Vec3());
+    var w2 = Vec3.add(body2.support(inverseDirection), body2.position, new Vec3());
 
     // The vertex in Minkowski space as well as the original pair in world space
     return OMRequestGJK_EPASupportPoint().reset(Vec3.subtract(w1, w2, new Vec3()), w1, w2);

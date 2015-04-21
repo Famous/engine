@@ -8,7 +8,6 @@ var Vec3 = require('famous-math').Vec3;
 var Quaternion = require('famous-math').Quaternion;
 
 var VEC_REGISTER = new Vec3();
-var ZYX_REGISTER = new Vec3();
 var QUAT_REGISTER = new Quaternion();
 var DELTA_REGISTER = new Vec3();
 
@@ -59,7 +58,7 @@ function PhysicsEngine(options) {
 
     this.transformBuffers = {
         position: [0, 0, 0],
-        rotation: [0, 0, 0]
+        rotation: [0, 0, 0, 1]
     };
 }
 
@@ -335,15 +334,15 @@ PhysicsEngine.prototype.getTransform = function getTransform(body) {
         rot = Quaternion.multiply(q, oq, QUAT_REGISTER);
         loc = oq.rotateVector(p, VEC_REGISTER);
     }
-    var ZYX = rot.toEuler(ZYX_REGISTER);
 
     transform.position[0] = o.x+loc.x;
     transform.position[1] = o.y+loc.y;
     transform.position[2] = o.z+loc.z;
 
-    transform.rotation[0] = ZYX.x;
-    transform.rotation[1] = ZYX.y;
-    transform.rotation[2] = ZYX.z;
+    transform.rotation[0] = rot.x;
+    transform.rotation[1] = rot.y;
+    transform.rotation[2] = rot.z;
+    transform.rotation[3] = rot.w;
 
     return transform;
 };

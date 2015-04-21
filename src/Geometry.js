@@ -596,7 +596,6 @@ function _computeConvexHull(vertices, maxIterations) {
        assigned[hull.vertices[i].index] = true;
     }
 
-
     var cx = A.x + B.x + C.x + D.x;
     var cy = A.y + B.y + C.y + D.y;
     var cz = A.z + B.z + C.z + D.z;

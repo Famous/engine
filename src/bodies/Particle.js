@@ -50,9 +50,7 @@ function Particle(options) {
     this.size = options.size || [0, 0, 0];
 
     var v = options.velocity;
-    var w = options.angularVelocity;
     if (v) this.setVelocity(v.x, v.y, v.z);
-    if (w) this.setAngularVelocity(w.x, w.y, w.z);
 
     this.restrictions = 0;
     this.setRestrictions.apply(this, options.restrictions || []);
