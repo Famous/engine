@@ -10,9 +10,6 @@ var progressbacks = [_processPointerStart, _processPointerMove, _processPointerE
 
 var touchEvents = ['touchstart', 'touchmove', 'touchend'];
 var mouseEvents = ['mousedown', 'mousemove', 'mouseup'];
-var methods = ['preventDefault'];
-var touchProperties = [{targetTouches: {0: ['pageX', 'pageY', 'identifier'], 1: ['pageX', 'pageY', 'identifier']}}];
-var mouseProperties = ['pageX', 'pageY'];
 
 /**
  * Component to manage gesture events. Will track 'pinch', 'rotate', 'tap', and 'drag' events, on an
@@ -78,13 +75,16 @@ function GestureHandler (node, events) {
     this.options = {};
     this.trackedGestures = {};
 
+    var i;
+    var len;
+
     if (events) {
-        for (var i = 0, len = events.length; i < len; i++) {
+        for (i = 0, len = events.length; i < len; i++) {
             this.on(events[i], events[i].callback);
         }
     }
 
-    for (var i = 0 ; i < 3 ; i++) {
+    for (i = 0 ; i < 3 ; i++) {
         var touchEvent = touchEvents[i];
         var mouseEvent = mouseEvents[i];
         node.addUIEvent(touchEvent);
@@ -131,17 +131,6 @@ GestureHandler.prototype.on = function on(ev, cb) {
 };
 
 /**
- * Deregister a callback from an event.
- *
- * @method on
- * @param {String} ev The event name.
- * @param {Function} cb The callback.
- */
-GestureHandler.prototype.off = function off(ev, cb) {
-    this._events.off(gesture, cb);
-};
-
-/**
  * Trigger gestures in the order they were requested, if they occured.
  *
  * @method triggerGestures
@@ -157,8 +146,8 @@ GestureHandler.prototype.triggerGestures = function() {
                 break;
             case 'tap':
                 if (payload.status === 'start') {
-                    if (this.options['tap']) {
-                        var pts = this.options['tap'].points || 1;
+                    if (this.options.tap) {
+                        var pts = this.options.tap.points || 1;
                         if(this.multiTap >= pts && payload.points >= pts) this.trigger(gesture, payload);
                     }
                     else this.trigger(gesture, payload);
@@ -204,9 +193,12 @@ function _processPointerStart(e) {
 
     this.event.time = Date.now();
 
+    var threshold;
+    var id;
+
     if (this.trackedPointerIDs[0] !== t[0].identifier) {
-        if (this.trackedGestures['tap']) {
-            var threshold = (this.options['tap'] && this.options['tap'].threshold) || 250;
+        if (this.trackedGestures.tap) {
+            threshold = (this.options.tap && this.options.tap.threshold) || 250;
             if (this.event.time - this.timeOfPointer < threshold) this.event.taps++;
             else this.event.taps = 1;
             this.timeOfPointer = this.event.time;
@@ -214,7 +206,7 @@ function _processPointerStart(e) {
         }
         this.event.current = 1;
         this.event.points = 1;
-        var id = t[0].identifier;
+        id = t[0].identifier;
         this.trackedPointerIDs[0] = id;
 
         this.last1.set(t[0].pageX, t[0].pageY);
@@ -223,13 +215,13 @@ function _processPointerStart(e) {
         this.event.pointers.push(this.pointer1);
     }
     if (t[1] && this.trackedPointerIDs[1] !== t[1].identifier) {
-        if (this.trackedGestures['tap']) {
-            var threshold = (this.options['tap'] && this.options['tap'].threshold) || 250;
+        if (this.trackedGestures.tap) {
+            threshold = (this.options.tap && this.options.tap.threshold) || 250;
             if (this.event.time - this.timeOfPointer < threshold) this.multiTap = 2;
         }
         this.event.current = 2;
         this.event.points = 2;
-        var id = t[1].identifier;
+        id = t[1].identifier;
         this.trackedPointerIDs[1] = id;
 
         this.last2.set(t[1].pageX, t[1].pageY);
@@ -243,12 +235,12 @@ function _processPointerStart(e) {
         Vec2.subtract(this.last2, this.last1, this.diff12);
         this.dist = this.diff12.length();
 
-        if (this.trackedGestures['pinch']) {
+        if (this.trackedGestures.pinch) {
             this.event.scale = this.event.scale || 1;
             this.event.scaleDelta = 0;
             this.event.scaleVelocity = 0;
         }
-        if (this.trackedGestures['rotate']) {
+        if (this.trackedGestures.rotate) {
             this.event.rotation = this.event.rotation || 0;
             this.event.rotationDelta = 0;
             this.event.rotationVelocity = 0;
@@ -261,12 +253,12 @@ function _processPointerStart(e) {
         this.center.copy(this.last1);
         this.centerDelta.clear();
         this.centerVelocity.clear();
-        if (this.trackedGestures['pinch']) {
+        if (this.trackedGestures.pinch) {
             this.event.scale = 1;
             this.event.scaleDelta = 0;
             this.event.scaleVelocity = 0;
         }
-        if (this.trackedGestures['rotate']) {
+        if (this.trackedGestures.rotate) {
             this.event.rotation = 0;
             this.event.rotationDelta = 0;
             this.event.rotationVelocity = 0;
@@ -322,7 +314,7 @@ function _processPointerMove(e) {
 
         Vec2.subtract(this.last2, this.last1, VEC_REGISTER);
 
-        if (this.trackedGestures['rotate']) {
+        if (this.trackedGestures.rotate) {
             var dot = VEC_REGISTER.dot(this.diff12);
             var cross = VEC_REGISTER.cross(this.diff12);
             var theta = -Math.atan2(cross, dot);
@@ -336,7 +328,7 @@ function _processPointerMove(e) {
         this.diff12.copy(VEC_REGISTER);
         this.dist = dist;
 
-        if (this.trackedGestures['pinch']) {
+        if (this.trackedGestures.pinch) {
             this.event.scale *= scale;
             scale -= 1.0;
             this.event.scaleDelta = scale;
@@ -349,12 +341,12 @@ function _processPointerMove(e) {
         this.center.copy(this.last1);
         this.centerDelta.copy(this.delta1);
         this.centerVelocity.copy(this.velocity1);
-        if (this.trackedGestures['pinch']) {
+        if (this.trackedGestures.pinch) {
             this.event.scale = 1;
             this.event.scaleDelta = 0;
             this.event.scaleVelocity = 0;
         }
-        if (this.trackedGestures['rotate']) {
+        if (this.trackedGestures.rotate) {
             this.event.rotation = 0;
             this.event.rotationDelta = 0;
             this.event.rotationVelocity = 0;
@@ -383,6 +375,8 @@ function _processPointerEnd(e) {
             return;
     }
 
+    var id;
+
     this.event.status = 'end';
     if (!t[0]) {
         this.event.current = 0;
@@ -395,7 +389,7 @@ function _processPointerEnd(e) {
     }
     else if(this.trackedPointerIDs[0] !== t[0].identifier) {
         this.trackedPointerIDs[0] = -1;
-        var id = t[0].identifier;
+        id = t[0].identifier;
         this.trackedPointerIDs[0] = id;
 
         this.last1.set(t[0].pageX, t[0].pageY);
@@ -412,7 +406,7 @@ function _processPointerEnd(e) {
     else if (this.trackedPointerIDs[1] !== t[1].identifier) {
         this.trackedPointerIDs[1] = -1;
         this.event.points = 2;
-        var id = t[1].identifier;
+        id = t[1].identifier;
         this.trackedPointerIDs[1] = id;
 
         this.last2.set(t[1].pageX, t[1].pageY);
@@ -433,9 +427,8 @@ function _processPointerEnd(e) {
  *
  * @method _processMouseLeave
  * @private
- * @param {Object} e The event object.
  */
-function _processMouseLeave(e) {
+function _processMouseLeave() {
     if (this.event.current) {
         this.event.status = 'end';
         this.event.current = 0;

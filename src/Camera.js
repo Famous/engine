@@ -200,6 +200,6 @@ Camera.prototype.onTransformChange = function onTransformChange(transform) {
     this._viewTransform[13] = (a00 * b09 - a01 * b07 + a02 * b06) * det;
     this._viewTransform[14] = (a31 * b01 - a30 * b03 - a32 * b00) * det;
     this._viewTransform[15] = (a20 * b03 - a21 * b01 + a22 * b00) * det;
-}
+};
 
 module.exports = Camera;
