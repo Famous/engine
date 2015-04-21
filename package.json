@@ -39,6 +39,6 @@
   },
   "dependencies": {
     "famous-webgl-geometries": "git+ssh://git@github.famo.us/platform/webgl-geometries#v0.1.2",
-    "famous-transitions": "git+ssh://git@github.famo.us/platform/transitions#v0.3.0"
+    "famous-transitions": "git+ssh://git@github.famo.us/platform/transitions#v0.4.0"
   }
 }
