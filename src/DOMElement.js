@@ -21,6 +21,7 @@ function DOMElement (node, options) {
 
     this._changeQueue = [];
     
+    this._UIEvents = node.getUIEvents().slice(0);
     this._classes = ['fa-surface'];
     this._requestingEventListeners = [];
     this._styles = {
@@ -83,6 +84,7 @@ DOMElement.prototype.onUpdate = function onUpdate () {
 DOMElement.prototype.onMount = function onMount (node, id) {
     this._node = node;
     this._id = id;
+    this._UIEvents = node.getUIEvents().slice(0);
     this.draw();
     this.setAttribute('data-fa-path', node.getLocation());
 };
@@ -123,7 +125,11 @@ DOMElement.prototype.onSizeChange = function onSizeChange (size) {
 };
 
 DOMElement.prototype.onAddUIEvent = function onAddUIEvent (UIEvent) {
-    this._changeQueue.push('ADD_EVENT_LISTENER', UIEvent, void 0, true, 'EVENT_END');
+    var index = this._UIEvents.indexOf(UIEvent);
+    if (index === -1) {
+        this._changeQueue.push('ADD_EVENT_LISTENER', UIEvent, void 0, true, 'EVENT_END');
+        this._UIEvents.push(UIEvent);
+    }
     if (!this._requestingUpdate) this._requestUpdate();
 };
 
@@ -235,6 +241,9 @@ DOMElement.prototype.draw = function draw () {
     for (key in this._attributes)
         if (this._attributes[key])
             this.setAttribute(key, this._attributes[key]);
+    
+    for (i = 0, len = this._UIEvents.length ; i < len ; i++)
+        this._changeQueue.push('ADD_EVENT_LISTENER', this._UIEvents[i], void 0, true, 'EVENT_END');
 
     this._inDraw = false;
 };
