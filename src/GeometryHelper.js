@@ -462,15 +462,16 @@ GeometryHelper.getAltitude = function altitude(v) {
  * @return {Array} new list of line-formatted indices
  */
 GeometryHelper.trianglesToLines = function triangleToLines(indices, out) {
+    var numVectors = indices.length / 3;
     var out = [];
     var face;
     var j;
     var i;
 
-    for (i = 0; i < indices.length; i++) {
-        out.push(indices[i][0], indices[i][1]);
-        out.push(indices[i][1], indices[i][2]);
-        out.push(indices[i][2], indices[i][0]);
+    for (i = 0; i < numVectors; i++) {
+        out.push(indices[i + 0], indices[i + 1]);
+        out.push(indices[i + 1], indices[i + 2]);
+        out.push(indices[i + 2], indices[i + 0]);
     }
 
     return out;

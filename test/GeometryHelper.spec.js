@@ -149,7 +149,7 @@ test('GeometryHelper', function(t) {
         }
 
         var allLengthOne = vectors.every(function(vec) {
-            return (vec.length() > 0.98) && (vec.length() < 1.02);
+            return isNormalized(vec.length());
         });
 
         t.ok(allLengthOne, "All returned vectors should be of length 1");
@@ -184,8 +184,90 @@ test('GeometryHelper', function(t) {
     });
 
     t.test('getSpheroidUV', function(t) {
+        var vertices = [0, 1, 0, 0, 0, 1];
+        var textureCoords = GeometryHelper.getSpheroidUV(vertices);
 
+        t.equals(textureCoords.length, vertices.length / 3 * 2, "Should return texCoords of same length");
+        t.end();
     });
+
+    t.test('normalizeAll', function(t) {
+        var numVerts = 10;
+        var vertices = generateRandomArray(numVerts, [-1, 1]);
+
+        var normalized = GeometryHelper.normalizeAll(vertices);
+        var allNormalized = testVector(normalized, function(vector) {
+            return isNormalized(vector.length());
+        });
+
+        t.ok(allNormalized, "All output vectors should be normalized");
+        t.end();
+    });
+
+    t.test('normalizeVertices', function(t) {
+        var vertices = generateRandomArray(10, [-10, 10]);
+        var normalized = GeometryHelper.normalizeVertices(vertices);
+        var withinRange = testVector(normalized, function(vector) {
+            return (vector.x <= 1) && (vector.x >= -1)
+                && (vector.y <= 1) && (vector.y >= -1)
+                && (vector.z <= 1) && (vector.z >= -1);
+        });
+
+        t.ok(withinRange, "All vectors should be within 2x2 bounding box");
+        t.end();
+    });
+
+    t.test('getTranslationFactor', function(t) {
+        t.end();
+    });
+
+    t.test('getScaleFactor', function(t) {
+        t.end();
+    });
+
+    t.test('getAzimuth', function(t) {
+        t.end();
+    });
+
+    t.test('getAlititude', function(t) {
+        t.end();
+    });
+
+    t.test('trianglesToLines', function(t) {
+        var triangleIndices = generateRandomArray(12);
+        var lineIndices = GeometryHelper.trianglesToLines(triangleIndices);
+
+        t.equals(lineIndices.length, triangleIndices.length * 2, "lineIndices should be 1/2 length of triangle indices");
+
+        t.end();
+    })
+
+    function testVector(vertices, callback) {
+        var numVectors = vertices.length / 3;
+
+        for (var i = 0; i < numVectors; i++) {
+            var vector = new Vec3(vertices[i * 3], vertices[i * 3 + 1], vertices[i * 3 + 2]);
+            if (!callback(vector)) return false;
+        }
+
+        return true;
+    }
+
+    function isNormalized(len) {
+        return (len > 0.98) && (len < 1.02);
+    }
+
+    function generateRandomArray(numVerts, range) {
+        var out = [];
+        var range = range || [0, 1];
+        var offset = range[1] - range[0];
+
+        while (numVerts--) {
+            out.push(Math.random() * offset) + range[0];
+        }
+
+        return out;
+    }
 
     t.end();
 });
