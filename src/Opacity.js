@@ -36,7 +36,7 @@ Opacity.toString = function toString() {
 * @return {Object} contains component key which holds the stringified constructor 
 * and value key which contains the numeric value
 */
-Opacity.prototype.getState = function getState() {
+Opacity.prototype.getValue = function getValue() {
     return {
         component: this.constructor.toString(),
         value: this._value.get()
@@ -51,9 +51,9 @@ Opacity.prototype.getState = function getState() {
 * @param {Object} state contains component key, which holds stringified constructor, and a value key, which contains a numeric value used to set opacity if the constructor value matches
 * @return {Boolean} true if set is successful, false otherwise
 */
-Opacity.prototype.setState = function setState(state) {
-    if (this.constructor.toString() === state.component) {
-        this.set(state.value);
+Opacity.prototype.setValue = function setValue(value) {
+    if (this.constructor.toString() === value.component) {
+        this.set(value.value);
         return true;
     }
     return false;
