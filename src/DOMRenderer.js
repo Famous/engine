@@ -323,7 +323,7 @@ DOMRenderer.prototype.setAttribute = function setAttribute (name, value) {
 
 DOMRenderer.prototype.setContent = function setContent (content) {
     this._assertTargetLoaded();
-    this.findChildren(this._path);
+    this.findChildren();
 
     // TODO Temporary solution
     for (var i = 0 ; i < this._children.length ; i++) {
