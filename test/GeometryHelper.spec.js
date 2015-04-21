@@ -4,7 +4,7 @@ var GeometryHelper = require('../src/GeometryHelper');
 var Vec3 = require('famous-math').Vec3;
 
 test('GeometryHelper', function(t) {
-    t.test('generateParametric', function(t) {
+    t.test('GeometryHelper.generateParametric', function(t) {
 
     	t.ok(
     		GeometryHelper.generateParametric instanceof Function, 
@@ -38,7 +38,7 @@ test('GeometryHelper', function(t) {
         t.end();
     });
 
-    t.test('computeNormals', function(t) {
+    t.test('GeometryHelper.computeNormals', function(t) {
         var vertices = [
             -1,  1, 0,
              0, -1, 0,
@@ -55,7 +55,7 @@ test('GeometryHelper', function(t) {
         t.end();
     });
 
-    t.test('subdivide', function(t) {
+    t.test('GeometryHelper.subdivide', function(t) {
         var vertices = [
             -1,  1, 0,
              0, -1, 0,
@@ -111,7 +111,7 @@ test('GeometryHelper', function(t) {
         t.end();
     });
 
-    t.test('getUniqueFaces', function(t) {
+    t.test('GeometryHelper.getUniqueFaces', function(t) {
         var vertices = [
             -1,  1, 0,
              0, -1, 0,
@@ -132,7 +132,7 @@ test('GeometryHelper', function(t) {
         t.end();
     });
 
-    t.test('subdivideSpheroid', function(t) {
+    t.test('GeometryHelper.subdivideSpheroid', function(t) {
         var vertices = [];
 
         vertices.push.apply(vertices, new Vec3(-1, 1, 0).normalize().toArray());
@@ -157,7 +157,7 @@ test('GeometryHelper', function(t) {
         t.end();
     });
 
-    t.test('getSpheroidNormals', function(t) {
+    t.test('GeometryHelper.getSpheroidNormals', function(t) {
         var vertices = [
             -1,  1, 0,
              0, -1, 0,
@@ -183,7 +183,7 @@ test('GeometryHelper', function(t) {
         t.end();
     });
 
-    t.test('getSpheroidUV', function(t) {
+    t.test('GeometryHelper.getSpheroidUV', function(t) {
         var vertices = [0, 1, 0, 0, 0, 1];
         var textureCoords = GeometryHelper.getSpheroidUV(vertices);
 
@@ -191,7 +191,7 @@ test('GeometryHelper', function(t) {
         t.end();
     });
 
-    t.test('normalizeAll', function(t) {
+    t.test('GeometryHelper.normalizeAll', function(t) {
         var numVerts = 10;
         var vertices = generateRandomArray(numVerts, [-1, 1]);
 
@@ -204,7 +204,7 @@ test('GeometryHelper', function(t) {
         t.end();
     });
 
-    t.test('normalizeVertices', function(t) {
+    t.test('GeometryHelper.normalizeVertices', function(t) {
         var vertices = generateRandomArray(10, [-10, 10]);
         var normalized = GeometryHelper.normalizeVertices(vertices);
         var withinRange = testVector(normalized, function(vector) {
@@ -217,57 +217,66 @@ test('GeometryHelper', function(t) {
         t.end();
     });
 
-    t.test('getTranslationFactor', function(t) {
+    t.test('GeometryHelper.getTranslationFactor', function(t) {
         t.end();
     });
 
-    t.test('getScaleFactor', function(t) {
+    t.test('GeometryHelper.getScaleFactor', function(t) {
         t.end();
     });
 
-    t.test('getAzimuth', function(t) {
+    t.test('GeometryHelper.getAzimuth', function(t) {
         t.end();
     });
 
-    t.test('getAlititude', function(t) {
+    t.test('GeometryHelper.getAlititude', function(t) {
         t.end();
     });
 
-    t.test('trianglesToLines', function(t) {
+    t.test('GeometryHelper.trianglesToLines', function(t) {
         var triangleIndices = generateRandomArray(12);
         var lineIndices = GeometryHelper.trianglesToLines(triangleIndices);
 
-        t.equals(lineIndices.length, triangleIndices.length * 2, "lineIndices should be 1/2 length of triangle indices");
+        t.equals(
+            lineIndices.length,
+            triangleIndices.length * 2,
+            "Line indices should be 1/2 length of triangle indices"
+        );
 
         t.end();
-    })
-
-    function testVector(vertices, callback) {
-        var numVectors = vertices.length / 3;
-
-        for (var i = 0; i < numVectors; i++) {
-            var vector = new Vec3(vertices[i * 3], vertices[i * 3 + 1], vertices[i * 3 + 2]);
-            if (!callback(vector)) return false;
-        }
-
-        return true;
-    }
-
-    function isNormalized(len) {
-        return (len > 0.98) && (len < 1.02);
-    }
-
-    function generateRandomArray(numVerts, range) {
-        var out = [];
-        var range = range || [0, 1];
-        var offset = range[1] - range[0];
-
-        while (numVerts--) {
-            out.push(Math.random() * offset) + range[0];
-        }
-
-        return out;
-    }
+    });
 
     t.end();
 });
+
+
+/*
+    Helpers
+*/
+
+function testVector(vertices, callback) {
+    var numVectors = vertices.length / 3;
+
+    for (var i = 0; i < numVectors; i++) {
+        var vector = new Vec3(vertices[i * 3], vertices[i * 3 + 1], vertices[i * 3 + 2]);
+        if (!callback(vector)) return false;
+    }
+
+    return true;
+}
+
+function isNormalized(len) {
+    return (len > 0.98) && (len < 1.02);
+}
+
+function generateRandomArray(numVerts, range) {
+    var out = [];
+    var range = range || [0, 1];
+    var offset = range[1] - range[0];
+
+    while (numVerts--) {
+        out.push(Math.random() * offset) + range[0];
+    }
+
+    return out;
+}

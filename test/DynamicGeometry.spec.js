@@ -1,6 +1,7 @@
 'use strict';
 var test = require('tape');
 var DynamicGeometry = require('../src/DynamicGeometry');
+var Circle = require('../src/primitives/Circle');
 
 test('DynamicGeometry', function(t) {
     t.test('constructor', function(t) {
@@ -22,7 +23,7 @@ test('DynamicGeometry', function(t) {
         t.end();
     });
 
-    t.test('setVertexBuffer', function(t) {
+    t.test('DynamicGeometry.prototype.setVertexBuffer', function(t) {
         var geometry = new DynamicGeometry();
 
         t.equal(typeof geometry.setVertexBuffer, 'function', 'should be a function');
@@ -46,7 +47,7 @@ test('DynamicGeometry', function(t) {
         t.end();
     });
 
-    t.test('getVertexBuffer', function(t) {
+    t.test('DynamicGeometry.prototype.getVertexBuffer', function(t) {
         var geometry = new DynamicGeometry();
 
         t.throws(geometry.getVertexBuffer, 'should throw when no arguments are provided');
@@ -59,7 +60,7 @@ test('DynamicGeometry', function(t) {
         t.end();
     });
 
-    t.test('setDrawType', function(t) {
+    t.test('DynamicGeometry.prototype.setDrawType', function(t) {
         var geometry = new DynamicGeometry();
 
         t.throws(geometry.setDrawType, 'should throw when no argument is provided');
@@ -67,6 +68,33 @@ test('DynamicGeometry', function(t) {
         geometry.setDrawType('PENANDPAPER');
 
         t.equals(geometry.spec.type, 'PENANDPAPER', 'should set the draw type of the spec');
+
+        t.end();
+    });
+
+    t.test('DynamicGeometry.prototype.getLength', function(t) {
+        var posAttribArray = [1, 2, 3];
+
+        var geometry = new DynamicGeometry({
+            buffers: [{
+                name: 'pos', data: posAttribArray
+            }]
+        });
+
+        t.equals(geometry.getLength(), posAttribArray.length, "Should return the length of pos attribute");
+        posAttribArray.push(4);
+        t.equals(geometry.getLength(), posAttribArray.length, "Should return the length of pos attribute");
+
+        t.end();
+    });
+
+    t.test('DynamicGeometry.prototype.fromGeometry', function(t) {
+        var geometry = new DynamicGeometry();
+        var circleGeometry = new Circle();
+        geometry.fromGeometry(circleGeometry);
+
+        t.deepEquals(circleGeometry.spec.bufferValues, geometry.spec.bufferValues, "Should have the same data for attribute buffers");
+        t.deepEquals(circleGeometry.spec.bufferNames, geometry.spec.bufferNames, "Should have the same names for attribute buffers");
 
         t.end();
     });
