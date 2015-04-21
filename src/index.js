@@ -3,6 +3,7 @@
 module.exports = {
     DOMRenderer: require('./DOMRenderer'),
     ElementCache: require('./ElementCache'),
-    math: require('./math'),
-    vendorPrefix: require('./vendorPrefix')
+    Math: require('./Math'),
+    VendorPrefix: require('./VendorPrefix'),
+    Events: require('./events')
 };

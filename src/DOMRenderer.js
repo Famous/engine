@@ -1,11 +1,11 @@
 'use strict';
 
 var ElementCache = require('./ElementCache');
-var math = require('./math');
-var vendorPrefix = require('./vendorPrefix');
+var math = require('./Math');
+var vendorPrefix = require('./VendorPrefix');
+var eventMap = require('./events/EventMap');
 
 var TRANSFORM = vendorPrefix('transform');
-
 
 /**
  * DOMRenderer is a class responsible for adding elements
@@ -43,6 +43,8 @@ function DOMRenderer (element, selector, compositor) {
                                                       // renderer is responsible
                                                       // for
 
+    this._boundTriggerEvent = this._triggerEvent.bind(this);
+
     this._selector = selector;
     
     this._elements = {};
@@ -60,91 +62,19 @@ function DOMRenderer (element, selector, compositor) {
 DOMRenderer.prototype.addEventListener = function addEventListener(path, type, properties, preventDefault) {
     if (!this._eventListeners[type]) {
         this._eventListeners[type] = {};
-        this._root.element.addEventListener(type, this._triggerEvent.bind(this));
+        if (eventMap[type][1]) {
+            // Use event delegation
+            this._root.element.addEventListener(type, this._boundTriggerEvent);
+        } else {
+            // Directly link event handler to DOM element
+            this._elements[path].element.addEventListener(type, this._boundTriggerEvent);
+        }
     }
 
     this._eventListeners[type][path] = {
-        properties: properties,
         preventDefault: preventDefault
     };
 };
-
-function _mirror(item, target, reference) {
-    var i, len;
-    var key, keys;
-    if (typeof item === 'string' || typeof item === 'number') target[item] = reference[item];
-    else if (Array.isArray(item)) {
-        for (i = 0, len = item.length; i < len; i++) {
-            _mirror(item[i], target, reference);
-        }
-    }
-    else {
-        keys = Object.keys(item);
-        for (i = 0, len = keys.length; i < len; i++) {
-            key = keys[i];
-            if (reference[key]) {
-                target[key] = {};
-                _mirror(item[key], target[key], reference[key])
-            }
-        }
-    }
-}
-
-function _makeTarget (ev) {
-    var target = ev.target;
-    var result = {
-        tagName: target.tagName,
-        id: target.getAttribute('id'),
-        classes: []
-    };
-    for (var i = 0, len = target.classList.length ; i < len ; i++)
-        result.classes[i] = target.classList[i];
-    return result;
-}
-
-function _stripEvent (ev, properties, path) {
-    var result = {
-        path: path,
-        target: _makeTarget(ev),
-        node: null
-    };
-    var i, len;
-    for (i = 0, len = properties ? properties.length : 0; i < len; i++) {
-        var prop = properties[i];
-        _mirror(prop, result, ev);
-    }
-    result.timeStamp = ev.timeStamp;
-    result.time = ev.timeStamp;
-    switch (ev.type) {
-        case 'mousedown':
-        case 'mouseup':
-        case 'click':
-        case 'mousemove':
-            result.x = ev.x;
-            result.y = ev.y;
-            result.timeStamp = ev.timeStamp;
-            result.pageX = ev.pageX;
-            result.pageY = ev.pageY;
-            break;
-        case 'wheel':
-            result.deltaX = ev.deltaX;
-            result.deltaY = ev.deltaY;
-            break;
-        case 'touchstart':
-        case 'touchmove':
-        case 'touchend':
-           result.targetTouches = [];
-           for (var i = 0 ; i < ev.targetTouches.length ; i++) {
-               result.targetTouches.push({
-                   pageX: ev.targetTouches[i].pageX,
-                   pageY: ev.targetTouches[i].pageY,
-                   identifier: ev.targetTouches[i].identifier
-               });
-           }
-    }
-    
-    return result;
-}
 
 DOMRenderer.prototype._triggerEvent = function _triggerEvent(ev) {
     var evPath = ev.path ? ev.path : _getPath(ev);
@@ -152,11 +82,15 @@ DOMRenderer.prototype._triggerEvent = function _triggerEvent(ev) {
         if (!evPath[i].dataset) continue;
         var path = evPath[i].dataset.faPath;
         if (this._eventListeners[ev.type][path]) {
-            this._compositor.sendEvent(path, ev.type, _stripEvent(ev, this._eventListeners[ev.type][path].properties, path));
+
             ev.stopPropagation();
             if (this._eventListeners[ev.type][path].preventDefault) {
                 ev.preventDefault();
             }
+
+            var EventConstructor = eventMap[ev.type][0];
+            this._compositor.sendEvent(path, ev.type, new EventConstructor(ev));
+
             break;
         }
     }
@@ -165,7 +99,7 @@ DOMRenderer.prototype._triggerEvent = function _triggerEvent(ev) {
 function _getPath (ev) {
     var path = [];
     var node = ev.target;
-    while (node != document.body) {
+    while (node !== document.body) {
         path.push(node);
         node = node.parentNode;
     }
@@ -340,7 +274,7 @@ DOMRenderer.prototype.setMatrix = function setMatrix (transform) {
     this._assertTargetLoaded();
     this.findParent();
     var worldTransform = this._target.worldTransform;
-    var changed = false
+    var changed = false;
 
     if (transform)
         for (var i = 0, len = 16 ; i < len ; i++) {
@@ -358,7 +292,7 @@ DOMRenderer.prototype.setMatrix = function setMatrix (transform) {
         var children = this.findChildren([]);
         var previousPath = this._path;
         var previousTarget = this._target;
-        for (i = 0, len = children.length ; i < len ; i++) {
+        for (var i = 0, len = children.length ; i < len ; i++) {
             this._target = children[i];
             this._path = this._target.path;
             this.setMatrix();
