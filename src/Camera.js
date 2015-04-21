@@ -110,7 +110,7 @@ Camera.prototype.onUpdate = function onUpdate() {
         .sendDrawCommand(path);
 
     if (this._perspectiveDirty) {
-        this._perspectiveDirty = true;
+        this._perspectiveDirty = false;
 
         switch (this._projectionType) {
             case Camera.FRUSTUM_PROJECTION:
