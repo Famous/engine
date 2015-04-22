@@ -6,10 +6,6 @@ var Vec2 = require('famous-math').Vec2;
 var VEC_REGISTER = new Vec2();
 
 var gestures = {drag: true, tap: true, rotate: true, pinch: true};
-var progressbacks = [_processPointerStart, _processPointerMove, _processPointerEnd];
-
-var touchEvents = ['touchstart', 'touchmove', 'touchend'];
-var mouseEvents = ['mousedown', 'mousemove', 'mouseup'];
 
 /**
  * Component to manage gesture events. Will track 'pinch', 'rotate', 'tap', and 'drag' events, on an
@@ -84,22 +80,35 @@ function GestureHandler (node, events) {
         }
     }
 
-    for (i = 0 ; i < 3 ; i++) {
-        var touchEvent = touchEvents[i];
-        var mouseEvent = mouseEvents[i];
-        node.addUIEvent(touchEvent);
-        node.addUIEvent(mouseEvent);
-    }
-
+    node.addUIEvent('touchstart');
+    node.addUIEvent('mousedown');
+    node.addUIEvent('touchmove');
+    node.addUIEvent('mousemove');
+    node.addUIEvent('touchend');
+    node.addUIEvent('mouseup');
     node.addUIEvent('mouseleave');
 }
 
-GestureHandler.prototype.onReceive = function onReceive (event, payload) {
-    var index = mouseEvents.indexOf(event);
-    index = index !== -1 ? index : touchEvents.indexOf(event);
-    
-    if (index !== -1) progressbacks[index].call(this, payload);
-    else if (event === 'mouseleave') _processMouseLeave.call(this, payload);
+GestureHandler.prototype.onReceive = function onReceive (ev, payload) {
+    switch(ev) {
+        case 'touchstart':
+        case 'mousedown':
+            _processPointerStart.call(this, payload);
+            break;
+        case 'touchmove':
+        case 'mousemove':
+            _processPointerMove.call(this, payload);
+            break;
+        case 'touchend':
+        case 'mouseup':
+            _processPointerEnd.call(this, payload);
+            break;
+        case 'mouseleave':
+            _processMouseLeave.call(this, payload);
+            break;
+        default:
+            break;
+    }
 };
 
 /**
