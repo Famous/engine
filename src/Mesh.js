@@ -128,7 +128,6 @@ Mesh.prototype.setBaseColor = function setBaseColor (color) {
         else if (color.getNormalizedRGB) {
             this._changeQueue.push('GL_UNIFORMS');
         }
-        console.log(1)
         this._changeQueue.push('baseColor');
         this._changeQueue.push(uniformValue);
     }
@@ -398,11 +397,11 @@ Mesh.prototype.onDismount = function onDismount () {
 };
 
 Mesh.prototype.onShow = function onShow () {
-    //TODO
+    this._changeQueue.push('GL_HIDE_MESH');
 };
 
 Mesh.prototype.onHide = function onHide () {
-    //TODO
+    this._changeQueue.push('GL_HIDE_MESH');
 };
 
 /**
