@@ -226,6 +226,16 @@ Context.prototype.receive = function receive(pathArr, path, commands, iterator) 
                 );
                 break;
 
+            case 'GL_HIDE_MESH':
+                if (!this.WebGLRenderer) this.initWebGL();
+                this.WebGLRenderer.hideMesh(path);
+                break;
+
+            case 'GL_SHOW_MESH':
+                if (!this.WebGLRenderer) this.initWebGL();
+                this.WebGLRenderer.showMesh(path);
+                break;
+
             case 'PINHOLE_PROJECTION':
                 this._renderState.projectionType = Camera.PINHOLE_PROJECTION;
                 this._renderState.perspectiveTransform[11] = -1 / commands[++localIterator];
