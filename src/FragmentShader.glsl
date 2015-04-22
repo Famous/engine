@@ -22,5 +22,4 @@ void main() {
     vec3 color = lightsEnabled ? applyLight(material) : material;
 
     gl_FragColor = vec4(color, opacity);
-    if (int(baseColor.r) == -1) gl_FragColor = texture2D(image, v_TextureCoordinate);
 }
