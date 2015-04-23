@@ -1,14 +1,36 @@
 'use strict';
 
+/**
+ * The transform class is responsible for calculating the transform of a particular
+ * node from the data on the node and its parent
+ *
+ * @constructor {Transform}
+ */
 function Transform () {
     this._matrix = new Float32Array(16);
-    this._scratch = new Float32Array(67);
 }
 
+/**
+ * Returns the last calculated transform
+ *
+ * @return {Array} a transform
+ */
 Transform.prototype.get = function get () {
     return this._matrix;
 };
 
+/**
+ * Uses the parent transform, the node's spec, the node's size, and the parent's size
+ * to calculate a final transform for the node. Returns true if the transform has changed.
+ *
+ * @param {Array} the parent matrix
+ * @param {Node.Spec} the target node's spec
+ * @param {Array} the size of the node
+ * @param {Array} the size of the parent
+ * @param {Array} the target array to write the resulting transform to
+ *
+ * @return {Boolean} whether or not the transform changed
+ */
 Transform.prototype.fromSpecWithParent = function fromSpecWithParent (parentMatrix, spec, mySize, parentSize, target) {
     target = target ? target : this._matrix;
 

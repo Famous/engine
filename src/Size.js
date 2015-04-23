@@ -1,3 +1,4 @@
+'use strict';
 
 /**
  * The Size class is responsible for processing Size from a node
