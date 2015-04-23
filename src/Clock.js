@@ -145,3 +145,4 @@ Clock.prototype.clearTimer = function (timer) {
 };
 
 module.exports = Clock;
+
