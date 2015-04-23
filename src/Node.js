@@ -16,6 +16,44 @@ var IDENT = [
 var ONES = [1, 1, 1];
 var QUAT = [0, 0, 0, 1];
 
+/**
+ * Nodes define hierarchy and geometrical transformations. They can be moved
+ * (translated), scaled and rotated.
+ * 
+ * A Node is either mounted or unmounted. Unmounted nodes are detached from the
+ * scene graph. Unmounted nodes have no parent node, while each mounted node has
+ * exactly one parent. Nodes have an arbitary number of children, which can be
+ * dynamically added using @{@link addChild}.
+ *
+ * Each Nodes have an arbitrary number of `components`. Those components can
+ * send `draw` commands to the renderer or mutate the node itself, in which case
+ * they define behavior in the most explicit way. Components that send `draw`
+ * commands aare considered `renderables`. From the node's perspective, there is
+ * no distinction between nodes that send draw commands and nodes that define
+ * behavior.
+ *
+ * Because of the fact that Nodes themself are very unopinioted (they don't
+ * "render" to anything), they are often being subclassed in order to add e.g.
+ * components at initialization to them. Because of this flexibility, they might
+ * as well have been called `Entities`.
+ *
+ * @example
+ * // create three detached (unmounted) nodes
+ * var parent = new Node();
+ * var child1 = new Node();
+ * var child2 = new Node();
+ *
+ * // build an unmounted subtree (parent is still detached)
+ * parent.addChild(child1);
+ * parent.addChild(child2);
+ *
+ * // mount parent by adding it to the context
+ * var context = Famous.createContext("body");
+ * context.addChild(parent);
+ *
+ * @class Node
+ * @constructor
+ */
 function Node () {
     this._calculatedValues = {
         transform: new Float32Array(IDENT),
@@ -45,6 +83,29 @@ Node.ABSOLUTE_SIZE = Size.ABSOLUTE;
 Node.RENDER_SIZE = Size.RENDER;
 Node.DEFAULT_SIZE = Size.DEFAULT;
 
+/**
+ * A Node spec holds the "data" associated with a Node.
+ *
+ * @property {String} location path to the node (e.g. "body/0/1")
+ * @property {Object} showState
+ * @property {Boolean} showState.mounted
+ * @property {Boolean} showState.shown
+ * @property {Number} showState.opacity
+ * @property {Object} offsets
+ * @property {Float32Array.<Number>} offsets.mountPoint
+ * @property {Float32Array.<Number>} offsets.align
+ * @property {Float32Array.<Number>} offsets.origin
+ * @property {Object} vectors
+ * @property {Float32Array.<Number>} vectors.position
+ * @property {Float32Array.<Number>} vectors.rotation
+ * @property {Float32Array.<Number>} vectors.scale
+ * @property {Object} size
+ * @property {Float32Array.<Number>} size.sizeMode
+ * @property {Float32Array.<Number>} size.proportional
+ * @property {Float32Array.<Number>} size.differential
+ * @property {Float32Array.<Number>} size.absolute
+ * @property {Float32Array.<Number>} size.render
+ */
 Node.Spec = function Spec () {
     this.location = null;
     this.showState = {
@@ -150,15 +211,39 @@ Node.prototype.addRenderable = function addRenderable (component) {
     return this;
 };
 
-
+/**
+ * Determine the node's location in the scene graph hierarchy.
+ * A location of `body/0/1` can be interpreted as the following scene graph
+ * hierarchy (ignoring siblings of ancestors and additional child nodes):
+ *
+ * `Context:body` -> `Node:0` -> `Node:1`, where `Node:1` is the node the
+ * `getLocation` method has been invoked on.
+ *
+ * @method getLocation
+ * 
+ * @return {String} location (path), e.g. `body/0/1`
+ */
 Node.prototype.getLocation = function getLocation () {
     return this.value.location;
 };
 
+/**
+ * @alias getId
+ */
 Node.prototype.getId = Node.prototype.getLocation;
 
+/**
+ * Dispatches the event on the node dispatcher by recursively traversing the
+ * scene graph upwards.
+ *
+ * @method emit
+ * 
+ * @param  {String} event   Event type.
+ * @param  {Object} payload Event object to be dispatched.
+ */
 Node.prototype.emit = function emit (event, payload) {
     var p = this.getParent();
+    // the context is its own ancestor
     while ((p = p.getParent()) !== p);
     p.getDispatch().dispatch(event, payload);
 };
@@ -169,6 +254,14 @@ Node.prototype.sendDrawCommand = function sendDrawCommand (message) {
     return this;
 };
 
+/**
+ * Recursively serializes the Node, including all previously added components.
+ *
+ * @method getValue
+ * 
+ * @return {Object}     Serialized representation of the node, including
+ *                      components.
+ */
 Node.prototype.getValue = function getValue () {
     var numberOfChildren = this._children.length;
     var numberOfComponents = this._components.length;
@@ -191,6 +284,16 @@ Node.prototype.getValue = function getValue () {
     return value;
 };
 
+/**
+ * Similar to @{@link getValue}, but returns the actual "computed" value. E.g.
+ * a proportional size of 0.5 might resolve into a "computed" size of 200px
+ * (assuming the parent has a width of 400px).
+ *
+ * @method getComputedValue
+ * 
+ * @return {Object}     Serialized representation of the node, including
+ *                      children, excluding components.
+ */
 Node.prototype.getComputedValue = function getComputedValue () {
     var numberOfChildren = this._children.length;
 
@@ -206,17 +309,42 @@ Node.prototype.getComputedValue = function getComputedValue () {
     return value;
 };
 
+/**
+ * Retrieves all children of the current node.
+ *
+ * @method getChildren
+ * 
+ * @return {Array.<Node>}   An array of children.
+ */
 Node.prototype.getChildren = function getChildren () {
     return this._children;
 };
 
+/**
+ * Retrieves the parent of the current node. Unmounted nodes do not have a
+ * parent node.
+ *
+ * @method getParent
+ * 
+ * @return {Node}       Parent node.
+ */
 Node.prototype.getParent = function getParent () {
     return this._parent;
 };
 
-Node.prototype.requestUpdate = function requestUpdate (id) {
-    if (this._inUpdate) return this.requestUpdateOnNextTick(id);
-    this._updateQueue.push(id);
+/**
+ * Schedules the @{@link update} function of the node to be invoked on the next
+ * frame (if no update during this frame has been scheduled already).
+ *
+ * @method requestUpdate
+ * 
+ * @param  {Object} requester   If the requester has an `onUpdate` method, it
+ *                              will be invoked during the next update phase of
+ *                              the node.
+ */
+Node.prototype.requestUpdate = function requestUpdate (requester) {
+    if (this._inUpdate) return this.requestUpdateOnNextTick(requester);
+    this._updateQueue.push(requester);
     if (!this._requestingUpdate) this._requestUpdate();
 };
 
