@@ -297,7 +297,7 @@ Mesh.prototype.setPositionOffset = function positionOffset (materialExpression) 
     }
 
     if (this._initialized) {
-        this._changeQueue.push(materialExpression._compile ? 'GL_UNIFORMS' : 'MATERIAL_INPUT');
+        this._changeQueue.push(materialExpression._compile ? 'MATERIAL_INPUT' : 'GL_UNIFORMS');
         this._changeQueue.push('positionOffset');
         this._changeQueue.push(uniformValue);
     }
