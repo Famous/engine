@@ -1,6 +1,6 @@
 {
   "name": "famous-core",
-  "version": "0.4.1",
+  "version": "0.4.0",
   "description": "Famous Core",
   "main": "src/index.js",
   "scripts": {
@@ -27,6 +27,6 @@
     "tape": "^3.0.3"
   },
   "dependencies": {
-    "famous-utilities": "git+ssh://git@github.com/FamousPartners/utilities#v0.3.2"
+    "famous-utilities": "git+ssh://git@github.famo.us/platform/utilities#v0.3.1"
   }
 }
