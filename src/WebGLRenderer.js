@@ -142,6 +142,7 @@ WebGLRenderer.prototype.createMesh = function createMesh(path) {
         glossiness: 0
     });
     return this.meshRegistry[path] = {
+        depth: null,
         uniformKeys: uniforms.keys,
         uniformValues: uniforms.values,
         buffers: {},
@@ -429,7 +430,7 @@ WebGLRenderer.prototype.drawMeshes = function drawMeshes() {
     for(var i = 0; i < this.meshRegistryKeys.length; i++) {
         mesh = this.meshRegistry[this.meshRegistryKeys[i]];
         buffers = this.bufferRegistry.registry[mesh.geometry];
-
+        
         if (!mesh.visible) continue;
 
         var gl = this.gl;
@@ -445,7 +446,6 @@ WebGLRenderer.prototype.drawMeshes = function drawMeshes() {
 
         if (mesh.options) this.handleOptions(mesh.options);
         if (mesh.texture) mesh.texture.bind();
-
         this.program.setUniforms(mesh.uniformKeys, mesh.uniformValues);
         this.drawBuffers(buffers, mesh.drawType, mesh.geometry);
 

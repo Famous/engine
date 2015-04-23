@@ -14,15 +14,18 @@ var intView = new Int32Array(buffer, 0, 1);
 
 function comp(list, registry, i) {
     var key = list[i];
-    return registry[key].uniformValues[1][14] + normalizer;
+    var item = registry[key];
+    return (item.depth ? item.depth : registry[key].uniformValues[1][14]) + normalizer;
 }
 
 function mutator(list, registry, i, value) {
     var key = list[i];
-    registry[key].uniformValues[1][14] = intToFloat(value) - normalizer;
+    registry[key].depth = intToFloat(value) - normalizer;
     return key;
 }
-
+function clean(list, registry, i) {
+    registry[list[i]].depth = null;
+}
 
 function floatToInt(k) {
     floatView[0] = k;
@@ -78,6 +81,7 @@ function sort(list, registry) {
     for (i = 0, n = list.length, offset = pass * maxRadix, size = pass * radixBits; i < n; i++) {
         div = floatToInt(comp(list, registry, i));
         out[++buckets[offset + (div >>> size & lastMask)]] = mutator(list, registry, i, div ^ (~div >> 31 | 0x80000000));
+        clean(list, registry, i);
     }
 
     return out;
