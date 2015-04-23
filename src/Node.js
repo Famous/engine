@@ -336,6 +336,9 @@ Node.prototype.getParent = function getParent () {
 /**
  * Schedules the @{@link update} function of the node to be invoked on the next
  * frame (if no update during this frame has been scheduled already).
+ * If the node is currently being updated (which means one of the requesters
+ * invoked requestsUpdate while being updated itself), an update will be
+ * scheduled on the next frame.
  *
  * @method requestUpdate
  * 
@@ -350,39 +353,112 @@ Node.prototype.requestUpdate = function requestUpdate (requester) {
     return this;
 };
 
-Node.prototype.requestUpdateOnNextTick = function requestUpdateOnNextTick (id) {
-    this._nextUpdateQueue.push(id);
+/**
+ * Schedules an update on the next tick. Similarily to @{@link requestUpdate},
+ * `requestUpdateOnNextTick` schedules the node's `onUpdate` function to be
+ * invoked on the frame after the next invocation on the node's onUpdate function.
+ *
+ * @method requestUpdateOnNextTick
+ * 
+ * @param  {Object} requester   If the requester has an `onUpdate` method, it
+ *                              will be invoked during the next update phase of
+ *                              the node.
+ */
+Node.prototype.requestUpdateOnNextTick = function requestUpdateOnNextTick (requester) {
+    this._nextUpdateQueue.push(requester);
     return this;
 };
 
+/**
+ * If the context has been created using @{@link Famous.createContext}, the
+ * @{@link Famous} singleton will be the global updater.
+ *
+ * @method getUpdater
+ * 
+ * @return {Object} The global updater.
+ */
 Node.prototype.getUpdater = function getUpdater () {
     return this._globalUpdater;
 };
 
+/**
+ * Checks if the node is mounted. Unmounted nodes are detached from the scene
+ * graph.
+ *
+ * @method isMounted
+ * 
+ * @return {Boolean}    Boolean indicating weather the node is mounted or not.
+ */
 Node.prototype.isMounted = function isMounted () {
     return this.value.showState.mounted;
 };
 
+/**
+ * Checks if the node is visible ("shown").
+ *
+ * @method isShown
+ * 
+ * @return {Boolean}    Boolean indicating weather the node is visible
+ *                      ("shown") or not.
+ */
 Node.prototype.isShown = function isShown () {
     return this.value.showState.shown;
 };
 
+/**
+ * Determines the node's relative opacity.
+ * The opacity needs to be within [0, 1], where 0 indicates a completely
+ * transparent, therefore invisible node, whereas an opacity of 1 means the
+ * node is completely solid.
+ *
+ * @method getOpacity
+ * 
+ * @return {Number}         Relative opacity of the node.
+ */
 Node.prototype.getOpacity = function getOpacity () {
     return this.value.showState.opacity;
 };
 
+/**
+ * Determines the node's previously set mount point.
+ * 
+ * @method getMountPoint
+ * 
+ * @return {Float32Array}   An array representing the mount point.
+ */
 Node.prototype.getMountPoint = function getMountPoint () {
     return this.value.offsets.mountPoint;
 };
 
+/**
+ * Determines the node's previously set align.
+ * 
+ * @method getAlign
+ * 
+ * @return {Float32Array}   An array representing the align.
+ */
 Node.prototype.getAlign = function getAlign () {
     return this.value.offsets.align;
 };
 
+/**
+ * Determines the node's previously set origin.
+ * 
+ * @method getOrigin
+ * 
+ * @return {Float32Array}   An array representing the origin.
+ */
 Node.prototype.getOrigin = function getOrigin () {
     return this.value.offsets.origin;
 };
 
+/**
+ * Determines the node's previously set position.
+ *
+ * @method getPosition
+ * 
+ * @return {Float32Array}   An array representing the position.
+ */
 Node.prototype.getPosition = function getPosition () {
     return this.value.vectors.position;
 };
@@ -460,6 +536,13 @@ Node.prototype.removeChild = function removeChild (child) {
     return added;
 };
 
+/**
+ * Each component can only be added once per node.
+ *
+ * @method addComponent
+ * 
+ * @param {Object} component    An component to be added.
+ */
 Node.prototype.addComponent = function addComponent (component) {
     var index = this._components.indexOf(component);
     if (index === -1) {
@@ -476,6 +559,14 @@ Node.prototype.addComponent = function addComponent (component) {
     return index;
 };
 
+/**
+ * Removes a previously via @{@link addComponent} added component.
+ *
+ * @method removeComponent
+ * 
+ * @param  {Object} component   An component that has previously been added
+ *                              using @{@link addComponent}.
+ */
 Node.prototype.removeComponent = function removeComponent (component) {
     var index = this._components.indexOf(component);
     if (index !== -1) {
@@ -765,6 +856,29 @@ Node.prototype.setOpacity = function setOpacity (val) {
     return this;
 };
 
+/**
+ * Sets the size mode being used for determining the nodes final width, height
+ * and depth.
+ * Size modes are a way to define the way the node's size is being calculated.
+ * Size modes are enums set on the @{@link Size} constructor (and aliased on
+ * the Node).
+ *
+ * @example
+ * node.setSizeMode(Node.RELATIVE_SIZE, Node.ABSOLUTE_SIZE, Node.ABSOLUTE_SIZE);
+ * // Instead of null, any proporional height or depth can be passed in, since
+ * // it would be ignored in any case.
+ * node.setProportionalSize(0.5, null, null);
+ * node.setAbsoluteSize(null, 100, 200);
+ *
+ * @method setSizeMode
+ * 
+ * @param {SizeMode} x    The size mode being used for determining the size in
+ *                        x direction ("width").
+ * @param {SizeMode} y    The size mode being used for determining the size in
+ *                        y direction ("height").
+ * @param {SizeMode} z    The size mode being used for determining the size in
+ *                        z direction ("depth").
+ */
 Node.prototype.setSizeMode = function setSizeMode (x, y, z) {
     var vec3 = this.value.size.sizeMode;
     var propogate = false;
@@ -789,6 +903,17 @@ Node.prototype.setSizeMode = function setSizeMode (x, y, z) {
     return this;
 };
 
+/**
+ * A proportional size defines the node's dimensions relative to its parents
+ * final size.
+ * Proportional sizes need to be within the range of [0, 1].
+ *
+ * @method setProportionalSize
+ * 
+ * @param {Number} x    x-Size in pixels ("width").
+ * @param {Number} y    y-Size in pixels ("height").
+ * @param {Number} z    z-Size in pixels ("depth").
+ */
 Node.prototype.setProportionalSize = function setProportionalSize (x, y, z) {
     var vec3 = this.value.size.proportional;
     var propogate = false;
@@ -813,6 +938,22 @@ Node.prototype.setProportionalSize = function setProportionalSize (x, y, z) {
     return this;
 };
 
+/**
+ * Differential sizing can be used to add or subtract an absolute size from a
+ * otherwise proportionally sized node.
+ * E.g. a differential width of `-10` and a proportional width of `0.5` is
+ * being interpreted as setting the node's size to 50% of its parent's width
+ * *minus* 10 pixels.
+ *
+ * @method setDifferentialSize
+ * 
+ * @param {Number} x    x-Size to be added to the relatively sized node in
+ *                      pixels ("width").
+ * @param {Number} y    y-Size to be added to the relatively sized node in
+ *                      pixels ("height").
+ * @param {Number} z    z-Size to be added to the relatively sized node in
+ *                      pixels ("depth").
+ */
 Node.prototype.setDifferentialSize = function setDifferentialSize (x, y, z) {
     var vec3 = this.value.size.differential;
     var propogate = false;
@@ -837,6 +978,15 @@ Node.prototype.setDifferentialSize = function setDifferentialSize (x, y, z) {
     return this;
 };
 
+/**
+ * Sets the nodes size in pixels, independent of its parent.
+ *
+ * @method setAbsoluteSize
+ * 
+ * @param {Number} x    x-Size in pixels ("width").
+ * @param {Number} y    y-Size in pixels ("height").
+ * @param {Number} z    z-Size in pixels ("depth").
+ */
 Node.prototype.setAbsoluteSize = function setAbsoluteSize (x, y, z) {
     var vec3 = this.value.size.absolute;
     var propogate = false;
@@ -908,6 +1058,14 @@ Node.prototype.getFrame = function getFrame () {
     return this._globalUpdater.getFrame();
 };
 
+/**
+ * Enters the node's update phase while updating its own spec and updating its components.
+ *
+ * @method update
+ * 
+ * @param  {Number} time    high-resolution timstamp, usually retrieved using
+ *                          requestAnimationFrame
+ */
 Node.prototype.update = function update (time){
     this._inUpdate = true;
     var nextQueue = this._nextUpdateQueue;
@@ -942,6 +1100,15 @@ Node.prototype.update = function update (time){
     return this;
 };
 
+/**
+ * Mounts the node and therefore its subtree by setting it as a child of the
+ * passed in parent.
+ *
+ * @method mount
+ * 
+ * @param  {Node} parent    parent node
+ * @param  {String} myId    path to node (e.g. `body/0/1`)
+ */
 Node.prototype.mount = function mount (parent, myId) {
     if (this.isMounted()) return;
     var i = 0;
@@ -971,6 +1138,12 @@ Node.prototype.mount = function mount (parent, myId) {
     return this;
 };
 
+/**
+ * Dismounts (detaches) the node from the scene graph by removing it as a
+ * child of its parent.
+ *
+ * @method dismount
+ */
 Node.prototype.dismount = function dismount () {
     if (!this.isMounted()) return;
     var i = 0;
@@ -1003,14 +1176,39 @@ Node.prototype.dismount = function dismount () {
     return this;
 };
 
+/**
+ * Function to be invoked by the parent as soon as the parent is
+ * being mounted.
+ *
+ * @method onParentMount
+ * 
+ * @param  {Node} parent        The parent node.
+ * @param  {String} parentId    The parent id (path to parent).
+ * @param  {Number} index       Id the node should be mounted to.
+ */
 Node.prototype.onParentMount = function onParentMount (parent, parentId, index) {
     return this.mount(parent, parentId + '/' + index);
 };
 
+/**
+ * Function to be invoked by the parent as soon as the parent is being
+ * unmounted.
+ *
+ * @method onParentDismount
+ */
 Node.prototype.onParentDismount = function onParentDismount () {
     return this.dismount();
 };
 
+/**
+ * Method to be called in order to dispatch an event to the node and all its
+ * components. Note that this doesn't recurse the subtree.
+ *
+ * @method receive
+ * 
+ * @param  {String} type   The event type (e.g. "click").
+ * @param  {Object} ev     The event payload object to be dispatched.
+ */
 Node.prototype.receive = function receive (type, ev) {
     var i = 0;
     var list = this._components;
@@ -1023,15 +1221,20 @@ Node.prototype.receive = function receive (type, ev) {
     return this;
 };
 
+
+Node.prototype._requestUpdateWithoutArgs = function _requestUpdateWithoutArgs () {
+    if (!this._requestingUpdate) this._requestUpdate();
+};
+
 Node.prototype.onUpdate = Node.prototype.update;
 
 Node.prototype.onParentShow = Node.prototype.show;
 
 Node.prototype.onParentHide = Node.prototype.hide;
 
-Node.prototype.onParentTransformChange = _requestUpdateWithoutArgs;
+Node.prototype.onParentTransformChange = Node.prototype._requestUpdateWithoutArgs;
 
-Node.prototype.onParentSizeChange = _requestUpdateWithoutArgs;
+Node.prototype.onParentSizeChange = Node.prototype._requestUpdateWithoutArgs;
 
 Node.prototype.onShow = Node.prototype.show;
 
@@ -1042,9 +1245,5 @@ Node.prototype.onMount = Node.prototype.mount;
 Node.prototype.onDismount = Node.prototype.dismount;
 
 Node.prototype.onReceive = Node.prototype.receive;
-
-function _requestUpdateWithoutArgs () {
-    if (!this._requestingUpdate) this._requestUpdate();
-}
 
 module.exports = Node;

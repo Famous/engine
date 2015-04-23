@@ -12,7 +12,7 @@ function Size () {
 Size.RELATIVE = 0;
 Size.ABSOLUTE = 1;
 Size.RENDER = 2;
-Size.DEFAULT = 0;
+Size.DEFAULT = Size.RELATIVE;
 
 /**
  * fromSpecWithParent takes the parent node's size, the target nodes spec,
@@ -42,7 +42,7 @@ Size.prototype.fromSpecWithParent = function fromSpecWithParent (parentSize, spe
                 target[i] = spec.size.absolute[i];
                 changed = changed || prev !== target[i];
                 break;
-            case Size.Render:
+            case Size.RENDER:
                 break;
         }
     }
