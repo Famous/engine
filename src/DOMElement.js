@@ -211,6 +211,10 @@ DOMElement.prototype.onSizeChange = function onSizeChange (size) {
     return this;
 };
 
+DOMElement.prototype.onOpacityChange = function onOpacityChange (opacity) {
+    return this.setProperty('opacity', opacity);
+};
+
 /**
  * Method to be invoked by the node as soon as a new UIEvent is being added.
  * This results into an `ADD_EVENT_LISTENER` command being send.
