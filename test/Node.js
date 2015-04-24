@@ -3,6 +3,7 @@
 var test = require('tape');
 var Node = require('../src/Node');
 var Size = require('../src/Size');
+var Context = require('../src/Context');
 var DefaultNodeSpec = require('./expected/DefaultNodeSpec');
 var ExampleNodeSpec = require('./expected/ExampleNodeSpec');
 
@@ -127,7 +128,7 @@ test('Node', function(t) {
         t.equal(requesters[4], node010);
         t.equal(requesters[5], node011);
         t.equal(requesters.length, 6);
-        
+
         t.deepEqual(root.getValue(), ExampleNodeSpec);
 
         t.end();
@@ -328,6 +329,56 @@ test('Node', function(t) {
         root.onUpdate(1);
         t.deepEqual(events, ['onMount']);
         events.length = 0;
+
+        t.end();
+    });
+
+    t.test('emit method', function(t) {
+        var updater = {
+            message: function() {
+                return updater;
+            }
+        };
+        var root = new Context('body', updater);
+
+        var child0 = root.addChild();
+        var child1 = root.addChild();
+        var child00 = child0.addChild();
+        var child01 = child0.addChild();
+        var child000 = child00.addChild();
+
+        t.equal(typeof root.emit, 'function', 'root.emit should be a function');
+
+        var receivedEvents = [];
+
+        function addEventListener(node) {
+            node.addComponent({
+                onReceive: function(type, ev) {
+                    receivedEvents.push([type, ev, node]);
+                }
+            });
+        }
+
+        addEventListener(root);
+        addEventListener(child0);
+        addEventListener(child1);
+        addEventListener(child00);
+        addEventListener(child01);
+        addEventListener(child000);
+
+        var expectedType = 'type';
+        var expectedEv = {};
+        child000.emit(expectedType, expectedEv);
+
+        t.deepEqual(receivedEvents.map(function(i) {
+            return i[2].getId()
+        }), [
+            'body/0',
+            'body/1',
+            'body/0/0',
+            'body/0/1',
+            'body/0/0/0'
+        ]);
 
         t.end();
     });
