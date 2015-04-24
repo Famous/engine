@@ -244,7 +244,7 @@ Node.prototype.getId = Node.prototype.getLocation;
 Node.prototype.emit = function emit (event, payload) {
     var p = this.getParent();
     // the context is its own ancestor
-    while ((p = p.getParent()) !== p);
+    while (p !== (p = p.getParent()));
     p.getDispatch().dispatch(event, payload);
 };
 
