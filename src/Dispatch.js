@@ -1,16 +1,16 @@
 'use strict';
 
-// TODO: Dispatcher should be generalized so that it can work on any Node
+// TODO: Dispatch should be generalized so that it can work on any Node
 // not just Contexts.
 
 
 /**
- * The Dispatcher class is used to propogate events down the
+ * The Dispatch class is used to propogate events down the
  * scene graph.
  *
  * @param {Context} Context on which it operates
  */
-function Dispatcher (context) {
+function Dispatch (context) {
 
     if (!context) throw new Error('Dispatch needs to be instantiated on a node');
     
@@ -35,7 +35,7 @@ function Dispatcher (context) {
  * 
  * @return {Node | undefined} The node at the requested path
  */
-Dispatcher.prototype.lookupNode = function lookupNode (location) {
+Dispatch.prototype.lookupNode = function lookupNode (location) {
     if (!location) throw new Error('lookupNode must be called with a path');
 
     var path = this._queue;
@@ -69,7 +69,7 @@ Dispatcher.prototype.lookupNode = function lookupNode (location) {
  * @param {String} event name
  * @param {Any} payload
  */
-Dispatcher.prototype.dispatch = function dispatch (event, payload) {
+Dispatch.prototype.dispatch = function dispatch (event, payload) {
     if (!event) throw new Error('dispatch requires an event name as it\'s first argument');
 
     var queue = this._queue;
@@ -99,7 +99,7 @@ Dispatcher.prototype.dispatch = function dispatch (event, payload) {
  * @param {String} the event name
  * @param {Any} the payload
  */
-Dispatcher.prototype.dispatchUIEvent = function dispatchUIEvent (path, event, payload) {
+Dispatch.prototype.dispatchUIEvent = function dispatchUIEvent (path, event, payload) {
     if (!path) throw new Error('dispatchUIEvent needs a valid path to dispatch to');
     if (!event) throw new Error('dispatchUIEvent needs an event name as its second argument');
 
@@ -139,5 +139,5 @@ function _splitTo (string, target) {
     return target;
 }
 
-module.exports = Dispatcher;
+module.exports = Dispatch;
 

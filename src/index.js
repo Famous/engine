@@ -5,7 +5,8 @@ module.exports = {
     Event: require('./Event'),
     Context: require('./Context'),
     Famous: require('./Famous'),
-    Dispatcher: require('./Dispatcher'),
+    Dispatch: require('./Dispatch'),
+    Dispatcher: require('./Dispatch'),
     Node: require('./Node'),
     Size: require('./Size'),
     Transform: require('./Transform')
