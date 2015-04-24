@@ -5,8 +5,9 @@ var DOMRenderer = require('famous-dom-renderers').DOMRenderer;
 function Context(selector, compositor) {
     this._compositor = compositor;
     this._rootEl = document.querySelector(selector);
+
     if (this._rootEl === document.body) {
-        window.addEventListener('resize', this.updateSize.bind(this));
+        window.addEventListener('resize', function updateSize() { this.updateSize.bind(this); });
     }
 
     var DOMLayerEl = document.createElement('div');

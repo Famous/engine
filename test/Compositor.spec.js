@@ -3,10 +3,7 @@
 var test = require('tape');
 var Compositor = require('../src/Compositor');
 var Context = require('../src/Context');
-var jsdom = require('jsdom');
-
-global.window = require('./TestingWindow');
-global.document = window.document;
+require('polyfill-function-prototype-bind');
 
 var elOne = document.createElement('div');
     elOne.id = 'one';
@@ -51,14 +48,13 @@ test('Compositor', function(t) {
 
     t.test('Compositor.prototype.handleWith', function(t) {
         var compositor = new Compositor();
-
         var path = 'body/1/2/3';
         var wasCalled = false;
         
         compositor._inCommands.push(path);
         compositor._contexts['body'] = new Context('body', compositor);
         compositor._contexts['body'].receive = function() { wasCalled = true; };
-        compositor.handleWith(compositor._inCommands);
+        compositor.handleWith(0, compositor._inCommands);
 
         t.equals(
             wasCalled,
@@ -110,7 +106,7 @@ test('Compositor', function(t) {
         shouldInclude(compositor._outCommands, t, 'WITH');
         shouldInclude(compositor._outCommands, t, selector);
         shouldInclude(compositor._outCommands, t, 'TRIGGER');
-        shouldInclude(compositor._outCommands, t, 'resize');
+        shouldInclude(compositor._outCommands, t, 'CONTEXT_RESIZE');
         shouldInclude(compositor._outCommands, t, size);
 
         t.end();
@@ -158,12 +154,6 @@ test('Compositor', function(t) {
         compositor._inCommands.push('WITH', paths[0], 'WITH', paths[1], 'WITH', paths[2]);
         compositor.drawCommands();
         
-        t.equals(
-            compositor._inCommands.index,
-            compositor._inCommands.length + 2,
-            'Should increment index to end of array plus two'
-        );
-
         t.ok(
             contexts[0].hasBeenDrawn && contexts[1].hasBeenDrawn && contexts[1].hasBeenDrawn,
             'Should call draw on all registered contexts'
@@ -210,12 +200,6 @@ test('Compositor', function(t) {
             compositor._outCommands.length,
             0,
             'Should clear outCommands'
-        );
-
-        t.equals(
-            compositor._inCommands.index,
-            0,
-            'Should clear the inCommands index'
         );
 
         t.end();

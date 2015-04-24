@@ -3,8 +3,7 @@
 var test = require('tape');
 var Context = require('../src/Context');
 var Compositor = require('../src/Compositor');
-global.window = require('./TestingWindow');
-global.document = window.document;
+require('polyfill-function-prototype-bind');
 
 test('Context', function(t) {
     t.test('constructor', function(t) {
@@ -15,7 +14,6 @@ test('Context', function(t) {
         t.ok(context._renderState, 'Should have a renderState object');
 
         t.ok(Array.isArray(context._size), 'Should have a size array');
-        t.ok(Array.isArray(context._renderers), 'Should have a renderers array');
 
         t.end();
     });
@@ -31,34 +29,19 @@ test('Context', function(t) {
         var dummyRenderers = [];
         var drawCallsIssued = 0;
 
-        for (var i = 0; i < 5; i++) {
-            context._renderers.push({
-                draw: function () {
-                    drawCallsIssued++;
-                }
-            });
-        }
+        context.DOMRenderer = { draw: function() { this.wasDrawn = true; } };
+        context.WebGLRenderer = { draw: function() { this.wasDrawn = true; } };
 
         context.draw();
 
-        t.equals(
-            drawCallsIssued,
-            5,
-            'Should call draw on all renderers'
-        );
+        t.ok(context.DOMRenderer.wasDrawn, 'Should call draw on the DOMRenderer');
+        t.ok(context.WebGLRenderer.wasDrawn, 'Should call draw on the WebGLRenderer');
 
         t.end();
     });
 
     t.test('Context.prototype.initWebGL', function(t) {
-        // var context = new Context('body');
-
-        // context.initWebGL();
-
-        // t.ok(
-        //     context.WebGLRenderer,
-        //     'Should create a WebGLRenderer'
-        // );
+        // TODO: These tests.
         
         t.end();
     });
@@ -67,7 +50,7 @@ test('Context', function(t) {
         var context = new Context('body');
         var rootSize = context.getRootSize();
 
-        t.equals(rootSize, context._size, 'Should return _size property');
+        t.deepEquals(rootSize, context._size.slice(0, 2), 'Should return _size property');
 
         t.end();
     });
