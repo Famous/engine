@@ -1,6 +1,6 @@
 'use strict';
 
-var Dispatch = require('./Dispatcher');
+var Dispatch = require('./Dispatch');
 var Node = require('./Node');
 var Size = require('./Size');
 
@@ -74,7 +74,7 @@ Context.prototype.getSelector = function getSelector () {
  * Returns the dispatcher of the context. Used to send events
  * to the nodes in the scene graph.
  *
- * @return {Dispatcher} the Context's Dispatcher
+ * @return {Dispatch} the Context's Dispatch
  */
 Context.prototype.getDispatch = function getDispatch () {
     return this._dispatch;

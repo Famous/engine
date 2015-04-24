@@ -233,8 +233,8 @@ Node.prototype.getLocation = function getLocation () {
 Node.prototype.getId = Node.prototype.getLocation;
 
 /**
- * Dispatches the event on the node dispatcher by recursively traversing the
- * scene graph upwards.
+ * Dispatches the event on the node by recursively traversing the scene graph
+ * upwards.
  *
  * @method emit
  * 
