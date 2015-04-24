@@ -15,7 +15,7 @@ var EventMap = {
     'abort': [Event, false],
     'beforeinput': [InputEvent, true],
     'blur': [FocusEvent, false],
-    'click': [MouseEvent, false],
+    'click': [MouseEvent, true],
     'compositionend': [CompositionEvent, true],
     'compositionstart': [CompositionEvent, true],
     'compositionupdate': [CompositionEvent, true],
@@ -33,11 +33,15 @@ var EventMap = {
 
     // bubbles, but will be triggered very frequently
     'mousemove': [MouseEvent, false],
+
     'mouseout': [MouseEvent, true],
     'mouseover': [MouseEvent, true],
     'mouseup': [MouseEvent, true],
     'resize': [UIEvent, false],
+
+    // might bubble
     'scroll': [UIEvent, false],
+    
     'select': [Event, true],
     'unload': [Event, false],
     'wheel': [WheelEvent, true],
