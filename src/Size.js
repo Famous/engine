@@ -240,15 +240,30 @@ Size.prototype.setProportional = function setProportional(x, y, z, options, call
         this._node.requestUpdate(this._id);
         this._requestingUpdate = true;
     }
+
+    var xCallback;
+    var yCallback;
+    var zCallback;
+
+    if (z != null) {
+        zCallback = callback;
+    }
+    else if (y != null) {
+        yCallback = callback;
+    }
+    else if (x != null) {
+        xCallback = callback;
+    }
+
     var prop = this._proportional;
     if (x != null) {
-        prop.x.set(x, options, callback);
+        prop.x.set(x, options, xCallback);
     }
     if (y != null) {
-        prop.y.set(y, options, callback);
+        prop.y.set(y, options, yCallback);
     }
     if (z != null) {
-        prop.z.set(z, options, callback);
+        prop.z.set(z, options, zCallback);
     }
     return this;
 };
