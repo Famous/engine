@@ -286,15 +286,30 @@ Size.prototype.setDifferential = function setDifferential(x, y, z, options, call
         this._node.requestUpdate(this._id);
         this._requestingUpdate = true;
     }
+
+    var xCallback;
+    var yCallback;
+    var zCallback;
+
+    if (z != null) {
+        zCallback = callback;
+    }
+    else if (y != null) {
+        yCallback = callback;
+    }
+    else if (x != null) {
+        xCallback = callback;
+    }
+
     var diff = this._differential;
     if (x != null) {
-        diff.x.set(x, options, callback);
+        diff.x.set(x, options, xCallback);
     }
     if (y != null) {
-        diff.y.set(y, options, callback);
+        diff.y.set(y, options, yCallback);
     }
     if (z != null) {
-        diff.z.set(z, options, callback);
+        diff.z.set(z, options, zCallback);
     }
     return this;
 };
