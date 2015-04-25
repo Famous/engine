@@ -194,15 +194,30 @@ Size.prototype.setAbsolute = function setAbsolute(x, y, z, options, callback) {
         this._node.requestUpdate(this._id);
         this._requestingUpdate = true;
     }
+
+    var xCallback;
+    var yCallback;
+    var zCallback;
+
+    if (z != null) {
+        zCallback = callback;
+    }
+    else if (y != null) {
+        yCallback = callback;
+    }
+    else if (x != null) {
+        xCallback = callback;
+    }
+
     var abs = this._absolute;
     if (x != null) {
-        abs.x.set(x, options, callback);
+        abs.x.set(x, options, xCallback);
     }
     if (y != null) {
-        abs.y.set(y, options, callback);
+        abs.y.set(y, options, yCallback);
     }
     if (z != null) {
-        abs.z.set(z, options, callback);
+        abs.z.set(z, options, zCallback);
     }
 };
 
