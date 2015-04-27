@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "mkdir dist & browserify index.js -t uglifyify --standalone famous | uglifyjs | gzip > dist/famous.min.js"
+    "build": "mkdir dist; browserify index.js -t uglifyify --standalone famous | uglifyjs --screw-ie8 -m -c dead_code,sequences,conditionals,booleans,unused,if_return,join_vars,drop_debugger | gzip > dist/famous.min.js"
   },
   "repository": {
     "type": "git",
