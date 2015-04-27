@@ -212,6 +212,19 @@ DOMElement.prototype.onSizeChange = function onSizeChange (size) {
 };
 
 /**
+ * Method to be invoked by the node as soon as its opacity changes.
+ * 
+ * @method onOpacityChange
+ * @chainable
+ * 
+ * @param  {Number} opacity      The new opacity, as a scalar from 0 to 1.
+ * @return {DOMElement} this
+ */
+DOMElement.prototype.onOpacityChange = function onOpacityChange (opacity) {
+    return this.setProperty('opacity', opacity);
+};
+
+/**
  * Method to be invoked by the node as soon as a new UIEvent is being added.
  * This results into an `ADD_EVENT_LISTENER` command being send.
  * 
