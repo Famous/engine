@@ -416,52 +416,15 @@ WebGLRenderer.prototype.bufferData = function bufferData(path, geometryId, buffe
  * affect the rendering of all renderables.
  */
 WebGLRenderer.prototype.draw = function draw(renderState) {
+    this.setGlobalUniforms(renderState);
+    this.meshRegistryKeys = sorter(this.meshRegistryKeys, this.meshRegistry);
+    this.drawCutouts();
+    this.drawMeshes();
+};
+
+WebGLRenderer.prototype.drawMeshes = function drawMeshes() {
     var mesh;
     var buffers;
-    var size;
-    var light;
-    var stride;
-    var cutout;
-
-    /**
-     * Update lights
-     */
-    for(var i = 0; i < this.lightRegistryKeys.length; i++) {
-        light = this.lightRegistry[this.lightRegistryKeys[i]];
-        stride = i * 4;
-
-        // Build the light positions' 4x4 matrix
-        this.lightPositions[0 + stride] = light.position[0];
-        this.lightPositions[1 + stride] = light.position[1];
-        this.lightPositions[2 + stride] = light.position[2];
-
-        // Build the light colors' 4x4 matrix
-        this.lightColors[0 + stride] = light.color[0];
-        this.lightColors[1 + stride] = light.color[1];
-        this.lightColors[2 + stride] = light.color[2];
-    }
-    
-    this.program.setUniforms(['u_NumLights'], [this.numLights]);
-    this.program.setUniforms(['u_AmbientLight'], [this.ambientLightColor]);
-    this.program.setUniforms(['u_LightPosition'], [this.lightPositions]);
-    this.program.setUniforms(['u_LightColor'], [this.lightColors]);
-
-    this.projectionTransform[11] = renderState.perspectiveTransform[11];
-    this.program.setUniforms(['perspective', 'time', 'view'], [this.projectionTransform, Date.now()  % 100000 / 1000, renderState.viewTransform]);
-
-    var keys = this.meshRegistryKeys;
-    var registry = this.meshRegistry;
-    this.meshRegistryKeys = sorter(keys, registry);
-
-    for (var i = 0, len = this.cutoutRegistryKeys.length; i < len; i++) {
-        cutout = this.cutoutRegistry[this.cutoutRegistryKeys[i]];
-        buffers = this.bufferRegistry.registry[cutout.geometry];
-
-        this.gl.enable(this.gl.BLEND);
-        this.program.setUniforms(cutout.uniformKeys, cutout.uniformValues);
-        this.drawBuffers(buffers, cutout.drawType, cutout.geometry);
-        this.gl.disable(this.gl.BLEND);
-    }
 
     for(var i = 0; i < this.meshRegistryKeys.length; i++) {
         mesh = this.meshRegistry[this.meshRegistryKeys[i]];
@@ -489,8 +452,76 @@ WebGLRenderer.prototype.draw = function draw(renderState) {
         if (mesh.texture) mesh.texture.unbind();
         if (mesh.options) this.resetOptions(mesh.options);
     }
+}
+
+WebGLRenderer.prototype.drawCutouts = function drawCutouts() {
+    var cutout;
+    var buffers;
+
+    for (var i = 0, len = this.cutoutRegistryKeys.length; i < len; i++) {
+        cutout = this.cutoutRegistry[this.cutoutRegistryKeys[i]];
+        buffers = this.bufferRegistry.registry[cutout.geometry];
+
+        this.gl.enable(this.gl.BLEND);
+        this.program.setUniforms(cutout.uniformKeys, cutout.uniformValues);
+        this.drawBuffers(buffers, cutout.drawType, cutout.geometry);
+        this.gl.disable(this.gl.BLEND);
+    }
 };
 
+WebGLRenderer.prototype.setGlobalUniforms = (function() {
+    var uniformNames = [
+        'u_NumLights',
+        'u_AmbientLight',
+        'u_LightPosition',
+        'u_LightColor',
+        'perspective',
+        'time',
+        'view'
+    ];
+    var uniformValues = [];
+
+    return function setGlobalUniforms(renderState) {
+        var light;
+        var stride;
+
+        /*
+         * Set light uniforms
+         */
+
+        for(var i = 0; i < this.lightRegistryKeys.length; i++) {
+            light = this.lightRegistry[this.lightRegistryKeys[i]];
+            stride = i * 4;
+
+            // Build the light positions' 4x4 matrix
+            this.lightPositions[0 + stride] = light.position[0];
+            this.lightPositions[1 + stride] = light.position[1];
+            this.lightPositions[2 + stride] = light.position[2];
+
+            // Build the light colors' 4x4 matrix
+            this.lightColors[0 + stride] = light.color[0];
+            this.lightColors[1 + stride] = light.color[1];
+            this.lightColors[2 + stride] = light.color[2];
+        }
+        
+        uniformValues[0] = this.numLights;
+        uniformValues[1] = this.ambientLightColor;
+        uniformValues[2] = this.lightPositions;
+        uniformValues[3] = this.lightColors;
+
+        /*
+         * Set time and projection uniforms
+         */
+
+        this.projectionTransform[11] = renderState.perspectiveTransform[11];
+
+        uniformValues[4] = this.projectionTransform;
+        uniformValues[5] = Date.now()  % 100000 / 1000;
+        uniformValues[6] = renderState.viewTransform;
+
+        this.program.setUniforms(uniformNames, uniformValues);
+    }
+}());
 
 /**
  * Loads the buffers and issues the draw command for a geometry.
