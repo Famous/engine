@@ -6,11 +6,11 @@ var CoreSize = require('famous-core').Size;
 /**
  * Size component used for managing the size of the underlying RenderContext.
  * Supports absolute and relative (proportional and differential) sizing.
- * 
+ *
  * @class Size
  * @constructor
  * @component
- * 
+ *
  * @param {LocalDispatch} node LocalDispatch to be retrieved from
  *                                 corresponding RenderNode of the Size
  *                                 component
@@ -51,11 +51,11 @@ Size.prototype.setMode = function setMode(x, y, z) {
     return this;
 };
 
-/** 
+/**
 * Stringifies Size.
 *
 * @method toString
-* 
+*
 * @return {String} `Size`
 */
 Size.toString = function toString() {
@@ -91,7 +91,7 @@ Size.toString = function toString() {
 * Returns serialized state of the component.
 *
 * @method getValue
-* 
+*
 * @return {absoluteSizeValue|relativeSizeValue}
 */
 Size.prototype.getValue = function getValue() {
@@ -119,7 +119,7 @@ Size.prototype.getValue = function getValue() {
 * Updates state of component.
 *
 * @method setValue
-* 
+*
 * @param {absoluteSizeValue|relativeSizeValue} state state encoded in same
 *                                                    format as state retrieved
 *                                                    through `getValue`
@@ -185,7 +185,7 @@ Size.prototype.onUpdate = function onUpdate() {
 *
 * @method setAbsolute
 * @chainable
-* 
+*
 * @param {Number} x used to set absolute size in x-direction (width)
 * @param {Number} y used to set absolute size in y-direction (height)
 * @param {Number} z used to set absolute size in z-direction (depth)
@@ -199,15 +199,30 @@ Size.prototype.setAbsolute = function setAbsolute(x, y, z, options, callback) {
         this._node.requestUpdate(this._id);
         this._requestingUpdate = true;
     }
+
+    var xCallback;
+    var yCallback;
+    var zCallback;
+
+    if (z != null) {
+        zCallback = callback;
+    }
+    else if (y != null) {
+        yCallback = callback;
+    }
+    else if (x != null) {
+        xCallback = callback;
+    }
+
     var abs = this._absolute;
     if (x != null) {
-        abs.x.set(x, options, callback);
+        abs.x.set(x, options, xCallback);
     }
     if (y != null) {
-        abs.y.set(y, options, callback);
+        abs.y.set(y, options, yCallback);
     }
     if (z != null) {
-        abs.z.set(z, options, callback);
+        abs.z.set(z, options, zCallback);
     }
 };
 
@@ -216,7 +231,7 @@ Size.prototype.setAbsolute = function setAbsolute(x, y, z, options, callback) {
 *
 * @method setProportional
 * @chainable
-* 
+*
 * @param {Number} x used to set proportional size in x-direction (width)
 * @param {Number} y used to set proportional size in y-direction (height)
 * @param {Number} z used to set proportional size in z-direction (depth)
@@ -230,15 +245,30 @@ Size.prototype.setProportional = function setProportional(x, y, z, options, call
         this._node.requestUpdate(this._id);
         this._requestingUpdate = true;
     }
+
+    var xCallback;
+    var yCallback;
+    var zCallback;
+
+    if (z != null) {
+        zCallback = callback;
+    }
+    else if (y != null) {
+        yCallback = callback;
+    }
+    else if (x != null) {
+        xCallback = callback;
+    }
+
     var prop = this._proportional;
     if (x != null) {
-        prop.x.set(x, options, callback);
+        prop.x.set(x, options, xCallback);
     }
     if (y != null) {
-        prop.y.set(y, options, callback);
+        prop.y.set(y, options, yCallback);
     }
     if (z != null) {
-        prop.z.set(z, options, callback);
+        prop.z.set(z, options, zCallback);
     }
     return this;
 };
@@ -248,7 +278,7 @@ Size.prototype.setProportional = function setProportional(x, y, z, options, call
 *
 * @method setDifferential
 * @chainable
-* 
+*
 * @param {Number} x used to set differential size in x-direction (width)
 * @param {Number} y used to set differential size in y-direction (height)
 * @param {Number} z used to set differential size in z-direction (depth)
@@ -261,15 +291,30 @@ Size.prototype.setDifferential = function setDifferential(x, y, z, options, call
         this._node.requestUpdate(this._id);
         this._requestingUpdate = true;
     }
+
+    var xCallback;
+    var yCallback;
+    var zCallback;
+
+    if (z != null) {
+        zCallback = callback;
+    }
+    else if (y != null) {
+        yCallback = callback;
+    }
+    else if (x != null) {
+        xCallback = callback;
+    }
+
     var diff = this._differential;
     if (x != null) {
-        diff.x.set(x, options, callback);
+        diff.x.set(x, options, xCallback);
     }
     if (y != null) {
-        diff.y.set(y, options, callback);
+        diff.y.set(y, options, yCallback);
     }
     if (z != null) {
-        diff.z.set(z, options, callback);
+        diff.z.set(z, options, zCallback);
     }
     return this;
 };
@@ -278,7 +323,7 @@ Size.prototype.setDifferential = function setDifferential(x, y, z, options, call
 * Retrieves the computed size applied to the underlying RenderContext.
 *
 * @method get
-* 
+*
 * @return {Number[]} size three dimensional computed size
 */
 Size.prototype.get = function get () {
@@ -287,10 +332,10 @@ Size.prototype.get = function get () {
 
 /**
  * Halts all currently active size transitions.
- * 
+ *
  * @method halt
  * @chainable
- * 
+ *
  * @return {Size} this
  */
 Size.prototype.halt = function halt () {
