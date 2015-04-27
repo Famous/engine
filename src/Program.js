@@ -44,36 +44,36 @@ var uniforms = Utility.keyValueToArrays({
     resolution: [0, 0, 0],
     transform: identityMatrix,
     size: [1, 1, 1],
-    time: 0,
-    opacity: 1,
-    metalness: 0,
-    glossiness: 0,
+    time: [0],
+    opacity: [1],
+    metalness: [0],
+    glossiness: [0],
     baseColor: [1, 1, 1],
     normal: [1, 1, 1],
     positionOffset: [0, 0, 0],
     u_LightPosition: identityMatrix,
     u_LightColor: identityMatrix,
     u_AmbientLight: [0, 0, 0],
-    u_FlatShading: 0,
-    u_NumLights: 0
+    u_FlatShading: [0],
+    u_NumLights: [0]
 });
 
 /**
  * Attributes keys and values
  */
 var attributes = Utility.keyValueToArrays({
-    pos: 3,
-    texCoord: 2,
-    normals: 3
+    pos: [0, 0, 0],
+    texCoord: [0, 0],
+    normals: [0, 0, 0]
 });
 
 /**
  * Varyings keys and values
  */
 var varyings = Utility.keyValueToArrays({
-    v_TextureCoordinate: 2,
-    v_Normal: 3,
-    v_Position: 3
+    v_TextureCoordinate: [0, 0],
+    v_Normal: [0, 0, 0],
+    v_Position: [0, 0, 0]
 });
 
 /**
@@ -226,13 +226,13 @@ Program.prototype.resetProgram = function resetProgram() {
 
     for(i = 0; i < this.attributeNames.length; i++) {
         name = this.attributeNames[i], value = this.attributeValues[i];
-        vertexHeader.push('attribute ' + TYPES[value] + name + ';\n');
+        vertexHeader.push('attribute ' + TYPES[value.length] + name + ';\n');
     }
 
     for(i = 0; i < this.varyingNames.length; i++) {
         name = this.varyingNames[i], value = this.varyingValues[i];
-        vertexHeader.push('varying ' + TYPES[value]  + name + ';\n');
-        fragmentHeader.push('varying ' + TYPES[value] + name + ';\n');
+        vertexHeader.push('varying ' + TYPES[value.length]  + name + ';\n');
+        fragmentHeader.push('varying ' + TYPES[value.length] + name + ';\n');
     }
 
     vertexSource = vertexHeader.join('') + vertexWrapper
