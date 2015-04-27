@@ -5,6 +5,7 @@ var DOMRenderer = require('famous-dom-renderers').DOMRenderer;
 function Context(selector, compositor) {
     this._compositor = compositor;
     this._rootEl = document.querySelector(selector);
+
     if (this._rootEl === document.body) {
         window.addEventListener('resize', this.updateSize.bind(this));
     }
@@ -224,6 +225,16 @@ Context.prototype.receive = function receive(pathArr, path, commands, iterator) 
                     commands[++localIterator],
                     commands[++localIterator]
                 );
+                break;
+
+            case 'GL_HIDE_MESH':
+                if (!this.WebGLRenderer) this.initWebGL();
+                this.WebGLRenderer.hideMesh(path);
+                break;
+
+            case 'GL_SHOW_MESH':
+                if (!this.WebGLRenderer) this.initWebGL();
+                this.WebGLRenderer.showMesh(path);
                 break;
 
             case 'PINHOLE_PROJECTION':

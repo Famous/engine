@@ -4,7 +4,7 @@
   "description": "Famous Renderers",
   "main": "src/index.js",
   "scripts": {
-    "test": "tape test/*.js | tap-spec",
+    "test": "browserify test/*.js | testling",
     "lint": "jshint --reporter node_modules/jshint-stylish/stylish.js src; true"
   },
   "repository": {
@@ -20,8 +20,10 @@
   "devDependencies": {
     "jshint": "^2.5.11",
     "jshint-stylish": "^1.0.0",
+    "polyfill-function-prototype-bind": "0.0.1",
     "tap-spec": "^2.2.0",
-    "tape": "^3.0.3"
+    "tape": "^3.0.3",
+    "testling": "^1.7.1"
   },
   "dependencies": {
     "famous-components": "git+ssh://git@github.famo.us/platform/components#v0.3.1",
