@@ -4,7 +4,7 @@
   "description": "Famous WebGL",
   "main": "src/index.js",
   "scripts": {
-    "test": "browserify test/*.js | node | tap-spec",
+    "test": "browserify test/*.js | smokestack | tap-spec",
     "watch-tests": "nodemon test/*.js --exec 'npm run test'",
     "watch": "nodemon --ignore node_modules/ -e js,json --exec 'npm test'",
     "lint": "jshint --reporter node_modules/jshint-stylish/stylish.js src; true"
@@ -30,6 +30,7 @@
     "jshint": "^2.5.11",
     "jshint-stylish": "^1.0.0",
     "nodemon": "^1.3.2",
+    "smokestack": "^3.2.2",
     "tap-spec": "^2.2.0",
     "tape": "^3.0.3",
     "testling": "^1.7.1",

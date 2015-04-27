@@ -1,6 +1,6 @@
 'use strict';
 var test = require('tape');
-var sort = require('../src/Geometry');
+var sort = require('../src/radixSort');
 
 test('radixSort', function(t) {
     var source = [];

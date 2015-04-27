@@ -1,3 +1,6 @@
+/**
+ * Mock WebGL rendering context for testing
+ */
 var methods = [
     { name: "activeTexture" },
     { name: "attachShader" },
@@ -148,10 +151,10 @@ function returnBound() {
     return this;
 }
 
-function WebGLTestingContext() {
+function ContextWebGL() {
     var i;
     var uniformLocations = 1;
-    
+
     for (var i = 0; i < methods.length; i++) {
         this[methods[i].name] = function (i) {
             this[methods[i].name].callCount++;
@@ -174,8 +177,8 @@ function WebGLTestingContext() {
     }.bind(this);
 }
 
-WebGLTestingContext.prototype.TEXTURE0 = 33984;
-WebGLTestingContext.prototype.FRAMEBUFFER_COMPLETE = 36053;
-WebGLTestingContext.prototype.ELEMENT_ARRAY_BUFFER = 34963;
+ContextWebGL.prototype.TEXTURE0 = 33984;
+ContextWebGL.prototype.FRAMEBUFFER_COMPLETE = 36053;
+ContextWebGL.prototype.ELEMENT_ARRAY_BUFFER = 34963;
 
-module.exports = WebGLTestingContext;
+module.exports = ContextWebGL;
