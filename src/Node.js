@@ -246,6 +246,7 @@ Node.prototype.emit = function emit (event, payload) {
     // the context is its own ancestor
     while (p !== (p = p.getParent()));
     p.getDispatch().dispatch(event, payload);
+    return this;
 };
 
 // THIS WILL BE DEPRICATED
@@ -346,10 +347,12 @@ Node.prototype.requestUpdate = function requestUpdate (requester) {
     if (this._inUpdate) return this.requestUpdateOnNextTick(requester);
     this._updateQueue.push(requester);
     if (!this._requestingUpdate) this._requestUpdate();
+    return this;
 };
 
 Node.prototype.requestUpdateOnNextTick = function requestUpdateOnNextTick (id) {
     this._nextUpdateQueue.push(id);
+    return this;
 };
 
 Node.prototype.getUpdater = function getUpdater () {
@@ -445,7 +448,8 @@ Node.prototype.addChild = function addChild (child) {
 
 Node.prototype.removeChild = function removeChild (child) {
     var index = this._children.indexOf(child);
-    if (index !== -1) {
+    var added = index !== -1;
+    if (added) {
         this._freedChildIndicies.push(index);
 
         if (this.isMounted() && child.onDismount)
@@ -453,6 +457,7 @@ Node.prototype.removeChild = function removeChild (child) {
 
         this._children[index] = null;
     }
+    return added;
 };
 
 Node.prototype.addComponent = function addComponent (component) {
@@ -483,6 +488,7 @@ Node.prototype.removeComponent = function removeComponent (component) {
 
         this._components[index] = null;
     }
+    return component;
 };
 
 Node.prototype.addUIEvent = function addUIEvent (eventName) {
@@ -490,13 +496,15 @@ Node.prototype.addUIEvent = function addUIEvent (eventName) {
     var components = this._components;
     var component;
 
-    if (UIEvents.indexOf(eventName) === -1) {
+    var added = UIEvents.indexOf(eventName) !== -1;
+    if (!added) {
         UIEvents.push(eventName);
         for (var i = 0, len = components.length ; i < len ; i++) {
             component = components[i];
             if (component.onAddUIEvent) component.onAddUIEvent(eventName);
         }
     }
+    return added;
 };
 
 Node.prototype._requestUpdate = function _requestUpdate (force) {
@@ -536,6 +544,7 @@ Node.prototype.show = function show () {
         item = items[i];
         if (item && item.onParentShow) item.onParentShow();
     }
+    return this;
 };
 
 Node.prototype.hide = function hide () {
@@ -559,6 +568,7 @@ Node.prototype.hide = function hide () {
         item = items[i];
         if (item && item.onParentHide) item.onParentHide();
     }
+    return this;
 };
 
 Node.prototype.setAlign = function setAlign (x, y, z) {
@@ -929,6 +939,7 @@ Node.prototype.update = function update (time){
         this._globalUpdater.requestUpdateOnNextTick(this);
         this._requestingUpdate = true;
     }
+    return this;
 };
 
 Node.prototype.mount = function mount (parent, myId) {
@@ -957,6 +968,7 @@ Node.prototype.mount = function mount (parent, myId) {
     }
 
     if (this._requestingUpdate) this._requestUpdate(true);
+    return this;
 };
 
 Node.prototype.dismount = function dismount () {
@@ -988,14 +1000,15 @@ Node.prototype.dismount = function dismount () {
 
     if (!this._requestingUpdate) this._requestUpdate();
     this._globalUpdater = null;
+    return this;
 };
 
 Node.prototype.onParentMount = function onParentMount (parent, parentId, index) {
-    this.mount(parent, parentId + '/' + index);
+    return this.mount(parent, parentId + '/' + index);
 };
 
 Node.prototype.onParentDismount = function onParentDismount () {
-    this.dismount();
+    return this.dismount();
 };
 
 Node.prototype.receive = function receive (type, ev) {
@@ -1007,6 +1020,7 @@ Node.prototype.receive = function receive (type, ev) {
         item = list[i];
         if (item && item.onReceive) item.onReceive(type, ev);
     }
+    return this;
 };
 
 Node.prototype.onUpdate = Node.prototype.update;
