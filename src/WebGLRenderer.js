@@ -147,7 +147,8 @@ WebGLRenderer.prototype.createMesh = function createMesh(path) {
         buffers: {},
         geometry: null,
         drawType: null,
-        texture: null
+        texture: null,
+        visible: true
     };
 };
 
@@ -196,6 +197,33 @@ WebGLRenderer.prototype.getOrSetCutout = function getOrSetCutout(path) {
     }
 
 };
+
+/**
+ * Prevents a mesh from being drawn to the canvas.
+ *
+ * @method hideMesh
+ *
+ * @param {String} path Path used as id of mesh in mesh registry.
+ *
+ */
+WebGLRenderer.prototype.hideMesh = function hideMesh(path) {
+    var mesh = this.meshRegistry[path] || this.createMesh(path);
+    mesh.visible = false;
+};
+
+/**
+ * Allows a mesh to be drawn to the canvas.
+ *
+ * @method showMesh
+ *
+ * @param {String} path Path used as id of mesh in mesh registry.
+ *
+ */
+WebGLRenderer.prototype.showMesh = function showMesh(path) {
+    var mesh = this.meshRegistry[path] || this.createMesh(path);
+    mesh.visible = true;
+};
+
 
 /**
  * Creates or retreives cutout
@@ -401,26 +429,28 @@ WebGLRenderer.prototype.draw = function draw(renderState) {
     for(var i = 0; i < this.lightRegistryKeys.length; i++) {
         light = this.lightRegistry[this.lightRegistryKeys[i]];
         stride = i * 4;
+
         // Build the light positions' 4x4 matrix
         this.lightPositions[0 + stride] = light.position[0];
         this.lightPositions[1 + stride] = light.position[1];
         this.lightPositions[2 + stride] = light.position[2];
+
         // Build the light colors' 4x4 matrix
         this.lightColors[0 + stride] = light.color[0];
         this.lightColors[1 + stride] = light.color[1];
         this.lightColors[2 + stride] = light.color[2];
     }
+    
     this.program.setUniforms(['u_NumLights'], [this.numLights]);
     this.program.setUniforms(['u_AmbientLight'], [this.ambientLightColor]);
     this.program.setUniforms(['u_LightPosition'], [this.lightPositions]);
     this.program.setUniforms(['u_LightColor'], [this.lightColors]);
 
     this.projectionTransform[11] = renderState.perspectiveTransform[11];
-
     this.program.setUniforms(['perspective', 'time', 'view'], [this.projectionTransform, Date.now()  % 100000 / 1000, renderState.viewTransform]);
+
     var keys = this.meshRegistryKeys;
     var registry = this.meshRegistry;
-
     this.meshRegistryKeys = sorter(keys, registry);
 
     for (var i = 0, len = this.cutoutRegistryKeys.length; i < len; i++) {
@@ -436,6 +466,8 @@ WebGLRenderer.prototype.draw = function draw(renderState) {
     for(var i = 0; i < this.meshRegistryKeys.length; i++) {
         mesh = this.meshRegistry[this.meshRegistryKeys[i]];
         buffers = this.bufferRegistry.registry[mesh.geometry];
+
+        if (!mesh.visible) continue;
 
         var gl = this.gl;
         if (mesh.uniformValues[0] < 1) {
