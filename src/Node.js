@@ -929,6 +929,11 @@ Node.prototype.update = function update (time){
         this._globalUpdater.requestUpdateOnNextTick(this);
         this._requestingUpdate = true;
     }
+    if (!this.isMounted()) {
+        // last update
+        this.value.location = null;
+        this._globalUpdater = null;
+    }
 };
 
 Node.prototype.mount = function mount (parent, myId) {
@@ -967,11 +972,8 @@ Node.prototype.dismount = function dismount () {
     var item;
 
     this.value.showState.mounted = false;
-    this.value.location = null;
 
     this._parent.removeChild(this);
-
-    this._parent = null;
 
     for (; i < len ; i++) {
         item = list[i];
@@ -987,7 +989,6 @@ Node.prototype.dismount = function dismount () {
     }
 
     if (!this._requestingUpdate) this._requestUpdate();
-    this._globalUpdater = null;
 };
 
 Node.prototype.onParentMount = function onParentMount (parent, parentId, index) {
