@@ -30,6 +30,17 @@ test('ThreadManager', function(t) {
         t.end();
     });
 
+    t.test('getCompositor/ getThread method', function(t) {
+        var thread = {};
+        var compositor = {};
+        var threadManager = new ThreadManager(thread, compositor);
+        t.equal(typeof threadManager.getThread, 'function', 'threadManager.getThread should be a function');
+        t.equal(typeof threadManager.getCompositor, 'function', 'threadManager.getCompositor should be a function');
+        t.equal(threadManager.getThread(), thread, 'threadManager.getThread should return used thread');
+        t.equal(threadManager.getCompositor(), compositor, 'threadManager.getCompositor should return used thread');
+        t.end();
+    });
+
     t.test('integration', function(t) {
         t.plan(8);
 
