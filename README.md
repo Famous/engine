@@ -37,11 +37,6 @@ Specific examples can be found [here](https://github.com/famous/examples).
 
 Lessons on the Famous platform are available [here](https://famo.us/university).
 
-
-## Dependencies
-
-- [famous-utilities](https://github.com/Famous/utilities)
-
 ## License
 
 All rights reserved. Famous Industries 2015
