@@ -43,6 +43,29 @@ function ThreadManager (thread, compositor) {
 }
 
 /**
+ * Returns the thread being used by the ThreadManager.
+ * This could either be an an actual web worker or a `Famous` singleton.
+ *
+ * @method getThread
+ * 
+ * @return {Worker|Famous}  Either a web worker or a `Famous` singleton.
+ */
+ThreadManager.prototype.getThread = function getThread() {
+    return this._thread;
+};
+
+/**
+ * Returns the compositor being used by this ThreadManager.
+ *
+ * @method getCompositor
+ * 
+ * @return {Compositor}     The compositor used by the ThreadManager.
+ */
+ThreadManager.prototype.getCompositor = function getCompositor() {
+    return this._compositor;
+};
+
+/**
  * Update method being invoked by the Engine on every `requestAnimationFrame`.
  * Used for updating the notion of time within the managed thread by sending
  * a FRAME command and sending messages to 
