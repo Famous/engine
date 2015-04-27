@@ -8,7 +8,7 @@ var CallbackStore = require('famous-utilities').CallbackStore;
  * @class EventHandler
  * @param {Node} node The node on which this component is registered.
  */
-function EventHandler (node, events) {
+function EventHandler (node) {
     this.node = node;
     this.id = node.addComponent(this);
     this._events = new CallbackStore();

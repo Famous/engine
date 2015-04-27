@@ -21,7 +21,6 @@ function Rotation(node) {
     var xx = x * x;
     var yy = y * y;
     var zz = z * z;
-    var ww = w * w;
 
     var ty = 2 * (x * z + y * w);
     ty = ty < -1 ? -1 : ty > 1 ? 1 : ty;

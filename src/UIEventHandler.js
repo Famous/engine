@@ -60,7 +60,7 @@ UIEventHandler.prototype.on = function on(ev, cb) {
  */
 UIEventHandler.prototype.off = function off(ev, cb) {
     this._events.off(ev, cb);
-    this.dispatch.deregisterGlobalEvent(ev, this.trigger.bind(this, ev))
+    this.dispatch.deregisterGlobalEvent(ev, this.trigger.bind(this, ev));
 };
 
 /**
