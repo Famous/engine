@@ -212,6 +212,14 @@ Famous.prototype.step = function step (time) {
     return this;
 };
 
+Famous.prototype.onmessage = function onmessage() {
+    console.error(
+        'famous-core is not running in a web worker, ' + 
+        'but no ThreadManager has has been setup.\n' +
+        'Try new ThreadManager(Famous, new Compositor())'
+    );
+};
+
 /**
  * returns the context of a particular path. The context is looked up by the selector
  * portion of the path and is listed from the start of the string to the first
