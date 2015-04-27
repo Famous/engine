@@ -3,7 +3,7 @@
 var test = require('tape');
 var Compositor = require('../src/Compositor');
 var Context = require('../src/Context');
-require('polyfill-function-prototype-bind');
+// require('polyfill-function-prototype-bind');
 
 var elOne = document.createElement('div');
     elOne.id = 'one';

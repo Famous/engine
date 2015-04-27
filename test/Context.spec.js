@@ -3,7 +3,7 @@
 var test = require('tape');
 var Context = require('../src/Context');
 var Compositor = require('../src/Compositor');
-require('polyfill-function-prototype-bind');
+// require('polyfill-function-prototype-bind');
 
 test('Context', function(t) {
     t.test('constructor', function(t) {

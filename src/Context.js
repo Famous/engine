@@ -40,7 +40,7 @@ function Context(selector, compositor) {
 }
 
 Context.prototype.updateSize = function () {
-    var newSize = this.DOMRenderer._getSize();
+    var newSize = this.DOMRenderer.getSize();
 
     var width = newSize[0];
     var height = newSize[1];
