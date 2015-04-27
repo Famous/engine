@@ -211,6 +211,15 @@ DOMElement.prototype.onSizeChange = function onSizeChange (size) {
     return this;
 };
 
+/**
+ * Method to be invoked by the node as soon as its opacity changes.
+ * 
+ * @method onOpacityChange
+ * @chainable
+ * 
+ * @param  {Number} opacity      The new opacity, as a scalar from 0 to 1.
+ * @return {DOMElement} this
+ */
 DOMElement.prototype.onOpacityChange = function onOpacityChange (opacity) {
     return this.setProperty('opacity', opacity);
 };
