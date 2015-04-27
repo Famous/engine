@@ -109,7 +109,6 @@ Mesh.prototype.getGeometry = function getGeometry () {
 */
 Mesh.prototype.setBaseColor = function setBaseColor (color) {
     var uniformValue;
-
     if (color._compile) {
         this.value.expressions.baseColor = color;
         uniformValue = color._compile(); 
@@ -398,11 +397,11 @@ Mesh.prototype.onDismount = function onDismount () {
 };
 
 Mesh.prototype.onShow = function onShow () {
-    //TODO
+    this._changeQueue.push('GL_HIDE_MESH');
 };
 
 Mesh.prototype.onHide = function onHide () {
-    //TODO
+    this._changeQueue.push('GL_HIDE_MESH');
 };
 
 /**
@@ -483,9 +482,10 @@ Mesh.prototype.draw = function draw () {
     if (value.color != null) this.setBaseColor(value.color);
     if (value.drawOptions != null) this.setDrawOptions(value.drawOptions);
     if (value.flatShading != null) this.setFlatShading(value.flatShading);
-    if (value.normals != null) this.setNormals(value.normals);
-    if (value.glossiness != null) this.setGlossiness(value.glossiness);
-    if (value.positionOffset != null) this.setPositionOffset(value.positionOffset);
+    if (value.expressions.normals != null) this.setNormals(value.expressions.normals);
+    if (value.expressions.baseColor != null) this.setBaseColor(value.expressions.baseColor);
+    if (value.expressions.glossiness != null) this.setGlossiness(value.expressions.glossiness);
+    if (value.expressions.positionOffset != null) this.setPositionOffset(value.expressions.positionOffset);
 
     this._inDraw = false;
 };
