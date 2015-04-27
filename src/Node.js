@@ -931,6 +931,7 @@ Node.prototype.update = function update (time){
     }
     if (!this.isMounted()) {
         // last update
+        this._parent = null;
         this.value.location = null;
         this._globalUpdater = null;
     }
