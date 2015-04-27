@@ -19,20 +19,25 @@ function Size(node) {
     this._node = node;
     this._id = node.addComponent(this);
     this._requestingUpdate = false;
+
+    var initialProportionalSize = node.getProportionalSize();
+    var initialDifferentialSize = node.getDifferentialSize();
+    var initialAbsoluteSize = node.getAbsoluteSize();
+
     this._proportional = {
-        x: new Transitionable(1),
-        y: new Transitionable(1),
-        z: new Transitionable(1)
+        x: new Transitionable(initialProportionalSize[0]),
+        y: new Transitionable(initialProportionalSize[1]),
+        z: new Transitionable(initialProportionalSize[2])
     };
     this._differential = {
-        x: new Transitionable(0),
-        y: new Transitionable(0),
-        z: new Transitionable(0)
+        x: new Transitionable(initialDifferentialSize[0]),
+        y: new Transitionable(initialDifferentialSize[1]),
+        z: new Transitionable(initialDifferentialSize[2])
     };
     this._absolute = {
-        x: new Transitionable(0),
-        y: new Transitionable(0),
-        z: new Transitionable(0)
+        x: new Transitionable(initialAbsoluteSize[0]),
+        y: new Transitionable(initialAbsoluteSize[1]),
+        z: new Transitionable(initialAbsoluteSize[2])
     };
 }
 
