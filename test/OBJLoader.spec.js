@@ -8,7 +8,7 @@ test('OBJLoader', function(t) {
     var invoked   = false;
     var normalized;
 
-    t.test('load', function(t) {
+    t.test('OBJLoader.load', function(t) {
         t.plan(9);
 
         t.ok(OBJLoader.load instanceof Function, 'should have a .load method');
