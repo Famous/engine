@@ -53,9 +53,9 @@ Node.Spec = function Spec () {
         opacity: 1
     };
     this.offsets = {
-        mountPoint: new Float32Array(3),
-        align: new Float32Array(3),
-        origin: new Float32Array(3)
+        mountPoint: new Float32Array([0, 0, 0.5]),
+        align: new Float32Array([0, 0, 0.5]),
+        origin: new Float32Array([0, 0, 0.5])
     };
     this.vectors = {
         position: new Float32Array(3),
@@ -439,7 +439,7 @@ Node.prototype.setAlign = function setAlign (x, y, z) {
 
     propogate = this._vecOptionalSet(vec3, 0, x) || propogate;
     propogate = this._vecOptionalSet(vec3, 1, y) || propogate;
-    propogate = this._vecOptionalSet(vec3, 2, z) || propogate;
+    propogate = this._vecOptionalSet(vec3, 2, (z - 0.5)) || propogate;
 
     if (propogate) {
         var i = 0;
@@ -463,7 +463,7 @@ Node.prototype.setMountPoint = function setMountPoint (x, y, z) {
 
     propogate = this._vecOptionalSet(vec3, 0, x) || propogate;
     propogate = this._vecOptionalSet(vec3, 1, y) || propogate;
-    propogate = this._vecOptionalSet(vec3, 2, z) || propogate;
+    propogate = this._vecOptionalSet(vec3, 2, (z - 0.5)) || propogate;
 
     if (propogate) {
         var i = 0;
@@ -487,7 +487,7 @@ Node.prototype.setOrigin = function setOrigin (x, y, z) {
 
     propogate = this._vecOptionalSet(vec3, 0, x) || propogate;
     propogate = this._vecOptionalSet(vec3, 1, y) || propogate;
-    propogate = this._vecOptionalSet(vec3, 2, z) || propogate;
+    propogate = this._vecOptionalSet(vec3, 2, (z - 0.5)) || propogate;
 
     if (propogate) {
         var i = 0;
@@ -527,6 +527,7 @@ Node.prototype.setPosition = function setPosition (x, y, z) {
             if (item && item.onPositionChange) item.onPositionChange(x, y, z);
         }
     }
+
     return this;
 };
 
