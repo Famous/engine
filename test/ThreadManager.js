@@ -25,8 +25,37 @@ test('ThreadManager', function(t) {
     });
 
     t.test('update method', function(t) {
-        var threadManager = new ThreadManager({}, {});
+        var actions = [];
+        var thread = {
+            postMessage: function(message) {
+                actions.push(['postMessage', message]);
+            }
+        };
+        var compositor = {
+            drawCommands: function() {
+                actions.push(['drawCommands'])
+            },
+            clearCommands: function() {
+                actions.push(['clearCommands'])
+            }
+        };
+        var threadManager = new ThreadManager(thread, compositor);
         t.equal(typeof threadManager.update, 'function', 'threadManager.update should be a function');
+
+        threadManager.update(123);
+        threadManager.update(124);
+
+        t.deepEqual(actions, [
+            ['postMessage', ['FRAME', 123]],
+            ['drawCommands'],
+            ['postMessage', undefined],
+            ['clearCommands'],
+            ['postMessage', ['FRAME', 124]],
+            ['drawCommands'],
+            ['postMessage', undefined],
+            ['clearCommands']
+        ]);
+
         t.end();
     });
 
