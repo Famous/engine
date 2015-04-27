@@ -53,9 +53,9 @@ Node.Spec = function Spec () {
         opacity: 1
     };
     this.offsets = {
-        mountPoint: new Float32Array([0, 0, 0.5]),
-        align: new Float32Array([0, 0, 0.5]),
-        origin: new Float32Array([0, 0, 0.5])
+        mountPoint: new Float32Array(3),
+        align: new Float32Array(3),
+        origin: new Float32Array(3)
     };
     this.vectors = {
         position: new Float32Array(3),
