@@ -51,6 +51,9 @@ function ConvexBodyFactory(hull) {
         _computeInertiaProperties.call(this, T);
         this.inverseInertia.copy(this.localInverseInertia);
         this.updateInertia();
+
+        var w = options.angularVelocity;
+        if (w) this.setAngularVelocity(w.x, w.y, w.z);
     }
 
     ConvexBody.prototype = Object.create(Particle.prototype);

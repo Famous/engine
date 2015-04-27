@@ -20,6 +20,9 @@ function Sphere(options) {
     this.updateLocalInertia();
     this.inverseInertia.copy(this.localInverseInertia);
 
+    var w = options.angularVelocity;
+    if (w) this.setAngularVelocity(w.x, w.y, w.z);
+
     this.type = 1 << 2;
 }
 

@@ -33,7 +33,7 @@ test('Particle', function(t) {
         t.assert(p.getMass instanceof Function, '.getMass should be a function');
         t.assert(p.getInverseMass instanceof Function, '.getInverseMass should be a function');
         t.assert(p.setMass instanceof Function, '.setMass should be a function');
-        t.assert(p.updateInertia instanceof Function, '.setInertia should be a function');
+        t.assert(p.updateInertia instanceof Function, '.updateInertia should be a function');
 
         t.assert(p.getMass() === p.mass && p.mass === 123, '.getMass should correctly return the mass');
         p.setMass(321);
