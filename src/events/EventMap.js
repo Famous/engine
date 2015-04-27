@@ -15,7 +15,7 @@ var EventMap = {
     'abort': [Event, false],
     'beforeinput': [InputEvent, true],
     'blur': [FocusEvent, false],
-    'click': [MouseEvent, false],
+    'click': [MouseEvent, true],
     'compositionend': [CompositionEvent, true],
     'compositionstart': [CompositionEvent, true],
     'compositionupdate': [CompositionEvent, true],
