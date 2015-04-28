@@ -3,7 +3,7 @@
 var test = require('tape');
 var Context = require('../src/Context');
 var Node = require('../src/Node');
-var Dispatcher = require('../src/Dispatcher');
+var Dispatch = require('../src/Dispatch');
 
 test('Context', function(t) {
     t.test('constructor', function(t) {
@@ -48,7 +48,7 @@ test('Context', function(t) {
         };
         var context = new Context('.context-get-dispatch', mockFamous);
         t.equal(typeof context.getUpdater, 'function', 'context.getDispatch should be a function');
-        t.equal(context.getDispatch().constructor, Dispatcher, 'context.getDispatch should return Dispatch instance');
+        t.equal(context.getDispatch().constructor, Dispatch, 'context.getDispatch should return Dispatch instance');
         t.end();
     });
 
