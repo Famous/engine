@@ -50,6 +50,7 @@ var Curves = require('./Curves');
 function Transitionable(initialState) {
     this._queue = [];
     this._multi = null;
+    this._method = null;
     this._end = null;
     this._startedAt = null;
     this._pausedAt = null;
@@ -84,8 +85,9 @@ Transitionable.Clock = typeof performance !== 'undefined' ? performance : Date;
  *                                                          complete
  * @return {Transitionable}         this
  */
-Transitionable.prototype.to = function to(finalState, curve, duration, callback) {
+Transitionable.prototype.to = function to(finalState, curve, duration, callback, method) {
     curve = curve != null && curve.constructor === String ? Curves[curve] : curve;
+    this._method = method;
     if (this._queue.length === 0) {
         this._startedAt = this.constructor.Clock.now();
         this._pausedAt = null;
@@ -166,8 +168,43 @@ Transitionable.prototype.override = function override(finalState, curve, duratio
 
 Transitionable.prototype._interpolate = function _interpolate(from, to, progress) {
     if (this._multi) {
-        for (var i = 0; i < to.length; i++) {
-            this._multi[i] = from[i] + progress * (to[i] - from[i]);
+        if (this._method === 'slerp') {
+            var x, y, z, w;
+            var qx, qy, qz, qw;
+            var omega, cosomega, sinomega, scaleFrom, scaleTo;
+            var resx, resy, resz, resw;
+
+            x = from[0];
+            y = from[1];
+            z = from[2];
+            w = from[3];
+
+            qx = to[0];
+            qy = to[1];
+            qz = to[2];
+            qw = to[3];
+
+            cosomega = w * qw + x * qx + y * qy + z * qz;
+            if ((1.0 - cosomega) > 1e-5) {
+                omega = Math.acos(cosomega);
+                sinomega = Math.sin(omega);
+                scaleFrom = Math.sin((1.0 - progress) * omega) / sinomega;
+                scaleTo = Math.sin(progress * omega) / sinomega;
+            }
+            else {
+                scaleFrom = 1.0 - progress;
+                scaleTo = progress;
+            }
+
+            this._multi[0] = x * scaleFrom + qx * scaleTo;
+            this._multi[1] = y * scaleFrom + qy * scaleTo;
+            this._multi[2] = z * scaleFrom + qz * scaleTo;
+            this._multi[3] = w * scaleFrom + qw * scaleTo;
+        }
+        else {
+            for (var i = 0; i < to.length; i++) {
+                this._multi[i] = from[i] + progress * (to[i] - from[i]);
+            }
         }
         return this._multi;
     } else {
@@ -192,7 +229,7 @@ Transitionable.prototype.get = function get(t) {
     if (this._queue.length === 0) return this._end;
 
     var progress = (t - this._startedAt) / this._queue[2];
-    var state = this._interpolate(this._end, this._queue[0], this._queue[1](progress > 1 ? 1 : progress));
+    var state = this._interpolate(this._end, this._queue[0], this._queue[1](progress > 1 ? 1 : progress), this._method);
     if (progress >= 1) {
         this._startedAt = this._startedAt + this._queue[2];
         this._end = this._queue.shift();
@@ -303,7 +340,7 @@ Transitionable.prototype.set = function(state, transition, callback) {
         this.from(state);
         if (callback) callback();
     } else {
-        this.to(state, transition.curve, transition.duration, callback);
+        this.to(state, transition.curve, transition.duration, callback, transition.method);
     }
     return this;
 };
