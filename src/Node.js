@@ -528,10 +528,10 @@ Node.prototype.removeChild = function removeChild (child) {
     if (added) {
         this._freedChildIndicies.push(index);
 
+        this._children[index] = null;
+
         if (this.isMounted() && child.onDismount)
             child.onDismount();
-
-        this._children[index] = null;
     }
     return added;
 };
