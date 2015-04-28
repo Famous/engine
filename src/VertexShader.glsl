@@ -3,9 +3,9 @@
 #pragma glslify: transpose = require(./chunks/transpose)
 
 /**
- * Converts vertex from modelspace to screenspace using transform 
+ * Converts vertex from modelspace to screenspace using transform
  * information from context.
- * 
+ *
  * @method applyTransform
  * @private
  *
@@ -21,7 +21,8 @@ vec4 applyTransform(vec4 pos) {
     pos.y *= -1.0;
 
     v_Position = (MVMatrix * pos).xyz;
-    
+    v_EyeVector = (resolution * 0.5) - v_Position;
+
     MVMatrix[0][1] *= -1.0;
     MVMatrix[1][1] *= -1.0;
     MVMatrix[2][1] *= -1.0;
@@ -43,7 +44,7 @@ vec4 applyTransform(vec4 pos) {
 /**
  * Placeholder for positionOffset chunks to be templated in.
  * Used for mesh deformation.
- * 
+ *
  * @method calculateOffset
  * @private
  *
@@ -59,7 +60,7 @@ vec3 calculateOffset(vec3 ID) {
  * Writes the position of the vertex onto the screen.
  * Passes texture coordinate and normal attributes as varyings
  * and passes the position attribute through position pipeline.
- * 
+ *
  * @method main
  * @private
  *
