@@ -73,7 +73,8 @@ var attributes = Utility.keyValueToArrays({
 var varyings = Utility.keyValueToArrays({
     v_TextureCoordinate: [0, 0],
     v_Normal: [0, 0, 0],
-    v_Position: [0, 0, 0]
+    v_Position: [0, 0, 0],
+    v_EyeVector: [0, 0, 0]
 });
 
 /**
