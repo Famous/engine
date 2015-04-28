@@ -1097,6 +1097,12 @@ Node.prototype.update = function update (time){
         this._globalUpdater.requestUpdateOnNextTick(this);
         this._requestingUpdate = true;
     }
+    if (!this.isMounted()) {
+        // last update
+        this._parent = null;
+        this.value.location = null;
+        this._globalUpdater = null;
+    }
     return this;
 };
 
@@ -1152,11 +1158,8 @@ Node.prototype.dismount = function dismount () {
     var item;
 
     this.value.showState.mounted = false;
-    this.value.location = null;
 
     this._parent.removeChild(this);
-
-    this._parent = null;
 
     for (; i < len ; i++) {
         item = list[i];
