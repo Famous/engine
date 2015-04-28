@@ -1,10 +1,8 @@
 'use strict';
 
-// Check to see if we're in a worker
-var isWorker = typeof self !== 'undefined' && self.window !== self;
-
 var Clock = require('./Clock');
 var Context = require('./Context');
+var Channel = require('./Channel');
 
 /**
  * Famous has two responsibilities, one to act as the highest level
@@ -35,15 +33,31 @@ function Famous () {
     this._clock = new Clock(); // a clock to keep track of time for the scene
                                // graph.
 
-    // if famous is in a worker we wire the event listener here.
-    // otherwise the thread manager will postMessage directly to
-    // famous
-    var _this = this;
-    if (isWorker)
-        self.addEventListener('message', function (ev) {
-            _this.postMessage(ev.data);
-        });
+    this._channel = new Channel();
+    this._channel.onMessage = this.handleMessage.bind(this);
 }
+
+/**
+ * @method setChannel
+ * @chainable
+ * 
+ * @param {Channel} channel     The channel to be used for communicating with
+ *                              the `ThreadManager`/ `Compositor`.
+ */
+Famous.prototype.setChannel = function setChannel(channel) {
+    this._channel = channel;
+    return this;
+};
+
+/**
+ * @method getChannel
+ * 
+ * @return {Channel} channel    The channel to be used for communicating with
+ *                              the `ThreadManager`/ `Compositor`.
+ */
+Famous.prototype.getChannel = function getChannel () {
+    return this._channel;
+};
 
 /**
  * _update is the body of the update loop. The frame consists of
@@ -111,10 +125,10 @@ Famous.prototype.requestUpdateOnNextTick = function requestUpdateOnNextTick (req
  * 
  * @return {Famous} this
  */
-Famous.prototype.postMessage = function postMessage (messages) {
+Famous.prototype.handleMessage = function handleMessage (messages) {
     if (!messages)
         throw new Error(
-            'postMessage must be called with an array of messages'
+            'onMessage must be called with an array of messages'
         );
 
     var command;
@@ -203,11 +217,9 @@ Famous.prototype.step = function step (time) {
     this._update(time);
 
     if (this._messages.length) {
-        if (isWorker) self.postMessage(this._messages);
-        else this.onmessage(this._messages);
+        this._channel.message(this._messages);
+        this._messages.length = 0;
     }
-    
-    this._messages.length = 0;
 
     return this;
 };
