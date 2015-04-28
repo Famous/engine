@@ -1176,7 +1176,6 @@ Node.prototype.dismount = function dismount () {
     }
 
     if (!this._requestingUpdate) this._requestUpdate();
-    this._globalUpdater = null;
     return this;
 };
 
