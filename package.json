@@ -14,8 +14,8 @@
   "author": "Famous",
   "license": "All rights reserved",
   "dependencies": {
-    "famous-components": "git+ssh://git@github.famo.us/platform/components#v0.4.1",
-    "famous-core": "git+ssh://git@github.famo.us/platform/core#v0.4.1",
+    "famous-components": "git+ssh://git@github.famo.us/platform/components#v0.4.2",
+    "famous-core": "git+ssh://git@github.famo.us/platform/core#v0.4.2",
     "famous-dom-renderables": "git+ssh://git@github.famo.us/platform/dom-renderables#v0.5.1",
     "famous-dom-renderers": "git+ssh://git@github.famo.us/platform/dom-renderers#v0.6.1",
     "famous-engine": "git+ssh://git@github.famo.us/platform/engine#v0.1.3",
