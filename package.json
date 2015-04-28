@@ -1,6 +1,6 @@
 {
   "name": "famous-components",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "description": "Famous Components",
   "main": "src/index.js",
   "scripts": {
