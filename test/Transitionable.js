@@ -336,6 +336,25 @@ test('Transitionable', function(t) {
         t.end();
     });
 
+    t.test('to method slerp', function(t) {
+        var transitionable = new Transitionable();
+        time = 0;
+        transitionable.from([0,0,0,1]).to([Math.sqrt(2)/2,0,Math.sqrt(2)/2,0], null, 1000, null, 'slerp');
+        t.equal(transitionable._method, 'slerp');
+        time = 500;
+        var x = Math.sin(Math.PI/4)*Math.sqrt(2)/2;
+        var z = x;
+        var w = Math.cos(Math.PI/4);
+        var tr = transitionable.get();
+        t.assert(Math.abs(tr[0] - x) < 0.001 &&
+            Math.abs(tr[1] - 0) < 0.001 &&
+            Math.abs(tr[2] - z) < 0.001 &&
+            Math.abs(tr[3] - w) < 0.001);
+        time = 1000;
+        t.deepEqual(transitionable.get(), [Math.sqrt(2)/2,0,Math.sqrt(2)/2,0]);
+        t.end();
+    });
+
     t.test('tear down', function(t) {
         Date.now = _now;
         t.end();
