@@ -1,7 +1,7 @@
 'use strict';
 
 var test = require('tape');
-var Dispatcher = require('../src/Dispatcher');
+var Dispatch = require('../src/Dispatch');
 
 function MockNode (selector, receivedQueue) {
     this.children = [];
@@ -27,9 +27,9 @@ MockNode.prototype.onReceive = function onReceive (type, ev) {
     this.receivedQueue.push(this);
 };
 
-test('Dispatcher', function(t) {
+test('Dispatch', function(t) {
     t.test('constructor', function(t) {
-        t.equal(typeof Dispatcher, 'function', 'Disaptcher should be a constructor function');
+        t.equal(typeof Dispatch, 'function', 'Disaptcher should be a constructor function');
         t.end();
     });
 
@@ -40,7 +40,7 @@ test('Dispatcher', function(t) {
         var node10 = node1.addChild();
         var node11 = node1.addChild();
         var node110 = node11.addChild();
-        var dispatcher = new Dispatcher(context);
+        var dispatcher = new Dispatch(context);
         t.equal(typeof dispatcher.lookupNode, 'function', 'destination.lookupNode should be a function');
         t.equal(dispatcher.lookupNode('body/0'), node0);
         t.equal(dispatcher.lookupNode('body/1'), node1);
@@ -53,7 +53,7 @@ test('Dispatcher', function(t) {
     t.test('dispatch method', function(t) {
         var receivedQueue = [];
         var context = new MockNode('body', receivedQueue);
-        var dispatcher = new Dispatcher(context);
+        var dispatcher = new Dispatch(context);
         t.equal(typeof dispatcher.dispatch, 'function', 'dispatcher.dispatch should be a function');
         var node0 = context.addChild(receivedQueue);
         var node1 = context.addChild(receivedQueue);
@@ -86,7 +86,7 @@ test('Dispatcher', function(t) {
         var node001 = node00.addChild(receivedQueue);
         var node01 = node0.addChild(receivedQueue);
         var clickEv = {};
-        var dispatcher = new Dispatcher(context);
+        var dispatcher = new Dispatch(context);
         dispatcher.dispatchUIEvent('body/0', 'click', clickEv);
 
         t.equal(receivedQueue[0], node0, 'dispatcher.dispatch should bubble events up to parent (upwards)');
