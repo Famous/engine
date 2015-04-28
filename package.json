@@ -26,9 +26,9 @@
     "testling": "^1.7.1"
   },
   "dependencies": {
-    "famous-components": "git+ssh://git@github.famo.us/platform/components#v0.3.1",
-    "famous-dom-renderers": "git+ssh://git@github.famo.us/platform/dom-renderers#v0.5.0",
-    "famous-webgl-renderers": "git+ssh://git@github.famo.us/platform/webgl-renderers#v0.3.2",
+    "famous-components": "git+ssh://git@github.famo.us/platform/components#v0.4.1",
+    "famous-dom-renderers": "git+ssh://git@github.famo.us/platform/dom-renderers#v0.6.1",
+    "famous-webgl-renderers": "git+ssh://git@github.famo.us/platform/webgl-renderers#v0.4.1",
     "famous-utilities": "git+ssh://git@github.famo.us/platform/utilities#v0.3.1"
   }
 }
