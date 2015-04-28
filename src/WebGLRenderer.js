@@ -457,16 +457,19 @@ WebGLRenderer.prototype.drawMeshes = function drawMeshes() {
 WebGLRenderer.prototype.drawCutouts = function drawCutouts() {
     var cutout;
     var buffers;
+    var len = this.cutoutRegistryKeys.length;
 
-    for (var i = 0, len = this.cutoutRegistryKeys.length; i < len; i++) {
+    if (len) this.gl.enable(this.gl.BLEND);
+
+    for (var i = 0; i < len; i++) {
         cutout = this.cutoutRegistry[this.cutoutRegistryKeys[i]];
         buffers = this.bufferRegistry.registry[cutout.geometry];
 
-        this.gl.enable(this.gl.BLEND);
         this.program.setUniforms(cutout.uniformKeys, cutout.uniformValues);
         this.drawBuffers(buffers, cutout.drawType, cutout.geometry);
-        this.gl.disable(this.gl.BLEND);
     }
+    
+    if (len) this.gl.disable(this.gl.BLEND);
 };
 
 WebGLRenderer.prototype.setGlobalUniforms = (function() {
