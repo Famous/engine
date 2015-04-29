@@ -20,13 +20,13 @@ vec3 applyLight(in vec3 material) {
 
         if (lambertian > 0.0) {
             diffuse += u_LightColor[i].rgb * material * lambertian;
+            if (glossiness > 0.0) {
+                vec3 halfVector = normalize(lightDirection + eyeVector);
+                float specular = pow(max(dot(halfVector, normal), 0.0), glossiness);
+                diffuse += u_LightColor[i].rgb * specular * lambertian;
+            }
         }
 
-        if (glossiness > 0.0) {
-            vec3 halfVector = normalize(lightDirection + eyeVector);
-            float specular = pow(max(dot(halfVector, normal), 0.0), glossiness);
-            diffuse += u_LightColor[i].rgb * specular;
-        }
     }
 
     return ambientColor + diffuse;
