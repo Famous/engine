@@ -49,9 +49,8 @@ var Curves = require('./Curves');
  */
 function Transitionable(initialState) {
     this._queue = [];
-    this._multi = null;
-    this._method = null;
-    this._end = null;
+    this._from = null;
+    this._state = null;
     this._startedAt = null;
     this._pausedAt = null;
     if (initialState != null) this.from(initialState);
@@ -87,7 +86,6 @@ Transitionable.Clock = typeof performance !== 'undefined' ? performance : Date;
  */
 Transitionable.prototype.to = function to(finalState, curve, duration, callback, method) {
     curve = curve != null && curve.constructor === String ? Curves[curve] : curve;
-    this._method = method;
     if (this._queue.length === 0) {
         this._startedAt = this.constructor.Clock.now();
         this._pausedAt = null;
@@ -96,7 +94,8 @@ Transitionable.prototype.to = function to(finalState, curve, duration, callback,
         finalState,
         curve != null ? curve : Curves.linear,
         duration != null ? duration : 100,
-        callback
+        callback,
+        method
     );
     return this;
 };
@@ -112,12 +111,8 @@ Transitionable.prototype.to = function to(finalState, curve, duration, callback,
  * @return {Transitionable}         this
  */
 Transitionable.prototype.from = function from(initialState) {
-    this._end = initialState;
-    if (initialState.constructor === Array && this._multi != null && this._multi.constructor === Array) {
-        this._multi.length = initialState.length;
-    } else {
-        this._multi = initialState.constructor === Array ? [] : false;
-    }
+    this._state = initialState;
+    this._from = this._sync(null, this._state);
     this._queue.length = 0;
     this._startedAt = this.constructor.Clock.now();
     this._pausedAt = null;
@@ -137,7 +132,7 @@ Transitionable.prototype.from = function from(initialState) {
  * @return {Transitionable}         this
  */
 Transitionable.prototype.delay = function delay(duration, callback) {
-    var endState = this._queue.length > 0 ? this._queue[this._queue.length - 4] : this._end;
+    var endState = this._queue.length > 0 ? this._queue[this._queue.length - 5] : this._state;
     return this.to(endState, Curves.flat, duration, callback);
 };
 
@@ -156,19 +151,20 @@ Transitionable.prototype.delay = function delay(duration, callback) {
  *                                                  is complete
  * @return {Transitionable}         this
  */
-Transitionable.prototype.override = function override(finalState, curve, duration, callback) {
+Transitionable.prototype.override = function override(finalState, curve, duration, callback, method) {
     if (this._queue.length > 0) {
         if (finalState != null) this._queue[0] = finalState;
         if (curve != null)      this._queue[1] = curve.constructor === String ? Curves[curve] : curve;
         if (duration != null)   this._queue[2] = duration;
         if (callback != null)   this._queue[3] = callback;
+        if (method != null)     this._queue[4] = method;
     }
     return this;
 };
 
-Transitionable.prototype._interpolate = function _interpolate(from, to, progress) {
-    if (this._multi) {
-        if (this._method === 'slerp') {
+Transitionable.prototype._interpolate = function _interpolate(output, from, to, progress, method) {
+    if (to instanceof Object) {
+        if (method === 'slerp') {
             var x, y, z, w;
             var qx, qy, qz, qw;
             var omega, cosomega, sinomega, scaleFrom, scaleTo;
@@ -196,20 +192,42 @@ Transitionable.prototype._interpolate = function _interpolate(from, to, progress
                 scaleTo = progress;
             }
 
-            this._multi[0] = x * scaleFrom + qx * scaleTo;
-            this._multi[1] = y * scaleFrom + qy * scaleTo;
-            this._multi[2] = z * scaleFrom + qz * scaleTo;
-            this._multi[3] = w * scaleFrom + qw * scaleTo;
+            output[0] = x * scaleFrom + qx * scaleTo;
+            output[1] = y * scaleFrom + qy * scaleTo;
+            output[2] = z * scaleFrom + qz * scaleTo;
+            output[3] = w * scaleFrom + qw * scaleTo;
         }
-        else {
-            for (var i = 0; i < to.length; i++) {
-                this._multi[i] = from[i] + progress * (to[i] - from[i]);
+        else if (to instanceof Array) {
+            for (var i = 0, len = to.length; i < len; i++) {
+                output[i] = this._interpolate(output[i], from[i], to[i], progress, method);
             }
         }
-        return this._multi;
+        else {
+            for (var key in to) {
+                output[key] = this._interpolate(output[key], from[key], to[key], progress, method);
+            }
+        }
     } else {
-        return from + progress * (to - from);
+        output = from + progress * (to - from);
     }
+    return output;
+};
+
+Transitionable.prototype._sync = function _sync(output, input) {
+    if (typeof input === 'number') output = input;
+    else if (input instanceof Array) {
+        if (output == null) output = [];
+        for (var i = 0, len = input.length; i < len; i++) {
+            output[i] = _sync(output[i], input[i]);
+        }
+    }
+    else if (input instanceof Object) {
+        if (output == null) output = {};
+        for (var key in input) {
+            output[key] = _sync(output[key], input[key]);
+        }
+    }
+    return output;
 };
 
 /**
@@ -224,18 +242,22 @@ Transitionable.prototype._interpolate = function _interpolate(from, to, progress
  *    interpolated to this point in time.
  */
 Transitionable.prototype.get = function get(t) {
+    if (this._queue.length === 0) return this._state;
+
     t = this._pausedAt ? this._pausedAt : t;
     t = t ? t : this.constructor.Clock.now();
-    if (this._queue.length === 0) return this._end;
 
     var progress = (t - this._startedAt) / this._queue[2];
-    var state = this._interpolate(this._end, this._queue[0], this._queue[1](progress > 1 ? 1 : progress), this._method);
+    this._state = this._interpolate(this._state, this._from, this._queue[0], this._queue[1](progress > 1 ? 1 : progress), this._queue[4]);
+    var state = this._state;
     if (progress >= 1) {
         this._startedAt = this._startedAt + this._queue[2];
-        this._end = this._queue.shift();
+        this._from = this._sync(this._from, this._state);
+        this._queue.shift();
         this._queue.shift();
         this._queue.shift();
         var callback = this._queue.shift();
+        this._queue.shift();
         if (callback) callback();
     }
     return progress > 1 ? this.get() : state;
