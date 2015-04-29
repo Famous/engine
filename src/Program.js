@@ -47,7 +47,7 @@ var uniforms = Utility.keyValueToArrays({
     time: [0],
     opacity: [1],
     metalness: [0],
-    glossiness: [0],
+    glossiness: [0, 0, 0, 0],
     baseColor: [1, 1, 1],
     normal: [1, 1, 1],
     positionOffset: [0, 0, 0],
