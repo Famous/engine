@@ -194,7 +194,7 @@ test('Transitionable', function(t) {
     });
 
     t.test('setting a value inside of a callback', function(t) {
-        t.plan(4);
+        t.plan(5);
         time = 0;
         var transitionable = new Transitionable(0);
         var test1 = false;
@@ -209,6 +209,7 @@ test('Transitionable', function(t) {
 
         time = 500;
         t.equal(transitionable.get(), 1);
+        t.equal(transitionable.get(), 2);
         t.ok(test1)
         time = 1000;
         t.equal(transitionable.get(), 3);
@@ -340,7 +341,6 @@ test('Transitionable', function(t) {
         var transitionable = new Transitionable();
         time = 0;
         transitionable.from([0,0,0,1]).to([Math.sqrt(2)/2,0,Math.sqrt(2)/2,0], null, 1000, null, 'slerp');
-        t.equal(transitionable._method, 'slerp');
         time = 500;
         var x = Math.sin(Math.PI/4)*Math.sqrt(2)/2;
         var z = x;
@@ -352,6 +352,23 @@ test('Transitionable', function(t) {
             Math.abs(tr[3] - w) < 0.001);
         time = 1000;
         t.deepEqual(transitionable.get(), [Math.sqrt(2)/2,0,Math.sqrt(2)/2,0]);
+        t.end();
+    });
+
+    t.test('to method batch', function(t) {
+        var start = {a:[0,0,0], b: 0, c: {x:0, y:0}, d: 'asdf'};
+        var transitionable = new Transitionable(start);
+        time = 0;
+        transitionable.to({a:[10,20,30], b: -10, c: {x:10, y:-10}}, null, 1000);
+        time = 500;
+        var s = transitionable.get();
+        t.equal(s, start);
+        t.deepEqual(s, start);
+        t.deepEqual(s, {a:[5,10,15], b: -5, c: {x:5, y:-5}, d: 'asdf'});
+        time = 1000;
+        s = transitionable.get();
+        t.deepEqual(s, start);
+        t.deepEqual(s, {a:[10,20,30], b: -10, c: {x:10, y:-10}, d: 'asdf'});
         t.end();
     });
 
