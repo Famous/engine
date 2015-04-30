@@ -4,10 +4,10 @@ var Texture = require('./Texture');
 var Program = require('./Program');
 var Buffer = require('./Buffer');
 var BufferRegistry = require('./BufferRegistry');
-var checkers = require('./Checkerboard');
 var Plane = require('famous-webgl-geometries').Plane;
 var sorter = require('./radixSort');
 var Utility = require('famous-utilities');
+var TextureManager = require('./TextureManager');
 
 var identity = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
 
@@ -39,7 +39,6 @@ function WebGLRenderer(canvas) {
     var gl = this.gl = this.getWebGLContext(this.canvas);
 
     gl.polygonOffset(0.1, 0.1);
-    gl.clearColor(1.0, 1.0, 1.0, 0.0);
     gl.enable(gl.POLYGON_OFFSET_FILL);
     gl.enable(gl.DEPTH_TEST);
     gl.enable(gl.BLEND);
@@ -65,7 +64,7 @@ function WebGLRenderer(canvas) {
     this.lightPositions = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     this.lightColors = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
-    this.textureRegistry = [];
+    this.textureRegistry = new TextureManager();
     this.texCache = {};
     this.bufferRegistry = new BufferRegistry(gl);
     this.program = new Program(gl, { debug: false });
@@ -379,7 +378,9 @@ WebGLRenderer.prototype.handleMaterialInput = function handleMaterialInput(path,
     var mesh = this.meshRegistry[path] || this.createMesh(path);
 
     mesh.uniformValues[mesh.uniformKeys.indexOf(name)][0] = - material._id;
-    if (material.texture) mesh.texture = handleTexture.call(this, material.texture);
+
+    if (material.texture) mesh.texture = this.textureManager.register(material.texture);
+
     this.program.registerMaterial(name, material);
 
     return this.updateSize();
@@ -460,6 +461,7 @@ WebGLRenderer.prototype.bufferData = function bufferData(path, geometryId, buffe
  * affect the rendering of all renderables.
  */
 WebGLRenderer.prototype.draw = function draw(renderState) {
+    this.textureManager.update();
     this.setGlobalUniforms(renderState);
     this.meshRegistryKeys = sorter(this.meshRegistryKeys, this.meshRegistry);
     this.drawCutouts();
@@ -487,15 +489,13 @@ WebGLRenderer.prototype.drawMeshes = function drawMeshes() {
 
         if (!buffers) continue;
 
-        if (mesh.texture) mesh.texture.bind();
-        this.program.setUniforms(mesh.uniformKeys, mesh.uniformValues);
-
         if (mesh.options) this.handleOptions(mesh.options, mesh);
+        if (mesh.texture) this.textureManager.bind(mesh.texture);
+        
+        this.program.setUniforms(mesh.uniformKeys, mesh.uniformValues);
         this.drawBuffers(buffers, mesh.drawType, mesh.geometry);
+        
         if (mesh.options) this.resetOptions(mesh.options);
-
-        if (mesh.texture) mesh.texture.unbind();
-
     }
 };
 
