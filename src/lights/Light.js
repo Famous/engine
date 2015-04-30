@@ -66,7 +66,7 @@ Light.prototype.getColor = function getColor(option) {
 * @private
 * @method onUpdate
 */
-Light.prototype.onUpdate = function clean() {
+Light.prototype.onUpdate = function onUpdate() {
     var path = this._node.getLocation();
 
     this._node
