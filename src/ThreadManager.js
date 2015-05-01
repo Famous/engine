@@ -7,13 +7,14 @@
  *
  * @example
  * var compositor = new Compositor();
+ * var engine = new Engine();
  * 
  * // Using a Web Worker
  * var worker = new Worker('worker.bundle.js');
- * var threadmanger = new ThreadManager(worker, compositor);
+ * var threadmanger = new ThreadManager(worker, compositor, engine);
  * 
  * // Without using a Web Worker
- * var threadmanger = new ThreadManager(Famous, compositor);
+ * var threadmanger = new ThreadManager(Famous, compositor, engine);
  * 
  * @class  ThreadManager
  * @constructor
@@ -27,15 +28,44 @@
  *                                      updates using `postMessage`.
  * @param {Compositor} compositor       an instance of Compositor used to
  *                                      extract enqueued draw commands from to
- *                                      be sent to the thread
+ *                                      be sent to the thread.
+ * @param {Engine} engine               an instance of Engine used for
+ *                                      executing the `ENGINE` commands on.
  */
-function ThreadManager (thread, compositor) {
+function ThreadManager (thread, compositor, engine) {
     this._thread = thread;
     this._compositor = compositor;
+    this._engine = engine;
+
+    if (engine) {
+        this._engine.update(this);
+    } else {
+        console.warn(
+            'Not passing in the engine into the ThreadManager is ' +
+            'deprecated!\n Use `new ThreadManager(thread, compositor, engine)`'
+        );
+    }
 
     var _this = this;
     this._thread.onmessage = function (ev) {
-        _this._compositor.receiveCommands(ev.data ? ev.data : ev);
+        var message = ev.data ? ev.data : ev;
+        if (message[0] === 'ENGINE') {
+            switch (message[1]) {
+                case 'START':
+                    _this._engine.start();
+                    break;
+                case 'STOP':
+                    _this._engine.stop();
+                    break;
+                default:
+                    console.error(
+                        'Unknown ENGINE command "' + message[1] + '"'
+                    );
+                    break;
+            }
+        } else {
+            _this._compositor.receiveCommands(message);
+        }
     };
     this._thread.onerror = function (error) {
         console.error(error);
@@ -63,6 +93,17 @@ ThreadManager.prototype.getThread = function getThread() {
  */
 ThreadManager.prototype.getCompositor = function getCompositor() {
     return this._compositor;
+};
+
+/**
+ * Returns the engine being used by this ThreadManager.
+ *
+ * @method getEngine
+ * 
+ * @return {Engine}     The engine used by the ThreadManager.
+ */
+ThreadManager.prototype.getEngine = function getEngine() {
+    return this._engine;
 };
 
 /**
