@@ -52,11 +52,10 @@ function Famous () {
  * time on all nodes. While _update is called _inUpdate is set to true and 
  * all requests to be placed in the update queue will be forwarded to the 
  * nextUpdateQueue.
- *
- * @param {Number} The current time
  */
-Famous.prototype._update = function _update (time) {
+Famous.prototype._update = function _update () {
     this._inUpdate = true;
+    var time = this._clock.now();
     var nextQueue = this._nextUpdateQueue;
     var queue = this._updateQueue;
     var item;
@@ -199,8 +198,7 @@ Famous.prototype.step = function step (time) {
     if (time == null) throw new Error('step must be called with a time');
 
     this._clock.step(time);
-
-    this._update(time);
+    this._update();
 
     if (this._messages.length) {
         if (isWorker) self.postMessage(this._messages);
