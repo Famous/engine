@@ -79,9 +79,9 @@ Texture.prototype.unbind = function unbind(unit) {
  * @return {Object} Current texture instance.
  */
 Texture.prototype.setImage = function setImage(img) {
-    this.gl.bindTexture(this.gl.TEXTURE_2D, this.id);
+    // this.gl.bindTexture(this.gl.TEXTURE_2D, this.id);
     this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.format, this.format, this.type, img);
-    this.gl.bindTexture(this.gl.TEXTURE_2D, null);
+    // this.gl.bindTexture(this.gl.TEXTURE_2D, null);
     return this;
 };
 

@@ -1,19 +1,23 @@
 var Texture = require('./Texture');
 var Checkerboard = require('./Checkerboard');
+var Clock = require('famous-core').Famous.getClock();
 
 function TextureManager(gl) {
 	this.registry = [];
 	this._updates = [];
 
+    this._activeTexture;
+
 	this.gl = gl;
 }
 
 TextureManager.prototype.update = function update() {
-	var time = Date.now();
+	var time = Clock.getTime();
 	var registryLength = this.registry.length;
 
 	for (var i = 1; i < registryLength; i++) {
-		if (this.registry[i].isLoaded && this.registry[i].resampleRate) {
+        // console.log(this.registry[i].isLoaded)
+        if (this.registry[i].isLoaded && this.registry[i].resampleRate) {
 			if (time - this.registry[i].lastResample > this.registry[i].resampleRate) {
 				if (!this._updates[this.registry[i].texture.id]) {
 					this._updates[this.registry[i].texture.id] = true;
@@ -30,32 +34,35 @@ TextureManager.prototype.register = function register(input) {
     var options = input.options || {};
     var texture = this.registry[textureId];
     var isLoaded = false;
+    var setter;
 
     if (!texture) {
         if (Array.isArray(source) || source instanceof Uint8Array || source instanceof Float32Array) {
             texture = new Texture(this.gl, options);
-            texture.setArray(source);
+            setter = 'setArray';
+            texture[setter](source);
             isLoaded = true;
         }
 
         else if (window && source instanceof window.HTMLVideoElement) {
             texture = new Texture(this.gl, options);
-            texture.src = texture;
+            // texture.src = texture;
+            setter = 'setImage';
             texture.setImage(Checkerboard);
             source.addEventListener('loadeddata', function() {
-                texture.setImage(source);
-                this.registry[textureId].loaded = true;
-                this.registry[textureId].source = img;
-
+                texture[setter](source);
+                this.registry[textureId].isLoaded = true;
+                this.registry[textureId].source = source;
             }.bind(this));
         }
 
         else if ('string' === typeof source) {
             texture = new Texture(this.gl, options);
             texture.setImage(Checkerboard);
+            setter = 'setImage';
             loadImage(source, function (img) {
-                texture.setImage(img);
-                this.registry[textureId].loaded = true;
+                texture[setter](img);
+                this.registry[textureId].isLoaded = true;
                 this.registry[textureId].source = img;
             }.bind(this));
         }
@@ -63,9 +70,10 @@ TextureManager.prototype.register = function register(input) {
         this.registry[textureId] = {
         	resampleRate: options.resampleRate || null,
         	isLoaded: isLoaded,
+            setter: setter,
         	texture: texture,
         	source: source,
-        	lastResample: Date.now()
+        	lastResample: Clock.getTime()
         }
     }
 
@@ -81,11 +89,13 @@ function loadImage (img, callback) {
     return obj;
 }
 
-TextureManager.prototype.bind = function bind(id) {
-	this.registry[id].texture.bind();
+TextureManager.prototype.bind = function bind(id, unit) {
+    var spec = this.registry[id];
 
-	if (this._updates[this.registry[id].texture.id]) {
-		this.registry[id].texture.setArray(this.registry[id].source);
+	spec.texture.bind();
+
+	if (this._updates[spec.texture.id]) {
+		spec.texture[spec.setter](spec.source);
 	}
 }
 

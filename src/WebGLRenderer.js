@@ -64,7 +64,7 @@ function WebGLRenderer(canvas) {
     this.lightPositions = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     this.lightColors = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
-    this.textureRegistry = new TextureManager();
+    this.textureManager = new TextureManager(gl);
     this.texCache = {};
     this.bufferRegistry = new BufferRegistry(gl);
     this.program = new Program(gl, { debug: false });
@@ -469,16 +469,16 @@ WebGLRenderer.prototype.draw = function draw(renderState) {
 };
 
 WebGLRenderer.prototype.drawMeshes = function drawMeshes() {
-    var mesh;
+    var gl = this.gl;
     var buffers;
-    
+    var mesh;
+
     for(var i = 0; i < this.meshRegistryKeys.length; i++) {
         mesh = this.meshRegistry[this.meshRegistryKeys[i]];
         buffers = this.bufferRegistry.registry[mesh.geometry];
 
         if (!mesh.visible) continue;
 
-        var gl = this.gl;
         if (mesh.uniformValues[0] < 1) {
             gl.depthMask(false);
             gl.enable(gl.BLEND);
@@ -494,7 +494,7 @@ WebGLRenderer.prototype.drawMeshes = function drawMeshes() {
         
         this.program.setUniforms(mesh.uniformKeys, mesh.uniformValues);
         this.drawBuffers(buffers, mesh.drawType, mesh.geometry);
-        
+
         if (mesh.options) this.resetOptions(mesh.options);
     }
 };
@@ -808,52 +808,6 @@ function loadImage (img, callback) {
     if (! obj.complete) obj.onload = function () { callback(obj); };
     else callback(obj);
     return obj;
-}
-
-/**
- * Handles loading of texture objects.
- *
- * @method handleTexture
- * @private
- *
- * @param {Object} input The input texture object collected from mesh.
- *
- * @return {Object} Texture instance linked to input data.
- */
-function handleTexture(input) {
-    var source = input.data;
-    var textureId = input.id;
-    var options = input.options;
-    var texture = this.textureRegistry[textureId];
-
-    if (!texture) {
-        if (Array.isArray(source)) {
-            texture = new Texture(this.gl, options);
-            texture.setArray(source);
-        }
-
-        else if (window && source instanceof window.HTMLVideoElement) {
-            texture = new Texture(this.gl, options);
-            texture.src = texture;
-            texture.setImage(checkers);
-            source.addEventListener('loadeddata', function() {
-                texture.setImage(source);
-                setInterval(function () { texture.setImage(source); }, 16);
-            });
-        }
-
-        else if ('string' === typeof source) {
-            texture = new Texture(this.gl, options);
-            texture.setImage(checkers);
-            loadImage(source, function (img) {
-                texture.setImage(img);
-            });
-        }
-
-        this.textureRegistry[textureId] = texture;
-    }
-
-    return texture;
 }
 
 module.exports = WebGLRenderer;
