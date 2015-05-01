@@ -30,7 +30,9 @@ test('ContainerEngine', function(t) {
             update: function(time) {
                 actualUpdates.push(time);
                 if (actualUpdates.length === expectedUpdates.length) {
-                    t.deepEqual(actualUpdates, expectedUpdates);
+                    t.deepEqual(actualUpdates.map(function(update) {
+                        return Math.round(update);
+                    }), expectedUpdates);
                 }
             }
         });
@@ -47,7 +49,7 @@ test('ContainerEngine', function(t) {
 
         var updateable = {
             update: function(time) {
-                t.equal(time, 123);
+                t.equal(Math.round(time), 123);
                 engine.noLongerUpdate(updateable);
                 window.postMessage(['FAMOUS', 'FRAME', 124], '*');
             }
@@ -92,5 +94,25 @@ test('ContainerEngine', function(t) {
             }
         });
         engine.step(123);
+    });
+
+    t.test('normalize time', function(t) {
+        t.plan(1);
+        var engine = new ContainerEngine();
+        engine.stop();
+
+        window.postMessage(['FAMOUS', 'FRAME', 100], '*');
+
+        setTimeout(function() {
+            engine.start();
+
+            engine.update({
+                update: function(time) {
+                    t.ok(100 - time < 5);
+                }
+            });
+
+            window.postMessage(['FAMOUS', 'FRAME', 1100], '*');
+        }, 1000);
     });
 });

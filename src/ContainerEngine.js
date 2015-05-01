@@ -13,6 +13,9 @@ var now = require('./now');
  */
 function ContainerEngine() {
     this._updates = [];
+    this._stoppedAt = now();
+    this._sleep = 0;
+
     this.start();
 
     var _this = this;
@@ -28,7 +31,7 @@ ContainerEngine.prototype._onWindowMessage = function _onWindowMessage(ev) {
         ev.data[0] === 'FAMOUS' &&
         ev.data[1] === 'FRAME'
     ) {
-        this.step(ev.data[2]);
+        this.step(ev.data[2] - this._sleep);
     }
 };
 
@@ -42,6 +45,7 @@ ContainerEngine.prototype._onWindowMessage = function _onWindowMessage(ev) {
  */
 ContainerEngine.prototype.start = function start() {
     this._running = true;
+    this._sleep += now() - this._stoppedAt;
     return this;
 };
 
@@ -55,6 +59,7 @@ ContainerEngine.prototype.start = function start() {
  */
 ContainerEngine.prototype.stop = function stop() {
     this._running = false;
+    this._stoppedAt = now();
     return this;
 };
 
