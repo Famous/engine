@@ -42,7 +42,8 @@ function DOMElement (node, options) {
     this._classes = ['fa-surface'];
     this._requestingEventListeners = [];
     this._styles = {
-        display: node.isShown() 
+        display: node.isShown(),
+        opacity: node.getOpacity()
     };
     this._attributes = {};
     this._content = '';
