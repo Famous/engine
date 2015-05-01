@@ -4,6 +4,9 @@ var Clock = require('./Clock');
 var Context = require('./Context');
 var Channel = require('./Channel');
 
+var ENGINE_START = ['ENGINE', 'START'];
+var ENGINE_STOP = ['ENGINE', 'STOP'];
+
 /**
  * Famous has two responsibilities, one to act as the highest level
  * updater and another to send messages over to the renderers. It is
@@ -291,6 +294,28 @@ Famous.prototype.createContext = function createContext (selector) {
     if (this._contexts[selector]) this._contexts[selector].dismount();
     this._contexts[selector] = new Context(selector, this);
     return this._contexts[selector];
+};
+
+/**
+ * Starts the engine running in the Main-Thread.
+ * This effects **every** updateable managed by the Engine.
+ *
+ * @chainable
+ */
+Famous.prototype.startEngine = function startEngine () {
+    this._channel.message(ENGINE_START);
+    return this;
+};
+
+/**
+ * Stops the engine running in the Main-Thread.
+ * This effects **every** updateable managed by the Engine.
+ * 
+ * @chainable
+ */
+Famous.prototype.stopEngine = function stopEngine () {
+    this._channel.message(ENGINE_STOP);
+    return this;
 };
 
 module.exports = new Famous();
