@@ -67,7 +67,7 @@ function WebGLRenderer(canvas) {
     this.textureManager = new TextureManager(gl);
     this.texCache = {};
     this.bufferRegistry = new BufferRegistry(gl);
-    this.program = new Program(gl, { debug: false });
+    this.program = new Program(gl, { debug: true });
 
     this.state = {
         boundArrayBuffer: null,
@@ -179,7 +179,7 @@ WebGLRenderer.prototype.createMesh = function createMesh(path) {
         buffers: {},
         geometry: null,
         drawType: null,
-        texture: null,
+        textures: [],
         visible: true
     };
 };
@@ -197,10 +197,15 @@ WebGLRenderer.prototype.createMesh = function createMesh(path) {
 
 WebGLRenderer.prototype.getOrSetCutout = function getOrSetCutout(path) {
     var geometry;
-    if (this.cutoutRegistry[path]) return this.cutoutRegistry[path];
 
-    this.cutoutRegistryKeys.push(path);
+    if (this.cutoutRegistry[path]) {
+        return this.cutoutRegistry[path];
+    }
+    else {
+        if (!this.cutoutGeometry) {
+            geometry = this.cutoutGeometry = Plane();
 
+<<<<<<< HEAD
     var uniforms = Utility.keyValueToArrays({
         opacity: 0,
         transform: identity,
@@ -214,6 +219,31 @@ WebGLRenderer.prototype.getOrSetCutout = function getOrSetCutout(path) {
         geometry: this.cutoutGeometry.id,
         drawType: 4
     };
+=======
+            this.bufferRegistry.allocate(-1, 'pos', geometry.spec.bufferValues[0], 3);
+            this.bufferRegistry.allocate(-1, 'texCoord', geometry.spec.bufferValues[1], 2);
+            this.bufferRegistry.allocate(-1, 'normals', geometry.spec.bufferValues[2], 3);
+            this.bufferRegistry.allocate(-1, 'indices', geometry.spec.bufferValues[3], 1);
+        }
+
+        this.cutoutRegistryKeys.push(path);
+
+        var uniforms = Utility.keyValueToArrays({
+            transform: identity,
+            size: [0, 0, 0],
+            origin: [0, 0, 0],
+            baseColor: [0, 0, 0],
+            opacity: 0
+        });
+
+        return this.cutoutRegistry[path] = {
+            uniformKeys: uniforms.keys,
+            uniformValues: uniforms.values,
+            geometry: this.cutoutGeometry.id,
+            drawType: 4
+        };
+    }
+>>>>>>> feat: basic implementation of mult-texture
 };
 
 /**
@@ -377,9 +407,20 @@ WebGLRenderer.prototype.setLightColor = function setLightColor(path, r, g, b) {
 WebGLRenderer.prototype.handleMaterialInput = function handleMaterialInput(path, name, material) {
     var mesh = this.meshRegistry[path] || this.createMesh(path);
 
-    mesh.uniformValues[mesh.uniformKeys.indexOf(name)][0] = - material._id;
+    // Set uniforms to enable texture!
 
-    if (material.texture) mesh.texture = this.textureManager.register(material.texture);
+    mesh.uniformValues[mesh.uniformKeys.indexOf(name)][0] = -material._id;
+
+    // Register textures!
+
+    var i = material.textures.length;
+    while (i--) {
+        mesh.textures.push(
+            this.textureManager.register(material.textures[i], i)
+        );
+    }
+
+    // Register material!
 
     this.program.registerMaterial(name, material);
 
@@ -490,7 +531,7 @@ WebGLRenderer.prototype.drawMeshes = function drawMeshes() {
         if (!buffers) continue;
 
         if (mesh.options) this.handleOptions(mesh.options, mesh);
-        if (mesh.texture) this.textureManager.bind(mesh.texture);
+        if (mesh.textures) this.textureManager.bindTextures(mesh.textures);
         
         this.program.setUniforms(mesh.uniformKeys, mesh.uniformValues);
         this.drawBuffers(buffers, mesh.drawType, mesh.geometry);
@@ -520,7 +561,7 @@ WebGLRenderer.prototype.setGlobalUniforms = function setGlobalUniforms(renderSta
     var light;
     var stride;
 
-    for (var i = 0; i < this.lightRegistryKeys.length; i++) {
+    for (var i = 0, len = this.lightRegistryKeys.length; i < len; i++) {
         light = this.lightRegistry[this.lightRegistryKeys[i]];
         stride = i * 4;
 

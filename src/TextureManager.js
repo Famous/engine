@@ -16,7 +16,6 @@ TextureManager.prototype.update = function update() {
 	var registryLength = this.registry.length;
 
 	for (var i = 1; i < registryLength; i++) {
-        // console.log(this.registry[i].isLoaded)
         if (this.registry[i].isLoaded && this.registry[i].resampleRate) {
 			if (time - this.registry[i].lastResample > this.registry[i].resampleRate) {
 				if (!this._updates[this.registry[i].texture.id]) {
@@ -28,7 +27,7 @@ TextureManager.prototype.update = function update() {
 	}
 }
 
-TextureManager.prototype.register = function register(input) {
+TextureManager.prototype.register = function register(input, slot) {
     var source = input.data;
     var textureId = input.id;
     var options = input.options || {};
@@ -37,6 +36,13 @@ TextureManager.prototype.register = function register(input) {
     var setter;
 
     if (!texture) {
+
+        // Set correct texture slot.
+
+        this.gl.activeTexture(this.gl.TEXTURE0 + slot);
+
+        // Handle array
+
         if (Array.isArray(source) || source instanceof Uint8Array || source instanceof Float32Array) {
             texture = new Texture(this.gl, options);
             setter = 'setArray';
@@ -44,28 +50,39 @@ TextureManager.prototype.register = function register(input) {
             isLoaded = true;
         }
 
+        // Handle video
+
         else if (window && source instanceof window.HTMLVideoElement) {
             texture = new Texture(this.gl, options);
-            // texture.src = texture;
             setter = 'setImage';
             texture.setImage(Checkerboard);
             source.addEventListener('loadeddata', function() {
+                this.gl.activeTexture(this.gl.TEXTURE0 + slot);
+                texture.bind();
+
                 texture[setter](source);
                 this.registry[textureId].isLoaded = true;
                 this.registry[textureId].source = source;
             }.bind(this));
         }
 
+        // Handle image url
+
         else if ('string' === typeof source) {
             texture = new Texture(this.gl, options);
             texture.setImage(Checkerboard);
             setter = 'setImage';
             loadImage(source, function (img) {
+                this.gl.activeTexture(this.gl.TEXTURE0 + slot);
+                texture.bind();
+
                 texture[setter](img);
                 this.registry[textureId].isLoaded = true;
                 this.registry[textureId].source = img;
             }.bind(this));
         }
+
+        // Add texture to registry
 
         this.registry[textureId] = {
         	resampleRate: options.resampleRate || null,
@@ -89,14 +106,18 @@ function loadImage (img, callback) {
     return obj;
 }
 
-TextureManager.prototype.bind = function bind(id, unit) {
-    var spec = this.registry[id];
+TextureManager.prototype.bindTextures = function bindTextures(textures) {
+    for (var i = 0; i < textures.length; i++) {
+        var id = textures[i];
+        var spec = this.registry[id];
 
-	spec.texture.bind();
+        this.gl.activeTexture(this.gl.TEXTURE0 + i);
+    	spec.texture.bind();
 
-	if (this._updates[spec.texture.id]) {
-		spec.texture[spec.setter](spec.source);
-	}
+    	if (this._updates[spec.texture.id]) {
+    		spec.texture[spec.setter](spec.source);
+    	}
+    }
 }
 
 TextureManager.prototype.get = function get(id) {

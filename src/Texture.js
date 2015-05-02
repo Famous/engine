@@ -20,20 +20,18 @@ function Texture(gl, options) {
 
     gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
     gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
-    
+
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl[options.magFilter] || gl.NEAREST);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl[options.minFilter] || gl.NEAREST);
 
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl[options.wrapS] || gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl[options.wrapS] || gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl[options.wrapT] || gl.CLAMP_TO_EDGE);
 
     gl.texImage2D(gl.TEXTURE_2D, 0, this.format, this.width, this.height, 0, this.format, this.type, null);
 
     if (options.mipmap !== false && isPowerOfTwo(this.width, this.height)) {
         gl.generateMipmap(gl.TEXTURE_2D);
     }
-
-    this.unbind();
 }
 
 /**
@@ -46,8 +44,7 @@ function Texture(gl, options) {
  *
  * @return {Object} Current texture instance.
  */
-Texture.prototype.bind = function bind(unit) {
-    this.gl.activeTexture(this.gl.TEXTURE0 + (unit || 0));
+Texture.prototype.bind = function bind() {
     this.gl.bindTexture(this.gl.TEXTURE_2D, this.id);
     return this;
 };
@@ -62,8 +59,7 @@ Texture.prototype.bind = function bind(unit) {
  * 
  * @return {Object} Current texture instance.
  */
-Texture.prototype.unbind = function unbind(unit) {
-    this.gl.activeTexture(this.gl.TEXTURE0 + (unit || 0));
+Texture.prototype.unbind = function unbind() {
     this.gl.bindTexture(this.gl.TEXTURE_2D, null);
     return this;
 };
@@ -79,9 +75,7 @@ Texture.prototype.unbind = function unbind(unit) {
  * @return {Object} Current texture instance.
  */
 Texture.prototype.setImage = function setImage(img) {
-    // this.gl.bindTexture(this.gl.TEXTURE_2D, this.id);
     this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.format, this.format, this.type, img);
-    // this.gl.bindTexture(this.gl.TEXTURE_2D, null);
     return this;
 };
 
@@ -96,9 +90,9 @@ Texture.prototype.setImage = function setImage(img) {
  * @return {Object} Current texture instance.
  */
 Texture.prototype.setArray = function setArray(input) {
-    this.gl.bindTexture(this.gl.TEXTURE_2D, this.id);
+    // this.gl.bindTexture(this.gl.TEXTURE_2D, this.id);
     this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.format, 1, 1, 0, this.format, this.type, new Uint8Array(input));
-    this.gl.bindTexture(this.gl.TEXTURE_2D, null);
+    // this.gl.bindTexture(this.gl.TEXTURE_2D, null);
     return this;
 };
 
