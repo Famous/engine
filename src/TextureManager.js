@@ -2,6 +2,14 @@ var Texture = require('./Texture');
 var Checkerboard = require('./Checkerboard');
 var Clock = require('famous-core').Famous.getClock();
 
+/**
+ * Handles loading, binding, and resampling of textures for WebGLRenderer.
+ *
+ * @class TextureManager
+ * @constructor
+ *
+ * @param {WebGL_Context} gl Context used to create and bind textures.
+ */
 function TextureManager(gl) {
 	this.registry = [];
 	this._needsResample = [];
