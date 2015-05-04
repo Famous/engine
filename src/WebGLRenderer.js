@@ -47,7 +47,6 @@ function WebGLRenderer(canvas) {
     /**
      * Lights
      */
-
     this.numLights = 0;
     this.ambientLightColor = [0, 0, 0];
     this.lightRegistry = {};
@@ -154,7 +153,7 @@ WebGLRenderer.prototype.createMesh = function createMesh(path) {
         baseColor: [0.5, 0.5, 0.5],
         positionOffset: [0, 0, 0],
         u_FlatShading: 0,
-        glossiness: 0
+        glossiness: [0, 0, 0, 0]
     });
     return this.meshRegistry[path] = {
         depth: null,
@@ -273,7 +272,7 @@ WebGLRenderer.prototype.removeMesh = function removeMesh(path) {
  *
  * @param {String} Path used as id of cutout in cutout registry.
  * @param {String} uniformLocation identifier used to upload value
- * @param {Array} value of uniform data 
+ * @param {Array} value of uniform data
  *
  */
 
@@ -410,14 +409,13 @@ WebGLRenderer.prototype.setGeometry = function setGeometry(path, geometry, drawT
  *
  * @param {String} Path used as id of mesh in mesh registry
  * @param {String} uniformLocation identifier used to upload value
- * @param {Array} value of uniform data 
+ * @param {Array} value of uniform data
  *
 **/
 WebGLRenderer.prototype.setMeshUniform = function setMeshUniform(path, uniformName, uniformValue) {
     var mesh = this.meshRegistry[path] || this.createMesh(path);
 
     var index = mesh.uniformKeys.indexOf(uniformName);
-
     if (index === -1) {
         mesh.uniformKeys.push(uniformName);
         mesh.uniformValues.push(uniformValue);
@@ -436,7 +434,7 @@ WebGLRenderer.prototype.setMeshUniform = function setMeshUniform(path, uniformNa
  * @param {String} Path used as id of mesh in mesh registry
  * @param {Number} Id of geometry in geometry registry
  * @param {String} Attribute location name
- * @param {Array} Vertex data 
+ * @param {Array} Vertex data
  * @param {Number} The dimensions of the vertex
  */
 
@@ -472,7 +470,7 @@ WebGLRenderer.prototype.drawMeshes = function drawMeshes() {
     for(var i = 0; i < this.meshRegistryKeys.length; i++) {
         mesh = this.meshRegistry[this.meshRegistryKeys[i]];
         buffers = this.bufferRegistry.registry[mesh.geometry];
-        
+
         if (!mesh.visible) continue;
 
         var gl = this.gl;
@@ -548,7 +546,7 @@ WebGLRenderer.prototype.setGlobalUniforms = (function() {
             this.lightColors[1 + stride] = light.color[1];
             this.lightColors[2 + stride] = light.color[2];
         }
-        
+
         uniformValues[0] = this.numLights;
         uniformValues[1] = this.ambientLightColor;
         uniformValues[2] = this.lightPositions;
@@ -749,9 +747,9 @@ function checkFrameBufferStatus(gl) {
  * Size is retreived from the container object of the renderer.
  *
  * @method updateSize
- * 
+ *
  * @param {Array} width, height and depth of canvas
- * 
+ *
  */
 WebGLRenderer.prototype.updateSize = function updateSize(size) {
     if (size) {
