@@ -73,7 +73,21 @@ function WebGLRenderer(canvas) {
 
     this.cachedSize = [];
 
-    this.projectionTransform = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
+    /*
+    The projectionTransform has some constant components, i.e. the z scale, and the x and y translation.
+
+    The z scale keeps the final z position of any vertex within the clip's domain by scaling it by an
+    arbitrarily small coefficient. This has the advantage of being a useful default in the event of the
+    user forgoing a near and far plane, an alien convention in dom space as in DOM overlapping is
+    conducted via painter's algorithm.
+
+    The x and y translation transforms the world space origin to the top left corner of the screen.
+
+    The final component (this.projectionTransform[15]) is initialized as 1 because certain projection models,
+    e.g. the WC3 specified model, keep the XY plane as the projection hyperplane.
+    */
+    this.projectionTransform = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, -0.000001, 0, -1, 1, 0, 1];
+
 }
 
 /**
@@ -544,6 +558,17 @@ WebGLRenderer.prototype.setGlobalUniforms = (function() {
          * Set time and projection uniforms
          */
 
+        /*
+         * projecting world space into a 2d plane representation of the canvas.
+         * The x and y scale (this.projectionTransform[0] and this.projectionTransform[5] respectively)
+         * convert the projected geometry back into clipspace.
+         * The perpective divide (this.projectionTransform[11]), adds the z value of the point
+         * multiplied by the perspective divide to the w value of the point. In the process
+         * of converting from homogenous coordinates to NDC (normalized device coordinates)
+         * the x and y values of the point are divided by w, which implements perspective.
+         */
+        this.projectionTransform[0] = 1/(this.cachedSize[0] * 0.5);
+        this.projectionTransform[5] = -1/(this.cachedSize[1] * 0.5);
         this.projectionTransform[11] = renderState.perspectiveTransform[11];
 
         uniformValues[4] = this.projectionTransform;
@@ -551,7 +576,7 @@ WebGLRenderer.prototype.setGlobalUniforms = (function() {
         uniformValues[6] = renderState.viewTransform;
 
         this.program.setUniforms(uniformNames, uniformValues);
-    }
+    };
 }());
 
 /**
