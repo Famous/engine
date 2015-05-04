@@ -129,8 +129,4 @@ TextureManager.prototype.bindTextures = function bindTextures(textures) {
     }
 }
 
-TextureManager.prototype.get = function get(id) {
-	return this.registry[id].texture;
-}
-
 module.exports = TextureManager;
