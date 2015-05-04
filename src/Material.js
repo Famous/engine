@@ -261,7 +261,7 @@ function processGLSL(str, inputs) {
 function makeLabel (n) {
     if (Array.isArray(n)) return arrayToVec(n);
     if (typeof n == 'object') return 'fa_' + (n._id);
-    else return JSON.stringify(n + .000001);
+    else return JSON.stringify(n.toFixed(6));
 }
 
 function arrayToVec(array) {
