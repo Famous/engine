@@ -8,9 +8,9 @@ bool hasSpecularColor = length(glossiness.rgb) > 0.0;
  * @private
  *
  */
-vec3 applyLight(in vec3 material) {
+vec4 applyLight(in vec4 material) {
     int numLights = int(u_NumLights);
-    vec3 ambientColor = u_AmbientLight * material;
+    vec3 ambientColor = u_AmbientLight * material.rgb;
     vec3 normal = normalize(v_Normal);
     vec3 eyeVector = normalize(v_EyeVector);
     vec3 diffuse = vec3(0.0);
@@ -23,7 +23,7 @@ vec3 applyLight(in vec3 material) {
         float lambertian = max(dot(lightDirection, normal), 0.0);
 
         if (lambertian > 0.0) {
-            diffuse += u_LightColor[i].rgb * material * lambertian;
+            diffuse += u_LightColor[i].rgb * material.rgb * lambertian;
             if (hasGlossiness) {
                 vec3 halfVector = normalize(lightDirection + eyeVector);
                 float specularWeight = pow(max(dot(halfVector, normal), 0.0), glossiness.a);
@@ -34,7 +34,7 @@ vec3 applyLight(in vec3 material) {
 
     }
 
-    return ambientColor + diffuse;
+    return vec4(ambientColor + diffuse, material.a);
 }
 
 #pragma glslify: export(applyLight)

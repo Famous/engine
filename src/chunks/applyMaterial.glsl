@@ -17,13 +17,14 @@ float applyMaterial(float ID) {
 #vec3_definitions
 vec3 applyMaterial(vec3 ID) {
     #vec3_applications
-    return vec3(.5);
+    return vec3(0);
 }
 
 #vec4_definitions
-vec4 applyMaterial(vec3 ID) {
+vec4 applyMaterial(vec4 ID) {
     #vec4_applications
-    return vec4(.5);
+
+    return vec4(0);
 }
 
 #pragma glslify: export(applyMaterial)
