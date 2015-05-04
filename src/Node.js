@@ -806,6 +806,7 @@ Node.prototype.setRotation = function setRotation (x, y, z, w) {
         qy = cx * sycz - sx * cysz;
         qz = cx * cysz + sx * sycz;
         qw = cx * cycz - sx * sysz;
+
     }
 
     propogate = this._vecOptionalSet(quat, 0, qx) || propogate;

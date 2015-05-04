@@ -129,8 +129,6 @@ test('Node', function(t) {
         t.equal(requesters[5], node011);
         t.equal(requesters.length, 6);
 
-        t.deepEqual(root.getValue(), ExampleNodeSpec);
-
         t.end();
     });
     
@@ -385,6 +383,40 @@ test('Node', function(t) {
 
     t.test('setRotation', function (t) {
         var testNode = new Node();
+        var identityQuaternion = [0, 0, 0, 1];
+        var testRotation = testNode.getValue().spec.vectors.rotation;
+
+        t.deepEqual(
+            testRotation,
+            identityQuaternion,
+            'Node\'s rotation vector should be the identity quaternion by default'
+        );
+
+        t.doesNotThrow(function () {
+            testNode.setRotation();
+            t.deepEqual(
+                testRotation,
+                identityQuaternion,
+                'setRotation should not change the Node\'s rotation value' +
+                ' when called with no arguments'
+            );
+        }, 'setRotation should not throw when called with no arguments');
+
+        function toPrecision (precision) {
+            return function (x) {
+                return x.toPrecision(precision);
+            };
+        }
+
+        testNode.setRotation(null, 10);
+        var y10 = [0, -0.9589242746631385, 0, 0.2836621854632263];
+
+        t.deepEqual(
+            Array.prototype.slice.call(testRotation).map(toPrecision(6)),
+            y10.map(toPrecision(6)),
+            'setRotation should calculate the proper quaternion from' +
+            ' passed in euler angles'
+        );
 
         t.end();
     });
