@@ -2,7 +2,7 @@
 
 var test = require('tape');
 var Program = require('../src/Program');
-var WebGLTestingContext = require('./WebGLTestingContext.spec');
+var WebGLTestingContext = require('./helpers/ContextWebGL');
 
 var time = 0;
 var _now = Date.now;

@@ -1,7 +1,7 @@
 'use strict';
 var test           = require('tape');
-var TestingContext = require('./WebGLTestingContext');
-var Texture        = require('../../../src/gl/Texture');
+var TestingContext = require('./helpers/ContextWebGL');
+var Texture        = require('../src/Texture');
 
 test('Texture', function(t) {
     t.test('constructor', function(t) {
@@ -10,11 +10,11 @@ test('Texture', function(t) {
 
         t.ok(texture.id instanceof Object, 'should create a texture object');
 
-        t.ok(testingContext.texImage2D.callCount === 1, 'should call texImage2D');
-        t.ok(testingContext.texImage2D.history[0][8] === null, 'should call texImage2D with a null value');
+        t.equals(testingContext.texImage2D.callCount, 1, 'should call texImage2D');
+        t.equals(testingContext.texImage2D.history[0][8], null, 'should call texImage2D with a null value');
 
-        t.ok(testingContext.pixelStorei.callCount === 1, 'should call pixelStorei');
-        t.ok(testingContext.bindTexture.callCount === 1, 'should bind the texture');
+        t.equals(testingContext.pixelStorei.callCount, 2, 'should call pixelStorei');
+        t.equals(testingContext.bindTexture.callCount, 2, 'should bind the texture');
 
         t.end();
     });
@@ -27,11 +27,11 @@ test('Texture', function(t) {
 
         texture.bind();
 
-        t.ok(testingContext.activeTexture.callCount === 1, 'should call the activeTexture method on the context');
-        t.ok(testingContext.bindTexture.callCount === 2, 'should call the bindTexture method on the context');
+        t.equals(testingContext.activeTexture.callCount, 3, 'should call the activeTexture method on the context');
+        t.equals(testingContext.bindTexture.callCount, 3, 'should call the bindTexture method on the context');
 
         texture.bind(5);
-        t.equal(testingContext.activeTexture.history[1][0], 33989, 'should call activeTexture with correct texture slot')
+        t.equals(testingContext.activeTexture.history[3][0], 33989, 'should call activeTexture with correct texture slot')
 
         t.end();
     });
@@ -44,11 +44,11 @@ test('Texture', function(t) {
 
         texture.unbind();
 
-        t.ok(testingContext.activeTexture.callCount === 1, 'should call the activeTexture method on the context');
-        t.ok(testingContext.bindTexture.callCount === 2, 'should call the bindTexture method on the context');
+        t.equals(testingContext.activeTexture.callCount, 3, 'should call the activeTexture method on the context');
+        t.equals(testingContext.bindTexture.callCount, 3, 'should call the bindTexture method on the context');
 
-        texture.bind(5);
-        t.equal(testingContext.activeTexture.history[1][0], 33989, 'should call activeTexture with correct texture slot')
+        texture.unbind(5);
+        t.equal(testingContext.activeTexture.history[3][0], 33989, 'should call activeTexture with correct texture slot')
 
         t.end();
     });
