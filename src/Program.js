@@ -22,9 +22,9 @@ var TYPES = {
 };
 
 var inputTypes = {
-    baseColor: 'vec3',
+    baseColor: 'vec4',
     normal: 'vec3',
-    glossiness: 'float',
+    glossiness: 'vec4',
     metalness: 'float',
     positionOffset: 'vert'
 };
