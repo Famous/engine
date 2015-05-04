@@ -3,6 +3,7 @@
 // TODO: Dispatch should be generalized so that it can work on any Node
 // not just Contexts.
 
+var Event = require('./Event');
 
 /**
  * The Dispatch class is used to propogate events down the
@@ -105,13 +106,15 @@ Dispatch.prototype.dispatchUIEvent = function dispatchUIEvent (path, event, payl
 
     var queue = this._queue;
     var node;
-
+    
+    Event.call(payload);
     payload.node = this.lookupNode(path); // After this call, the path is loaded into the queue
                                           // (lookUp node doesn't clear the queue after the lookup)
 
     while (queue.length) {
         node = queue.pop(); // pop nodes off of the queue to move up the ancestor chain.
         if (node.onReceive) node.onReceive(event, payload);
+        if (payload.propagationStopped) break;
     }
 };
 

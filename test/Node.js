@@ -129,8 +129,6 @@ test('Node', function(t) {
         t.equal(requesters[5], node011);
         t.equal(requesters.length, 6);
 
-        t.deepEqual(root.getValue(), ExampleNodeSpec);
-
         t.end();
     });
     
