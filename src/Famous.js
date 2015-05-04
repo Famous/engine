@@ -141,9 +141,6 @@ Famous.prototype.handleMessage = function handleMessage (messages) {
             case 'FRAME':
                 this.handleFrame(messages);
                 break;
-            case 'INVOKE':
-                this.handleInvoke(message);
-                break;
             default:
                 throw new Error('received unknown command: ' + command);
                 break;
