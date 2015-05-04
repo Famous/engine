@@ -5,11 +5,9 @@ var CallbackStore = require('famous-utilities').CallbackStore;
 var RENDER_SIZE = 2;
 
 /**
- * A DOMElement is a renderable that can be added just like a "normal"
- * component to a node using `addComponent`.
- * Renderables send draw commands to the node they are attached to.
+ * DOMElements send draw commands through the node they are attached to.
  * Those commands then get interpreted by the `DOMRenderer` in the Main thread
- * to build the actual DOM representation.
+ * to build the actual DOM tree.
  *
  * @class DOMElement
  * @constructor
