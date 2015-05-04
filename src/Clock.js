@@ -13,7 +13,40 @@ function Clock () {
     this._frame = 0;
     this._timerQueue = [];
     this._updatingIndex = 0;
+
+    this._scale = 1;
+    this._scaledTime = this._time;
 }
+
+/**
+ * Sets the scale at which the clock time is passing.
+ * Useful for slow-motion or fast-forward effects.
+ * 
+ * `1` means no time scaling ("realtime"),
+ * `2` means the clock time is passing twice as fast,
+ * `0.5` means the clock time is passing two times slower than the "actual"
+ * time at which the Clock is being updated via `.step`.
+ *
+ * Initally the clock time is not being scaled (factor `1`).
+ * 
+ * @method  setScale
+ * @chainable
+ * 
+ * @param {Number} scale    The scale at which the clock time is passing.
+ */
+Clock.prototype.setScale = function setScale (scale) {
+    this._scale = scale;
+    return this;
+};
+
+/**
+ * @method  getScale
+ * 
+ * @return {Number} scale    The scale at which the clock time is passing.
+ */
+Clock.prototype.getScale = function getScale () {
+    return this._scale;
+};
 
 /**
  * Updates the internal clock time.
@@ -27,26 +60,16 @@ function Clock () {
  */
 Clock.prototype.step = function step (time) {
     this._frame++;
+
+    this._scaledTime = this._scaledTime + (time - this._time)*this._scale;
     this._time = time;
+
     for (var i = 0; i < this._timerQueue.length; i++) {
-        if (this._timerQueue[i](this._time)) {
+        if (this._timerQueue[i](this._scaledTime)) {
             this._timerQueue.splice(i, 1);
         }
     }
     return this;
-};
-
-/**
- * Returns the internal clock time.
- *
- * @method  getTime
- * @deprecated Use #now instead
- * 
- * @param  {Number} time high resolution timstamp used for invoking the
- *                       `update` method on all registered objects
- */
-Clock.prototype.getTime = function getTime() {
-    return this._time;
 };
 
 /**
@@ -58,8 +81,19 @@ Clock.prototype.getTime = function getTime() {
  *                       `update` method on all registered objects
  */
 Clock.prototype.now = function now () {
-    return this._time;
+    return this._scaledTime;
 };
+
+/**
+ * Returns the internal clock time.
+ *
+ * @method  getTime
+ * @deprecated Use #now instead
+ * 
+ * @param  {Number} time high resolution timstamp used for invoking the
+ *                       `update` method on all registered objects
+ */
+Clock.prototype.getTime = Clock.prototype.now;
 
 /**
  * Returns the number of frames elapsed so far.

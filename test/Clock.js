@@ -137,4 +137,34 @@ test('Clock', function(t) {
         clock.step(101);
         t.end();
     });
+
+    t.test('setScale/ getScale method', function(t) {
+        var clock = new Clock();
+        t.equal(typeof clock.setScale, 'function', 'clock.setScale should be a function');
+        t.equal(typeof clock.getScale, 'function', 'clock.getScale should be a function');
+
+        clock.step(100);
+        t.equal(clock.now(), 100);
+
+        t.equal(clock.getScale(), 1, 'Clock should be initialized with a time scale of 1 (realtime)');
+        
+        clock.step(120);
+        t.equal(clock.now(), 120);
+        clock.setScale(0.5);
+        t.equal(clock.getScale(), 0.5);
+        t.equal(clock.now(), 120);
+
+        clock.step(150);
+        t.equal(clock.now(), 135);
+        
+        clock.step(210);
+        t.equal(clock.now(), 165);
+
+        clock.setScale(1);
+        t.equal(clock.getScale(), 1);
+        clock.step(220);
+        t.equal(clock.now(), 175);
+        
+        t.end();
+    });
 });
