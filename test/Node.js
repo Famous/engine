@@ -382,4 +382,10 @@ test('Node', function(t) {
 
         t.end();
     });
+
+    t.test('setRotation', function (t) {
+        var testNode = new Node();
+
+        t.end();
+    });
 });

@@ -75,6 +75,10 @@ function Node () {
     this._parent = null;
     this._globalUpdater = null;
 
+    this._lastEulerX = 0;
+    this._lastEulerY = 0;
+    this._lastEulerZ = 0;
+
     this.value = new Node.Spec();
 }
 
@@ -772,6 +776,16 @@ Node.prototype.setRotation = function setRotation (x, y, z, w) {
         qw = w;
     }
     else {
+
+        if (x == null) x = this._lastEulerX;
+        else this._lastEulerX = x;
+
+        if (y == null) y = this._lastEulerY;
+        else this._lastEulerY = y;
+
+        if (z == null) z = this._lastEulerZ;
+        else this._lastEulerZ = z;
+
         var hx = x * 0.5;
         var hy = y * 0.5;
         var hz = z * 0.5;
