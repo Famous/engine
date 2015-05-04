@@ -94,12 +94,12 @@ test('Famous', function(t) {
     });
 
     t.test('postMessage method (FRAME command)', function(t) {
-        t.equal(typeof Famous.postMessage, 'function', 'Famous.postMessage should be a function');
-        Famous.postMessage(['FRAME', 123]);
+        t.equal(typeof Famous.getChannel().postMessage, 'function', 'Famous.getChannel().postMessage should be a function');
+        Famous.getChannel().postMessage(['FRAME', 123]);
         t.equal(Famous.getClock().now(), 123);
-        Famous.postMessage(['FRAME', 124, 'FRAME', 125]);
+        Famous.getChannel().postMessage(['FRAME', 124, 'FRAME', 125]);
         t.equal(Famous.getClock().now(), 125);
-        Famous.postMessage(['FRAME', 126]);
+        Famous.getChannel().postMessage(['FRAME', 126]);
         t.equal(Famous.getClock().now(), 126);
 
         t.end();
@@ -114,7 +114,7 @@ test('Famous', function(t) {
         t.equal(context1.constructor, Context, 'Famous.createContext should return Context instances');
         t.notEqual(context0, context1, 'Famous.createContext being invoked on two different selectors should return different context instances');
 
-        Famous.onmessage = function() {};
+        Famous.getChannel().onmessage = function() {};
         Famous.step(0);
         t.end();
     });
@@ -133,7 +133,7 @@ test('Famous', function(t) {
         Famous.message('and');
         Famous.message('ms');
         var receivedMessages = [];
-        Famous.onmessage = function(message) {
+        Famous.getChannel().onmessage = function(message) {
             receivedMessages.push(message.slice());
         };
         Famous.step(3141);
