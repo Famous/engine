@@ -1,3 +1,6 @@
+bool hasGlossiness = glossiness.a > 0.0;
+bool hasSpecularColor = length(glossiness.rgb) > 0.0;
+
 /**
  * Calculates the intensity of light on a surface.
  *
