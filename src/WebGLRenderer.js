@@ -170,7 +170,7 @@ WebGLRenderer.prototype.createMesh = function createMesh(path) {
         opacity: 1,
         transform: identity,
         size: [0, 0, 0],
-        baseColor: [0.5, 0.5, 0.5],
+        baseColor: [0.5, 0.5, 0.5, 1],
         positionOffset: [0, 0, 0],
         u_FlatShading: 0,
         glossiness: [0, 0, 0, 0]

@@ -22,9 +22,9 @@ var TYPES = {
 };
 
 var inputTypes = {
-    baseColor: 'vec3',
+    baseColor: 'vec4',
     normal: 'vec3',
-    glossiness: 'float',
+    glossiness: 'vec4',
     metalness: 'float',
     positionOffset: 'vert'
 };
@@ -48,7 +48,7 @@ var uniforms = Utility.keyValueToArrays({
     opacity: [1],
     metalness: [0],
     glossiness: [0, 0, 0, 0],
-    baseColor: [1, 1, 1],
+    baseColor: [1, 1, 1, 1],
     normal: [1, 1, 1],
     positionOffset: [0, 0, 0],
     u_LightPosition: identityMatrix,
@@ -97,9 +97,11 @@ function Program(gl, options) {
     this.flaggedUniforms = [];
     this.cachedUniforms  = {};
 
-    this.definitionVec = [];
+    this.definitionVec4 = [];
+    this.definitionVec3 = [];
     this.definitionFloat = [];
-    this.applicationVec = [];
+    this.applicationVec3 = [];
+    this.applicationVec4 = [];
     this.applicationFloat = [];
     this.applicationVert = [];
     this.definitionVert = [];
@@ -155,9 +157,15 @@ Program.prototype.registerMaterial = function registerMaterial(name, material) {
     }
 
     if (type == 'vec3') {
-        this.definitionVec.push(material.defines);
-        this.definitionVec.push('vec3 fa_' + material._id + '() {\n '  + compiled.glsl + ' \n}');
-        this.applicationVec.push('if (int(abs(ID.x)) == ' + material._id + ') return fa_' + material._id + '();');
+        this.definitionVec3.push(material.defines);
+        this.definitionVec3.push('vec3 fa_' + material._id + '() {\n '  + compiled.glsl + ' \n}');
+        this.applicationVec3.push('if (int(abs(ID.x)) == ' + material._id + ') return fa_' + material._id + '();');
+    }
+
+    if (type == 'vec4') {
+        this.definitionVec4.push(material.defines);
+        this.definitionVec4.push('vec4 fa_' + material._id + '() {\n '  + compiled.glsl + ' \n}');
+        this.applicationVec4.push('if (int(abs(ID.x)) == ' + material._id + ') return fa_' + material._id + '();');
     }
 
     if (type == 'vert') {
@@ -241,8 +249,10 @@ Program.prototype.resetProgram = function resetProgram() {
         .replace('#vert_applications', this.applicationVert.join('\n'));
 
     fragmentSource = fragmentHeader.join('') + fragmentWrapper
-        .replace('#vec_definitions', this.definitionVec.join('\n'))
-        .replace('#vec_applications', this.applicationVec.join('\n'))
+        .replace('#vec3_definitions', this.definitionVec3.join('\n'))
+        .replace('#vec3_applications', this.applicationVec3.join('\n'))
+        .replace('#vec4_definitions', this.definitionVec4.join('\n'))
+        .replace('#vec4_applications', this.applicationVec4.join('\n'))
         .replace('#float_definitions', this.definitionFloat.join('\n'))
         .replace('#float_applications', this.applicationFloat.join('\n'));
 
