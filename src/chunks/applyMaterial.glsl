@@ -14,10 +14,16 @@ float applyMaterial(float ID) {
     return 1.;
 }
 
-#vec_definitions
+#vec3_definitions
 vec3 applyMaterial(vec3 ID) {
-    #vec_applications
+    #vec3_applications
     return vec3(.5);
+}
+
+#vec4_definitions
+vec4 applyMaterial(vec3 ID) {
+    #vec4_applications
+    return vec4(.5);
 }
 
 #pragma glslify: export(applyMaterial)
