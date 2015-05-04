@@ -222,11 +222,19 @@ Famous.prototype.step = function step (time) {
     return this;
 };
 
-Famous.prototype.onmessage = function onmessage() {
+Famous.prototype.onmessage = function () {
     console.error(
-        'famous-core is not running in a web worker, ' + 
-        'but no ThreadManager has has been setup.\n' +
-        'Try new ThreadManager(Famous, new Compositor())'
+        'Famous#onmessage has been moved to Channel!\n' +
+        'Use new ThreadManager(Famous.getChannel(), compositor) \n' + 
+        'instead of new ThreadManager(Famous, compositor).'
+    );
+};
+
+Famous.prototype.postMessage = function () {
+    console.error(
+        'Famous#postMessage has been moved to Channel!\n' +
+        'Use new ThreadManager(Famous.getChannel(), compositor) \n' + 
+        'instead of new ThreadManager(Famous, compositor).'
     );
 };
 
