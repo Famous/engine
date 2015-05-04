@@ -1,9 +1,5 @@
 'use strict';
 
-var VirtualElement = require('famous-dom-renderers').VirtualElement;
-var strip = require('famous-utilities').strip;
-var flatClone = require('famous-utilities').flatClone;
-
 var Context = require('./Context');
 
 /**
@@ -18,7 +14,12 @@ function Compositor() {
     this._outCommands = [];
     this._inCommands = [];
 
-    this.clearCommands();
+    this._resized = false;
+
+    var _this = this;
+    window.addEventListener('resize', function(ev) {
+        _this._resized = true;
+    });
 }
 
 /**
@@ -39,6 +40,21 @@ Compositor.prototype.sendEvent = function sendEvent(path, ev, payload) {
 };
 
 /**
+ * Internal helper method used for notifying the WebWorker about externally
+ * resized contexts (e.g. by resizing the browser window).
+ *
+ * @method sendResize
+ * @private
+ *
+ * @param  {String} selector    render path to the node (context) that should
+ *                              be resized
+ * @param  {Array} size         new context size
+ */
+Compositor.prototype.sendResize = function sendResize (selector, size) {
+    this.sendEvent(selector, 'CONTEXT_RESIZE', size);
+};
+
+/**
  * Internal helper method used by `drawCommands`.
  *
  * @method handleWith
@@ -55,10 +71,8 @@ Compositor.prototype.handleWith = function handleWith (iterator, commands) {
 };
 
 /**
- * Retrieves the top-level VirtualElement attached to the passed in document
- * selector.
- * If no such element exists, one will be instantiated, therefore representing
- * the equivalent of a Context in the Main Thread.
+ * Retrieves the top-level Context associated with the passed in document
+ * query selector. If no such Context exists, a new one will be instantiated.
  *
  * @method getOrSetContext
  * @private
@@ -67,7 +81,7 @@ Compositor.prototype.handleWith = function handleWith (iterator, commands) {
  *                                      retrieving the DOM node the
  *                                      VirtualElement should be attached to
  * @return {Object} result
- * @return {VirtualElement} result.DOM  final VirtualElement
+ * @return {Context}                    final VirtualElement
  */
 Compositor.prototype.getOrSetContext = function getOrSetContext(selector) {
     if (this._contexts[selector]) return this._contexts[selector];
@@ -87,55 +101,6 @@ Compositor.prototype.giveSizeFor = function giveSizeFor(iterator, commands) {
     var selector = commands[iterator];
     var size = this.getOrSetContext(selector).getRootSize();
     this.sendResize(selector, size);
-    var _this = this;
-    if (selector === 'body')
-        window.addEventListener('resize', function() {
-            if (!_this._sentResize) {
-                _this.sendResize(selector, _this.getOrSetContext(selector).getRootSize());
-            }
-        });
-};
-
-/**
- * Internal helper method used for notifying the WebWorker about externally
- * resized contexts (e.g. by resizing the browser window).
- *
- * @method sendResize
- * @private
- *
- * @param  {String} selector    render path to the node (context) that should
- *                              be resized
- * @param  {Array} size         new context size
- */
-Compositor.prototype.sendResize = function sendResize (selector, size) {
-    this._outCommands.push('WITH', selector, 'TRIGGER', 'CONTEXT_RESIZE', size);
-    this._sentResize = true;
-};
-
-Compositor.prototype._wrapProxyFunction = function _wrapProxyFunction(id) {
-    var _this = this;
-    return function() {
-        var i;
-
-        for (i = 0; i < arguments.length; i++) {
-            if (typeof arguments[i] === 'object') {
-                arguments[i] = strip(flatClone(arguments[i]));
-            }
-        }
-        _this._outCommands.push('INVOKE', id, Array.prototype.slice.call(arguments));
-    };
-};
-
-Compositor.prototype.invoke = function invoke (target, methodName, args, functionArgs) {
-    var targetObject = window[target];
-
-    for (var i = 0; i < args.length; i++) {
-        if (functionArgs[i] != null) {
-            args[i] = this._wrapProxyFunction(functionArgs[i]);
-        }
-    }
-
-    targetObject[methodName].apply(targetObject, args);
 };
 
 /**
@@ -157,16 +122,6 @@ Compositor.prototype.drawCommands = function drawCommands() {
             case 'WITH':
                 localIterator = this.handleWith(++localIterator, commands);
                 break;
-
-            case 'INVOKE':
-                this.invoke(
-                    commands[++localIterator],
-                    commands[++localIterator],
-                    commands[++localIterator],
-                    commands[++localIterator]
-                );
-                break;
-
             case 'NEED_SIZE_FOR':
                 this.giveSizeFor(++localIterator, commands);
                 break;
@@ -178,6 +133,10 @@ Compositor.prototype.drawCommands = function drawCommands() {
 
     for (var key in this._contexts) {
         this._contexts[key].draw();
+    }
+
+    if (this._resized && this._contexts.body) {
+        this.sendResize('body', this._contexts.body.getRootSize());
     }
 
     return this._outCommands;
@@ -206,7 +165,7 @@ Compositor.prototype.receiveCommands = function receiveCommands(commands) {
 Compositor.prototype.clearCommands = function clearCommands() {
     this._inCommands.length = 0;
     this._outCommands.length = 0;
-    this._sentResize = false;
+    this._resized = null;    
 };
 
 module.exports = Compositor;
