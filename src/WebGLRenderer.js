@@ -503,6 +503,7 @@ WebGLRenderer.prototype.bufferData = function bufferData(path, geometryId, buffe
  */
 WebGLRenderer.prototype.draw = function draw(renderState) {
     this.textureManager.update();
+    
     this.setGlobalUniforms(renderState);
     this.meshRegistryKeys = sorter(this.meshRegistryKeys, this.meshRegistry);
     this.drawCutouts();

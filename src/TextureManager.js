@@ -4,9 +4,10 @@ var Clock = require('famous-core').Famous.getClock();
 
 function TextureManager(gl) {
 	this.registry = [];
-	this._updates = [];
+	this._needsResample = [];
 
-    this._activeTexture;
+    this._activeTexture = 0;
+    this._boundTexture;
 
 	this.gl = gl;
 }
@@ -18,8 +19,8 @@ TextureManager.prototype.update = function update() {
 	for (var i = 1; i < registryLength; i++) {
         if (this.registry[i].isLoaded && this.registry[i].resampleRate) {
 			if (time - this.registry[i].lastResample > this.registry[i].resampleRate) {
-				if (!this._updates[this.registry[i].texture.id]) {
-					this._updates[this.registry[i].texture.id] = true;
+				if (!this._needsResample[this.registry[i].texture.id]) {
+					this._needsResample[this.registry[i].texture.id] = true;
 					this.registry[i].lastResample = time;
 				}
 			}
@@ -33,7 +34,6 @@ TextureManager.prototype.register = function register(input, slot) {
     var options = input.options || {};
     var texture = this.registry[textureId];
     var isLoaded = false;
-    var setter;
 
     if (!texture) {
 
@@ -45,8 +45,7 @@ TextureManager.prototype.register = function register(input, slot) {
 
         if (Array.isArray(source) || source instanceof Uint8Array || source instanceof Float32Array) {
             texture = new Texture(this.gl, options);
-            setter = 'setArray';
-            texture[setter](source);
+            texture.setArray(source);
             isLoaded = true;
         }
 
@@ -54,13 +53,12 @@ TextureManager.prototype.register = function register(input, slot) {
 
         else if (window && source instanceof window.HTMLVideoElement) {
             texture = new Texture(this.gl, options);
-            setter = 'setImage';
             texture.setImage(Checkerboard);
             source.addEventListener('loadeddata', function() {
                 this.gl.activeTexture(this.gl.TEXTURE0 + slot);
                 texture.bind();
 
-                texture[setter](source);
+                texture.setImage(source);
                 this.registry[textureId].isLoaded = true;
                 this.registry[textureId].source = source;
             }.bind(this));
@@ -71,12 +69,11 @@ TextureManager.prototype.register = function register(input, slot) {
         else if ('string' === typeof source) {
             texture = new Texture(this.gl, options);
             texture.setImage(Checkerboard);
-            setter = 'setImage';
             loadImage(source, function (img) {
                 this.gl.activeTexture(this.gl.TEXTURE0 + slot);
                 texture.bind();
 
-                texture[setter](img);
+                texture.setImage(img);
                 this.registry[textureId].isLoaded = true;
                 this.registry[textureId].source = img;
             }.bind(this));
@@ -87,7 +84,6 @@ TextureManager.prototype.register = function register(input, slot) {
         this.registry[textureId] = {
         	resampleRate: options.resampleRate || null,
         	isLoaded: isLoaded,
-            setter: setter,
         	texture: texture,
         	source: source,
         	lastResample: Clock.getTime()
@@ -97,13 +93,15 @@ TextureManager.prototype.register = function register(input, slot) {
     return textureId;
 }
 
-function loadImage (img, callback) {
-    var obj = (typeof img === 'string' ? new Image() : img) || {};
-    obj.crossOrigin = 'anonymous';
-    if (! obj.src) obj.src = img;
-    if (! obj.complete) obj.onload = function () { callback(obj); };
-    else callback(obj);
-    return obj;
+function loadImage (input, callback) {
+    var image = (typeof input === 'string' ? new Image() : input) || {};
+        image.crossOrigin = 'anonymous';
+
+    if (!image.src) image.src = input;
+    if (!image.complete) image.onload = function () { callback(image); };
+    else callback(image);
+
+    return image;
 }
 
 TextureManager.prototype.bindTextures = function bindTextures(textures) {
@@ -111,11 +109,22 @@ TextureManager.prototype.bindTextures = function bindTextures(textures) {
         var id = textures[i];
         var spec = this.registry[id];
 
-        this.gl.activeTexture(this.gl.TEXTURE0 + i);
-    	spec.texture.bind();
+        if (this._activeTexture !== i) {
+            this.gl.activeTexture(this.gl.TEXTURE0 + i);
+            this._activeTexture = i;
+        }
 
-    	if (this._updates[spec.texture.id]) {
-    		spec.texture[spec.setter](spec.source);
+    	if (this._boundTexture !== id) {
+            this._boundTexture = id;
+            spec.texture.bind();
+        }
+
+    	if (this._needsResample[spec.texture.id]) {
+
+            // TODO: Account for resampling of arrays.
+
+    		spec.texture.setImage(spec.source);
+            this._needsResample[spec.texture.id] = false;
     	}
     }
 }
