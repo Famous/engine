@@ -29,6 +29,7 @@ function WebGLRenderer(canvas) {
     var gl = this.gl = this.getWebGLContext(this.canvas);
 
     gl.polygonOffset(0.1, 0.1);
+    gl.clearColor(1.0, 1.0, 1.0, 0.0);
     gl.enable(gl.POLYGON_OFFSET_FILL);
     gl.enable(gl.DEPTH_TEST);
     gl.enable(gl.BLEND);
@@ -225,6 +226,31 @@ WebGLRenderer.prototype.showMesh = function showMesh(path) {
     mesh.visible = true;
 };
 
+WebGLRenderer.prototype.removeMesh = function removeMesh(path) {
+    var keyLocation = this.meshRegistryKeys.indexOf(path);
+    this.meshRegistryKeys.splice(keyLocation, 1);
+
+    var len = this.meshRegistryKeys.length;
+    var targetGeometry = this.meshRegistry[path].geometry;
+    var key;
+
+    this.meshRegistry[path] = null;
+
+    for (var i = 0; i < len; i++) {
+        key = this.meshRegistryKeys[i];
+
+        // If geometry is being used in another mesh return
+
+        if (this.meshRegistry[key].geometry === targetGeometry) {
+            return;
+        }
+    }
+
+    // Deallocate WebGL buffers for geometry if no longer necessary
+
+    this.bufferRegistry.deallocate(targetGeometry);
+};
+
 
 /**
  * Creates or retreives cutout
@@ -417,6 +443,8 @@ WebGLRenderer.prototype.bufferData = function bufferData(path, geometryId, buffe
  * affect the rendering of all renderables.
  */
 WebGLRenderer.prototype.draw = function draw(renderState) {
+    this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
+
     this.setGlobalUniforms(renderState);
     this.meshRegistryKeys = sorter(this.meshRegistryKeys, this.meshRegistry);
     this.drawCutouts();
@@ -457,16 +485,19 @@ WebGLRenderer.prototype.drawMeshes = function drawMeshes() {
 WebGLRenderer.prototype.drawCutouts = function drawCutouts() {
     var cutout;
     var buffers;
+    var len = this.cutoutRegistryKeys.length;
 
-    for (var i = 0, len = this.cutoutRegistryKeys.length; i < len; i++) {
+    if (len) this.gl.enable(this.gl.BLEND);
+
+    for (var i = 0; i < len; i++) {
         cutout = this.cutoutRegistry[this.cutoutRegistryKeys[i]];
         buffers = this.bufferRegistry.registry[cutout.geometry];
 
-        this.gl.enable(this.gl.BLEND);
         this.program.setUniforms(cutout.uniformKeys, cutout.uniformValues);
         this.drawBuffers(buffers, cutout.drawType, cutout.geometry);
-        this.gl.disable(this.gl.BLEND);
     }
+    
+    if (len) this.gl.disable(this.gl.BLEND);
 };
 
 WebGLRenderer.prototype.setGlobalUniforms = (function() {
