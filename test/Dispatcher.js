@@ -2,30 +2,7 @@
 
 var test = require('tape');
 var Dispatch = require('../src/Dispatch');
-
-function MockNode (selector, receivedQueue) {
-    this.children = [];
-    this.selector = selector;
-    this.receivedQueue = receivedQueue;
-}
-
-MockNode.prototype.getSelector = function getSelector () {
-    return this.selector;
-};
-
-MockNode.prototype.getChildren = function getChildren () {
-    return this.children;
-};
-
-MockNode.prototype.addChild = function addChild (receivedQueue) {
-    var node = new MockNode(null, receivedQueue);
-    this.children.push(node);
-    return node;
-};
-
-MockNode.prototype.onReceive = function onReceive (type, ev) {
-    this.receivedQueue.push(this);
-};
+var MockNode = require('./helpers/MockNode');
 
 test('Dispatch', function(t) {
     t.test('constructor', function(t) {
@@ -92,6 +69,17 @@ test('Dispatch', function(t) {
         t.equal(receivedQueue[0], node0, 'dispatcher.dispatch should bubble events up to parent (upwards)');
         t.equal(receivedQueue[1], context, 'dispatcher.dispatch should bubble events up to parent (upwards)');
         t.equal(receivedQueue.length, 2, 'dispatcher.dispatch should bubble events up to parent (upwards)');
+
+        receivedQueue.length = 0;
+
+        node00.onReceive = function (name, payload) {
+            payload.stopPropagation();
+        }
+
+        dispatcher.dispatchUIEvent(node001.getLocation(), 'click', clickEv);
+
+        t.equal(receivedQueue.length, 1, 'dispatcher.dispatchUIEvent should not bubble if a node calls stopPropagation');
+
         t.end();
     });
 });
