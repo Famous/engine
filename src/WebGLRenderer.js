@@ -8,6 +8,7 @@ var Plane = require('famous-webgl-geometries').Plane;
 var sorter = require('./radixSort');
 var Utility = require('famous-utilities');
 var TextureManager = require('./TextureManager');
+var compileMaterial = require('./compileMaterial');
 
 var identity = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
 
@@ -379,6 +380,8 @@ WebGLRenderer.prototype.setLightColor = function setLightColor(path, r, g, b) {
 **/
 WebGLRenderer.prototype.handleMaterialInput = function handleMaterialInput(path, name, material) {
     var mesh = this.meshRegistry[path] || this.createMesh(path);
+    var material = compileMaterial(material);
+    debugger;
 
     // Set uniforms to enable texture!
 
