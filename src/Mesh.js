@@ -111,10 +111,11 @@ Mesh.prototype.getGeometry = function getGeometry () {
 Mesh.prototype.setBaseColor = function setBaseColor (color) {
     var uniformValue;
 
-    if (color._compile) {
+    if (color.__isAMaterial__) {
         this.value.color = null;
         this.value.expressions.baseColor = color;
-        uniformValue = color._compile();
+        // uniformValue = color.__isAMaterial__();
+        uniformValue = color;
     }
     else if (color.getNormalizedRGB) {
         this.value.expressions.baseColor = null;
@@ -130,7 +131,7 @@ Mesh.prototype.setBaseColor = function setBaseColor (color) {
 
         // If a material expression
 
-        if (color._compile) {
+        if (color.__isAMaterial__) {
             this._changeQueue.push('MATERIAL_INPUT');
         }
 
