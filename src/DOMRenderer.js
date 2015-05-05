@@ -59,7 +59,7 @@ function DOMRenderer (element, selector, compositor) {
     this._size = [null, null];
 }
 
-DOMRenderer.prototype.addEventListener = function addEventListener(path, type, properties, preventDefault) {
+DOMRenderer.prototype.addEventListener = function addEventListener(path, type, preventDefault) {
     if (!this._eventListeners[type]) {
         this._eventListeners[type] = {};
         if (eventMap[type][1]) {
