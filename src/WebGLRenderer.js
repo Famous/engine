@@ -202,38 +202,12 @@ WebGLRenderer.prototype.getOrSetCutout = function getOrSetCutout(path) {
         return this.cutoutRegistry[path];
     }
     else {
-        if (!this.cutoutGeometry) {
-            geometry = this.cutoutGeometry = Plane();
-
-<<<<<<< HEAD
-    var uniforms = Utility.keyValueToArrays({
-        opacity: 0,
-        transform: identity,
-        size: [0, 0, 0],
-        origin: [0, 0, 0],
-        baseColor: [0, 0, 0, 1]
-    });
-    return this.cutoutRegistry[path] = {
-        uniformKeys: uniforms.keys,
-        uniformValues: uniforms.values,
-        geometry: this.cutoutGeometry.id,
-        drawType: 4
-    };
-=======
-            this.bufferRegistry.allocate(-1, 'pos', geometry.spec.bufferValues[0], 3);
-            this.bufferRegistry.allocate(-1, 'texCoord', geometry.spec.bufferValues[1], 2);
-            this.bufferRegistry.allocate(-1, 'normals', geometry.spec.bufferValues[2], 3);
-            this.bufferRegistry.allocate(-1, 'indices', geometry.spec.bufferValues[3], 1);
-        }
-
-        this.cutoutRegistryKeys.push(path);
-
         var uniforms = Utility.keyValueToArrays({
+            opacity: 0,
             transform: identity,
             size: [0, 0, 0],
             origin: [0, 0, 0],
-            baseColor: [0, 0, 0],
-            opacity: 0
+            baseColor: [0, 0, 0, 1]
         });
 
         return this.cutoutRegistry[path] = {
@@ -243,7 +217,6 @@ WebGLRenderer.prototype.getOrSetCutout = function getOrSetCutout(path) {
             drawType: 4
         };
     }
->>>>>>> feat: basic implementation of mult-texture
 };
 
 /**
@@ -531,8 +504,10 @@ WebGLRenderer.prototype.drawMeshes = function drawMeshes() {
 
         if (!buffers) continue;
 
+        var j = mesh.textures.length;
+        while (j--) this.textureManager.bindTexture(mesh.textures[i]);
+        
         if (mesh.options) this.handleOptions(mesh.options, mesh);
-        if (mesh.textures) this.textureManager.bindTextures(mesh.textures);
         
         this.program.setUniforms(mesh.uniformKeys, mesh.uniformValues);
         this.drawBuffers(buffers, mesh.drawType, mesh.geometry);
@@ -555,6 +530,7 @@ WebGLRenderer.prototype.drawCutouts = function drawCutouts() {
         this.program.setUniforms(cutout.uniformKeys, cutout.uniformValues);
         this.drawBuffers(buffers, cutout.drawType, cutout.geometry);
     }
+
     if (len) this.gl.disable(this.gl.BLEND);
 };
 
@@ -830,26 +806,5 @@ WebGLRenderer.prototype.resetOptions = function resetOptions(options) {
     if (options.blending) gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
     if (options.side === 'back') gl.cullFace(gl.BACK);
 };
-
-/**
- * Loads an image from a string or Image object and executes a callback function.
- *
- * @method loadImage
- * @private
- *
- * @param {Object | String} img The input image data to load as an asset.
- * @param {Function} callback The callback function to be fired when
- * the image has finished loading.
- *
- * @return {Object} Image object being loaded.
- */
-function loadImage (img, callback) {
-    var obj = (typeof img === 'string' ? new Image() : img) || {};
-    obj.crossOrigin = 'anonymous';
-    if (! obj.src) obj.src = img;
-    if (! obj.complete) obj.onload = function () { callback(obj); };
-    else callback(obj);
-    return obj;
-}
 
 module.exports = WebGLRenderer;
