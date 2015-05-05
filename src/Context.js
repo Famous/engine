@@ -147,10 +147,9 @@ Context.prototype.receive = function receive(pathArr, path, commands, iterator) 
                 if (this.WebGLRenderer) this.WebGLRenderer.getOrSetCutout(path);
 
                 var type = commands[++localIterator];
-                var properties = commands[++localIterator];
                 var preventDefault = commands[++localIterator];
 
-                this.DOMRenderer.addEventListener(path, type, properties, preventDefault);
+                this.DOMRenderer.addEventListener(path, type, preventDefault);
                 break;
 
             case 'GL_SET_DRAW_OPTIONS': 
