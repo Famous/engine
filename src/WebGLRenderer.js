@@ -11,16 +11,15 @@ var Utility = require('famous-utilities');
 
 var identity = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
 
-var uniformNames = [
-    'u_NumLights',
-    'u_AmbientLight',
-    'u_LightPosition',
-    'u_LightColor',
-    'perspective',
-    'time',
-    'view'
-];
-var uniformValues = [];
+var globalUniforms = Utility.keyValueToArrays({
+    'u_NumLights': 0,
+    'u_AmbientLight': new Array(3),
+    'u_LightPosition': new Array(3),
+    'u_LightColor': new Array(3),
+    'perspective': new Array(16),
+    'time': 0,
+    'view': new Array(16)
+});
 
 /**
  * WebGLRenderer is a private class that manages all interactions with the WebGL
@@ -97,9 +96,8 @@ function WebGLRenderer(canvas) {
     The final component (this.projectionTransform[15]) is initialized as 1 because certain projection models,
     e.g. the WC3 specified model, keep the XY plane as the projection hyperplane.
     */
+    
     this.projectionTransform = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, -0.000001, 0, -1, 1, 0, 1];
-
-    this.projectionTransform = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
 
     var cutout = this.cutoutGeometry = new Plane();
     cutout.id = -1;
@@ -209,7 +207,7 @@ WebGLRenderer.prototype.getOrSetCutout = function getOrSetCutout(path) {
         transform: identity,
         size: [0, 0, 0],
         origin: [0, 0, 0],
-        baseColor: [0, 0, 0]
+        baseColor: [0, 0, 0, 1]
     });
     return this.cutoutRegistry[path] = {
         uniformKeys: uniforms.keys,
@@ -380,9 +378,10 @@ WebGLRenderer.prototype.setLightColor = function setLightColor(path, r, g, b) {
 WebGLRenderer.prototype.handleMaterialInput = function handleMaterialInput(path, name, material) {
     var mesh = this.meshRegistry[path] || this.createMesh(path);
 
-    mesh.uniformValues[mesh.uniformKeys.indexOf[name]][0] = - material._id;
+    mesh.uniformValues[mesh.uniformKeys.indexOf(name)][0] = - material._id;
     if (material.texture) mesh.texture = handleTexture.call(this, material.texture);
     this.program.registerMaterial(name, material);
+
     return this.updateSize();
 };
 
@@ -461,8 +460,6 @@ WebGLRenderer.prototype.bufferData = function bufferData(path, geometryId, buffe
  * affect the rendering of all renderables.
  */
 WebGLRenderer.prototype.draw = function draw(renderState) {
-    this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
-
     this.setGlobalUniforms(renderState);
     this.meshRegistryKeys = sorter(this.meshRegistryKeys, this.meshRegistry);
     this.drawCutouts();
@@ -523,71 +520,48 @@ WebGLRenderer.prototype.setGlobalUniforms = function setGlobalUniforms(renderSta
     var light;
     var stride;
 
-        for(var i = 0; i < this.lightRegistryKeys.length; i++) {
-            light = this.lightRegistry[this.lightRegistryKeys[i]];
-            stride = i * 4;
-
-            // Build the light positions' 4x4 matrix
-            this.lightPositions[0 + stride] = light.position[0];
-            this.lightPositions[1 + stride] = light.position[1];
-            this.lightPositions[2 + stride] = light.position[2];
-
-            // Build the light colors' 4x4 matrix
-            this.lightColors[0 + stride] = light.color[0];
-            this.lightColors[1 + stride] = light.color[1];
-            this.lightColors[2 + stride] = light.color[2];
-        }
-
-        uniformValues[0] = this.numLights;
-        uniformValues[1] = this.ambientLightColor;
-        uniformValues[2] = this.lightPositions;
-        uniformValues[3] = this.lightColors;
-
-        /*
-         * Set time and projection uniforms
-         * projecting world space into a 2d plane representation of the canvas.
-         * The x and y scale (this.projectionTransform[0] and this.projectionTransform[5] respectively)
-         * convert the projected geometry back into clipspace.
-         * The perpective divide (this.projectionTransform[11]), adds the z value of the point
-         * multiplied by the perspective divide to the w value of the point. In the process
-         * of converting from homogenous coordinates to NDC (normalized device coordinates)
-         * the x and y values of the point are divided by w, which implements perspective.
-         */
-        this.projectionTransform[0] = 1/(this.cachedSize[0] * 0.5);
-        this.projectionTransform[5] = -1/(this.cachedSize[1] * 0.5);
-        this.projectionTransform[11] = renderState.perspectiveTransform[11];
-    for(var i = 0; i < this.lightRegistryKeys.length; i++) {
+    for (var i = 0; i < this.lightRegistryKeys.length; i++) {
         light = this.lightRegistry[this.lightRegistryKeys[i]];
         stride = i * 4;
 
         // Build the light positions' 4x4 matrix
+
         this.lightPositions[0 + stride] = light.position[0];
         this.lightPositions[1 + stride] = light.position[1];
         this.lightPositions[2 + stride] = light.position[2];
 
-        this.program.setUniforms(uniformNames, uniformValues);
         // Build the light colors' 4x4 matrix
+
         this.lightColors[0 + stride] = light.color[0];
         this.lightColors[1 + stride] = light.color[1];
         this.lightColors[2 + stride] = light.color[2];
     }
-    
-    uniformValues[0] = this.numLights;
-    uniformValues[1] = this.ambientLightColor;
-    uniformValues[2] = this.lightPositions;
-    uniformValues[3] = this.lightColors;
+
+    globalUniforms.values[0] = this.numLights;
+    globalUniforms.values[1] = this.ambientLightColor;
+    globalUniforms.values[2] = this.lightPositions;
+    globalUniforms.values[3] = this.lightColors;
 
     /*
      * Set time and projection uniforms
+     * projecting world space into a 2d plane representation of the canvas.
+     * The x and y scale (this.projectionTransform[0] and this.projectionTransform[5] respectively)
+     * convert the projected geometry back into clipspace.
+     * The perpective divide (this.projectionTransform[11]), adds the z value of the point
+     * multiplied by the perspective divide to the w value of the point. In the process
+     * of converting from homogenous coordinates to NDC (normalized device coordinates)
+     * the x and y values of the point are divided by w, which implements perspective.
      */
 
+    this.projectionTransform[0] = 1 / (this.cachedSize[0] * 0.5);
+    this.projectionTransform[5] = -1 / (this.cachedSize[1] * 0.5);
     this.projectionTransform[11] = renderState.perspectiveTransform[11];
 
-    uniformValues[4] = this.projectionTransform;
-    uniformValues[5] = Date.now()  % 100000 / 1000;
-    uniformValues[6] = renderState.viewTransform;
+    globalUniforms.values[4] = this.projectionTransform;
+    globalUniforms.values[5] = Date.now() % 100000 / 1000;
+    globalUniforms.values[6] = renderState.viewTransform;
 
-    this.program.setUniforms(uniformNames, uniformValues);
+    this.program.setUniforms(globalUniforms.keys, globalUniforms.values);
 };
 
 /**
