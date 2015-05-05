@@ -5,6 +5,13 @@ var types = {
     4: 'vec4 '
 };
 
+/**
+ * Converts material graph into chunk
+ *
+ * @method _compile
+ * @protected
+ *
+ */
 function compileMaterial(material) {
     var glsl = '';
     var uniforms = {};
@@ -39,6 +46,14 @@ function compileMaterial(material) {
     };
 }
 
+/**
+ * Iterates over material graph
+ *
+ * @method traverse
+ * @chainable
+ *
+ * @param {Function} invoked upon every expression in the graph
+ */
 function _traverse(material, callback) {
 	var inputs = material.inputs;
     var len = inputs && inputs.length;
