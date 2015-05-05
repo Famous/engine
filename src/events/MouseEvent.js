@@ -22,7 +22,6 @@ function MouseEvent(ev) {
 
     UIEvent.call(this, ev);
     this.screenX = ev.screenX;
-    this.screenX = ev.screenX;
     this.screenY = ev.screenY;
     this.clientX = ev.clientX;
     this.clientY = ev.clientY;
@@ -32,6 +31,13 @@ function MouseEvent(ev) {
     this.metaKey = ev.metaKey;
     this.button = ev.button;
     this.buttons = ev.buttons;
+
+    this.pageX = ev.pageX;
+    this.pageY = ev.pageY;
+    this.x = ev.x;
+    this.y = ev.y;
+    this.offsetX = ev.offsetX;
+    this.offsetY = ev.offsetY;
 }
 
 MouseEvent.prototype = UIEvent.prototype;
