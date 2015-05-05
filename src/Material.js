@@ -95,10 +95,9 @@ var snippets = {
 
     multiply: {glsl: '%1 * %2;', output: {'1,1':1, '2,2':2, '3,3':3, '4,4':4, '2,1':2, '3,1':3, '4,1':4}},
 
-
     /* The normal function returns the 3-dimensional surface normal, which is a vector that is perpendicular to the tangent plane at that point.*/
 
-    normal: {glsl:'(v_Normal + 1.0) * 0.5;', output: 3},
+    normal: { glsl: 'vec4((v_Normal + 1.0) * 0.5, 1.0);', output: 4 },
 
     /* The uv function returns the 2-dimensional vector that maps the object's 3-dimensional vertices to a 2D plane. */
 
@@ -109,15 +108,14 @@ var snippets = {
     meshPosition: {glsl:'(v_Position + 1.0) * 0.5;', output: 3},
 
 
-    normalize: {glsl: 'normalize(%1)', output: {'1': 1, 2: 2, 3: 3, 4: 4}},
+    normalize: {glsl: 'normalize(%1)', output: {1: 1, 2: 2, 3: 3, 4: 4}},
 
 
     dot: {glsl: 'dot(%1, %2);', output: {'1,1': 1,'2,2':1, '3,3': 1, '4,4':1 }},
 
-
     /* The image function fetches the model's */
 
-    image: {glsl:'texture2D(u_Textures[0], v_TextureCoordinate).rgb;', output: 3},
+    image: {glsl:'texture2D(u_Textures[0], v_TextureCoordinate);', output: 4 },
 
 
     /* The constant function returns a static value which is defined at compile-time that cannot be changed dynamically.*/
@@ -162,6 +160,7 @@ function Material(name, chunk, inputs, options) {
     this.uniforms = options.uniforms || {};
     this.varyings = options.varyings;
     this.attributes = options.attributes;
+    
     if (options.texture) {
         this.texture = options.texture.__isATexture__ ? options.texture : TextureRegistry.register(null, options.texture);
     }
@@ -258,6 +257,7 @@ function processGLSL(str, inputs) {
         return makeLabel(inputs[s[1]-1]);
     });
 }
+
 function makeLabel (n) {
     if (Array.isArray(n)) return arrayToVec(n);
     if (typeof n == 'object') return 'fa_' + (n._id);
