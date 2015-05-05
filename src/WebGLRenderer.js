@@ -96,9 +96,8 @@ function WebGLRenderer(canvas) {
     The final component (this.projectionTransform[15]) is initialized as 1 because certain projection models,
     e.g. the WC3 specified model, keep the XY plane as the projection hyperplane.
     */
+    
     this.projectionTransform = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, -0.000001, 0, -1, 1, 0, 1];
-
-    this.projectionTransform = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
 
     var cutout = this.cutoutGeometry = new Plane();
     cutout.id = -1;
@@ -382,6 +381,7 @@ WebGLRenderer.prototype.handleMaterialInput = function handleMaterialInput(path,
     mesh.uniformValues[mesh.uniformKeys.indexOf(name)][0] = - material._id;
     if (material.texture) mesh.texture = handleTexture.call(this, material.texture);
     this.program.registerMaterial(name, material);
+
     return this.updateSize();
 };
 
@@ -558,7 +558,7 @@ WebGLRenderer.prototype.setGlobalUniforms = function setGlobalUniforms(renderSta
     this.projectionTransform[11] = renderState.perspectiveTransform[11];
 
     globalUniforms.values[4] = this.projectionTransform;
-    globalUniforms.values[5] = Date.now()  % 100000 / 1000;
+    globalUniforms.values[5] = Date.now() % 100000 / 1000;
     globalUniforms.values[6] = renderState.viewTransform;
 
     this.program.setUniforms(globalUniforms.keys, globalUniforms.values);
