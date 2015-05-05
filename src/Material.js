@@ -2,13 +2,6 @@
 
 var TextureRegistry = require('./TextureRegistry');
 
-var types = {
-    1: 'float ',
-    2: 'vec2 ',
-    3: 'vec3 ',
-    4: 'vec4 '
-};
-
 var expressions = {};
 
 var snippets = {
@@ -47,7 +40,7 @@ var snippets = {
 
     /* Mix - The mix function returns the linear blend of x and y, i.e. the product of x and (1 - a) plus the product of y and a. The input parameters can be floating scalars or float vectors. In case of float vectors the operation is done component-wise. */
 
-    mix: {glsl: 'mix(%1, %2, %3);', output: { '3,3,1': 3, '2,2,1': 2, '4,4,1': 4, '1,1,1': 1 }},
+    mix: {glsl: 'mix(%1, %2, %3);', output: { '4,4,1': 4, '3,3,1': 3, '2,2,1': 2, '4,4,1': 4, '1,1,1': 1 }},
 
     /* Step - The step function returns 0.0 if x is smaller then edge and otherwise 1.0. The input parameters can be floating scalars or float vectors. In case of float vectors the operation is done component-wise. */
 
@@ -60,7 +53,7 @@ var snippets = {
 
     /* fragCoord - The fragCoord function returns the fragment's position in screenspace. */
 
-    fragCoord: {glsl: 'gl_FragColor;', output: 4},
+    fragCoord: {glsl: 'gl_FragColor;', output: 4 },
 
     /* Sin - The sin function returns the sine of an angle in radians. The input parameter can be a floating scalar or a float vector. In case of a float vector the sine is calculated separately for every component. */
 
@@ -160,7 +153,7 @@ function Material(name, chunk, inputs, options) {
     this.uniforms = options.uniforms || {};
     this.varyings = options.varyings;
     this.attributes = options.attributes;
-    
+
     if (options.texture) {
         this.texture = options.texture.__isATexture__ ? options.texture : TextureRegistry.register(null, options.texture);
     }
@@ -168,6 +161,7 @@ function Material(name, chunk, inputs, options) {
     this._id = Material.id++;
 
     this.invalidations = [];
+    this.__isAMaterial__ = true;
 }
 
 Material.id = 2;
@@ -181,15 +175,15 @@ Material.id = 2;
  * @param {Function} invoked upon every expression in the graph
  */
 
-Material.prototype.traverse = function traverse(callback) {
-    var len = this.inputs && this.inputs.length, idx = -1, save;
+// Material.prototype.traverse = function traverse(callback) {
+//     var len = this.inputs && this.inputs.length, idx = -1, save;
 
-    while (++idx < len) save = traverse.call(this.inputs[idx], callback, idx);
+//     while (++idx < len) save = traverse.call(this.inputs[idx], callback, idx);
 
-    callback(this);
+//     callback(this);
 
-    return this;
-};
+//     return this;
+// };
 
 Material.prototype.setUniform = function setUniform(name, value) {
     this.uniforms[name] = value;
@@ -205,69 +199,69 @@ Material.prototype.setUniform = function setUniform(name, value) {
  *
  */
 
-Material.prototype._compile = function _compile() {
-    var glsl = '';
-    var uniforms = {};
-    var varyings = {};
-    var attributes = {};
-    var defines = [];
-    var textures = [];
+// Material.prototype._compile = function _compile() {
+//     var glsl = '';
+//     var uniforms = {};
+//     var varyings = {};
+//     var attributes = {};
+//     var defines = [];
+//     var textures = [];
 
-    this.traverse(function (node, depth) {
-        if (! node.chunk) return;
-        var type = types[getType(node)];
+//     this.traverse(function (node, depth) {
+//         if (! node.chunk) return;
+//         var type = types[getType(node)];
 
-        glsl += type + makeLabel(node) + ' = ' + processGLSL(node.chunk.glsl, node.inputs) + '\n ';
-        if (node.uniforms) extend(uniforms, node.uniforms);
-        if (node.varyings) extend(varyings, node.varyings);
-        if (node.attributes) extend(attributes, node.attributes);
-        if (node.chunk.defines) defines.push(node.chunk.defines);
-        if (node.texture) textures.push(node.texture);
-    });
+//         glsl += type + makeLabel(node) + ' = ' + processGLSL(node.chunk.glsl, node.inputs) + '\n ';
+//         if (node.uniforms) extend(uniforms, node.uniforms);
+//         if (node.varyings) extend(varyings, node.varyings);
+//         if (node.attributes) extend(attributes, node.attributes);
+//         if (node.chunk.defines) defines.push(node.chunk.defines);
+//         if (node.texture) textures.push(node.texture);
+//     });
 
-    return {
-        _id: this._id,
-        glsl: glsl + 'return ' + makeLabel(this) + ';',
-        defines: defines.join('\n'),
-        uniforms: uniforms,
-        varyings: varyings,
-        attributes: attributes,
-        textures: textures
-    };
-};
+//     return {
+//         _id: this._id,
+//         glsl: glsl + 'return ' + makeLabel(this) + ';',
+//         defines: defines.join('\n'),
+//         uniforms: uniforms,
+//         varyings: varyings,
+//         attributes: attributes,
+//         textures: textures
+//     };
+// };
 
-function getType(node) {
+// function getType(node) {
 
-    //input is a constant
+//     //input is a constant
 
-    if (typeof node == 'number') return '1';
-    if (Array.isArray(node)) return node.length;
+//     if (typeof node == 'number') return '1';
+//     if (Array.isArray(node)) return node.length;
     
-    var output = node.chunk.output;
-    if (typeof output === 'number') return output;
-    var key = node.inputs.map(function recurse(node) { return getType(node); }).join(',');
+//     var output = node.chunk.output;
+//     if (typeof output === 'number') return output;
+//     var key = node.inputs.map(function recurse(node) { return getType(node); }).join(',');
 
-    return output[key];
-}
+//     return output[key];
+// }
 
-function extend (a, b) { for (var k in b) a[k] = b[k]; }
+// function extend (a, b) { for (var k in b) a[k] = b[k]; }
 
-function processGLSL(str, inputs) {
-    return str.replace(/%\d/g, function (s) {
-        return makeLabel(inputs[s[1]-1]);
-    });
-}
+// function processGLSL(str, inputs) {
+//     return str.replace(/%\d/g, function (s) {
+//         return makeLabel(inputs[s[1]-1]);
+//     });
+// }
 
-function makeLabel (n) {
-    if (Array.isArray(n)) return arrayToVec(n);
-    if (typeof n == 'object') return 'fa_' + (n._id);
-    else return JSON.stringify(n.toFixed(6));
-}
+// function makeLabel (n) {
+//     if (Array.isArray(n)) return arrayToVec(n);
+//     if (typeof n == 'object') return 'fa_' + (n._id);
+//     else return JSON.stringify(n.toFixed(6));
+// }
 
-function arrayToVec(array) {
-    var len = array.length;
-    return 'vec' + len + '(' + array.join(',')  + ')';
-}
+// function arrayToVec(array) {
+//     var len = array.length;
+//     return 'vec' + len + '(' + array.join(',')  + ')';
+// }
 
 module.exports = expressions;
 expressions.Material = Material;
