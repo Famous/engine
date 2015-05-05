@@ -24,7 +24,8 @@ function Mesh (node, options) {
         expressions: {},
         geometry: null,
         flatShading: null,
-        glossiness: [null, null],
+        glossiness: new Array(2),
+        baseColor: new Array(4),
         positionOffset: null,
         normals: null,
     };
@@ -107,7 +108,6 @@ Mesh.prototype.getGeometry = function getGeometry () {
 * @param {Object|Color} Material, image, vec3, or Color instance
 * @chainable
 */
-var baseColorRGBA = [0, 0, 0, 1];
 Mesh.prototype.setBaseColor = function setBaseColor (color) {
     var uniformValue;
 
@@ -119,14 +119,13 @@ Mesh.prototype.setBaseColor = function setBaseColor (color) {
     else if (color.getNormalizedRGB) {
         this.value.expressions.baseColor = null;
         this.value.color = color;
-        var color = color.getNormalizedRGB();
-        baseColorRGBA[0] = color[0];
-        baseColorRGBA[1] = color[1];
-        baseColorRGBA[2] = color[2];
-        
-        uniformValue = baseColorRGBA;
-    }
+        var value = color.getNormalizedRGB();
+        this.value.baseColor[0] = value[0];
+        this.value.baseColor[1] = value[1];
+        this.value.baseColor[2] = value[2];
 
+        uniformValue = this.value.baseColor;
+    }
     if (this._initialized) {
 
         // If a material expression
