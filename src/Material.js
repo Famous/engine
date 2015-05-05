@@ -166,102 +166,11 @@ function Material(name, chunk, inputs, options) {
 
 Material.id = 2;
 
-/**
- * Iterates over material graph
- *
- * @method traverse
- * @chainable
- *
- * @param {Function} invoked upon every expression in the graph
- */
-
-// Material.prototype.traverse = function traverse(callback) {
-//     var len = this.inputs && this.inputs.length, idx = -1, save;
-
-//     while (++idx < len) save = traverse.call(this.inputs[idx], callback, idx);
-
-//     callback(this);
-
-//     return this;
-// };
-
 Material.prototype.setUniform = function setUniform(name, value) {
     this.uniforms[name] = value;
 
     this.invalidations.push(name);
 };
-
-/**
- * Converts material graph into chunk
- *
- * @method _compile
- * @protected
- *
- */
-
-// Material.prototype._compile = function _compile() {
-//     var glsl = '';
-//     var uniforms = {};
-//     var varyings = {};
-//     var attributes = {};
-//     var defines = [];
-//     var textures = [];
-
-//     this.traverse(function (node, depth) {
-//         if (! node.chunk) return;
-//         var type = types[getType(node)];
-
-//         glsl += type + makeLabel(node) + ' = ' + processGLSL(node.chunk.glsl, node.inputs) + '\n ';
-//         if (node.uniforms) extend(uniforms, node.uniforms);
-//         if (node.varyings) extend(varyings, node.varyings);
-//         if (node.attributes) extend(attributes, node.attributes);
-//         if (node.chunk.defines) defines.push(node.chunk.defines);
-//         if (node.texture) textures.push(node.texture);
-//     });
-
-//     return {
-//         _id: this._id,
-//         glsl: glsl + 'return ' + makeLabel(this) + ';',
-//         defines: defines.join('\n'),
-//         uniforms: uniforms,
-//         varyings: varyings,
-//         attributes: attributes,
-//         textures: textures
-//     };
-// };
-
-// function getType(node) {
-
-//     //input is a constant
-
-//     if (typeof node == 'number') return '1';
-//     if (Array.isArray(node)) return node.length;
-    
-//     var output = node.chunk.output;
-//     if (typeof output === 'number') return output;
-//     var key = node.inputs.map(function recurse(node) { return getType(node); }).join(',');
-
-//     return output[key];
-// }
-
-// function extend (a, b) { for (var k in b) a[k] = b[k]; }
-
-// function processGLSL(str, inputs) {
-//     return str.replace(/%\d/g, function (s) {
-//         return makeLabel(inputs[s[1]-1]);
-//     });
-// }
-
-// function makeLabel (n) {
-//     if (Array.isArray(n)) return arrayToVec(n);
-//     if (typeof n == 'object') return 'fa_' + (n._id);
-//     else return JSON.stringify(n.toFixed(6));
-// }
-
-// function arrayToVec(array) {
-//     var len = array.length;
-//     return 'vec' + len + '(' + array.join(',')  + ')';
-// }
 
 module.exports = expressions;
 expressions.Material = Material;
