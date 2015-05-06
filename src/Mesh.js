@@ -19,12 +19,13 @@ function Mesh (node, options) {
     this._requestingUpdate = false;
     this._inDraw = false;
     this.value = {
-        drawOptions: null,
+        drawOptions: {},
         color: null,
         expressions: {},
         geometry: null,
         flatShading: null,
-        glossiness: [null, null],
+        glossiness: new Array(2),
+        baseColor: new Array(4),
         positionOffset: null,
         normals: null,
     };
@@ -44,17 +45,8 @@ function Mesh (node, options) {
  * @chainable
  */
 Mesh.prototype.setDrawOptions = function setOptions (options) {
-    if (this.value.drawOptions.blendMode) {
-        this.value.drawOptions.blendMode = options.blendMode;
-        this._changeQueue.push('GL_SET_DRAW_OPTIONS');
-        this._changeQueue.push(options);
-    } else {
-        this.vale.drawOptions = {
-            blendMode: options.blendMode
-        };
-        this._changeQueue.push('GL_SET_DRAW_OPTIONS');
-        this._changeQueue.push(options);
-    }
+    this._changeQueue.push('GL_SET_DRAW_OPTIONS');
+    this._changeQueue.push(options);
     return this;
 };
 
@@ -116,7 +108,7 @@ Mesh.prototype.getGeometry = function getGeometry () {
 * @param {Object|Color} Material, image, vec3, or Color instance
 * @chainable
 */
-Mesh.prototype.setBaseColor = function setBaseColor(color) {
+Mesh.prototype.setBaseColor = function setBaseColor (color) {
     var uniformValue;
 
     if (color._compile) {
@@ -127,11 +119,27 @@ Mesh.prototype.setBaseColor = function setBaseColor(color) {
     else if (color.getNormalizedRGB) {
         this.value.expressions.baseColor = null;
         this.value.color = color;
-        uniformValue = color.getNormalizedRGB();
-    }
+        var value = color.getNormalizedRGB();
+        this.value.baseColor[0] = value[0];
+        this.value.baseColor[1] = value[1];
+        this.value.baseColor[2] = value[2];
 
+        uniformValue = this.value.baseColor;
+    }
     if (this._initialized) {
-        this._changeQueue.push(color._compile ? 'MATERIAL_INPUT' : 'GL_UNIFORMS');
+
+        // If a material expression
+
+        if (color._compile) {
+            this._changeQueue.push('MATERIAL_INPUT');
+        }
+
+        // If a color component
+
+        else if (color.getNormalizedRGB) {
+            this._changeQueue.push('GL_UNIFORMS');
+        }
+
         this._changeQueue.push('baseColor');
         this._changeQueue.push(uniformValue);
     }
@@ -406,11 +414,13 @@ Mesh.prototype.onMount = function onMount (node, id) {
 
 Mesh.prototype.onDismount = function onDismount () {
     this._initialized = false;
-    this.onHide();
+    this._changeQueue.push('GL_REMOVE_MESH');
+
+    this._requestUpdate();
 };
 
 Mesh.prototype.onShow = function onShow () {
-    this._changeQueue.push('GL_HIDE_MESH');
+    this._changeQueue.push('GL_SHOW_MESH');
 };
 
 Mesh.prototype.onHide = function onHide () {
