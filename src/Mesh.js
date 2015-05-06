@@ -126,6 +126,7 @@ Mesh.prototype.setBaseColor = function setBaseColor (color) {
 
         uniformValue = this.value.baseColor;
     }
+
     if (this._initialized) {
 
         // If a material expression
@@ -241,7 +242,7 @@ Mesh.prototype.setGlossiness = function setGlossiness(glossiness, strength) {
     var glossiness;
 
     if (glossiness.__isAMaterial__) {
-        this.value.glossiness = [null, null];
+        this.value.glossiness = null;
         this.value.expressions.glossiness = glossiness;
     }
     else if (glossiness.getNormalizedRGB) {
@@ -288,6 +289,7 @@ Mesh.prototype.setPositionOffset = function positionOffset(materialExpression) {
 
     if (materialExpression.__isAMaterial__) {
         this.value.expressions.positionOffset = materialExpression;
+        uniformValue = materialExpression;
     }
     else {
         this.value.expressions.positionOffset = null;
@@ -498,6 +500,7 @@ Mesh.prototype.draw = function draw () {
     this.init();
 
     var value = this.getValue();
+
     if (value.geometry != null) this.setGeometry(value.geometry);
     if (value.color != null) this.setBaseColor(value.color);
     if (value.drawOptions != null) this.setDrawOptions(value.drawOptions);
