@@ -108,7 +108,7 @@ var snippets = {
 
     /* The image function fetches the model's */
 
-    image: {glsl:'texture2D(u_Textures[0], v_TextureCoordinate);', output: 4 },
+    image: {glsl:'texture2D($TEXTURE, v_TextureCoordinate);', output: 4 },
 
 
     /* The constant function returns a static value which is defined at compile-time that cannot be changed dynamically.*/
