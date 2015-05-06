@@ -12,6 +12,7 @@ function Texture(gl, options) {
     this.id = gl.createTexture();
     this.width = options.width || 0;
     this.height = options.height || 0;
+    this.mipmap = options.mipmap;
     this.format = options.format || gl.RGBA;
     this.type = options.type || gl.UNSIGNED_BYTE;
     this.gl = gl;
@@ -28,10 +29,6 @@ function Texture(gl, options) {
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl[options.wrapT] || gl.CLAMP_TO_EDGE);
 
     gl.texImage2D(gl.TEXTURE_2D, 0, this.format, this.width, this.height, 0, this.format, this.type, null);
-
-    if (options.mipmap !== false && isPowerOfTwo(this.width, this.height)) {
-        gl.generateMipmap(gl.TEXTURE_2D);
-    }
 }
 
 /**
@@ -76,6 +73,7 @@ Texture.prototype.unbind = function unbind() {
  */
 Texture.prototype.setImage = function setImage(img) {
     this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.format, this.format, this.type, img);
+    if (this.mipmap) this.gl.generateMipmap(this.gl.TEXTURE_2D);
     return this;
 };
 
