@@ -27,7 +27,7 @@ TextureManager.prototype.update = function update() {
     for (var i = 1; i < registryLength; i++) {
         var texture = this.registry[i];
 
-        if (texture.isLoaded && texture.resampleRate) {
+        if (texture && texture.isLoaded && texture.resampleRate) {
             if (time - texture.lastResample > texture.resampleRate) {
                 if (!this._needsResample[texture.id]) {
                     this._needsResample[texture.id] = true;

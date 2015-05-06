@@ -12,7 +12,7 @@ var types = {
  * @protected
  *
  */
-function compileMaterial(material) {
+function compileMaterial(material, textureSlot) {
     var glsl = '';
     var uniforms = {};
     var varyings = {};
@@ -22,9 +22,10 @@ function compileMaterial(material) {
 
     _traverse(material, function (node, depth) {
         if (! node.chunk) return;
+        
         var type = types[_getOutputType(node)];
         var label = _makeLabel(node);
-        var output = _processGLSL(node.chunk.glsl, node.inputs);
+        var output = _processGLSL(node.chunk.glsl, node.inputs, textures.length + textureSlot);
 
         glsl += type + label + ' = ' + output + '\n ';
 
@@ -85,10 +86,12 @@ function _getOutputType(node) {
     return output[key];
 }
 
-function _processGLSL(str, inputs) {
-    return str.replace(/%\d/g, function (s) {
-        return _makeLabel(inputs[s[1]-1]);
-    });
+function _processGLSL(str, inputs, textureSlot) {
+    return str
+        .replace(/%\d/g, function (s) {
+            return _makeLabel(inputs[s[1]-1]);
+        })
+        .replace(/\$TEXTURE/, 'u_Textures[' + textureSlot + ']');
 }
 
 function _makeLabel (n) {
