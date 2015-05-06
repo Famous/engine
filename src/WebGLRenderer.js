@@ -4,10 +4,10 @@ var Texture = require('./Texture');
 var Program = require('./Program');
 var Buffer = require('./Buffer');
 var BufferRegistry = require('./BufferRegistry');
-var checkers = require('./Checkerboard');
 var Plane = require('famous-webgl-geometries').Plane;
 var sorter = require('./radixSort');
 var Utility = require('famous-utilities');
+var TextureManager = require('./TextureManager');
 
 var identity = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
 
@@ -39,7 +39,6 @@ function WebGLRenderer(canvas) {
     var gl = this.gl = this.getWebGLContext(this.canvas);
 
     gl.polygonOffset(0.1, 0.1);
-    gl.clearColor(1.0, 1.0, 1.0, 0.0);
     gl.enable(gl.POLYGON_OFFSET_FILL);
     gl.enable(gl.DEPTH_TEST);
     gl.enable(gl.BLEND);
@@ -65,10 +64,10 @@ function WebGLRenderer(canvas) {
     this.lightPositions = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     this.lightColors = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
-    this.textureRegistry = [];
+    this.textureManager = new TextureManager(gl);
     this.texCache = {};
     this.bufferRegistry = new BufferRegistry(gl);
-    this.program = new Program(gl, { debug: false });
+    this.program = new Program(gl, { debug: true });
 
     this.state = {
         boundArrayBuffer: null,
@@ -180,7 +179,7 @@ WebGLRenderer.prototype.createMesh = function createMesh(path) {
         buffers: {},
         geometry: null,
         drawType: null,
-        texture: null,
+        textures: [],
         visible: true
     };
 };
@@ -198,23 +197,26 @@ WebGLRenderer.prototype.createMesh = function createMesh(path) {
 
 WebGLRenderer.prototype.getOrSetCutout = function getOrSetCutout(path) {
     var geometry;
-    if (this.cutoutRegistry[path]) return this.cutoutRegistry[path];
 
-    this.cutoutRegistryKeys.push(path);
+    if (this.cutoutRegistry[path]) {
+        return this.cutoutRegistry[path];
+    }
+    else {
+        var uniforms = Utility.keyValueToArrays({
+            opacity: 0,
+            transform: identity,
+            size: [0, 0, 0],
+            origin: [0, 0, 0],
+            baseColor: [0, 0, 0, 1]
+        });
 
-    var uniforms = Utility.keyValueToArrays({
-        opacity: 0,
-        transform: identity,
-        size: [0, 0, 0],
-        origin: [0, 0, 0],
-        baseColor: [0, 0, 0, 1]
-    });
-    return this.cutoutRegistry[path] = {
-        uniformKeys: uniforms.keys,
-        uniformValues: uniforms.values,
-        geometry: this.cutoutGeometry.id,
-        drawType: 4
-    };
+        return this.cutoutRegistry[path] = {
+            uniformKeys: uniforms.keys,
+            uniformValues: uniforms.values,
+            geometry: this.cutoutGeometry.id,
+            drawType: 4
+        };
+    }
 };
 
 /**
@@ -378,8 +380,21 @@ WebGLRenderer.prototype.setLightColor = function setLightColor(path, r, g, b) {
 WebGLRenderer.prototype.handleMaterialInput = function handleMaterialInput(path, name, material) {
     var mesh = this.meshRegistry[path] || this.createMesh(path);
 
-    mesh.uniformValues[mesh.uniformKeys.indexOf(name)][0] = - material._id;
-    if (material.texture) mesh.texture = handleTexture.call(this, material.texture);
+    // Set uniforms to enable texture!
+
+    mesh.uniformValues[mesh.uniformKeys.indexOf(name)][0] = -material._id;
+
+    // Register textures!
+
+    var i = material.textures.length;
+    while (i--) {
+        mesh.textures.push(
+            this.textureManager.register(material.textures[i], i)
+        );
+    }
+
+    // Register material!
+
     this.program.registerMaterial(name, material);
 
     return this.updateSize();
@@ -460,6 +475,8 @@ WebGLRenderer.prototype.bufferData = function bufferData(path, geometryId, buffe
  * affect the rendering of all renderables.
  */
 WebGLRenderer.prototype.draw = function draw(renderState) {
+    this.textureManager.update();
+    
     this.setGlobalUniforms(renderState);
     this.meshRegistryKeys = sorter(this.meshRegistryKeys, this.meshRegistry);
     this.drawCutouts();
@@ -467,16 +484,16 @@ WebGLRenderer.prototype.draw = function draw(renderState) {
 };
 
 WebGLRenderer.prototype.drawMeshes = function drawMeshes() {
-    var mesh;
+    var gl = this.gl;
     var buffers;
-    
+    var mesh;
+
     for(var i = 0; i < this.meshRegistryKeys.length; i++) {
         mesh = this.meshRegistry[this.meshRegistryKeys[i]];
         buffers = this.bufferRegistry.registry[mesh.geometry];
 
         if (!mesh.visible) continue;
 
-        var gl = this.gl;
         if (mesh.uniformValues[0] < 1) {
             gl.depthMask(false);
             gl.enable(gl.BLEND);
@@ -487,15 +504,15 @@ WebGLRenderer.prototype.drawMeshes = function drawMeshes() {
 
         if (!buffers) continue;
 
-        if (mesh.texture) mesh.texture.bind();
-        this.program.setUniforms(mesh.uniformKeys, mesh.uniformValues);
-
+        var j = mesh.textures.length;
+        while (j--) this.textureManager.bindTexture(mesh.textures[i]);
+        
         if (mesh.options) this.handleOptions(mesh.options, mesh);
+        
+        this.program.setUniforms(mesh.uniformKeys, mesh.uniformValues);
         this.drawBuffers(buffers, mesh.drawType, mesh.geometry);
+
         if (mesh.options) this.resetOptions(mesh.options);
-
-        if (mesh.texture) mesh.texture.unbind();
-
     }
 };
 
@@ -513,6 +530,7 @@ WebGLRenderer.prototype.drawCutouts = function drawCutouts() {
         this.program.setUniforms(cutout.uniformKeys, cutout.uniformValues);
         this.drawBuffers(buffers, cutout.drawType, cutout.geometry);
     }
+
     if (len) this.gl.disable(this.gl.BLEND);
 };
 
@@ -520,7 +538,7 @@ WebGLRenderer.prototype.setGlobalUniforms = function setGlobalUniforms(renderSta
     var light;
     var stride;
 
-    for (var i = 0; i < this.lightRegistryKeys.length; i++) {
+    for (var i = 0, len = this.lightRegistryKeys.length; i < len; i++) {
         light = this.lightRegistry[this.lightRegistryKeys[i]];
         stride = i * 4;
 
@@ -788,72 +806,5 @@ WebGLRenderer.prototype.resetOptions = function resetOptions(options) {
     if (options.blending) gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
     if (options.side === 'back') gl.cullFace(gl.BACK);
 };
-
-/**
- * Loads an image from a string or Image object and executes a callback function.
- *
- * @method loadImage
- * @private
- *
- * @param {Object | String} img The input image data to load as an asset.
- * @param {Function} callback The callback function to be fired when
- * the image has finished loading.
- *
- * @return {Object} Image object being loaded.
- */
-function loadImage (img, callback) {
-    var obj = (typeof img === 'string' ? new Image() : img) || {};
-    obj.crossOrigin = 'anonymous';
-    if (! obj.src) obj.src = img;
-    if (! obj.complete) obj.onload = function () { callback(obj); };
-    else callback(obj);
-    return obj;
-}
-
-/**
- * Handles loading of texture objects.
- *
- * @method handleTexture
- * @private
- *
- * @param {Object} input The input texture object collected from mesh.
- *
- * @return {Object} Texture instance linked to input data.
- */
-function handleTexture(input) {
-    var source = input.data;
-    var textureId = input.id;
-    var options = input.options;
-    var texture = this.textureRegistry[textureId];
-
-    if (!texture) {
-        if (Array.isArray(source)) {
-            texture = new Texture(this.gl, options);
-            texture.setArray(source);
-        }
-
-        else if (window && source instanceof window.HTMLVideoElement) {
-            texture = new Texture(this.gl, options);
-            texture.src = texture;
-            texture.setImage(checkers);
-            source.addEventListener('loadeddata', function() {
-                texture.setImage(source);
-                setInterval(function () { texture.setImage(source); }, 16);
-            });
-        }
-
-        else if ('string' === typeof source) {
-            texture = new Texture(this.gl, options);
-            texture.setImage(checkers);
-            loadImage(source, function (img) {
-                texture.setImage(img);
-            });
-        }
-
-        this.textureRegistry[textureId] = texture;
-    }
-
-    return texture;
-}
 
 module.exports = WebGLRenderer;
