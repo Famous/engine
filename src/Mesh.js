@@ -114,7 +114,6 @@ Mesh.prototype.setBaseColor = function setBaseColor (color) {
     if (color.__isAMaterial__) {
         this.value.color = null;
         this.value.expressions.baseColor = color;
-        // uniformValue = color.__isAMaterial__();
         uniformValue = color;
     }
     else if (color.getNormalizedRGB) {
@@ -204,14 +203,13 @@ Mesh.prototype.getFlatShading = function getFlatShading () {
  * @return {Element} current Mesh
  */
 Mesh.prototype.setNormals = function setNormals (materialExpression) {
-    if (materialExpression._compile) {
+    if (materialExpression.__isAMaterial__) {
         this.value.expressions.normals = materialExpression;
-        materialExpression = materialExpression._compile();
     }
 
     if (this._initialized) {
-        this._changeQueue.push(materialExpression._compile ? 'MATERIAL_INPUT' : 'UNIFORM_INPUT');
-        this._changeQueue.push('normal');
+        this._changeQueue.push(materialExpression.__isAMaterial__ ? 'MATERIAL_INPUT' : 'UNIFORM_INPUT');
+        this._changeQueue.push('u_Normals');
         this._changeQueue.push(materialExpression);
     }
 
@@ -242,10 +240,9 @@ Mesh.prototype.getNormals = function getNormals (materialExpression) {
 Mesh.prototype.setGlossiness = function setGlossiness(glossiness, strength) {
     var glossiness;
 
-    if (glossiness._compile) {
+    if (glossiness.__isAMaterial__) {
         this.value.glossiness = [null, null];
         this.value.expressions.glossiness = glossiness;
-        glossiness = glossiness._compile();
     }
     else if (glossiness.getNormalizedRGB) {
         this.value.expressions.glossiness = null;
@@ -255,7 +252,7 @@ Mesh.prototype.setGlossiness = function setGlossiness(glossiness, strength) {
     }
 
     if (this._initialized) {
-        this._changeQueue.push(glossiness._compile ? 'MATERIAL_INPUT' : 'GL_UNIFORMS');
+        this._changeQueue.push(glossiness.__isAMaterial__ ? 'MATERIAL_INPUT' : 'GL_UNIFORMS');
         this._changeQueue.push('glossiness');
         this._changeQueue.push(glossiness);
     }
@@ -289,9 +286,8 @@ Mesh.prototype.getGlossiness = function getGlossiness() {
 Mesh.prototype.setPositionOffset = function positionOffset(materialExpression) {
     var uniformValue;
 
-    if (materialExpression._compile) {
+    if (materialExpression.__isAMaterial__) {
         this.value.expressions.positionOffset = materialExpression;
-        uniformValue = materialExpression._compile();
     }
     else {
         this.value.expressions.positionOffset = null;
@@ -300,7 +296,7 @@ Mesh.prototype.setPositionOffset = function positionOffset(materialExpression) {
     }
 
     if (this._initialized) {
-        this._changeQueue.push(materialExpression._compile ? 'MATERIAL_INPUT' : 'GL_UNIFORMS');
+        this._changeQueue.push(materialExpression.__isAMaterial__ ? 'MATERIAL_INPUT' : 'GL_UNIFORMS');
         this._changeQueue.push('positionOffset');
         this._changeQueue.push(uniformValue);
     }
