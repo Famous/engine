@@ -185,7 +185,7 @@ DOMElement.prototype.onTransformChange = function onTransformChange (transform) 
     for (var i = 0, len = transform.length ; i < len ; i++)
         this._changeQueue.push(transform[i]);
 
-    if (!this._requestingUpdate) this._requestUpdate();
+    this.onUpdate();
 };
 
 /**
