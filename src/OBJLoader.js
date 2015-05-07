@@ -12,7 +12,8 @@ var GeometryHelper = require('./GeometryHelper');
 
 var OBJLoader = {
     cached: {},
-    requests: {}
+    requests: {},
+    formatText: format
 };
 
 /*
