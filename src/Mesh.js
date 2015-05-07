@@ -503,9 +503,9 @@ Mesh.prototype.draw = function draw () {
 
     if (value.geometry != null) this.setGeometry(value.geometry);
     if (value.color != null) this.setBaseColor(value.color);
+    if (value.glossiness != null) this.setGlossiness.apply(this, value.glossiness);
     if (value.drawOptions != null) this.setDrawOptions(value.drawOptions);
     if (value.flatShading != null) this.setFlatShading(value.flatShading);
-    if (value.glossiness != null) this.setGlossiness.apply(this, value.glossiness);
 
     if (value.expressions.normals != null) this.setNormals(value.expressions.normals);
     if (value.expressions.baseColor != null) this.setBaseColor(value.expressions.baseColor);
