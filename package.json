@@ -27,6 +27,6 @@
     "tape": "^3.0.3"
   },
   "dependencies": {
-    "famous-polyfills": "git+ssh://git@github.famo.us/platform/polyfills#v0.1.2"
+    "famous-polyfills": "git+ssh://git@github.famo.us/platform/polyfills#v0.2.0"
   }
 }
