@@ -1,6 +1,6 @@
 {
   "name": "famous-webgl-renderers",
-  "version": "0.4.1",
+  "version": "0.5.0",
   "description": "Famous WebGL",
   "main": "src/index.js",
   "scripts": {
