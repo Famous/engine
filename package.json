@@ -1,6 +1,6 @@
 {
   "name": "famous-core",
-  "version": "0.4.3",
+  "version": "0.5.0",
   "description": "Famous Core",
   "main": "src/index.js",
   "scripts": {
