@@ -17,13 +17,13 @@ test('Context', function(t) {
         t.end();
     });
 
-    t.test('Context.prototype.updateSize', function(t) {
+    t.test('updateSize method', function(t) {
         // TODO: These tests.
 
         t.end();
     });
 
-    t.test('Context.prototype.draw', function(t) {
+    t.test('draw method', function(t) {
         var context = new Context('body');
         var dummyRenderers = [];
         var drawCallsIssued = 0;
@@ -39,13 +39,13 @@ test('Context', function(t) {
         t.end();
     });
 
-    t.test('Context.prototype.initWebGL', function(t) {
+    t.test('initWebGL method', function(t) {
         // TODO: These tests.
-        
+
         t.end();
     });
 
-    t.test('Context.prototype.getRootSize', function(t) {
+    t.test('getRootSize method', function(t) {
         var context = new Context('body');
         var rootSize = context.getRootSize();
 
@@ -54,7 +54,7 @@ test('Context', function(t) {
         t.end();
     });
 
-    t.test('Context.prototype.receive', function(t) {
+    t.test('receive method', function(t) {
 
         t.end();
     });
