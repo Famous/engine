@@ -1,6 +1,6 @@
 {
   "name": "famous-webgl-shaders",
-  "version": "0.1.4",
+  "version": "0.2.0",
   "description": "Famous WebGL Shaders",
   "main": "src/index.js",
   "repository": {
