@@ -90,7 +90,7 @@ Context.prototype.receive = function receive(pathArr, path, commands, iterator) 
     this.DOMRenderer.loadPath(path);
     this.DOMRenderer.findTarget();
     while (command) {
-
+        
         switch (command) {
             case 'INIT_DOM':
                 this.DOMRenderer.insertEl(commands[++localIterator]);
@@ -234,6 +234,11 @@ Context.prototype.receive = function receive(pathArr, path, commands, iterator) 
             case 'GL_SHOW_MESH':
                 if (!this.WebGLRenderer) this.initWebGL();
                 this.WebGLRenderer.showMesh(path);
+                break;
+
+            case 'GL_REMOVE_MESH':
+                if (!this.WebGLRenderer) this.initWebGL();
+                this.WebGLRenderer.removeMesh(path);
                 break;
 
             case 'PINHOLE_PROJECTION':
