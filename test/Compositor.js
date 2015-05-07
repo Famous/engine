@@ -17,7 +17,6 @@ document.body.appendChild(elThree);
 
 test('Compositor', function(t) {
     t.test('constructor', function(t) {
-
         var compositor = new Compositor();
 
         t.ok(compositor._contexts, 'Should have an _contexts property');
@@ -27,7 +26,7 @@ test('Compositor', function(t) {
         t.end();
     });
 
-    t.test('Compositor.prototype.sendEvent', function(t) {
+    t.test('sendEvent method', function(t) {
         var compositor = new Compositor();
 
         var eventPayload = {};
@@ -45,11 +44,11 @@ test('Compositor', function(t) {
         t.end();
     });
 
-    t.test('Compositor.prototype.handleWith', function(t) {
+    t.test('handleWith method', function(t) {
         var compositor = new Compositor();
         var path = 'body/1/2/3';
         var wasCalled = false;
-        
+
         compositor._inCommands.push(path);
         compositor._contexts['body'] = new Context('body', compositor);
         compositor._contexts['body'].receive = function() { wasCalled = true; };
@@ -64,7 +63,7 @@ test('Compositor', function(t) {
         t.end();
     });
 
-    t.test('Compositor.prototype.getOrSetContext', function(t) {
+    t.test('getOrSetContext method', function(t) {
         var compositor = new Compositor();
         var selector = 'body';
 
@@ -85,7 +84,7 @@ test('Compositor', function(t) {
         t.end();
     });
 
-    t.test('Compositor.prototype.giveSizeFor', function(t) {
+    t.test('giveSizeFor method', function(t) {
         var compositor = new Compositor();
         var selector = 'body';
 
@@ -94,7 +93,7 @@ test('Compositor', function(t) {
         t.end();
     });
 
-    t.test('Compositor.prototype.sendResize', function(t) {
+    t.test('sendResize method', function(t) {
         var compositor = new Compositor();
 
         var selector = 'body';
@@ -111,30 +110,11 @@ test('Compositor', function(t) {
         t.end();
     });
 
-    t.test('Compositor.prototype._wrapProxyFunction', function(t) {
-        var compositor = new Compositor();
-        var id = 0;
-        var returned = compositor._wrapProxyFunction(id);
-
-        t.equals(
-            typeof returned,
-            'function',
-            'Should return a function.'
-        );
-
-        returned(1, 2, 3);
-
-        shouldInclude(compositor._outCommands, t, 'INVOKE');
-        shouldInclude(compositor._outCommands, t, id);
-
+    t.test('invoke method', function(t) {
         t.end();
     });
 
-    t.test('Compositor.prototype.invoke', function(t) {
-        t.end();
-    });
-
-    t.test('Compositor.prototype.drawCommands', function(t) {
+    t.test('drawCommands method', function(t) {
         var compositor = new Compositor();
 
         var paths = ['#one/1/2/3', '#two/1/2/3', '#three/1/2/3'];
@@ -152,7 +132,7 @@ test('Compositor', function(t) {
 
         compositor._inCommands.push('WITH', paths[0], 'WITH', paths[1], 'WITH', paths[2]);
         compositor.drawCommands();
-        
+
         t.ok(
             contexts[0].hasBeenDrawn && contexts[1].hasBeenDrawn && contexts[1].hasBeenDrawn,
             'Should call draw on all registered contexts'
@@ -161,7 +141,7 @@ test('Compositor', function(t) {
         t.end();
     });
 
-    t.test('Compositor.prototype.receiveCommands', function(t) {
+    t.test('receiveCommands method', function(t) {
         var compositor = new Compositor();
         var commands = [1, 2, 3];
 
@@ -180,7 +160,7 @@ test('Compositor', function(t) {
         t.end();
     });
 
-    t.test('Compositor.prototype.clearCommands', function(t) {
+    t.test('clearCommands method', function(t) {
         var compositor = new Compositor();
 
         compositor._inCommands = [1, 2, 3];
