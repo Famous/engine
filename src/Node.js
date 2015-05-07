@@ -19,7 +19,7 @@ var QUAT = [0, 0, 0, 1];
 /**
  * Nodes define hierarchy and geometrical transformations. They can be moved
  * (translated), scaled and rotated.
- * 
+ *
  * A Node is either mounted or unmounted. Unmounted nodes are detached from the
  * scene graph. Unmounted nodes have no parent node, while each mounted node has
  * exactly one parent. Nodes have an arbitary number of children, which can be
@@ -78,6 +78,7 @@ function Node () {
     this._lastEulerX = 0;
     this._lastEulerY = 0;
     this._lastEulerZ = 0;
+    this._lastEuler = false;
 
     this.value = new Node.Spec();
 }
@@ -224,7 +225,7 @@ Node.prototype.addRenderable = function addRenderable (component) {
  * `getLocation` method has been invoked on.
  *
  * @method getLocation
- * 
+ *
  * @return {String} location (path), e.g. `body/0/1`
  */
 Node.prototype.getLocation = function getLocation () {
@@ -241,7 +242,7 @@ Node.prototype.getId = Node.prototype.getLocation;
  * upwards.
  *
  * @method emit
- * 
+ *
  * @param  {String} event   Event type.
  * @param  {Object} payload Event object to be dispatched.
  */
@@ -263,7 +264,7 @@ Node.prototype.sendDrawCommand = function sendDrawCommand (message) {
  * Recursively serializes the Node, including all previously added components.
  *
  * @method getValue
- * 
+ *
  * @return {Object}     Serialized representation of the node, including
  *                      components.
  */
@@ -295,7 +296,7 @@ Node.prototype.getValue = function getValue () {
  * (assuming the parent has a width of 400px).
  *
  * @method getComputedValue
- * 
+ *
  * @return {Object}     Serialized representation of the node, including
  *                      children, excluding components.
  */
@@ -318,7 +319,7 @@ Node.prototype.getComputedValue = function getComputedValue () {
  * Retrieves all children of the current node.
  *
  * @method getChildren
- * 
+ *
  * @return {Array.<Node>}   An array of children.
  */
 Node.prototype.getChildren = function getChildren () {
@@ -330,7 +331,7 @@ Node.prototype.getChildren = function getChildren () {
  * parent node.
  *
  * @method getParent
- * 
+ *
  * @return {Node}       Parent node.
  */
 Node.prototype.getParent = function getParent () {
@@ -345,7 +346,7 @@ Node.prototype.getParent = function getParent () {
  * scheduled on the next frame.
  *
  * @method requestUpdate
- * 
+ *
  * @param  {Object} requester   If the requester has an `onUpdate` method, it
  *                              will be invoked during the next update phase of
  *                              the node.
@@ -363,7 +364,7 @@ Node.prototype.requestUpdate = function requestUpdate (requester) {
  * invoked on the frame after the next invocation on the node's onUpdate function.
  *
  * @method requestUpdateOnNextTick
- * 
+ *
  * @param  {Object} requester   If the requester has an `onUpdate` method, it
  *                              will be invoked during the next update phase of
  *                              the node.
@@ -378,7 +379,7 @@ Node.prototype.requestUpdateOnNextTick = function requestUpdateOnNextTick (reque
  * @{@link Famous} singleton will be the global updater.
  *
  * @method getUpdater
- * 
+ *
  * @return {Object} The global updater.
  */
 Node.prototype.getUpdater = function getUpdater () {
@@ -390,7 +391,7 @@ Node.prototype.getUpdater = function getUpdater () {
  * graph.
  *
  * @method isMounted
- * 
+ *
  * @return {Boolean}    Boolean indicating weather the node is mounted or not.
  */
 Node.prototype.isMounted = function isMounted () {
@@ -401,7 +402,7 @@ Node.prototype.isMounted = function isMounted () {
  * Checks if the node is visible ("shown").
  *
  * @method isShown
- * 
+ *
  * @return {Boolean}    Boolean indicating weather the node is visible
  *                      ("shown") or not.
  */
@@ -416,7 +417,7 @@ Node.prototype.isShown = function isShown () {
  * node is completely solid.
  *
  * @method getOpacity
- * 
+ *
  * @return {Number}         Relative opacity of the node.
  */
 Node.prototype.getOpacity = function getOpacity () {
@@ -425,9 +426,9 @@ Node.prototype.getOpacity = function getOpacity () {
 
 /**
  * Determines the node's previously set mount point.
- * 
+ *
  * @method getMountPoint
- * 
+ *
  * @return {Float32Array}   An array representing the mount point.
  */
 Node.prototype.getMountPoint = function getMountPoint () {
@@ -436,9 +437,9 @@ Node.prototype.getMountPoint = function getMountPoint () {
 
 /**
  * Determines the node's previously set align.
- * 
+ *
  * @method getAlign
- * 
+ *
  * @return {Float32Array}   An array representing the align.
  */
 Node.prototype.getAlign = function getAlign () {
@@ -447,9 +448,9 @@ Node.prototype.getAlign = function getAlign () {
 
 /**
  * Determines the node's previously set origin.
- * 
+ *
  * @method getOrigin
- * 
+ *
  * @return {Float32Array}   An array representing the origin.
  */
 Node.prototype.getOrigin = function getOrigin () {
@@ -460,7 +461,7 @@ Node.prototype.getOrigin = function getOrigin () {
  * Determines the node's previously set position.
  *
  * @method getPosition
- * 
+ *
  * @return {Float32Array}   An array representing the position.
  */
 Node.prototype.getPosition = function getPosition () {
@@ -544,7 +545,7 @@ Node.prototype.removeChild = function removeChild (child) {
  * Each component can only be added once per node.
  *
  * @method addComponent
- * 
+ *
  * @param {Object} component    An component to be added.
  */
 Node.prototype.addComponent = function addComponent (component) {
@@ -567,7 +568,7 @@ Node.prototype.addComponent = function addComponent (component) {
  * Removes a previously via @{@link addComponent} added component.
  *
  * @method removeComponent
- * 
+ *
  * @param  {Object} component   An component that has previously been added
  *                              using @{@link addComponent}.
  */
@@ -774,17 +775,33 @@ Node.prototype.setRotation = function setRotation (x, y, z, w) {
         qy = y;
         qz = z;
         qw = w;
+        this._lastEulerX = null;
+        this._lastEulerY = null;
+        this._lastEulerZ = null;
+        this._lastEuler = false;
     }
     else {
+        if (x == null || y == null || z == null) {
+            if (this._lastEuler) {
+                x = x == null ? this._lastEulerX : x;
+                y = y == null ? this._lastEulerY : y;
+                z = z == null ? this._lastEulerZ : z;
+            }
+            else {
+                var sp = -2 * (quat[1] * quat[2] - quat[3] * quat[0]);
 
-        if (x == null) x = this._lastEulerX;
-        else this._lastEulerX = x;
-
-        if (y == null) y = this._lastEulerY;
-        else this._lastEulerY = y;
-
-        if (z == null) z = this._lastEulerZ;
-        else this._lastEulerZ = z;
+                if (Math.abs(sp) > (1 - Number.MIN_VALUE)) {
+                    y = y == null ? Math.PI * 0.5 * sp : y;
+                    x = x == null ? Math.atan2(-quat[0] * quat[2] + quat[3] * quat[1], 0.5 - quat[1] * quat[1] - quat[2] * quat[2]) : x;
+                    z = z == null ? 0 : z;
+                }
+                else {
+                    y = y == null ? Math.asin(sp) : y;
+                    x = x == null ? Math.atan2(quat[0] * quat[2] + quat[3] * quat[1], 0.5 - quat[0] * quat[0] - quat[1] * quat[1]) : x;
+                    z = z == null ? Math.atan2(quat[0] * quat[1] + quat[3] * quat[2], 0.5 - quat[0] * quat[0] - quat[2] * quat[2]) : z;
+                }
+            }
+        }
 
         var hx = x * 0.5;
         var hy = y * 0.5;
@@ -807,6 +824,10 @@ Node.prototype.setRotation = function setRotation (x, y, z, w) {
         qz = cx * cysz + sx * sycz;
         qw = cx * cycz - sx * sysz;
 
+        this._lastEuler = true;
+        this._lastEulerX = x;
+        this._lastEulerY = y;
+        this._lastEulerZ = z;
     }
 
     propogate = this._vecOptionalSet(quat, 0, qx) || propogate;
@@ -887,7 +908,7 @@ Node.prototype.setOpacity = function setOpacity (val) {
  * node.setAbsoluteSize(null, 100, 200);
  *
  * @method setSizeMode
- * 
+ *
  * @param {SizeMode} x    The size mode being used for determining the size in
  *                        x direction ("width").
  * @param {SizeMode} y    The size mode being used for determining the size in
@@ -925,7 +946,7 @@ Node.prototype.setSizeMode = function setSizeMode (x, y, z) {
  * Proportional sizes need to be within the range of [0, 1].
  *
  * @method setProportionalSize
- * 
+ *
  * @param {Number} x    x-Size in pixels ("width").
  * @param {Number} y    y-Size in pixels ("height").
  * @param {Number} z    z-Size in pixels ("depth").
@@ -962,7 +983,7 @@ Node.prototype.setProportionalSize = function setProportionalSize (x, y, z) {
  * *minus* 10 pixels.
  *
  * @method setDifferentialSize
- * 
+ *
  * @param {Number} x    x-Size to be added to the relatively sized node in
  *                      pixels ("width").
  * @param {Number} y    y-Size to be added to the relatively sized node in
@@ -998,7 +1019,7 @@ Node.prototype.setDifferentialSize = function setDifferentialSize (x, y, z) {
  * Sets the nodes size in pixels, independent of its parent.
  *
  * @method setAbsoluteSize
- * 
+ *
  * @param {Number} x    x-Size in pixels ("width").
  * @param {Number} y    y-Size in pixels ("height").
  * @param {Number} z    z-Size in pixels ("depth").
@@ -1078,7 +1099,7 @@ Node.prototype.getFrame = function getFrame () {
  * Enters the node's update phase while updating its own spec and updating its components.
  *
  * @method update
- * 
+ *
  * @param  {Number} time    high-resolution timstamp, usually retrieved using
  *                          requestAnimationFrame
  */
@@ -1127,7 +1148,7 @@ Node.prototype.update = function update (time){
  * passed in parent.
  *
  * @method mount
- * 
+ *
  * @param  {Node} parent    parent node
  * @param  {String} myId    path to node (e.g. `body/0/1`)
  */
@@ -1199,7 +1220,7 @@ Node.prototype.dismount = function dismount () {
  * being mounted.
  *
  * @method onParentMount
- * 
+ *
  * @param  {Node} parent        The parent node.
  * @param  {String} parentId    The parent id (path to parent).
  * @param  {Number} index       Id the node should be mounted to.
@@ -1223,7 +1244,7 @@ Node.prototype.onParentDismount = function onParentDismount () {
  * components. Note that this doesn't recurse the subtree.
  *
  * @method receive
- * 
+ *
  * @param  {String} type   The event type (e.g. "click").
  * @param  {Object} ev     The event payload object to be dispatched.
  */
