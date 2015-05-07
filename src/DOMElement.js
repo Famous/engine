@@ -232,7 +232,7 @@ DOMElement.prototype.onOpacityChange = function onOpacityChange (opacity) {
 DOMElement.prototype.onAddUIEvent = function onAddUIEvent (UIEvent) {
     var index = this._UIEvents.indexOf(UIEvent);
     if (index === -1) {
-        this._changeQueue.push('ADD_EVENT_LISTENER', UIEvent, void 0, true, 'EVENT_END');
+        this._changeQueue.push('ADD_EVENT_LISTENER', UIEvent, true, 'EVENT_END');
         this._UIEvents.push(UIEvent);
     }
     if (!this._requestingUpdate) this._requestUpdate();
