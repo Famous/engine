@@ -16,7 +16,7 @@ function Famous () {
     this._updateQueue = []; // The updateQueue is a place where nodes
                             // can place themselves in order to be
                             // updated on the frame.
-    
+
     this._nextUpdateQueue = []; // the nextUpdateQueue is used to queue
                                 // updates for the next tick.
                                 // this prevents infinite loops where during
@@ -43,7 +43,7 @@ function Famous () {
 /**
  * @method setChannel
  * @chainable
- * 
+ *
  * @param {Channel} channel     The channel to be used for communicating with
  *                              the `ThreadManager`/ `Compositor`.
  */
@@ -54,7 +54,7 @@ Famous.prototype.setChannel = function setChannel(channel) {
 
 /**
  * @method getChannel
- * 
+ *
  * @return {Channel} channel    The channel to be used for communicating with
  *                              the `ThreadManager`/ `Compositor`.
  */
@@ -66,8 +66,8 @@ Famous.prototype.getChannel = function getChannel () {
  * _update is the body of the update loop. The frame consists of
  * pulling in appending the nextUpdateQueue to the currentUpdate queue
  * then moving through the updateQueue and calling onUpdate with the current
- * time on all nodes. While _update is called _inUpdate is set to true and 
- * all requests to be placed in the update queue will be forwarded to the 
+ * time on all nodes. While _update is called _inUpdate is set to true and
+ * all requests to be placed in the update queue will be forwarded to the
  * nextUpdateQueue.
  */
 Famous.prototype._update = function _update () {
@@ -124,7 +124,7 @@ Famous.prototype.requestUpdateOnNextTick = function requestUpdateOnNextTick (req
  *
  * @param {Array} an array of commands.
  * @chainable
- * 
+ *
  * @return {Famous} this
  */
 Famous.prototype.handleMessage = function handleMessage (messages) {
@@ -172,7 +172,7 @@ Famous.prototype.handleWith = function handleWith (messages) {
         case 'TRIGGER': // the TRIGGER command sends a UIEvent to the specified path
             var type = messages.shift();
             var ev = messages.shift();
-            
+
             this.getContext(path).getDispatch().dispatchUIEvent(path, type, ev);
             break;
         default:
@@ -183,7 +183,7 @@ Famous.prototype.handleWith = function handleWith (messages) {
 };
 
 /**
- * handleFrame is called when the renderers issue a FRAME command to 
+ * handleFrame is called when the renderers issue a FRAME command to
  * Famous. Famous will then step updating the scene graph to the current time.
  *
  * @param {Array} array of messages.
@@ -215,7 +215,7 @@ Famous.prototype.step = function step (time) {
     this._update();
 
     if (this._messages.length) {
-        this._channel.message(this._messages);
+        this._channel.sendMessage(this._messages);
         this._messages.length = 0;
     }
 
@@ -225,7 +225,7 @@ Famous.prototype.step = function step (time) {
 Famous.prototype.onmessage = function () {
     console.error(
         'Famous#onmessage has been moved to Channel!\n' +
-        'Use new ThreadManager(Famous.getChannel(), compositor) \n' + 
+        'Use new ThreadManager(Famous.getChannel(), compositor) \n' +
         'instead of new ThreadManager(Famous, compositor).'
     );
 };
@@ -233,7 +233,7 @@ Famous.prototype.onmessage = function () {
 Famous.prototype.postMessage = function () {
     console.error(
         'Famous#postMessage has been moved to Channel!\n' +
-        'Use new ThreadManager(Famous.getChannel(), compositor) \n' + 
+        'Use new ThreadManager(Famous.getChannel(), compositor) \n' +
         'instead of new ThreadManager(Famous, compositor).'
     );
 };
@@ -249,7 +249,7 @@ Famous.prototype.postMessage = function () {
  */
 Famous.prototype.getContext = function getContext (selector) {
     if (!selector) throw new Error('getContext must be called with a selector');
-    
+
     var index = selector.indexOf('/');
     selector = index === -1 ? selector : selector.substring(0, index);
 
@@ -300,20 +300,19 @@ Famous.prototype.createContext = function createContext (selector) {
  * @chainable
  */
 Famous.prototype.startEngine = function startEngine () {
-    this._channel.message(ENGINE_START);
+    this._channel.sendMessage(ENGINE_START);
     return this;
 };
 
 /**
  * Stops the engine running in the Main-Thread.
  * This effects **every** updateable managed by the Engine.
- * 
+ *
  * @chainable
  */
 Famous.prototype.stopEngine = function stopEngine () {
-    this._channel.message(ENGINE_STOP);
+    this._channel.sendMessage(ENGINE_STOP);
     return this;
 };
 
 module.exports = new Famous();
-

@@ -28,11 +28,9 @@ Channel.prototype.onMessage = null;
 /**
  * Sends a message to the ThreadManager.
  *
- * @method message
- * 
  * @param  {Any}    message Arbitrary message object.
  */
-Channel.prototype.message = function message (message) {
+Channel.prototype.sendMessage = function sendMessage (message) {
     if (this._workerMode) {
         self.postMessage(message);
     } else {
