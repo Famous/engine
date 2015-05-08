@@ -5,12 +5,11 @@ var Node = require('../src/Node');
 var Size = require('../src/Size');
 var Context = require('../src/Context');
 var DefaultNodeSpec = require('./expected/DefaultNodeSpec');
-var ExampleNodeSpec = require('./expected/ExampleNodeSpec');
 
 test('Node', function(t) {
     t.test('constructor', function(t) {
         t.equal(typeof Node, 'function', 'Node should be a constructor function');
-        var node = new Node();
+        new Node();
         t.end();
     });
 
@@ -131,7 +130,7 @@ test('Node', function(t) {
 
         t.end();
     });
-    
+
     t.test('getComputedValue method', function(t) {
         var root = new Node();
         t.equal(typeof root.getComputedValue, 'function', 'root.getComputedValue should be a function');
@@ -276,7 +275,7 @@ test('Node', function(t) {
         child.onUpdate();
         t.equal(child.getOpacity(), 1, 'should not multiply opacities');
 
-        t.end(); 
+        t.end();
     });
 
     t.test('addChild, getChildren method', function(t) {
@@ -316,7 +315,7 @@ test('Node', function(t) {
         var events = [];
 
         t.equal(typeof root.addComponent, 'function', 'root.addComponent should be a function');
-        
+
         root.addComponent({
             onMount: function() {
                 events.push('onMount');
@@ -369,7 +368,7 @@ test('Node', function(t) {
         child000.emit(expectedType, expectedEv);
 
         t.deepEqual(receivedEvents.map(function(i) {
-            return i[2].getId()
+            return i[2].getId();
         }), [
             'body/0',
             'body/1',
@@ -382,42 +381,130 @@ test('Node', function(t) {
     });
 
     t.test('setRotation', function (t) {
-        var testNode = new Node();
-        var identityQuaternion = [0, 0, 0, 1];
-        var testRotation = testNode.getValue().spec.vectors.rotation;
-
-        t.deepEqual(
-            testRotation,
-            identityQuaternion,
-            'Node\'s rotation vector should be the identity quaternion by default'
+        t.comment(
+            'Any mutation of a transform primitive is expected to result ' +
+            'into onTransformChange event being propagated. The final, ' +
+            'multiplied matrix will then be compared to a set of ' +
+            'predefined, expected final transform matrices.'
         );
 
-        t.doesNotThrow(function () {
-            testNode.setRotation();
-            t.deepEqual(
-                testRotation,
-                identityQuaternion,
-                'setRotation should not change the Node\'s rotation value' +
-                ' when called with no arguments'
+        t.test('basic (quaternions only)', function(t) {
+            t.plan(6);
+
+            var node = new Node();
+            var identity = [0, 0, 0, 1];
+
+            t.equal(
+                typeof node.setRotation,
+                'function',
+                'node.setRotation should be a function'
             );
-        }, 'setRotation should not throw when called with no arguments');
 
-        function toPrecision (precision) {
-            return function (x) {
-                return x.toPrecision(precision);
-            };
-        }
+            t.deepEqual(
+                node.getRotation(),
+                identity,
+                'Node\'s rotation vector should be the identity quaternion by ' +
+                'default'
+            );
 
-        testNode.setRotation(null, 10);
-        var y10 = [0, -0.9589242746631385, 0, 0.2836621854632263];
+            var root = new Node();
+            root.onMount(root);
+            node.onMount(root, 'body');
 
-        t.deepEqual(
-            Array.prototype.slice.call(testRotation).map(toPrecision(6)),
-            y10.map(toPrecision(6)),
-            'setRotation should calculate the proper quaternion from' +
-            ' passed in euler angles'
-        );
+            node.addComponent({
+                onTransformChange: function(transform) {
+                    t.deepEqual(
+                        transform,
+                        expectedTransforms.shift(),
+                        'node.setRotation should result into an appropriate ' +
+                        'matrix multiplication'
+                    );
+                }
+            });
 
-        t.end();
+            var expectedTransforms = [
+                { 0: -25, 1: 46, 10: -39, 11: 0, 12: 0, 13: 0, 14: 0, 15: 1, 2: 4, 3: 0, 4: -14, 5: -49, 6: 52, 7: 0, 8: 44, 9: -28 },
+                { 0: -79, 1: 64, 10: -121, 11: 0, 12: 0, 13: 0, 14: 0, 15: 1, 2: 8, 3: 0, 4: 56, 5: -57, 6: 34, 7: 0, 8: 32, 9: 14 },
+                { 0: -9, 1: 54, 10: -169, 11: 0, 12: 0, 13: 0, 14: 0, 15: 1, 2: -18, 3: 0, 4: 18, 5: -163, 6: 166, 7: 0, 8: 54, 9: -158 },
+                { 0: 1, 1: 0, 10: 1, 11: 0, 12: 0, 13: 0, 14: 0, 15: 1, 2: 0, 3: 0, 4: 0, 5: 1, 6: 0, 7: 0, 8: 0, 9: 0 }
+            ];
+
+            node.setRotation(4, 2, 3, 5).update();
+            node.setRotation(5, 6, 2, 1).update();
+            node.setRotation(9, 2, 1, 9).update();
+            node.setRotation(0, 0, 0, 1).update();
+        });
+
+        t.test('switching between euler angles and quaternions', function(t) {
+            t.plan(3);
+
+            var node = new Node();
+
+            var root = new Node();
+            root.onMount(root);
+            node.onMount(root, 'body');
+
+            node.addComponent({
+                onTransformChange: function(transform) {
+                    t.deepEqual(
+                        transform,
+                        expectedTransforms.shift(),
+                        'node.setRotation should result into an appropriate ' +
+                        'matrix multiplication'
+                    );
+                }
+            });
+
+            t.comment(
+                'This test case ensures that the conversion from quaternions ' +
+                'to euler angles is correct.'
+            );
+
+            var expectedTransforms = [
+                { 0: 0.55901700258255, 1: 0.7625707387924194, 10: 0.4156269133090973, 11: 0, 12: 0, 13: 0, 14: 0, 15: 1, 2: -0.3255546987056732, 3: 0, 4: -0.18163561820983887, 5: 0.4957217872142792, 6: 0.8492752313613892, 7: 0, 8: 0.80901700258255, 9: -0.4156269431114197 },
+                { 0: 0.4755282700061798, 1: 0.8784343600273132, 10: 0.4156269133090973, 11: 0, 12: 0, 13: 0, 14: 0, 15: 1, 2: -0.04718049615621567, 3: 0, 4: -0.345491498708725, 5: 0.23581215739250183, 6: 0.9083107113838196, 7: 0, 8: 0.80901700258255, 9: -0.4156269431114197 },
+                { 0: 0.55901700258255, 1: 0.7625707387924194, 10: 0.4156269133090973, 11: 0, 12: 0, 13: 0, 14: 0, 15: 1, 2: -0.3255546987056732, 3: 0, 4: -0.18163561820983887, 5: 0.4957217872142792, 6: 0.8492752313613892, 7: 0, 8: 0.80901700258255, 9: -0.4156269431114197 }
+            ];
+
+            node.setRotation(
+                0.4023891896939372,
+                0.36092862331592634,
+                0.3003698248556209,
+                0.7858698602217358
+            ).update();
+
+            t.comment(
+                'Setting the same rotation in euler angles should not result ' +
+                'into an update.'
+            );
+
+            node.setRotation(
+                Math.PI*0.25,
+                Math.PI*0.3,
+                Math.PI*0.1
+            ).update();
+
+            t.comment(
+                'Updating the rotation along the z axis without modifying x ' +
+                'and y should result into update (euler angles).'
+            );
+
+            node.setRotation(
+                null,
+                null,
+                Math.PI*0.2
+            ).update();
+
+            t.comment(
+                'Switching back to initial rotation (quaternion).'
+            );
+
+            node.setRotation(
+                0.4023891896939372,
+                0.36092862331592634,
+                0.3003698248556209,
+                0.7858698602217358
+            ).update();
+        });
     });
 });
