@@ -23,7 +23,7 @@ var TYPES = {
 
 var inputTypes = {
     baseColor: 'vec4',
-    normal: 'vec3',
+    u_Normals: 'vert',
     glossiness: 'vec4',
     metalness: 'float',
     positionOffset: 'vert'
@@ -49,7 +49,7 @@ var uniforms = Utility.keyValueToArrays({
     metalness: [0],
     glossiness: [0, 0, 0, 0],
     baseColor: [1, 1, 1, 1],
-    normal: [1, 1, 1],
+    u_Normals: [1, 1, 1],
     positionOffset: [0, 0, 0],
     u_LightPosition: identityMatrix,
     u_LightColor: identityMatrix,
@@ -221,10 +221,10 @@ Program.prototype.resetProgram = function resetProgram() {
     this.flaggedUniforms = [];
     this.cachedUniforms = {};
 
-    fragmentHeader.push('uniform sampler2D u_Textures[2];\n');
+    fragmentHeader.push('uniform sampler2D u_Textures[7];\n');
 
-    if (this.applicationVert.length > 1) {
-        vertexHeader.push('uniform sampler2D u_Textures[2];\n');
+    if (this.applicationVert.length) {
+        vertexHeader.push('uniform sampler2D u_Textures[7];\n');
     }
 
     for(i = 0; i < this.uniformNames.length; i++) {
@@ -282,7 +282,7 @@ Program.prototype.resetProgram = function resetProgram() {
     this.setUniforms(this.uniformNames, this.uniformValues);
 
     var textureLocation = this.gl.getUniformLocation(this.program, 'u_Textures[0]');
-    this.gl.uniform1iv(textureLocation, [0, 1]);
+    this.gl.uniform1iv(textureLocation, [0, 1, 2, 3, 4, 5, 6]);
 
     return this;
 };
@@ -386,9 +386,6 @@ Program.prototype.setUniforms = function (uniformNames, uniformValue) {
                 case 9:  gl.uniformMatrix3fv(location, false, value); break;
                 default: throw 'cant load uniform "' + name + '" with value:' + JSON.stringify(value);
             }
-        }
-        else if (uniformValue.type) {
-            gl[uniformValue.type](uniformValue.value);
         }
         else if (! isNaN(parseFloat(value)) && isFinite(value)) {
             gl.uniform1f(location, value);

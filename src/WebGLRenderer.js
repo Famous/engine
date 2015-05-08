@@ -8,6 +8,7 @@ var Plane = require('famous-webgl-geometries').Plane;
 var sorter = require('./radixSort');
 var Utility = require('famous-utilities');
 var TextureManager = require('./TextureManager');
+var compileMaterial = require('./compileMaterial');
 
 var identity = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
 
@@ -169,6 +170,7 @@ WebGLRenderer.prototype.createMesh = function createMesh(path) {
         size: [0, 0, 0],
         baseColor: [0.5, 0.5, 0.5, 1],
         positionOffset: [0, 0, 0],
+        u_Normals: [0, 0, 0],
         u_FlatShading: 0,
         glossiness: [0, 0, 0, 0]
     });
@@ -379,6 +381,7 @@ WebGLRenderer.prototype.setLightColor = function setLightColor(path, r, g, b) {
 **/
 WebGLRenderer.prototype.handleMaterialInput = function handleMaterialInput(path, name, material) {
     var mesh = this.meshRegistry[path] || this.createMesh(path);
+    var material = compileMaterial(material, mesh.textures.length);
 
     // Set uniforms to enable texture!
 
@@ -389,7 +392,7 @@ WebGLRenderer.prototype.handleMaterialInput = function handleMaterialInput(path,
     var i = material.textures.length;
     while (i--) {
         mesh.textures.push(
-            this.textureManager.register(material.textures[i], i)
+            this.textureManager.register(material.textures[i], mesh.textures.length + i)
         );
     }
 
@@ -505,7 +508,7 @@ WebGLRenderer.prototype.drawMeshes = function drawMeshes() {
         if (!buffers) continue;
 
         var j = mesh.textures.length;
-        while (j--) this.textureManager.bindTexture(mesh.textures[i]);
+        while (j--) this.textureManager.bindTexture(mesh.textures[j]);
         
         if (mesh.options) this.handleOptions(mesh.options, mesh);
         
