@@ -420,10 +420,14 @@ Mesh.prototype.onDismount = function onDismount () {
 
 Mesh.prototype.onShow = function onShow () {
     this._changeQueue.push('GL_SHOW_MESH');
+
+    this._requestUpdate();
 };
 
 Mesh.prototype.onHide = function onHide () {
     this._changeQueue.push('GL_HIDE_MESH');
+
+    this._requestUpdate();
 };
 
 /**
