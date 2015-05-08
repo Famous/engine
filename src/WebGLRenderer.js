@@ -39,6 +39,7 @@ function WebGLRenderer(canvas) {
 
     var gl = this.gl = this.getWebGLContext(this.canvas);
 
+    gl.clearColor(0.0, 0.0, 0.0, 0.0);
     gl.polygonOffset(0.1, 0.1);
     gl.enable(gl.POLYGON_OFFSET_FILL);
     gl.enable(gl.DEPTH_TEST);
@@ -478,6 +479,7 @@ WebGLRenderer.prototype.bufferData = function bufferData(path, geometryId, buffe
  * affect the rendering of all renderables.
  */
 WebGLRenderer.prototype.draw = function draw(renderState) {
+    this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
     this.textureManager.update();
     
     this.setGlobalUniforms(renderState);
