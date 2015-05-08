@@ -174,7 +174,7 @@ DOMRenderer.prototype.findParent = function findParent () {
 DOMRenderer.prototype.findChildren = function findChildren (array) {
     this._assertPathLoaded();
     
-    var path = this._path;
+    var path = this._path + '/';
     var keys = Object.keys(this._elements);
     var i = 0;
     var len;
