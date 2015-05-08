@@ -142,10 +142,10 @@ vec3 calculateOffset(vec3 ID) {
  */
 void main() {
     gl_PointSize = 10.0;
-    vec3 invertedNormals = normals;
+    v_TextureCoordinate = texCoord;
+    vec3 invertedNormals = normals + (u_Normals.x < 0.0 ? calculateOffset(u_Normals) * 2.0 - 1.0 : vec3(0.0));
     invertedNormals.y *= -1.0;
     v_Normal = transpose(mat3(inverse(transform))) * invertedNormals;
-    v_TextureCoordinate = texCoord;
     vec3 offsetPos = pos + calculateOffset(positionOffset);
     gl_Position = applyTransform(vec4(offsetPos, 1.0));
 }
