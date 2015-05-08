@@ -242,7 +242,7 @@ Mesh.prototype.setGlossiness = function setGlossiness(glossiness, strength) {
     var glossiness;
 
     if (glossiness.__isAMaterial__) {
-        this.value.glossiness = null;
+        this.value.glossiness = [null, null];
         this.value.expressions.glossiness = glossiness;
     }
     else if (glossiness.getNormalizedRGB) {
@@ -503,7 +503,7 @@ Mesh.prototype.draw = function draw () {
 
     if (value.geometry != null) this.setGeometry(value.geometry);
     if (value.color != null) this.setBaseColor(value.color);
-    if (value.glossiness != null) this.setGlossiness.apply(this, value.glossiness);
+    if (value.glossiness[0] != null) this.setGlossiness.apply(this, value.glossiness);
     if (value.drawOptions != null) this.setDrawOptions(value.drawOptions);
     if (value.flatShading != null) this.setFlatShading(value.flatShading);
 
