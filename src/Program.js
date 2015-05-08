@@ -387,9 +387,6 @@ Program.prototype.setUniforms = function (uniformNames, uniformValue) {
                 default: throw 'cant load uniform "' + name + '" with value:' + JSON.stringify(value);
             }
         }
-        else if (uniformValue.type) {
-            gl[uniformValue.type](uniformValue.value);
-        }
         else if (! isNaN(parseFloat(value)) && isFinite(value)) {
             gl.uniform1f(location, value);
         }
