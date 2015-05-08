@@ -58,13 +58,15 @@ function DOMElement (node, options) {
             this.addClass(options.classes[i]);
     }
 
+    var key;
+
     if (options.attributes) {
-        for (var key in options.attributes)
+        for (key in options.attributes)
             this.setAttribute(key, options.attributes[key]);
     }
 
     if (options.properties) {
-        for (var key in options.properties)
+        for (key in options.properties)
             this.setProperty(key, options.properties[key]);
     }
 
@@ -226,16 +228,31 @@ DOMElement.prototype.onOpacityChange = function onOpacityChange (opacity) {
 /**
  * Method to be invoked by the node as soon as a new UIEvent is being added.
  * This results into an `ADD_EVENT_LISTENER` command being send.
- * 
+ *
  * @param  {String} UIEvent     UIEvent to be subscribed to (e.g. `click`).
  */
 DOMElement.prototype.onAddUIEvent = function onAddUIEvent (UIEvent) {
-    var index = this._UIEvents.indexOf(UIEvent);
-    if (index === -1) {
-        this._changeQueue.push('ADD_EVENT_LISTENER', UIEvent, true, 'EVENT_END');
+    if (this._UIEvents.indexOf(UIEvent) === -1) {
+        this._addEventListener(UIEvent);
         this._UIEvents.push(UIEvent);
+    } else if (this._inDraw) {
+        this._addEventListener(UIEvent);
     }
-    if (!this._requestingUpdate) this._requestUpdate();
+    return this;
+};
+
+/**
+ * Appends an `ADD_EVENT_LISTENER` command to the command queue.
+ *
+ * @param  {String} UIEvent Event type (e.g. `click`)
+ */
+DOMElement.prototype._addEventListener = function _addEventListener (UIEvent) {
+    if (this._initialized) {
+        this._changeQueue.push('ADD_EVENT_LISTENER', UIEvent, true, 'EVENT_END');
+    }
+    if (!this._requestingUpdate) {
+        this._requestUpdate();
+    }
 };
 
 /**
@@ -444,7 +461,7 @@ DOMElement.prototype.draw = function draw () {
             this.setAttribute(key, this._attributes[key]);
     
     for (i = 0, len = this._UIEvents.length ; i < len ; i++)
-        this._changeQueue.push('ADD_EVENT_LISTENER', this._UIEvents[i], void 0, true, 'EVENT_END');
+        this.onAddUIEvent(this._UIEvents[i]);
 
     this._inDraw = false;
 };
