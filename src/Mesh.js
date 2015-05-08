@@ -24,7 +24,7 @@ function Mesh (node, options) {
         expressions: {},
         geometry: null,
         flatShading: null,
-        glossiness: [0, 0],
+        glossiness: null,
         baseColor: [0, 0, 0, 1],
         positionOffset: null,
         normals: null,
@@ -249,7 +249,7 @@ Mesh.prototype.setGlossiness = function setGlossiness(glossiness, strength) {
         this.value.expressions.glossiness = null;
         this.value.glossiness = [glossiness, strength || 20];
         glossiness = glossiness ? glossiness.getNormalizedRGB() : [0, 0, 0];
-        glossiness.push(this.value.glossiness[1]);
+        glossiness.push(strength || 20);
     }
 
     if (this._initialized) {
@@ -379,7 +379,7 @@ Mesh.prototype.onUpdate = function onUpdate() {
             this._node.sendDrawCommand(this.value.color.getNormalizedRGB());
             this._node.requestUpdateOnNextTick(this._id);
         }
-        if (this.value.glossiness[0] && this.value.glossiness[0].isActive()) {
+        if (this.value.glossiness && this.value.glossiness[0] && this.value.glossiness[0].isActive()) {
             this._node.sendDrawCommand('GL_UNIFORMS');
             this._node.sendDrawCommand('glossiness');
             var glossiness = this.value.glossiness[0].getNormalizedRGB();
@@ -503,7 +503,7 @@ Mesh.prototype.draw = function draw () {
 
     if (value.geometry != null) this.setGeometry(value.geometry);
     if (value.color != null) this.setBaseColor(value.color);
-    if (value.glossiness[0] != null) this.setGlossiness.apply(this, value.glossiness);
+    if (value.glossiness != null) this.setGlossiness.apply(this, value.glossiness);
     if (value.drawOptions != null) this.setDrawOptions(value.drawOptions);
     if (value.flatShading != null) this.setFlatShading(value.flatShading);
 
