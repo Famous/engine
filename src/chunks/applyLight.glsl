@@ -5,7 +5,7 @@
  * @private
  *
  */
-vec4 applyLight(in vec4 baseColor, in vec3 normal) {
+vec4 applyLight(in vec4 baseColor, in vec3 normal, in vec4 glossiness) {
     int numLights = int(u_NumLights);
     vec3 ambientColor = u_AmbientLight * baseColor.rgb;
     vec3 eyeVector = normalize(v_EyeVector);

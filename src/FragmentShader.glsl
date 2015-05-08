@@ -18,7 +18,9 @@ void main() {
      * and at least one light is added to the scene
      */
     bool lightsEnabled = (u_FlatShading == 0.0) && (u_NumLights > 0.0 || length(u_AmbientLight) > 0.0);
-    vec4 color = lightsEnabled ? applyLight(material, normalize(v_Normal)) : material;
+    vec3 normal = normalize(v_Normal);
+    vec4 glossiness = glossiness.x < 0.0 ? applyMaterial(glossiness) : glossiness;
+    vec4 color = lightsEnabled ? applyLight(material, normalize(v_Normal), glossiness) : material;
 
     gl_FragColor = color;
     gl_FragColor.a *= opacity;   
