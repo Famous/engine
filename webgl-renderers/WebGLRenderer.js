@@ -274,26 +274,7 @@ WebGLRenderer.prototype.showMesh = function showMesh(path) {
 WebGLRenderer.prototype.removeMesh = function removeMesh(path) {
     var keyLocation = this.meshRegistryKeys.indexOf(path);
     this.meshRegistryKeys.splice(keyLocation, 1);
-
-    var len = this.meshRegistryKeys.length;
-    var targetGeometry = this.meshRegistry[path].geometry;
-    var key;
-
     this.meshRegistry[path] = null;
-
-    for (var i = 0; i < len; i++) {
-        key = this.meshRegistryKeys[i];
-
-        // If geometry is being used in another mesh return
-
-        if (this.meshRegistry[key].geometry === targetGeometry) {
-            return;
-        }
-    }
-
-    // Deallocate WebGL buffers for geometry if no longer necessary
-
-    this.bufferRegistry.deallocate(targetGeometry);
 };
 
 
@@ -521,6 +502,11 @@ WebGLRenderer.prototype.drawMeshes = function drawMeshes() {
         buffers = this.bufferRegistry.registry[mesh.geometry];
 
         if (!mesh.visible) continue;
+
+        if (window.a) {
+            console.log(mesh);
+            window.a = false;
+        }
 
         if (mesh.uniformValues[0] < 1) {
             gl.depthMask(false);

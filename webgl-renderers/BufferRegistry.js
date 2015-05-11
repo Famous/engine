@@ -138,25 +138,4 @@ BufferRegistry.prototype.allocate = function allocate(geometryId, name, value, s
     vertexBuffers.values[j].subData();
 };
 
-BufferRegistry.prototype.deallocate = function deallocate(id) {
-    var entry = this.registry[id];
-    var nBuffers = entry.values.length;
-    var bufferToDelete;
-    var bufferInRegistry;
-    var bufferType;
-
-    for (var i = 0; i < nBuffers; i++) {
-        bufferToDelete = entry.values[i];
-        for (var j = 0; j < this._dynamicBuffers.length; j++) {
-            bufferInRegistry = this._dynamicBuffers[j].buffer;
-            if (bufferInRegistry === bufferToDelete) {
-                this._dynamicBuffers.splice(j, 1);
-                this.gl.deleteBuffer(this.bufferInRegistry);
-            }
-        }
-    }
-
-    delete this.registry[id];
-};
-
 module.exports = BufferRegistry;
