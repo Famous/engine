@@ -1,3 +1,5 @@
+/*jshint -W079 */
+
 'use strict';
 
 var Dispatch = require('./Dispatch');

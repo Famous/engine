@@ -1,3 +1,4 @@
+'use strict';
 
 /**
  * The Event class adds the stopPropagation functionality

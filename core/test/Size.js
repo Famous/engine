@@ -8,7 +8,7 @@ test('Size', function(t) {
     t.test('constructor', function(t) {
         t.equal(typeof Size, 'function', 'Size should be a constructor function');
         t.doesNotThrow(function() {
-            var size = new Size();
+            new Size();
         }, 'Size constructor should not throw an error');
         t.end();
     });

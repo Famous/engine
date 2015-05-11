@@ -16,7 +16,7 @@ test('Context', function(t) {
                 return mockFamous;
             }
         };
-        var context = new Context('.context-constructor', mockFamous);
+        new Context('.context-constructor', mockFamous);
 
         t.deepEqual(receivedMessages, ['NEED_SIZE_FOR', '.context-constructor']);
         t.end();

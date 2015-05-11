@@ -1,3 +1,5 @@
+/*jshint -W079 */
+
 'use strict';
 
 // TODO: Dispatch should be generalized so that it can work on any Node

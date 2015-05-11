@@ -1,3 +1,5 @@
+/*jshint -W079 */
+
 'use strict';
 
 var Transform = require('./Transform');
@@ -877,7 +879,7 @@ Node.prototype.setScale = function setScale (x, y, z) {
 };
 
 Node.prototype.setOpacity = function setOpacity (val) {
-    if (val != this.value.showState.opacity) {
+    if (val !== this.value.showState.opacity) {
         this.value.showState.opacity = val;
         if (!this._requestingUpdate) this._requestUpdate();
 
