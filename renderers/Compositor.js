@@ -37,6 +37,7 @@ function Compositor() {
     this._contexts = {};
     this._outCommands = [];
     this._inCommands = [];
+    this._time = null
 
     this._resized = false;
 
@@ -45,6 +46,18 @@ function Compositor() {
         _this._resized = true;
     });
 }
+
+/**
+ * Retrieves the time being used by the internal clock managed by
+ * `FamousEngine`.
+ * 
+ * @method  getTime
+ *  
+ * @return {Number}     Clock time.
+ */ 
+Compositor.prototype.getTime = function getTime() {
+    return this._time;
+};
 
 /**
  * Schedules an event to be sent to the WebWorker the next time the out command
@@ -143,6 +156,9 @@ Compositor.prototype.drawCommands = function drawCommands() {
     var command = commands[localIterator];
     while (command) {
         switch (command) {
+            case 'TIME':
+                this._time = commands[++localIterator];
+                break;
             case 'WITH':
                 localIterator = this.handleWith(++localIterator, commands);
                 break;
