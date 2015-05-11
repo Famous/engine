@@ -1,7 +1,7 @@
 'use strict';
 
 var test = require('tape');
-var now = require('../src/now');
+var now = require('../now');
 
 test('now', function(t) {
     t.equal(typeof now(), 'number', 'now() should return a number');

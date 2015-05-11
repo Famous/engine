@@ -1,3 +1,5 @@
+'use strict';
+
 var types = {
     1: 'float ',
     2: 'vec2 ',

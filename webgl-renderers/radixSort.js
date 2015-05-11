@@ -1,3 +1,5 @@
+'use strict';
+
 var radixBits = 11,
     maxRadix = 1 << (radixBits),
     radixMask = maxRadix - 1,

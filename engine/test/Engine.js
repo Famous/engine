@@ -2,7 +2,7 @@
 
 var test = require('tape');
 
-var Engine = require('../src/Engine');
+var Engine = require('../Engine');
 
 test('Engine', function(t) {
     t.test('constructor', function(t) {

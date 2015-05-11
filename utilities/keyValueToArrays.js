@@ -1,3 +1,5 @@
+'use strict';
+
 /**
  * Takes an object containing keys and values and returns an object
  * comprising two "associate" arrays, one with the keys and the other

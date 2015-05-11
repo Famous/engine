@@ -1,3 +1,5 @@
+'use strict';
+
 var Texture = require('./Texture');
 var Checkerboard = require('./Checkerboard');
 var Clock = require('../core').Famous.getClock();

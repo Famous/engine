@@ -1,3 +1,5 @@
+'use strict';
+
 /**
  * Takes the original rendering contexts' compiler function
  * and augments it with added functionality for parsing and
