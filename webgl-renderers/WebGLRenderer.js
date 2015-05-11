@@ -100,12 +100,11 @@ function WebGLRenderer(canvas) {
     
     this.projectionTransform = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, -0.000001, 0, -1, 1, 0, 1];
 
-    // var cutout = this.cutoutGeometry = new Plane();
-    // cutout.id = -1;
-    // this.bufferRegistry.allocate(cutout.id, 'pos', cutout.spec.bufferValues[0], 3);
-    // this.bufferRegistry.allocate(cutout.id, 'texCoord', cutout.spec.bufferValues[1], 2);
-    // this.bufferRegistry.allocate(cutout.id, 'normals', cutout.spec.bufferValues[2], 3);
-    // this.bufferRegistry.allocate(cutout.id, 'indices', cutout.spec.bufferValues[3], 1);
+    var cutout = this.cutoutGeometry = new Plane();
+    this.bufferRegistry.allocate(cutout.id, 'pos', cutout.spec.bufferValues[0], 3);
+    this.bufferRegistry.allocate(cutout.id, 'texCoord', cutout.spec.bufferValues[1], 2);
+    this.bufferRegistry.allocate(cutout.id, 'normals', cutout.spec.bufferValues[2], 3);
+    this.bufferRegistry.allocate(cutout.id, 'indices', cutout.spec.bufferValues[3], 1);
 }
 
 /**
