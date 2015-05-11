@@ -1,3 +1,4 @@
+'use strict';
 
 function MockNode (selector, receivedQueue) {
     this.children = [];

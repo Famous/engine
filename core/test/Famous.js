@@ -67,7 +67,7 @@ test('Famous', function(t) {
             var objectWithoutOnUpdateMethod = {};
             Famous.requestUpdate(objectWithoutOnUpdateMethod);
             Famous.step(10);
-        }, 'Famous.requestUpdate method should not throw an error when being invoked ')
+        }, 'Famous.requestUpdate method should not throw an error when being invoked');
     });
 
     t.test('requestUpdateOnNextTick method', function(t) {

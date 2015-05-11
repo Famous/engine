@@ -146,7 +146,6 @@ Famous.prototype.handleMessage = function handleMessage (messages) {
                 break;
             default:
                 throw new Error('received unknown command: ' + command);
-                break;
         }
     }
     return this;
@@ -165,8 +164,6 @@ Famous.prototype.handleMessage = function handleMessage (messages) {
 Famous.prototype.handleWith = function handleWith (messages) {
     var path = messages.shift();
     var command = messages.shift();
-    var i;
-    var len;
 
     switch (command) {
         case 'TRIGGER': // the TRIGGER command sends a UIEvent to the specified path
@@ -177,7 +174,6 @@ Famous.prototype.handleWith = function handleWith (messages) {
             break;
         default:
             throw new Error('received unknown command: ' + command);
-            break;
     }
     return this;
 };

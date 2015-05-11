@@ -1,3 +1,5 @@
+/*jshint -W079 */
+
 'use strict';
 
 var test = require('tape');
@@ -80,8 +82,8 @@ test('Node', function(t) {
         var requesters = [];
         context.getUpdater = function getUpdater () {
             return {
-                message: function message (message) {
-                    receivedMessages.push(message)
+                message: function message (element) {
+                    receivedMessages.push(element);
                 },
                 requestUpdate: function requestUpdate (requester) {
                     requesters.push(requester);
