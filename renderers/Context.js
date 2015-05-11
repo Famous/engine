@@ -224,6 +224,7 @@ Context.prototype.receive = function receive(pathArr, path, commands, iterator) 
                     commands[++localIterator],
                     commands[++localIterator],
                     commands[++localIterator],
+                    commands[++localIterator],
                     commands[++localIterator]
                 );
                 break;

@@ -87,6 +87,21 @@ Mesh.prototype.setGeometry = function setGeometry (geometry, options) {
         this.value.geometry = geometry;
     }
 
+    if (this._initialized) {
+        if (this._node) {
+            var i = this.value.geometry.spec.invalidations.length;
+            while (i--) {
+                var bufferIndex = this.value.geometry.spec.invalidations.pop();
+                this._changeQueue.push('GL_BUFFER_DATA');
+                this._changeQueue.push(this.value.geometry.id);
+                this._changeQueue.push(this.value.geometry.spec.bufferNames[i]);
+                this._changeQueue.push(this.value.geometry.spec.bufferValues[i]);
+                this._changeQueue.push(this.value.geometry.spec.bufferSpacings[i]);
+                this._changeQueue.push(this.value.geometry.spec.dynamic);
+            }
+            if (i) this._requestUpdate();
+        }
+    }
     return this;
 };
 
@@ -359,18 +374,6 @@ Mesh.prototype.onUpdate = function onUpdate() {
     if (node) {
         node.sendDrawCommand('WITH');
         node.sendDrawCommand(node.getLocation());
-
-        if (this.value.geometry) {
-        i = this.value.geometry.spec.invalidations.length;
-            while (i--) {
-                var bufferIndex = this.value.geometry.spec.invalidations.pop();
-                node.sendDrawCommand('GL_BUFFER_DATA');
-                node.sendDrawCommand(this.value.geometry.id);
-                node.sendDrawCommand(this.value.geometry.spec.bufferNames[i]);
-                node.sendDrawCommand(this.value.geometry.spec.bufferValues[i]);
-                node.sendDrawCommand(this.value.geometry.spec.bufferSpacings[i]);
-            }
-        }
 
         // If any invalidations exist, push them into the queue
         if (this.value.color && this.value.color.isActive()) {
