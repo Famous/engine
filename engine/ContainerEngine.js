@@ -28,10 +28,9 @@ ContainerEngine.prototype._onWindowMessage = function _onWindowMessage(ev) {
     if (
         this._running &&
         ev.data.constructor === Array &&
-        ev.data[0] === 'FAMOUS' &&
-        ev.data[1] === 'FRAME'
+        ev.data[0] === 'FRAME'
     ) {
-        this.step(ev.data[2] - this._sleep);
+        this.step(ev.data[1] - this._sleep);
     }
 };
 
