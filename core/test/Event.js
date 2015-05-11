@@ -1,11 +1,9 @@
+/*jshint -W079 */
+
+'use strict';
 
 var Event = require('../Event');
 var test = require('tape');
-
-function TestPayload () {
-    this.t1 = 5;
-    this.t2 = {};
-}
 
 test('Event', function (t) {
     t.test('constructor', function (t) {

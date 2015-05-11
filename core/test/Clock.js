@@ -58,15 +58,15 @@ test('Clock', function(t) {
 
     t.test('setTimeout method (multiple sequential functions)', function(t) {
         var clock = new Clock();
-        var timerFunctions = [];
         var time = 0;
         var i;
+        function timer(i) {
+            if (time < i) {
+                t.fail(i + '. timeout function has been invoked at ' + time);
+            }
+        }
         for (i = 10; i < 20; i++) {
-            clock.setTimeout(function(i) {
-                if (time < i) {
-                    t.fail(i + '. timeout function has been invoked at ' + time);
-                }
-            }.bind(null, i), i);
+            clock.setTimeout(timer.bind(null, i), i);
         }
         for (i = 0; i < 20; i++) {
             time = i;

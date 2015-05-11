@@ -58,10 +58,10 @@ test('Dispatch', function(t) {
         var receivedQueue = [];
         var context = new MockNode('body', receivedQueue);
         var node0 = context.addChild(receivedQueue);
-        var node1 = context.addChild(receivedQueue);
+        context.addChild(receivedQueue);
         var node00 = node0.addChild(receivedQueue);
         var node001 = node00.addChild(receivedQueue);
-        var node01 = node0.addChild(receivedQueue);
+        node0.addChild(receivedQueue);
         var clickEv = {};
         var dispatcher = new Dispatch(context);
         dispatcher.dispatchUIEvent('body/0', 'click', clickEv);
@@ -74,7 +74,7 @@ test('Dispatch', function(t) {
 
         node00.onReceive = function (name, payload) {
             payload.stopPropagation();
-        }
+        };
 
         dispatcher.dispatchUIEvent(node001.getLocation(), 'click', clickEv);
 
