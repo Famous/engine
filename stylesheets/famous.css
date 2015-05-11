@@ -1,0 +1,85 @@
+html {
+    width: 100%;
+    height: 100%;
+    margin: 0px;
+    padding: 0px;
+    overflow: hidden;
+    -webkit-transform-style: preserve-3d;
+    transform-style: preserve-3d;
+}
+
+body {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    margin: 0px;
+    padding: 0px;
+    -webkit-transform-style: preserve-3d;
+    transform-style: preserve-3d;
+    -webkit-font-smoothing: antialiased;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-perspective: 0;
+    perspective: none;
+    overflow: hidden;
+}
+
+.famous-container, .famous-group {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    bottom: 0px;
+    right: 0px;
+    overflow: visible;
+    -webkit-transform-style: preserve-3d;
+    transform-style: preserve-3d;
+    -webkit-backface-visibility: visible;
+    backface-visibility: visible;
+    pointer-events: none;
+}
+
+.famous-group {
+    width: 0px;
+    height: 0px;
+    margin: 0px;
+    padding: 0px;
+    -webkit-transform-style: preserve-3d;
+    transform-style: preserve-3d;
+}
+
+.fa-surface {
+    position: absolute;
+    -webkit-transform-origin: 0% 0%;
+    transform-origin: 0% 0%;
+    -webkit-backface-visibility: visible;
+    backface-visibility: visible;
+    -webkit-transform-style: preserve-3d;
+    transform-style: preserve-3d; /* performance */
+    -webkit-tap-highlight-color: transparent;
+    pointer-events: auto;
+    z-index: 1; /* HACK to account for browser issues with eventing on the same z-plane*/
+}
+
+.fa-content {
+    position: absolute;
+}
+
+.famous-container-group {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.fa-container {
+    position: absolute;
+    -webkit-transform-origin: center center;
+    transform-origin: center center;
+    overflow: hidden;
+}
+
+canvas.famous-webgl {
+    pointer-events: none;
+    position: absolute;
+    z-index: 1;
+    top: 0px;
+    left: 0px;
+}

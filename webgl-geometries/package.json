@@ -1,0 +1,43 @@
+{
+  "name": "famous-webgl-geometries",
+  "version": "0.2.0",
+  "description": "Famous WebGL renderables",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "tape test/*.js | tap-spec",
+    "watch": "nodemon --ignore node_modules/ -e js,json --exec 'npm test'",
+    "cover": "browserify -t coverify test/*.js | node | coverify",
+    "lint": "jshint --reporter node_modules/jshint-stylish/stylish.js src; true"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Famous/webgl-geometries.git"
+  },
+  "author": "",
+  "license": "All rights reserved",
+  "bugs": {
+    "url": "https://github.com/Famous/webgl-geometries/issues"
+  },
+  "homepage": "https://github.com/Famous/webgl-geometries",
+  "testling": {
+    "files": [
+      "tests/**.spec.js"
+    ],
+    "scripts": "tests/utilities/bind-polyfill.js"
+  },
+  "devDependencies": {
+    "browserify": "^9.0.7",
+    "coverify": "^1.1.0",
+    "jshint": "^2.5.11",
+    "jshint-stylish": "^1.0.0",
+    "nodemon": "^1.3.2",
+    "tap-spec": "^2.2.0",
+    "tape": "^3.0.3",
+    "testling": "^1.7.1",
+    "watchify": "^2.1.1"
+  },
+  "dependencies": {
+    "famous-math": "git+ssh://git@github.famo.us/platform/math#v0.3.0",
+    "famous-utilities": "git+ssh://git@github.famo.us/platform/utilities#v0.4.0"
+  }
+}

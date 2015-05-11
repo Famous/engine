@@ -1,0 +1,180 @@
+'use strict';
+
+var Geometry = require('./Geometry');
+
+/**
+ * DynamicGeometry is a component that defines the data that should
+ *   be drawn to the webGL canvas. Manages vertex data and attributes.
+ *
+ * @class DynamicGeometry
+ * @constructor
+ * 
+ * @param {Object} options instantiation options
+ */
+function DynamicGeometry(options) {
+    Geometry.call(this, options);
+
+    this.spec.dynamic = true;
+}
+
+/**
+ * Returns the number of attribute values used to draw the DynamicGeometry.
+ *
+ * @class DynamicGeometry
+ * @constructor
+ * 
+ * @return {Object} flattened length of the vertex positions attribute
+ * in the geometry.
+ */
+DynamicGeometry.prototype.getLength = function getLength() {
+    return this.getVertexPositions().length;
+};
+
+/**
+ * Gets the buffer object based on buffer name. Throws error
+ * if bufferName is not provided.
+ *
+ * @method getVertexBuffer
+ *
+ * @param {String} bufferName Name of vertexBuffer to be retrieved.
+ * @return {Object} value of buffer with corresponding bufferName.
+ */
+DynamicGeometry.prototype.getVertexBuffer = function getVertexBuffer(bufferName) {
+    if (! bufferName) throw 'getVertexBuffer requires a name';
+
+    var idx = this.spec.bufferNames.indexOf(bufferName);
+    if (idx === -1) throw 'buffer does not exist';
+    else {
+        return this.spec.bufferValues[idx];
+    }
+};
+
+/**
+ * Sets a vertex buffer with given name to input value. Registers a new 
+ * buffer if one does not exist with given name.
+ * 
+ * @method setVertexBuffer
+ * @param {String} bufferName Name of vertexBuffer to be set.
+ * @param {Array} value Input data to fill target buffer.
+ * @param {Number} size Vector size of input buffer data.
+ * @return {Object} current geometry.
+ */
+DynamicGeometry.prototype.setVertexBuffer = function setVertexBuffer(bufferName, value, size) {
+    var idx = this.spec.bufferNames.indexOf(bufferName);
+
+    if (idx === -1) {
+        idx = this.spec.bufferNames.push(bufferName) - 1;
+    }
+
+    this.spec.bufferValues[idx] = value || [];
+    this.spec.bufferSpacings[idx] = size || this.DEFAULT_BUFFER_SIZE;
+
+    if (this.spec.invalidations.indexOf(idx) === -1) {
+        this.spec.invalidations.push(idx);
+    }
+
+    return this;
+};
+
+/**
+ * Copies and sets all buffers from another geometry instance.
+ *
+ * @method fromGeometry
+ *
+ * @param {Object} geometry Geometry instance to copy buffers from.
+ * @return {Object} current geometry.
+ */
+DynamicGeometry.prototype.fromGeometry = function fromGeometry(geometry) {
+    var len = geometry.spec.bufferNames.length;
+    for (var i = 0; i < len; i++) {
+        this.setVertexBuffer(
+            geometry.spec.bufferNames[i],
+            geometry.spec.bufferValues[i],
+            geometry.spec.bufferSpacings[i]
+        );
+    }
+    return this;
+};
+
+/**
+ *  Set the positions of the vertices in this geometry.
+ * 
+ *  @method setVertexPositions
+ *  @param {Array} value New value for vertex position buffer
+ *  @return {Object} current geometry.
+ */
+DynamicGeometry.prototype.setVertexPositions = function (value) {
+    return this.setVertexBuffer('pos', value, 3);
+};
+
+/**
+ *  Set the normals on this geometry.
+ * 
+ *  @method setNormals
+ *  @param {Array} value Value to set normal buffer to.
+ *  @return {Object} current geometry.
+ */
+DynamicGeometry.prototype.setNormals = function (value) {
+    return this.setVertexBuffer('normals', value, 3);
+};
+
+/**
+ *  Set the texture coordinates on this geometry.
+ * 
+ *  @method setTextureCoords
+ *  @param {Array} value New value for texture coordinates buffer.
+ *  @return {Object} current geometry.
+ */
+DynamicGeometry.prototype.setTextureCoords = function (value) {
+    return this.setVertexBuffer('texCoord', value, 2);
+};
+
+/**
+ *  Set the texture coordinates on this geometry.
+ *  @method setTextureCoords
+ *  @param {Array} value New value for index buffer
+ *  @return {Object} current geometry.
+ */
+DynamicGeometry.prototype.setIndices = function (value) {
+    return this.setVertexBuffer('indices', value, 1);
+};
+
+/**
+ *  Set the WebGL drawing primitive for this geometry.
+ *  @method setDrawType
+ *  @param {String} type New drawing primitive for geometry
+ *  @return {Object} current geometry.
+ */
+DynamicGeometry.prototype.setDrawType = function (value) {
+    this.spec.type = value.toUpperCase();
+    return this;
+};
+
+/**
+ * Returns the 'pos' vertex buffer of the geometry.
+ * @method getVertexPositions
+ * @return {Array} Vertex buffer.
+ */
+DynamicGeometry.prototype.getVertexPositions = function () {
+    return this.getVertexBuffer('pos');
+};
+
+/**
+ * Returns the 'normal' vertex buffer of the geometry.
+ * @method getNormals
+ * @return {Array} Vertex Buffer.
+ */
+DynamicGeometry.prototype.getNormals = function () {
+    return this.getVertexBuffer('normals');
+};
+
+/**
+ * Returns the 'textureCoord' vertex buffer of the geometry.
+ * @method getTextureCoords
+ * @return {Array} Vertex Buffer.
+ */
+DynamicGeometry.prototype.getTextureCoords = function () {
+    return this.getVertexBuffer('texCoord');
+};
+
+module.exports = DynamicGeometry;

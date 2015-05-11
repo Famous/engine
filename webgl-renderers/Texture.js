@@ -1,0 +1,144 @@
+'use strict';
+
+/**
+ * Texture is a private class that stores image data
+ * to be accessed from a shader or used as a render target.
+ *
+ * @class Texture
+ * @constructor
+ */
+function Texture(gl, options) {
+    options = options || {};
+    this.id = gl.createTexture();
+    this.width = options.width || 0;
+    this.height = options.height || 0;
+    this.mipmap = options.mipmap;
+    this.format = options.format || gl.RGBA;
+    this.type = options.type || gl.UNSIGNED_BYTE;
+    this.gl = gl;
+
+    this.bind();
+
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
+    gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
+
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl[options.magFilter] || gl.NEAREST);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl[options.minFilter] || gl.NEAREST);
+
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl[options.wrapS] || gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl[options.wrapT] || gl.CLAMP_TO_EDGE);
+
+    gl.texImage2D(gl.TEXTURE_2D, 0, this.format, this.width, this.height, 0, this.format, this.type, null);
+}
+
+/**
+ * Binds this texture as the selected target.
+ *
+ * @method bind
+ * @chainable
+ *
+ * @param {Number} unit The texture slot in which to upload the data.
+ *
+ * @return {Object} Current texture instance.
+ */
+Texture.prototype.bind = function bind() {
+    this.gl.bindTexture(this.gl.TEXTURE_2D, this.id);
+    return this;
+};
+
+/**
+ * Erases the texture data in the given texture slot.
+ *
+ * @method unbind
+ * @chainable
+ *
+ * @param {Number} unit The texture slot in which to clean the data.
+ * 
+ * @return {Object} Current texture instance.
+ */
+Texture.prototype.unbind = function unbind() {
+    this.gl.bindTexture(this.gl.TEXTURE_2D, null);
+    return this;
+};
+
+/**
+ * Replaces the image data in the texture with the given image.
+ *
+ * @method setImage
+ * @chainable
+ *
+ * @param {Image} img The image object to upload pixel data from.
+ *
+ * @return {Object} Current texture instance.
+ */
+Texture.prototype.setImage = function setImage(img) {
+    this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.format, this.format, this.type, img);
+    if (this.mipmap) this.gl.generateMipmap(this.gl.TEXTURE_2D);
+    return this;
+};
+
+/**
+ * Replaces the image data in the texture with an array of arbitrary data.
+ *
+ * @method setArray
+ * @chainable
+ *
+ * @param {Array} input Array to be set as data to texture. 
+ *
+ * @return {Object} Current texture instance.
+ */
+Texture.prototype.setArray = function setArray(input) {
+    // this.gl.bindTexture(this.gl.TEXTURE_2D, this.id);
+    this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.format, 1, 1, 0, this.format, this.type, new Uint8Array(input));
+    // this.gl.bindTexture(this.gl.TEXTURE_2D, null);
+    return this;
+};
+
+/**
+ * Dumps the rgb-pixel contents of a texture into an array for debugging purposes
+ *
+ * @method readBack
+ * @chainable
+ *
+ * @param {Number} x-offset between texture coordinates and snapshot
+ * @param {Number} y-offset between texture coordinates and snapshot
+ * @param {Number} x-depth of the snapshot
+ * @param {Number} y-depth of the snapshot
+ * 
+ * @return {Array} An array of the pixels contained in the snapshot.
+ */
+Texture.prototype.readBack = function readBack(x, y, width, height) {
+    var gl = this.gl;
+    var pixels;
+    x = x || 0;
+    y = y || 0;
+    width = width || this.width;
+    height = height || this.height;
+    var fb = gl.createFramebuffer();
+    gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
+    gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this.id, 0);
+    if (gl.checkFramebufferStatus(gl.FRAMEBUFFER) == gl.FRAMEBUFFER_COMPLETE) {
+        pixels = new Uint8Array(width * height * 4);
+        gl.readPixels(x, y, width, height, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
+    }
+    return pixels;
+};
+
+/*
+ * Determines whether both input values are power-of-two numbers.
+ *
+ * @method isPowerOfTwo
+ * @private
+ *
+ * @param {Number} width Number representing texture width.
+ * @param {Number} height Number representing texture height.
+ *
+ * @return {Boolean} Boolean denoting whether the input dimensions
+ * are both power-of-two values.
+ */
+function isPowerOfTwo(width, height) {
+    return (width & width - 1) === 0 
+        && (height & height - 1) === 0;
+};
+
+module.exports = Texture;
