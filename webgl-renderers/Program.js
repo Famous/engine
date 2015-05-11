@@ -2,8 +2,8 @@
 
 var Utility = require('../utilities');
 
-var vertexWrapper = require('../webgl-shaders/vertex');
-var fragmentWrapper = require('../webgl-shaders/fragment');
+var vertexWrapper = require('../webgl-shaders').vertex;
+var fragmentWrapper = require('../webgl-shaders').fragment;
 var Debug = require('./Debug');
 
 var VERTEX_SHADER = 35633;
