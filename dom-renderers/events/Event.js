@@ -58,8 +58,16 @@ function Event(ev) {
     this.timeStamp = ev.timeStamp;
 }
 
+
+/**
+ * Proxies the passed in native event onto the normalized event (`this`).
+ * 
+ * @method  proxy
+ *  
+ * @param  {Event} ev   Event payload. 
+ */ 
 Event.prototype.proxy = function proxy (ev) {
-    this.prototype.constructor.call(this, ev);
+    this.constructor.call(this, ev);
 };
 
 module.exports = Event;

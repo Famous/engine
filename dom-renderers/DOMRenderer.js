@@ -78,8 +78,6 @@ function DOMRenderer (element, selector, compositor) {
     this.perspectiveTransform = new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
     this._VPtransform = new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
 
-    this._eventListeners = {};
-
     this._size = [null, null];
 }
 
@@ -99,24 +97,22 @@ function DOMRenderer (element, selector, compositor) {
  * @param  {String} type            DOM event type (e.g. click, mouseover).
  * @param  {Boolean} preventDefault Whether or not the default browser action
  *                                  should be prevented.
- */
-DOMRenderer.prototype.addEventListener = function addEventListener(path, type, preventDefault) {
-    if (!this._eventListeners[type]) {
-        this._eventListeners[type] = {};
-        if (eventMap[type][1]) {
-            // Use event delegation
-            this._root.element.addEventListener(type, this._boundTriggerEvent);
-        } else {
-            // Directly link event handler to DOM element
-            this._elements[path].element.addEventListener(type, this._boundTriggerEvent);
-        }
+ */ 
+DOMRenderer.prototype.addEventListener = function addEventListener(type, preventDefault) {
+    // TODO preventDefault should be a separate command
+    this._assertTargetLoaded();
+    
+    this._target.preventDefault[type] = preventDefault;
+    this._target.subscribe[type] = true;
+    
+    if (
+        !this._target.listeners[type] && !this._root.listeners[type]
+    ) {
+        var target = eventMap[type][1] ? this._root : this._target;
+        target.listeners[type] = this._boundTriggerEvent;
+        target.element.addEventListener(type, this._boundTriggerEvent);
     }
-
-    this._eventListeners[type][path] = {
-        preventDefault: preventDefault
-    };
 };
-
 
 /**
  * Function to be added using `addEventListener` to the corresponding
@@ -132,18 +128,21 @@ DOMRenderer.prototype._triggerEvent = function _triggerEvent(ev) {
     for (var i = 0; i < evPath.length; i++) {
         if (!evPath[i].dataset) continue;
         var path = evPath[i].dataset.faPath;
-        if (this._eventListeners[ev.type][path]) {
-
+        if (!path) continue;
+        
+        if (this._elements[path].subscribe[ev.type]) {
             ev.stopPropagation();
-            if (this._eventListeners[ev.type][path].preventDefault) {
+
+            if (this._elements[path].preventDefault[ev.type]) {
                 ev.preventDefault();
             }
-
-            var EventConstructor = eventMap[ev.type][0];
-            this._compositor.sendEvent(path, ev.type, new EventConstructor(ev));
-
-            break;
+    
+            var normalizedEvent = eventMap[ev.type][0];
+            normalizedEvent.proxy(ev);
+            this._compositor.sendEvent(path, ev.type, normalizedEvent);
         }
+        
+        break;
     }
 };
 

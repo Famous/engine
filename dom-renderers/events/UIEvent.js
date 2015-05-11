@@ -37,7 +37,7 @@ function UIEvent(ev) {
     this.detail = ev.detail;
 }
 
-UIEvent.prototype = Event.prototype;
+UIEvent.prototype = Object.create(Event.prototype);
 UIEvent.prototype.constructor = UIEvent;
 
 module.exports = UIEvent;

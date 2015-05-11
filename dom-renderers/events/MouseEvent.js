@@ -64,7 +64,7 @@ function MouseEvent(ev) {
     this.offsetY = ev.offsetY;
 }
 
-MouseEvent.prototype = UIEvent.prototype;
+MouseEvent.prototype = Object.create(UIEvent.prototype);
 MouseEvent.prototype.constructor = MouseEvent;
 
 module.exports = MouseEvent;
