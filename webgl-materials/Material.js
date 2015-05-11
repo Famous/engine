@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
+ 
 'use strict';
 
 var TextureRegistry = require('./TextureRegistry');
@@ -31,7 +31,7 @@ var expressions = {};
 var snippets = {
 
     /* Abs - The abs function returns the absolute value of x, i.e. x when x is positive or zero and -x for negative x. The input parameter can be a floating scalar or a float vector. In case of a float vector the operation is done component-wise.
-     */ 
+     */
 
     abs: {glsl: 'abs(%1);', output: { 4: 4, 3: 3, 2: 2, 1: 1 }},
     /* Sign - The sign function returns 1.0 when x is positive, 0.0 when x is zero and -1.0 when x is negative. The input parameter can be a floating scalar or a float vector. In case of a float vector the operation is done component-wise. */
@@ -54,7 +54,7 @@ var snippets = {
 
     min: {glsl: 'min(%1, %2);', output: { 4: 4, 3: 3, 2: 2, 1: 1 }},
 
-    /* Max - The max function returns the larger of the two arguments. The input parameters can be floating scalars or float vectors. In case of float vectors the operation is done component-wise. */ 
+    /* Max - The max function returns the larger of the two arguments. The input parameters can be floating scalars or float vectors. In case of float vectors the operation is done component-wise. */
 
     max: {glsl: 'max(%1, %2);', output: { 4: 4, 3: 3, 2: 2, 1: 1 }},
 
@@ -64,13 +64,13 @@ var snippets = {
 
     /* Mix - The mix function returns the linear blend of x and y, i.e. the product of x and (1 - a) plus the product of y and a. The input parameters can be floating scalars or float vectors. In case of float vectors the operation is done component-wise. */
 
-    mix: {glsl: 'mix(%1, %2, %3);', output: { '4,4,1': 4, '3,3,1': 3, '2,2,1': 2, '4,4,1': 4, '1,1,1': 1 }},
+    mix: {glsl: 'mix(%1, %2, %3);', output: { '4,4,1': 4, '3,3,1': 3, '2,2,1': 2, '1,1,1': 1 }},
 
     /* Step - The step function returns 0.0 if x is smaller then edge and otherwise 1.0. The input parameters can be floating scalars or float vectors. In case of float vectors the operation is done component-wise. */
 
     step: {glsl: 'step(%1, %2, %3);', output: { '1,1': 1, '1,2': 2, '1,3': 3, '1,4': 4 }},
-    
-    /* Smoothstep - The smoothstep function returns 0.0 if x is smaller then edge0 and 1.0 if x is larger than edge1. Otherwise the return value is interpolated between 0.0 and 1.0 using Hermite polynomirals. The input parameters can be floating scalars or float vectors. In case of float vectors the operation is done component-wise. */ 
+
+    /* Smoothstep - The smoothstep function returns 0.0 if x is smaller then edge0 and 1.0 if x is larger than edge1. Otherwise the return value is interpolated between 0.0 and 1.0 using Hermite polynomirals. The input parameters can be floating scalars or float vectors. In case of float vectors the operation is done component-wise. */
 
     smoothstep: {glsl: 'smoothstep(%1);', output: { '1,1,1':1, '2,2,2':2, '3,3,3':3, '4,4,4':4 }},
 
@@ -88,11 +88,11 @@ var snippets = {
 
     cos: {glsl: 'cos(%1);', output: {'1':1, '2':2, '3':3, '4':4}},
 
-    /* Pow - The power function returns x raised to the power of y. The input parameters can be floating scalars or float vectors. In case of float vectors the operation is done component-wise. */ 
+    /* Pow - The power function returns x raised to the power of y. The input parameters can be floating scalars or float vectors. In case of float vectors the operation is done component-wise. */
 
     pow: {glsl: 'pow(%1, %2);', output: {'1,1':1, '2,2':2, '3,3':3, '1,4':4}},
 
-    /* Sqrt - The sqrt function returns the square root of x. The input parameter can be a floating scalar or a float vector. In case of a float vector the operation is done component-wise. */ 
+    /* Sqrt - The sqrt function returns the square root of x. The input parameter can be a floating scalar or a float vector. In case of a float vector the operation is done component-wise. */
 
     sqrt: {glsl: 'sqrt(%1);', output: {'1,1':1, '2,2':2, '3,3':3, '1,4':4}},
 
@@ -136,9 +136,9 @@ var snippets = {
 
 
     /* The constant function returns a static value which is defined at compile-time that cannot be changed dynamically.*/
-    
+
     constant: {glsl: '%1;'},
-    
+
     /* The Parameter expression has values that can be modified (dynamically during runtime in some cases) in a MaterialInstance of the base material containing the parameter. These expressions should be given unique names, via the Parameter Name property, to be used when identifying the specific parameter in the MaterialInstance. If two parameters of the same type have the same name in the same material, they will be assumed to be the same parameter. Changing the value of the parameter in the MaterialInstance would change the value of both the parameter expressions in the material. A default value for the parameter will also be set in the base material. This will be the value of the parameter in the MaterialInstance unless it is overridden and modified there. */
 
     parameter: {uniforms: {parameter: 1}, glsl: 'parameter;'},
