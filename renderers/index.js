@@ -26,5 +26,5 @@
 
 module.exports = {
     Compositor: require('./Compositor'),
-    ThreadManager: require('./ThreadManager')
+    UIManager: require('./UIManager')
 };

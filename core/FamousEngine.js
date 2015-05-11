@@ -25,8 +25,11 @@
 'use strict';
 
 var Clock = require('./Clock');
-var Context = require('./Context');
+var Scene = require('./Scene');
 var Channel = require('./Channel');
+var UIManager = require('../renderers/UIManager');
+var Compositor = require('../renderers/Compositor');
+var Engine = require('../engine/Engine');
 
 var ENGINE_START = ['ENGINE', 'START'];
 var ENGINE_STOP = ['ENGINE', 'STOP'];
@@ -36,7 +39,7 @@ var ENGINE_STOP = ['ENGINE', 'STOP'];
  * updater and another to send messages over to the renderers. It is
  * a singleton.
  */
-function Famous () {
+function FamousEngine() {
     this._updateQueue = []; // The updateQueue is a place where nodes
                             // can place themselves in order to be
                             // updated on the frame.
@@ -47,7 +50,7 @@ function Famous () {
                                 // an update a node continuously puts itself
                                 // back in the update queue.
 
-    this._contexts = {}; // a hash of all of the context's that this famous
+    this._scenes = {}; // a hash of all of the scenes's that the FamousEngine
                          // is responsible for.
 
     this._messages = []; // a queue of all of the draw commands to send to the
@@ -64,14 +67,26 @@ function Famous () {
     this._channel.onMessage = this.handleMessage.bind(this);
 }
 
+
+/**
+ * @method init
+ * @chainable
+ */
+FamousEngine.prototype.init = function init(options) {
+    this.compositor = options && options.compositor || new Compositor();
+    this.engine = options && options.engine || new Engine();
+    this.uiManager = new UIManager(this.getChannel(), this.compositor, this.engine);
+    return this;
+};
+
 /**
  * @method setChannel
  * @chainable
  *
  * @param {Channel} channel     The channel to be used for communicating with
- *                              the `ThreadManager`/ `Compositor`.
+ *                              the `UIManager`/ `Compositor`.
  */
-Famous.prototype.setChannel = function setChannel(channel) {
+FamousEngine.prototype.setChannel = function setChannel(channel) {
     this._channel = channel;
     return this;
 };
@@ -80,9 +95,9 @@ Famous.prototype.setChannel = function setChannel(channel) {
  * @method getChannel
  *
  * @return {Channel} channel    The channel to be used for communicating with
- *                              the `ThreadManager`/ `Compositor`.
+ *                              the `UIManager`/ `Compositor`.
  */
-Famous.prototype.getChannel = function getChannel () {
+FamousEngine.prototype.getChannel = function getChannel () {
     return this._channel;
 };
 
@@ -94,7 +109,7 @@ Famous.prototype.getChannel = function getChannel () {
  * all requests to be placed in the update queue will be forwarded to the
  * nextUpdateQueue.
  */
-Famous.prototype._update = function _update () {
+FamousEngine.prototype._update = function _update () {
     this._inUpdate = true;
     var time = this._clock.now();
     var nextQueue = this._nextUpdateQueue;
@@ -114,12 +129,12 @@ Famous.prototype._update = function _update () {
 /**
  * requestUpdates takes a class that has an onUpdate method and puts it
  * into the updateQueue to be updated at the next frame.
- * If Famous is currently in an update, requestUpdate
+ * If FamousEngine is currently in an update, requestUpdate
  * passes its argument to requestUpdateOnNextTick.
  *
  * @param {Object} an object with an onUpdate method
  */
-Famous.prototype.requestUpdate = function requestUpdate (requester) {
+FamousEngine.prototype.requestUpdate = function requestUpdate (requester) {
     if (!requester)
         throw new Error(
             'requestUpdate must be called with a class to be updated'
@@ -131,27 +146,27 @@ Famous.prototype.requestUpdate = function requestUpdate (requester) {
 
 /**
  * requestUpdateOnNextTick is requests an update on the next frame.
- * If Famous is not currently in an update than it is functionally equivalent
+ * If FamousEngine is not currently in an update than it is functionally equivalent
  * to requestUpdate. This method should be used to prevent infinite loops where
  * a class is updated on the frame but needs to be updated again next frame.
  *
  * @param {Object} an object with an onUpdate method
  */
-Famous.prototype.requestUpdateOnNextTick = function requestUpdateOnNextTick (requester) {
+FamousEngine.prototype.requestUpdateOnNextTick = function requestUpdateOnNextTick (requester) {
     this._nextUpdateQueue.push(requester);
 };
 
 /**
- * postMessage sends a message queue into Famous to be processed.
+ * postMessage sends a message queue into FamousEngine to be processed.
  * These messages will be interpreted and sent into the scene graph
  * as events if necessary.
  *
  * @param {Array} an array of commands.
  * @chainable
  *
- * @return {Famous} this
+ * @return {FamousEngine} this
  */
-Famous.prototype.handleMessage = function handleMessage (messages) {
+FamousEngine.prototype.handleMessage = function handleMessage (messages) {
     if (!messages)
         throw new Error(
             'onMessage must be called with an array of messages'
@@ -183,9 +198,9 @@ Famous.prototype.handleMessage = function handleMessage (messages) {
  * @param {Array} array of messages.
  * @chainable
  *
- * @return {Famous} this
+ * @return {FamousEngine} this
  */
-Famous.prototype.handleWith = function handleWith (messages) {
+FamousEngine.prototype.handleWith = function handleWith (messages) {
     var path = messages.shift();
     var command = messages.shift();
 
@@ -204,14 +219,14 @@ Famous.prototype.handleWith = function handleWith (messages) {
 
 /**
  * handleFrame is called when the renderers issue a FRAME command to
- * Famous. Famous will then step updating the scene graph to the current time.
+ * FamousEngine. FamousEngine will then step updating the scene graph to the current time.
  *
  * @param {Array} array of messages.
  * @chainable
  *
- * @return {Famous} this
+ * @return {FamousEngine} this
  */
-Famous.prototype.handleFrame = function handleFrame (messages) {
+FamousEngine.prototype.handleFrame = function handleFrame (messages) {
     if (!messages) throw new Error('handleFrame must be called with an array of messages');
     if (!messages.length) throw new Error('FRAME must be sent with a time');
 
@@ -226,9 +241,9 @@ Famous.prototype.handleFrame = function handleFrame (messages) {
  * @param {Number} current engine time
  * @chainable
  *
- * @return {Famous} this
+ * @return {FamousEngine} this
  */
-Famous.prototype.step = function step (time) {
+FamousEngine.prototype.step = function step (time) {
     if (time == null) throw new Error('step must be called with a time');
 
     this._clock.step(time);
@@ -251,21 +266,21 @@ Famous.prototype.step = function step (time) {
  *
  * @return {Context | Undefined} the context if found, else undefined.
  */
-Famous.prototype.getContext = function getContext (selector) {
+FamousEngine.prototype.getContext = function getContext (selector) {
     if (!selector) throw new Error('getContext must be called with a selector');
 
     var index = selector.indexOf('/');
     selector = index === -1 ? selector : selector.substring(0, index);
 
-    return this._contexts[selector];
+    return this._scenes[selector];
 };
 
 /**
  * returns the instance of clock within famous.
  *
- * @return {Clock} Famous's clock
+ * @return {Clock} FamousEngine's clock
  */
-Famous.prototype.getClock = function getClock () {
+FamousEngine.prototype.getClock = function getClock () {
     return this._clock;
 };
 
@@ -275,26 +290,26 @@ Famous.prototype.getClock = function getClock () {
  * @param {Any} Draw Command
  * @chainable
  *
- * @return {Famous} this
+ * @return {FamousEngine} this
  */
-Famous.prototype.message = function message (command) {
+FamousEngine.prototype.message = function message (command) {
     this._messages.push(command);
     return this;
 };
 
 /**
- * Creates a context under which a scene graph could be built.
+ * Creates a scene under which a scene graph could be built.
  *
- * @param {String} a dom selector for where the context should be placed
+ * @param {String} a dom selector for where the scene should be placed
  *
- * @return {Context} a new instance of Context.
+ * @return {Scene} a new instance of Scene.
  */
-Famous.prototype.createContext = function createContext (selector) {
+FamousEngine.prototype.createScene = function createScene (selector) {
     selector = selector || 'body';
 
-    if (this._contexts[selector]) this._contexts[selector].dismount();
-    this._contexts[selector] = new Context(selector, this);
-    return this._contexts[selector];
+    if (this._scenes[selector]) this._scenes[selector].dismount();
+    this._scenes[selector] = new Scene(selector, this);
+    return this._scenes[selector];
 };
 
 /**
@@ -303,7 +318,7 @@ Famous.prototype.createContext = function createContext (selector) {
  *
  * @chainable
  */
-Famous.prototype.startEngine = function startEngine () {
+FamousEngine.prototype.startEngine = function startEngine () {
     this._channel.sendMessage(ENGINE_START);
     return this;
 };
@@ -314,9 +329,9 @@ Famous.prototype.startEngine = function startEngine () {
  *
  * @chainable
  */
-Famous.prototype.stopEngine = function stopEngine () {
+FamousEngine.prototype.stopEngine = function stopEngine () {
     this._channel.sendMessage(ENGINE_STOP);
     return this;
 };
 
-module.exports = new Famous();
+module.exports = new FamousEngine();
