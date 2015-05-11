@@ -1,6 +1,6 @@
 'use strict';
 
-var Vec3 = require('../../../math.Vec3');
+var Vec3 = require('../../../math/Vec3');
 var ObjectManager = require('../../../utilities/ObjectManager');
 
 ObjectManager.register('Manifold', Manifold);

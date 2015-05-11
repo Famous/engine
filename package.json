@@ -9,41 +9,23 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.famo.us/platform/oasis.git"
+    "url": "https://github.com/Famous/engine.git"
   },
   "author": "Famous",
   "license": "All rights reserved",
-  "dependencies": {
-    "famous-components": "git+ssh://git@github.famo.us/platform/components#v0.4.3",
-    "famous-core": "git+ssh://git@github.famo.us/platform/core#v0.4.3",
-    "famous-dom-renderables": "git+ssh://git@github.famo.us/platform/dom-renderables#v0.5.1",
-    "famous-dom-renderers": "git+ssh://git@github.famo.us/platform/dom-renderers#v0.6.1",
-    "famous-engine": "git+ssh://git@github.famo.us/platform/engine#v0.1.3",
-    "famous-math": "git+ssh://git@github.famo.us/platform/math#v0.2.1",
-    "famous-physics": "git+ssh://git@github.famo.us/platform/physics#v0.2.2",
-    "famous-polyfills": "git+ssh://git@github.famo.us/platform/polyfills#v0.1.2",
-    "famous-renderers": "git+ssh://git@github.famo.us/platform/renderers#v0.3.4",
-    "famous-router": "git+ssh://git@github.famo.us/platform/router#v0.1.2",
-    "famous-stylesheets": "git+ssh://git@github.famo.us/platform/stylesheets#v0.3.0",
-    "famous-transitions": "git+ssh://git@github.famo.us/platform/transitions#v0.4.1",
-    "famous-utilities": "git+ssh://git@github.famo.us/platform/utilities#v0.3.1",
-    "famous-webgl-geometries": "git+ssh://git@github.famo.us/platform/webgl-geometries#v0.1.3",
-    "famous-webgl-materials": "git+ssh://git@github.famo.us/platform/webgl-materials#v0.1.3",
-    "famous-webgl-renderables": "git+ssh://git@github.famo.us/platform/webgl-renderables#v0.3.3",
-    "famous-webgl-renderers": "git+ssh://git@github.famo.us/platform/webgl-renderers#v0.4.1",
-    "famous-webgl-shaders": "git+ssh://git@github.famo.us/platform/webgl-shaders#v0.1.4"
-  },
   "devDependencies": {
     "browserify": "^9.0.3",
     "uglify-js": "^2.4.17",
     "uglifyify": "^3.0.1"
   },
   "dependencies": {
-    "glslify": "^1.6.0"
+    "glslify": "^1.6.0",
+    "cssify": "^0.6.0"
   },
   "browserify": {
     "transform": [
-      "glslify"
+      "glslify",
+      "cssify"
     ]
   }
 }

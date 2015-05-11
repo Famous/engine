@@ -1,6 +1,6 @@
 'use strict';
 
-var Particle = require('../bodies/Particle');
+var Particle = require('./Particle');
 var Mat33 = require('../../math/Mat33');
 var Vec3 = require('../../math/Vec3');
 var Geometry = require('../Geometry');

@@ -3,7 +3,7 @@
 var Vec3 = require('../math/Vec3');
 var Mat33 = require('../math/Mat33');
 
-var ObjectManager = require('famous-utilities').ObjectManager;
+var ObjectManager = require('../utilities/ObjectManager');
 ObjectManager.register('DynamicGeometry', DynamicGeometry);
 ObjectManager.register('DynamicGeometryFeature', DynamicGeometryFeature);
 var OMRequestDynamicGeometryFeature = ObjectManager.requestDynamicGeometryFeature;
