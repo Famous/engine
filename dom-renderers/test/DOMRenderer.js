@@ -25,7 +25,7 @@
 'use strict';
 
 var test = require('tape');
-var DOMRenderer = require('../src/DOMRenderer');
+var DOMRenderer = require('../DOMRenderer');
 
 /**
  * Helpers method used for creating a mock compostior that fails on received

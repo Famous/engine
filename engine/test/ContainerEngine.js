@@ -25,7 +25,7 @@
 'use strict';
 
 var test = require('tape');
-var ContainerEngine = require('../src/ContainerEngine');
+var ContainerEngine = require('../ContainerEngine');
 
 test('ContainerEngine', function(t) {
     t.test('constructor', function(t) {
@@ -62,7 +62,7 @@ test('ContainerEngine', function(t) {
         });
 
         expectedUpdates.forEach(function (time) {
-            window.postMessage(['FAMOUS', 'FRAME', time], '*');
+            window.postMessage(['FRAME', time], '*');
         });
     });
 
@@ -75,12 +75,12 @@ test('ContainerEngine', function(t) {
             update: function(time) {
                 t.equal(Math.round(time), 123);
                 engine.noLongerUpdate(updateable);
-                window.postMessage(['FAMOUS', 'FRAME', 124], '*');
+                window.postMessage(['FRAME', 124], '*');
             }
         };
         engine.update(updateable);
 
-        window.postMessage(['FAMOUS', 'FRAME', 123], '*');
+        window.postMessage(['FRAME', 123], '*');
     });
 
     t.test('start method', function(t) {
@@ -103,7 +103,7 @@ test('ContainerEngine', function(t) {
             }
         });
 
-        window.postMessage(['FAMOUS', 'FRAME', 123], '*');
+        window.postMessage(['FRAME', 123], '*');
     });
 
     t.test('step method', function(t) {
@@ -125,7 +125,7 @@ test('ContainerEngine', function(t) {
         var engine = new ContainerEngine();
         engine.stop();
 
-        window.postMessage(['FAMOUS', 'FRAME', 100], '*');
+        window.postMessage(['FRAME', 100], '*');
 
         setTimeout(function() {
             engine.start();
@@ -136,7 +136,7 @@ test('ContainerEngine', function(t) {
                 }
             });
 
-            window.postMessage(['FAMOUS', 'FRAME', 1100], '*');
+            window.postMessage(['FRAME', 1100], '*');
         }, 1000);
     });
 });
