@@ -37,5 +37,13 @@
     "browserify": "^9.0.3",
     "uglify-js": "^2.4.17",
     "uglifyify": "^3.0.1"
+  },
+  "dependencies": {
+    "glslify": "^1.6.0"
+  },
+  "browserify": {
+    "transform": [
+      "glslify"
+    ]
   }
 }
