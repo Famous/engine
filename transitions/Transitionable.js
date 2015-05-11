@@ -25,6 +25,7 @@
 'use strict';
 
 var Curves = require('./Curves');
+var Famous = require('../core/Famous');
 
 /**
  * A state maintainer for a smooth transition between
@@ -84,9 +85,9 @@ function Transitionable(initialState) {
  * Internal Clock used for determining the current time for the ongoing
  * transitions.
  *
- * @type {Performance|Date|Object}
+ * @type {Performance|Date|Clock}
  */
-Transitionable.Clock = typeof performance !== 'undefined' ? performance : Date;
+Transitionable.Clock = Famous.getClock();
 
 /**
  * Registers a transition to be pushed onto the internal queue.
