@@ -189,7 +189,7 @@ Compositor.prototype.receiveCommands = function receiveCommands(commands) {
 Compositor.prototype.clearCommands = function clearCommands() {
     this._inCommands.length = 0;
     this._outCommands.length = 0;
-    this._resized = null;    
+    this._resized = null;
 };
 
 module.exports = Compositor;

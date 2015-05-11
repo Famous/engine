@@ -42,8 +42,8 @@ function Context(selector, compositor) {
     DOMLayerEl.style.transformStyle = 'preserve-3d';
     DOMLayerEl.style.webkitTransformStyle = 'preserve-3d';
     this._rootEl.appendChild(DOMLayerEl);
-    this.DOMRenderer = new DOMRenderer(DOMLayerEl, selector, compositor); 
- 
+    this.DOMRenderer = new DOMRenderer(DOMLayerEl, selector, compositor);
+
     this.WebGLRenderer = null;
     this.canvas = null;
 
@@ -116,7 +116,7 @@ Context.prototype.receive = function receive(pathArr, path, commands, iterator) 
     this.DOMRenderer.loadPath(path);
     this.DOMRenderer.findTarget();
     while (command) {
-        
+
         switch (command) {
             case 'INIT_DOM':
                 this.DOMRenderer.insertEl(commands[++localIterator]);
@@ -129,7 +129,7 @@ Context.prototype.receive = function receive(pathArr, path, commands, iterator) 
 
                 if (this.WebGLRenderer)
                     this.WebGLRenderer.setCutoutUniform(path, 'transform', this._meshTransform);
-                
+
                 break;
 
             case 'CHANGE_SIZE':
@@ -161,7 +161,7 @@ Context.prototype.receive = function receive(pathArr, path, commands, iterator) 
 
             case 'ADD_CLASS':
                 if (this.WebGLRenderer) this.WebGLRenderer.getOrSetCutout(path);
-                this.DOMRenderer.addClass(commands[++localIterator]); 
+                this.DOMRenderer.addClass(commands[++localIterator]);
                 break;
 
             case 'REMOVE_CLASS':
@@ -178,7 +178,7 @@ Context.prototype.receive = function receive(pathArr, path, commands, iterator) 
                 this.DOMRenderer.addEventListener(path, type, preventDefault);
                 break;
 
-            case 'GL_SET_DRAW_OPTIONS': 
+            case 'GL_SET_DRAW_OPTIONS':
                 if (!this.WebGLRenderer) this.initWebGL();
                 this.WebGLRenderer.setMeshOptions(path, commands[++localIterator]);
                 break;

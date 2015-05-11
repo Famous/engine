@@ -35,7 +35,7 @@ var RENDER_SIZE = 2;
  *
  * @class DOMElement
  * @constructor
- * 
+ *
  * @param {Node} node                   The entity to which the `DOMElement`
  *                                      renderable should be attached to.
  * @param {Object} options              Initial options used for instantiating
@@ -59,7 +59,7 @@ function DOMElement (node, options) {
     this._requestingUpdate = false;
 
     this._changeQueue = [];
-    
+
     this._UIEvents = node.getUIEvents().slice(0);
     this._classes = ['fa-surface'];
     this._requestingEventListeners = [];
@@ -104,7 +104,7 @@ function DOMElement (node, options) {
  * scene graph hierarchies.
  *
  * @method getValue
- * 
+ *
  * @return {Object}     serialized component.
  */
 DOMElement.prototype.getValue = function getValue () {
@@ -148,7 +148,7 @@ DOMElement.prototype.onUpdate = function onUpdate () {
  * ancestors) is being mounted.
  *
  * @method onMount
- * 
+ *
  * @param  {Node} node      Parent node to which the component should be added.
  * @param  {String} id      Path at which the component (or node) is being
  *                          attached. The path is being set on the actual
@@ -163,7 +163,7 @@ DOMElement.prototype.onMount = function onMount (node, id) {
 };
 
 /**
- * Method to be invoked by the Node as soon as the node is being dismounted 
+ * Method to be invoked by the Node as soon as the node is being dismounted
  * either directly or by dismounting one of its ancestors).
  *
  * @method onDismount
@@ -203,7 +203,7 @@ DOMElement.prototype.onHide = function onHide () {
  * commands to the `DOMRenderer`.
  *
  * @method onTransformChange
- * 
+ *
  * @param  {Float32Array} transform     The final transform matrix.
  */
 DOMElement.prototype.onTransformChange = function onTransformChange (transform) {
@@ -216,10 +216,10 @@ DOMElement.prototype.onTransformChange = function onTransformChange (transform) 
 
 /**
  * Method to be invoked by the node as soon as its computed size changes.
- * 
+ *
  * @method onSizeChange
  * @chainable
- * 
+ *
  * @param  {Float32Array} size      Absolute, pixel size.
  * @return {DOMElement} this
  */
@@ -227,7 +227,7 @@ DOMElement.prototype.onSizeChange = function onSizeChange (size) {
     var sizeMode = this._node.getSizeMode();
     var sizedX = sizeMode[0] !== RENDER_SIZE;
     var sizedY = sizeMode[1] !== RENDER_SIZE;
-    if (this._initialized) 
+    if (this._initialized)
         this._changeQueue.push('CHANGE_SIZE',
             sizedX ? size[0] : sizedX,
             sizedY ? size[1] : sizedY);
@@ -238,10 +238,10 @@ DOMElement.prototype.onSizeChange = function onSizeChange (size) {
 
 /**
  * Method to be invoked by the node as soon as its opacity changes.
- * 
+ *
  * @method onOpacityChange
  * @chainable
- * 
+ *
  * @param  {Number} opacity      The new opacity, as a scalar from 0 to 1.
  * @return {DOMElement} this
  */
@@ -288,7 +288,7 @@ DOMElement.prototype._addEventListener = function _addEventListener (UIEvent) {
  */
 DOMElement.prototype.onSizeModeChange = function onSizeModeChange () {
     this.onSizeChange(this._node.getSize());
-}; 
+};
 
 DOMElement.prototype._requestUpdate = function _requestUpdate () {
     if (!this._requestingUpdate) {
@@ -330,7 +330,7 @@ DOMElement.prototype.setId = function setId (id) {
  *
  * @method addClass
  * @chainable
- * 
+ *
  * @param {String} value    New class name to be added.
  * @return {DOMElement} this
  */
@@ -353,7 +353,7 @@ DOMElement.prototype.addClass = function addClass (value) {
  * Removes a class from the DOMElement's classList.
  *
  * @method removeClass
- * 
+ *
  * @param  {String} value       Class name to be removed.
  * @return {DOMElement} this
  */
@@ -374,7 +374,7 @@ DOMElement.prototype.removeClass = function removeClass (value) {
  * Sets an attribute of the DOMElement.
  *
  * @method setAttribute
- * 
+ *
  * @param {String} name     Attribute key (e.g. `src`)
  * @param {String} value    Attribute value (e.g. `http://famo.us`)
  */
@@ -392,7 +392,7 @@ DOMElement.prototype.setAttribute = function setAttribute (name, value) {
  *
  * @method setProperty
  * @chainable
- * 
+ *
  * @param {String} name  Name of the CSS rule (e.g. `background-color`).
  * @param {String} value Value of CSS property (e.g. `red`).
  * @return {DOMElement} this
@@ -411,7 +411,7 @@ DOMElement.prototype.setProperty = function setProperty (name, value) {
  * generated content is therefore essential for security purposes.
  *
  * @method setContent
- * 
+ *
  * @param {String} content     Content to be set using `.innerHTML = ...`
  */
 DOMElement.prototype.setContent = function setContent (content) {
@@ -427,7 +427,7 @@ DOMElement.prototype.setContent = function setContent (content) {
  * Subscribes to a DOMElement using.
  *
  * @method on
- * 
+ *
  * @param  {String} event       The event type (e.g. `click`).
  * @param  {Function} listener  Handler function for the specified event type
  *                              in which the payload event object will be
@@ -447,7 +447,7 @@ DOMElement.prototype.on = function on (event, listener) {
  *     @{@linkCallbackStore}.
  *
  * @method onReceive
- * 
+ *
  * @param  {String} event   Event type (e.g. `click`).
  * @param  {Object} payload Event object.
  */
@@ -474,16 +474,16 @@ DOMElement.prototype.draw = function draw () {
     for (i = 0, len = this._classes.length ; i < len ; i++)
         this.addClass(this._classes[i]);
 
-    this.setContent(this._content);
+    if (this._content) this.setContent(this._content);
 
-    for (key in this._styles) 
+    for (key in this._styles)
         if (this._styles[key])
             this.setProperty(key, this._styles[key]);
 
     for (key in this._attributes)
         if (this._attributes[key])
             this.setAttribute(key, this._attributes[key]);
-    
+
     for (i = 0, len = this._UIEvents.length ; i < len ; i++)
         this.onAddUIEvent(this._UIEvents[i]);
 
