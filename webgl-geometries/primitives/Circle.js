@@ -1,6 +1,6 @@
 'use strict';
 
-var Geometry       = require('../Geometry');
+var Geometry = require('../Geometry');
 
 /**
  * This function returns a new static geometry, which is passed

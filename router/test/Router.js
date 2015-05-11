@@ -1,7 +1,7 @@
 'use strict';
 
 var test = require('tape');
-var Router = require('../src/Router');
+var Router = require('../Router');
 
 test('Router', function (t) {
     t.test('constructor', function (t) {

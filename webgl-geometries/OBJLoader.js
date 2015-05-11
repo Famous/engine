@@ -1,4 +1,4 @@
-var loadURL        = require('famous-utilities').loadURL;
+var loadURL        = require('../utilities/loadURL');
 var GeometryHelper = require('./GeometryHelper');
 
 /*

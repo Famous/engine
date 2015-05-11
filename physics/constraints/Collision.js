@@ -1,6 +1,6 @@
 'use strict';
 
-var Vec3 = require('famous-math').Vec3;
+var Vec3 = require('../../math/Vec3');
 var Constraint = require('./Constraint');
 
 var SweepAndPrune = require('./collision/SweepAndPrune');
@@ -10,7 +10,7 @@ var GJK = ConvexCollision.GJK;
 var EPA = ConvexCollision.EPA;
 var ContactManifoldTable = require('./collision/ContactManifold');
 
-var ObjectManager = require('famous-utilities').ObjectManager;
+var ObjectManager = require('../../utilities/ObjectManager');
 ObjectManager.register('CollisionData', CollisionData);
 var OMRequestCollisionData = ObjectManager.requestCollisionData;
 

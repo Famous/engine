@@ -1,4 +1,4 @@
-var rAF = require('../src/requestAnimationFrame');
+var rAF = require('../requestAnimationFrame');
 var test = require('tape');
 
 test('requestAnimationFrame', function(t) {

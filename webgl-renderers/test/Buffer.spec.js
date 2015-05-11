@@ -1,6 +1,6 @@
 'use strict';
 var test = require('tape');
-var Buffer = require('../src/Buffer');
+var Buffer = require('../Buffer');
 var TestingContext = require('./helpers/ContextWebGL');
 
 test('Buffer', function(t) {

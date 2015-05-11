@@ -1,7 +1,7 @@
 'use strict';
 
 var test = require('tape');
-var curves = require('../src/Curves');
+var curves = require('../Curves');
 
 test('Curves', function(t) {
     var curveNames = [

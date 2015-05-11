@@ -1,8 +1,8 @@
 'use strict';
 
 var test = require('tape');
-var Compositor = require('../src/Compositor');
-var Context = require('../src/Context');
+var Compositor = require('../Compositor');
+var Context = require('../Context');
 
 var elOne = document.createElement('div');
     elOne.id = 'one';

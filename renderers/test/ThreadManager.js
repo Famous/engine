@@ -1,7 +1,7 @@
 'use strict';
 
 var test = require('tape');
-var ThreadManager = require('../src/ThreadManager');
+var ThreadManager = require('../ThreadManager');
 
 test('ThreadManager', function(t) {
     t.test('constructor', function(t) {

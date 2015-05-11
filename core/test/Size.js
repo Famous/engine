@@ -1,7 +1,7 @@
 'use strict';
 
 var test = require('tape');
-var Size = require('../src/Size');
+var Size = require('../Size');
 var SizeTestCases = require('./expected/Size');
 
 test('Size', function(t) {

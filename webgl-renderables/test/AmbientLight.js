@@ -1,7 +1,7 @@
 'use strict';
 
 var test = require('tape');
-var AmbientLight = require('../src/lights/AmbientLight');
+var AmbientLight = require('../lights/AmbientLight');
 var MockDispatch = require('./MockDispatch');
 var MockColor = require('./MockColor');
 

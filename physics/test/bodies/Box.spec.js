@@ -1,7 +1,7 @@
 'use strict';
 
-var Particle = require('../../src/bodies/Particle');
-var Box = require('../../src/bodies/Box');
+var Particle = require('../../bodies/Particle');
+var Box = require('../../bodies/Box');
 var test = require('tape');
 
 test('Box', function(t) {

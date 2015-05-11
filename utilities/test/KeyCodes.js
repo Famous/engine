@@ -1,7 +1,7 @@
 'use strict';
 
 var test = require('tape');
-var KeyCodes = require('../src/KeyCodes');
+var KeyCodes = require('../KeyCodes');
 
 test('KeyCodes', function(t) {
     t.equal(typeof KeyCodes, 'object', 'KeyCodes should export an object');

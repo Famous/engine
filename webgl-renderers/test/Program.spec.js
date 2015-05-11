@@ -1,7 +1,7 @@
 'use strict';
 
 var test = require('tape');
-var Program = require('../src/Program');
+var Program = require('../Program');
 var WebGLTestingContext = require('./helpers/ContextWebGL');
 
 var time = 0;

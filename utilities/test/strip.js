@@ -1,7 +1,7 @@
 'use strict'
 
 var test = require('tape');
-var strip = require('../src/strip');
+var strip = require('../strip');
 
 test('strip', function(t) {
     t.equal(typeof strip, 'function', 'strip should be a function');

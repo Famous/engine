@@ -4,9 +4,9 @@ var Texture = require('./Texture');
 var Program = require('./Program');
 var Buffer = require('./Buffer');
 var BufferRegistry = require('./BufferRegistry');
-var Plane = require('famous-webgl-geometries').Plane;
+var Plane = require('../webgl-geometries/Plane');
 var sorter = require('./radixSort');
-var Utility = require('famous-utilities');
+var Utility = require('../utilities');
 var TextureManager = require('./TextureManager');
 var compileMaterial = require('./compileMaterial');
 

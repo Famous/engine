@@ -1,7 +1,7 @@
 'use strict';
 
 var test = require('tape');
-var Dispatch = require('../src/Dispatch');
+var Dispatch = require('../Dispatch');
 var MockNode = require('./helpers/MockNode');
 
 test('Dispatch', function(t) {

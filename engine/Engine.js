@@ -1,6 +1,6 @@
 'use strict';
 
-var polyfills = require('famous-polyfills');
+var polyfills = require('../polyfills');
 var rAF = polyfills.requestAnimationFrame;
 var cAF = polyfills.cancelAnimationFrame;
 var now = require('./now');

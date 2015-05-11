@@ -1,7 +1,7 @@
 'use strict';
 
 var test = require('tape');
-var Mesh = require('../src/Mesh');
+var Mesh = require('../Mesh');
 var MockDispatch = require('./MockDispatch');
 var MockColor = require('./MockColor');
 

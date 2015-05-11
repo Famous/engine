@@ -1,9 +1,9 @@
 'use strict';
 
 var test = require('tape');
-var Node = require('../src/Node');
-var Size = require('../src/Size');
-var Context = require('../src/Context');
+var Node = require('../Node');
+var Size = require('../Size');
+var Context = require('../Context');
 var DefaultNodeSpec = require('./expected/DefaultNodeSpec');
 
 test('Node', function(t) {

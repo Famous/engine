@@ -1,5 +1,5 @@
 'use strict';
-var Geometry = require('famous-webgl-geometries');
+var Geometry = require('../webgl-geometries');
 
 /**
  * The Mesh class is responsible for providing the API for how

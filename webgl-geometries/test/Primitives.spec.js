@@ -1,19 +1,19 @@
 'use strict';
 var test = require('tape');
-var Geometry = require('../src/Geometry');
+var Geometry = require('../Geometry');
 
 var primitives = {
-    Box: require('../src/primitives/Box'),
-    Circle: require('../src/primitives/Circle'),
-    Cylinder: require('../src/primitives/Cylinder'),
-    GeodesicSphere: require('../src/primitives/GeodesicSphere'),
-    Icosahedron: require('../src/primitives/Icosahedron'),
-    ParametricCone: require('../src/primitives/ParametricCone'),
-    Plane: require('../src/primitives/Plane'),
-    Sphere: require('../src/primitives/Sphere'),
-    Tetrahedron: require('../src/primitives/Tetrahedron'),
-    Torus: require('../src/primitives/Torus'),
-    Triangle: require('../src/primitives/Triangle'),
+    Box: require('../primitives/Box'),
+    Circle: require('../primitives/Circle'),
+    Cylinder: require('../primitives/Cylinder'),
+    GeodesicSphere: require('../primitives/GeodesicSphere'),
+    Icosahedron: require('../primitives/Icosahedron'),
+    ParametricCone: require('../primitives/ParametricCone'),
+    Plane: require('../primitives/Plane'),
+    Sphere: require('../primitives/Sphere'),
+    Tetrahedron: require('../primitives/Tetrahedron'),
+    Torus: require('../primitives/Torus'),
+    Triangle: require('../primitives/Triangle'),
 }
 
 test('Primitives', function(t) {

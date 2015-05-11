@@ -1,9 +1,9 @@
 'use strict';
 
 var test = require('tape');
-var Context = require('../src/Context');
-var Node = require('../src/Node');
-var Dispatch = require('../src/Dispatch');
+var Context = require('../Context');
+var Node = require('../Node');
+var Dispatch = require('../Dispatch');
 
 test('Context', function(t) {
     t.test('constructor', function(t) {

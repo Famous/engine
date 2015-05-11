@@ -1,7 +1,7 @@
 'use strict';
 
 var Particle = require('./Particle');
-var Vec3 = require('famous-math').Vec3;
+var Vec3 = require('../../math/Vec3');
 
 /**
  * @enum directions

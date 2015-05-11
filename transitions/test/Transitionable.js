@@ -4,7 +4,7 @@ var time = 0;
 var _now = Date.now;
 
 var test = require('tape');
-var Transitionable = require('../src/Transitionable');
+var Transitionable = require('../Transitionable');
 
 
 test('Transitionable', function(t) {

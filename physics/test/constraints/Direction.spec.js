@@ -1,9 +1,9 @@
 'use strict';
 
-var Direction = require('../../src/constraints/Direction');
-var Constraint = require('../../src/constraints/Constraint');
-var Box = require('../../src/bodies/Box');
-var Vec3 = require('famous-math').Vec3;
+var Direction = require('../../constraints/Direction');
+var Constraint = require('../../constraints/Constraint');
+var Box = require('../../bodies/Box');
+var Vec3 = require('../../../math/Vec3');
 var test = require('tape');
 
 function vec3sAreEqual(a,b) {

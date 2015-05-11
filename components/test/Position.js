@@ -1,7 +1,7 @@
 'use strict';
 
 var test = require('tape');
-var Position = require('../src/Position');
+var Position = require('../Position');
 
 function noop() {}
 

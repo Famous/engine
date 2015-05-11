@@ -1,9 +1,9 @@
 'use strict';
 
-var Distance = require('../../src/constraints/Distance');
-var Constraint = require('../../src/constraints/Constraint');
-var Box = require('../../src/bodies/Box');
-var Vec3 = require('famous-math').Vec3;
+var Distance = require('../../constraints/Distance');
+var Constraint = require('../../constraints/Constraint');
+var Box = require('../../bodies/Box');
+var Vec3 = require('../../../math/Vec3');
 var test = require('tape');
 
 test('Distance', function(t) {

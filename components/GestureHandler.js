@@ -1,7 +1,7 @@
 'use strict';
 
-var CallbackStore = require('famous-utilities').CallbackStore;
-var Vec2 = require('famous-math').Vec2;
+var CallbackStore = require('../utilities/CallbackStore');
+var Vec2 = require('../math/Vec2');
 
 var VEC_REGISTER = new Vec2();
 

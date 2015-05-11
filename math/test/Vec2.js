@@ -1,7 +1,7 @@
 'use strict';
 
 var test = require('tape');
-var Vec2 = require('../src/Vec2');
+var Vec2 = require('../Vec2');
 
 test('Vec2', function(t) {
     t.test('constructor', function(t) {

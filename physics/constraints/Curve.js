@@ -1,7 +1,7 @@
 'use strict';
 
 var Constraint = require('./Constraint');
-var Vec3 = require('famous-math').Vec3;
+var Vec3 = require('../../math/Vec3');
 
 var IMPULSE_REGISTER = new Vec3();
 var NORMAL_REGISTER = new Vec3();

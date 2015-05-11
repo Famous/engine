@@ -1,7 +1,7 @@
 'use strict';
 
 var test = require('tape');
-var UIEventHandler = require('../src/UIEventHandler');
+var UIEventHandler = require('../UIEventHandler');
 
 test('UIEventHandler', function(t) {
 

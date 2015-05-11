@@ -1,7 +1,7 @@
 'use strict';
 
 var DOMElement = require('./DOMElement');
-var CallbackStore = require('famous-utilities').CallbackStore;
+var CallbackStore = require('../utilities/CallbackStore');
 
 var WITH = 'WITH';
 var CHANGE_TRANSFORM = 'CHANGE_TRANSFORM';

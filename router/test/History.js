@@ -1,7 +1,7 @@
 'use strict';
 
 var test = require('tape');
-var _History = require('../src/History');
+var _History = require('../History');
 
 test('_History', function (t) {
     t.test('constructor', function (t) {

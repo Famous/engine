@@ -1,7 +1,7 @@
 'use strict';
 
 var test = require('tape');
-var clamp = require('../src/clamp');
+var clamp = require('../clamp');
 
 test('clamp', function(t) {
     t.equal(typeof clamp, 'function', 'clamp should be a function');

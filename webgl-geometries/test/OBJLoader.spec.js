@@ -1,7 +1,7 @@
 'use strict';
-var test           = require('tape');
-var OBJLoader      = require('../src/OBJLoader');
-var Vec3           = require('famous-math').Vec3;
+var test = require('tape');
+var OBJLoader = require('../OBJLoader');
+var Vec3 = require('../../math/Vec3');
 
 test('OBJLoader', function(t) {
     var teapotURL = 'http://people.sc.fsu.edu/~jburkardt/data/obj/teapot.obj';

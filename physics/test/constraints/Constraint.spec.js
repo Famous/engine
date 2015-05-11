@@ -1,6 +1,6 @@
 'use strict';
 
-var Constraint = require('../../src/constraints/Constraint');
+var Constraint = require('../../constraints/Constraint');
 var test = require('tape');
 
 test('Constraint', function(t) {

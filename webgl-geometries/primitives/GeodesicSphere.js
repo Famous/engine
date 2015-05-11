@@ -1,6 +1,6 @@
 'use strict';
 
-var Geometry       = require('../Geometry');
+var Geometry = require('../Geometry');
 var GeometryHelper = require('../GeometryHelper');
 
 /**

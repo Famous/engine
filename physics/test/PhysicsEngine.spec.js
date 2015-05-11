@@ -1,8 +1,8 @@
 'use strict';
 
 var test = require('tape');
-var PhysicsEngine = require('../src/PhysicsEngine');
-var Particle = require('../src/bodies/Particle');
+var PhysicsEngine = require('../PhysicsEngine');
+var Particle = require('../bodies/Particle');
 
 test('PhysicsEngine', function(t) {
     var world = new PhysicsEngine();

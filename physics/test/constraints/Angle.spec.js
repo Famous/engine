@@ -1,9 +1,9 @@
 'use strict';
 
-var Angle = require('../../src/constraints/Angle');
-var Constraint = require('../../src/constraints/Constraint');
-var Box = require('../../src/bodies/Box');
-var Vec3 = require('famous-math').Vec3;
+var Angle = require('../../constraints/Angle');
+var Constraint = require('../../constraints/Constraint');
+var Box = require('../../bodies/Box');
+var Vec3 = require('../../../math/Vec3');
 var test = require('tape');
 
 test('Angle', function(t) {

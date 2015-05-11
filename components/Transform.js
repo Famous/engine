@@ -1,7 +1,7 @@
 'use strict';
 
-var Transitionable = require('famous-transitions').Transitionable;
-var Quaternion = require('famous-math').Quaternion;
+var Transitionable = require('../transitions/Transitionable');
+var Quaternion = require('../math/Quaternion');
 
 var Q_REGISTER = new Quaternion();
 var Q2_REGISTER = new Quaternion();

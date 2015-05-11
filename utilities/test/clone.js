@@ -1,7 +1,7 @@
 'use strict';
 
 var test = require('tape');
-var clone = require('../src/clone');
+var clone = require('../clone');
 
 test('clone', function(t) {
     t.equal(typeof clone, 'function', 'clone should be a function');

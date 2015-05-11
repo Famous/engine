@@ -1,7 +1,7 @@
 'use strict';
 
 var test = require('tape');
-var Clock = require('../src/Clock');
+var Clock = require('../Clock');
 
 test('Clock', function(t) {
     t.test('constructor', function(t) {

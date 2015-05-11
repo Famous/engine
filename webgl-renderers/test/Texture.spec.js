@@ -1,7 +1,7 @@
 'use strict';
 var test           = require('tape');
 var TestingContext = require('./helpers/ContextWebGL');
-var Texture        = require('../src/Texture');
+var Texture        = require('../Texture');
 
 test('Texture', function(t) {
     t.test('constructor', function(t) {

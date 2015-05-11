@@ -1,7 +1,7 @@
 'use strict';
 
 var test = require('tape');
-var Color = require('../src/Color');
+var Color = require('../Color');
 
 var time = 0;
 var _now = Date.now;

@@ -1,6 +1,6 @@
 'use strict';
 
-var Transitionable = require('famous-transitions').Transitionable;
+var Transitionable = require('../transitions/Transitionable');
 
 /**
  * @class Color

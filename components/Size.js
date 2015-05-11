@@ -1,6 +1,6 @@
 'use strict';
 
-var Transitionable = require('famous-transitions').Transitionable;
+var Transitionable = require('../transitions/Transitionable');
 
 /**
  * Size component used for managing the size of the underlying RenderContext.

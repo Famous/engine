@@ -1,8 +1,8 @@
 'use strict';
 
-var WebGLRenderer = require('famous-webgl-renderers').WebGLRenderer;
-var Camera = require('famous-components').Camera;
-var DOMRenderer = require('famous-dom-renderers').DOMRenderer;
+var WebGLRenderer = require('../webgl-renderers/WebGLRenderer');
+var Camera = require('../components/Camera');
+var DOMRenderer = require('../dom-renderers/DOMRenderer');
 
 function Context(selector, compositor) {
     this._compositor = compositor;

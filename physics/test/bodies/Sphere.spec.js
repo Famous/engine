@@ -1,8 +1,8 @@
 'use strict';
 
-var Particle = require('../../src/bodies/Particle');
-var Sphere = require('../../src/bodies/Sphere');
-var Vec3 = require('famous-math').Vec3;
+var Particle = require('../../bodies/Particle');
+var Sphere = require('../../bodies/Sphere');
+var Vec3 = require('../../../math/Vec3');
 var test = require('tape');
 
 function arraysAreEqual(a, b) {

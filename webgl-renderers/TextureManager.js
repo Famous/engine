@@ -1,6 +1,6 @@
 var Texture = require('./Texture');
 var Checkerboard = require('./Checkerboard');
-var Clock = require('famous-core').Famous.getClock();
+var Clock = require('../core').Famous.getClock();
 
 /**
  * Handles loading, binding, and resampling of textures for WebGLRenderer.

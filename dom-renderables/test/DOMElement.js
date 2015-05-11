@@ -1,7 +1,7 @@
 'use strict';
 
 var test = require('tape');
-var DOMElement = require('../src/DOMElement.js');
+var DOMElement = require('../DOMElement.js');
 
 var IDENT = [
     1, 0, 0, 0,

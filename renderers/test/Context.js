@@ -1,8 +1,8 @@
 'use strict';
 
 var test = require('tape');
-var Context = require('../src/Context');
-var Compositor = require('../src/Compositor');
+var Context = require('../Context');
+var Compositor = require('../Compositor');
 
 test('Context', function(t) {
     t.test('constructor', function(t) {

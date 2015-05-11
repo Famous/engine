@@ -1,6 +1,6 @@
 'use strict';
 
-var CallbackStore = require('famous-utilities').CallbackStore;
+var CallbackStore = require('../utilities/CallbackStore');
 
 /**
  * Component to manage DOM events. When registering an event, the user may specify .methods and

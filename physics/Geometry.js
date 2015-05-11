@@ -1,7 +1,7 @@
 'use strict';
 
-var Vec3 = require('famous-math').Vec3;
-var Mat33 = require('famous-math').Mat33;
+var Vec3 = require('../math/Vec3');
+var Mat33 = require('../math/Mat33');
 
 var ObjectManager = require('famous-utilities').ObjectManager;
 ObjectManager.register('DynamicGeometry', DynamicGeometry);

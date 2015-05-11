@@ -1,7 +1,7 @@
 'use strict';
 var test = require('tape');
-var DynamicGeometry = require('../src/DynamicGeometry');
-var Circle = require('../src/primitives/Circle');
+var DynamicGeometry = require('../DynamicGeometry');
+var Circle = require('../primitives/Circle');
 
 test('DynamicGeometry', function(t) {
     t.test('constructor', function(t) {

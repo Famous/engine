@@ -1,7 +1,7 @@
 'use strict';
 
-var Vec3 = require('famous-math').Vec3;
-var Vec2 = require('famous-math').Vec2;
+var Vec3 = require('../math/Vec3');
+var Vec2 = require('../math/Vec2');
 
 var outputs = [
     new Vec3(),

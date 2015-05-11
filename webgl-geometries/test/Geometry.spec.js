@@ -1,6 +1,6 @@
 'use strict';
 var test = require('tape');
-var Geometry = require('../src/Geometry');
+var Geometry = require('../Geometry');
 
 test('Geometry', function(t) {
     t.test('constructor', function(t) {

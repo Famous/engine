@@ -1,7 +1,7 @@
 'use strict';
 
 var test = require('tape');
-var TextureRegistry = require('../src/TextureRegistry');
+var TextureRegistry = require('../TextureRegistry');
 
 test('TextureRegistry', function(t) {
 

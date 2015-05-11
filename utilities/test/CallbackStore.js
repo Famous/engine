@@ -1,7 +1,7 @@
 'use strict';
 
 var test = require('tape');
-var CallbackStore = require('../src/CallbackStore');
+var CallbackStore = require('../CallbackStore');
 
 test('CallbackStore', function(t) {
     t.test('constructor', function(t) {

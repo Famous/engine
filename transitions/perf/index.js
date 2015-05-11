@@ -1,6 +1,6 @@
 'use strict';
 
-var Transitionable = require('../src/Transitionable');
+var Transitionable = require('../Transitionable');
 
 var centerX = window.innerWidth / 2;
 var centerY = window.innerHeight / 2;

@@ -1,8 +1,8 @@
 'use strict';
 
-var Particle = require('../../src/bodies/Particle');
-var Wall = require('../../src/bodies/Wall');
-var Vec3 = require('famous-math').Vec3;
+var Particle = require('../../bodies/Particle');
+var Wall = require('../../bodies/Wall');
+var Vec3 = require('../../../math/Vec3');
 var test = require('tape');
 
 test('Wall', function(t) {

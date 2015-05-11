@@ -1,9 +1,9 @@
 'use strict';
 
-var Drag = require('../../src/forces/Drag');
-var Force = require('../../src/forces/Force');
-var Particle = require('../../src/bodies/Particle');
-var Vec3 = require('famous-math').Vec3;
+var Drag = require('../../forces/Drag');
+var Force = require('../../forces/Force');
+var Particle = require('../../bodies/Particle');
+var Vec3 = require('../../../math/Vec3');
 var test = require('tape');
 
 function vec3sAreEqual(a,b) {

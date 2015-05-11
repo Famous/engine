@@ -1,5 +1,5 @@
 
-var Event = require('../src/Event');
+var Event = require('../Event');
 var test = require('tape');
 
 function TestPayload () {

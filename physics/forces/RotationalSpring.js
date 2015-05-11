@@ -1,9 +1,9 @@
 'use strict';
 
 var Force = require('./Force');
-var Quaternion = require('famous-math').Quaternion;
-var Vec3 = require('famous-math').Vec3;
-var Mat33 = require('famous-math').Mat33;
+var Vec3 = require('../../math/Vec3');
+var Mat33 = require('../../math/Mat33');
+var Quaternion = require('../../math/Quaternion');
 
 var Q_REGISTER = new Quaternion();
 var DAMPING_REGISTER = new Vec3();

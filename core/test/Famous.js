@@ -1,9 +1,9 @@
 'use strict';
 
 var test = require('tape');
-var Famous = require('../src/Famous');
-var Clock = require('../src/Clock');
-var Context = require('../src/Context');
+var Famous = require('../Famous');
+var Clock = require('../Clock');
+var Context = require('../Context');
 
 function onUpdateWrap(fn) {
     return {

@@ -1,9 +1,9 @@
 'use strict';
 
 var Constraint = require('./Constraint');
-var Vec3 = require('famous-math').Vec3;
-var Mat33 = require('famous-math').Mat33;
-var Quaternion = require('famous-math').Quaternion;
+var Vec3 = require('../../math/Vec3');
+var Mat33 = require('../../math/Mat33');
+var Quaternion = require('../../math/Quaternion');
 
 var VEC1_REGISTER = new Vec3();
 var VEC2_REGISTER = new Vec3();

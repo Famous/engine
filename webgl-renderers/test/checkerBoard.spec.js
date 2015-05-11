@@ -1,6 +1,6 @@
 'use strict';
 var test = require('tape');
-var Checkerboard = require('../src/Checkerboard');
+var Checkerboard = require('../Checkerboard');
 var TestingContext = require('./helpers/ContextWebGL');
 
 var grey = 221;

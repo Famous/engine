@@ -1,8 +1,8 @@
 'use strict';
 
-var Gravity1D = require('../../src/forces/Gravity1D');
-var Force = require('../../src/forces/Force');
-var Vec3 = require('famous-math').Vec3;
+var Gravity1D = require('../../forces/Gravity1D');
+var Force = require('../../forces/Force');
+var Vec3 = require('../../../math/Vec3');
 var test = require('tape');
 
 test('Gravity1D', function(t) {

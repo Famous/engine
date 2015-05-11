@@ -1,6 +1,6 @@
 'use strict';
 
-var CallbackStore = require('famous-utilities').CallbackStore;
+var CallbackStore = require('../utilities/CallbackStore');
 
 var RENDER_SIZE = 2;
 

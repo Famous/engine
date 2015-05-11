@@ -1,8 +1,8 @@
 'use strict';
 
 var test = require('tape');
-var Vec3 = require('famous-math').Vec3;
-var Geometry = require('../src/Geometry');
+var Vec3 = require('../../math/Vec3');
+var Geometry = require('../Geometry');
 var DynamicGeometry = Geometry.DynamicGeometry;
 var ConvexHull = Geometry.ConvexHull;
 
