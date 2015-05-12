@@ -27,8 +27,6 @@
 module.exports = {
     Align: require('./Align'),
     Camera: require('./Camera'),
-    EventEmitter: require('./EventEmitter'),
-    EventHandler: require('./EventHandler'),
     GestureHandler: require('./GestureHandler'),
     MountPoint: require('./MountPoint'),
     Opacity: require('./Opacity'),
