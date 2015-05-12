@@ -236,6 +236,8 @@ WebGLRenderer.prototype.getOrSetCutout = function getOrSetCutout(path) {
             baseColor: [0, 0, 0, 1]
         });
 
+        this.cutoutRegistryKeys.push(path);
+
         return this.cutoutRegistry[path] = {
             uniformKeys: uniforms.keys,
             uniformValues: uniforms.values,
@@ -502,11 +504,6 @@ WebGLRenderer.prototype.drawMeshes = function drawMeshes() {
         buffers = this.bufferRegistry.registry[mesh.geometry];
 
         if (!mesh.visible) continue;
-
-        if (window.a) {
-            console.log(mesh);
-            window.a = false;
-        }
 
         if (mesh.uniformValues[0] < 1) {
             gl.depthMask(false);
