@@ -1,18 +1,18 @@
 /**
  * The MIT License (MIT)
- * 
+ *
  * Copyright (c) 2015 Famous Industries Inc.
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -24,7 +24,7 @@
 
 'use strict';
 
-var Point2Point = require('../../constraints/Point2Point');
+var BallAndSocket = require('../../constraints/BallAndSocket');
 var Constraint = require('../../constraints/Constraint');
 var Box = require('../../bodies/Box');
 var Vec3 = require('../../../math/Vec3');
@@ -34,15 +34,15 @@ function vec3sAreEqual(a,b) {
     return Math.abs(a.x - b.x) < 0.001 && Math.abs(a.y - b.y) < 0.001 && Math.abs(a.z - b.z) < 0.001;
 }
 
-test('Point2Point', function(t) {
+test('BallAndSocket', function(t) {
     var a = new Box({size:[100,100,100], position: new Vec3(0,0,0)});
     var b = new Box({size:[100,100,100], position: new Vec3(100,100,0)});
-    var d = new Point2Point(a,b, {anchor: new Vec3(0,100,0), axis: new Vec3(0,0,1)});
+    var d = new BallAndSocket(a,b, {anchor: new Vec3(0,100,0), axis: new Vec3(0,0,1)});
 
     t.test('should extend Constraint', function(t) {
-        t.assert(Point2Point instanceof Function, 'Point2Point should be a constructor');
+        t.assert(BallAndSocket instanceof Function, 'BallAndSocket should be a constructor');
 
-        t.assert(d instanceof Point2Point && d instanceof Constraint, 'constructed objects should be instances of Constraint');
+        t.assert(d instanceof BallAndSocket && d instanceof Constraint, 'constructed objects should be instances of Constraint');
 
         t.end();
     });
