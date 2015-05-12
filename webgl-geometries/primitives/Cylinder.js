@@ -52,6 +52,10 @@ function Cylinder (options) {
         Cylinder.generator.bind(null, radius)
     );
 
+    if (options.backface !== false) {
+        buffers.indices = GeometryHelper.createBackfaceIndices(buffers.indices);
+    }
+
     return new Geometry({
         buffers: [
             { name: 'pos', data: buffers.vertices },

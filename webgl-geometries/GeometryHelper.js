@@ -501,4 +501,16 @@ GeometryHelper.trianglesToLines = function triangleToLines(indices, out) {
     return out;
 };
 
+GeometryHelper.createBackfaceIndices = function createBackfaceIndices(indices, out) {
+    var out = out || [];
+    var nFaces = indices.length / 3;
+
+    for (var i = 0; i < nFaces; i++) {
+        out.push(indices[i * 3], indices[i * 3 + 1], indices[i * 3 + 2]);
+        out.push(indices[i * 3], indices[i * 3 + 2], indices[i * 3 + 1]);
+    }
+
+    return out;
+}
+
 module.exports = GeometryHelper;
