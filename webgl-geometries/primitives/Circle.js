@@ -61,20 +61,16 @@ function Circle (options) {
 function getBackFaces (vertices) {
     var out = [];
     var offset = 3;
-    var nFaces = (vertices.length - offset) / 3;
+    var nFaces = vertices.length / 3;
 
-    out[0] = vertices[0];
-    out[1] = vertices[1];
-    out[2] = vertices[2];
+    for (var i = 1; i < nFaces; i++) {
+        var x = vertices[i * 3],
+            y = vertices[i * 3 + 1],
+            z = vertices[i * 3 + 2];
 
-    for (var i = 0; i < nFaces; i++) {
-        var x = vertices[offset + i * 3],
-            y = vertices[offset + i * 3 + 1],
-            z = vertices[offset + i * 3 + 2];
-
-        out[offset + (nFaces - i) * 3] = x;
-        out[offset + (nFaces - i) * 3 + 1] = y;
-        out[offset + (nFaces - i) * 3 + 2] = z;
+        out[(nFaces - i - 1) * 3] = x;
+        out[(nFaces - i - 1) * 3 + 1] = y;
+        out[(nFaces - i - 1) * 3 + 2] = z;
     }
 
     return out;

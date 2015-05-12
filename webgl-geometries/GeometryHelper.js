@@ -64,7 +64,8 @@ GeometryHelper.generateParametric = function generateParametric(detailX, detailY
 
     // We must wrap around slightly more than once for uv coordinates to look correct.
 
-    var Xrange = Math.PI + (Math.PI / (detailX - 1));
+    // var Xrange = Math.PI + (Math.PI / (detailX - 1));
+    var Xrange = Math.PI;
     var out = [];
 
     for (i = 0; i < detailX + 1; i++) {
