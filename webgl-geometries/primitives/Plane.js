@@ -25,6 +25,7 @@
 'use strict';
 
 var Geometry = require('../Geometry');
+var GeometryHelper = require('../GeometryHelper');
 
 /**
  * This function returns a new static geometry, which is passed
@@ -62,7 +63,11 @@ function Plane(options) {
             }
         }
     }
-    
+
+    if (options.backface !== false) {
+        indices = GeometryHelper.createBackfaceIndices(indices);
+    }
+
     return new Geometry({
         buffers: [
             { name: 'pos', data: vertices },

@@ -35,7 +35,7 @@ var GeometryHelper = require('../GeometryHelper');
  * @class Cylinder
  * @constructor
  * 
- * @param {Object} options Parameters that alter the
+ * @param {Object} options Parameters that alter thed
  * vertex buffers of the generated geometry.
  *
  * @return {Object} constructed geometry
@@ -47,10 +47,14 @@ function Cylinder (options) {
     var buffers;
 
     buffers = GeometryHelper.generateParametric(
-        1,
+        detail,
         detail,
         Cylinder.generator.bind(null, radius)
     );
+
+    if (options.backface !== false) {
+        buffers.indices = GeometryHelper.createBackfaceIndices(buffers.indices);
+    }
 
     return new Geometry({
         buffers: [
@@ -74,9 +78,9 @@ function Cylinder (options) {
  * @return {Array} x, y and z coordinate of geometry.
  */
 Cylinder.generator = function generator(r, u, v, pos) {
+    pos[1] = r * Math.sin(v);
     pos[0] = r * Math.cos(v);
-    pos[1] = r * (-1 + u / Math.PI * 2);
-    pos[2] = r * Math.sin(v);
+    pos[2] = r * (-1 + u / Math.PI * 2);
 }
 
 module.exports = Cylinder;

@@ -60,6 +60,10 @@ function Triangle (options) {
     while(--detail) GeometryHelper.subdivide(indices, vertices, textureCoords);
     normals       = GeometryHelper.computeNormals(vertices, indices);
 
+    if (options.backface !== false) {
+        indices = GeometryHelper.createBackfaceIndices(indices);
+    }
+
     return new Geometry({
         buffers: [
             { name: 'pos', data: vertices },

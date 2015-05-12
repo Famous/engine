@@ -50,6 +50,10 @@ function ParametricCone (options) {
         ParametricCone.generator.bind(null, radius)
     );
 
+    if (options.backface !== false) {
+        buffers.indices = GeometryHelper.createBackfaceIndices(buffers.indices);
+    }
+
     return new Geometry({
         buffers: [
             { name: 'pos', data: buffers.vertices },
@@ -72,9 +76,9 @@ function ParametricCone (options) {
  */
 
 ParametricCone.generator = function generator(r, u, v, pos) {
-    pos[0] = r * u * Math.sin(v);
-    pos[1] = -r * u * Math.cos(v);
-    pos[2] = -u;
+    pos[0] = -r * u * Math.cos(v);
+    pos[1] = r * u * Math.sin(v);
+    pos[2] = -u / (Math.PI / 2) + 1;
 }
 
 module.exports = ParametricCone;

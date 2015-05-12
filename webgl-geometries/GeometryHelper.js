@@ -64,7 +64,8 @@ GeometryHelper.generateParametric = function generateParametric(detailX, detailY
 
     // We must wrap around slightly more than once for uv coordinates to look correct.
 
-    var Xrange = Math.PI + (Math.PI / (detailX - 1));
+    // var Xrange = Math.PI + (Math.PI / (detailX - 1));
+    var Xrange = Math.PI;
     var out = [];
 
     for (i = 0; i < detailX + 1; i++) {
@@ -496,6 +497,18 @@ GeometryHelper.trianglesToLines = function triangleToLines(indices, out) {
         out.push(indices[i + 0], indices[i + 1]);
         out.push(indices[i + 1], indices[i + 2]);
         out.push(indices[i + 2], indices[i + 0]);
+    }
+
+    return out;
+};
+
+GeometryHelper.createBackfaceIndices = function createBackfaceIndices(indices, out) {
+    var out = out || [];
+    var nFaces = indices.length / 3;
+
+    for (var i = 0; i < nFaces; i++) {
+        out.push(indices[i * 3], indices[i * 3 + 1], indices[i * 3 + 2]);
+        out.push(indices[i * 3], indices[i * 3 + 2], indices[i * 3 + 1]);
     }
 
     return out;
