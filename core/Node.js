@@ -1083,7 +1083,14 @@ Node.prototype.getFrame = function getFrame () {
     return this._globalUpdater.getFrame();
 };
 
-
+/**
+ * returns an array of the components currently attached to this
+ * node.
+ *
+ * @method getComponents
+ *
+ * @return {Array} list of components.
+ */
 Node.prototype.getComponents = function getComponents () {
     return this._components;
 };
