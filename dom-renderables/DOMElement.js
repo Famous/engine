@@ -81,7 +81,8 @@ function DOMElement (node, options) {
     this._classes = [];
     this._requestingEventListeners = [];
     this._styles = {
-        display: node ? node.isShown() : [] 
+        display: node.isShown(),
+        opacity: node.getOpacity()
     };
     this._attributes = {};
     this._content = '';
@@ -102,18 +103,20 @@ function DOMElement (node, options) {
 
     if (!options) return;
 
+    var key;
+
     if (options.classes) {
         for (var i = 0; i < options.classes.length; i++)
             this.addClass(options.classes[i]);
     }
 
     if (options.attributes) {
-        for (var key in options.attributes)
+        for (key in options.attributes)
             this.setAttribute(key, options.attributes[key]);
     }
 
     if (options.properties) {
-        for (var key in options.properties)
+        for (key in options.properties)
             this.setProperty(key, options.properties[key]);
     }
 
@@ -313,7 +316,7 @@ DOMElement.prototype.onTransformChange = function onTransformChange (transform) 
     for (var i = 0, len = transform.length ; i < len ; i++)
         this._changeQueue.push(transform[i]);
 
-    if (!this._requestingUpdate) this._requestUpdate();
+    this.onUpdate();
 };
 
 /**
