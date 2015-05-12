@@ -236,6 +236,8 @@ WebGLRenderer.prototype.getOrSetCutout = function getOrSetCutout(path) {
             baseColor: [0, 0, 0, 1]
         });
 
+        this.cutoutRegistryKeys.push(path);
+
         return this.cutoutRegistry[path] = {
             uniformKeys: uniforms.keys,
             uniformValues: uniforms.values,
@@ -274,26 +276,7 @@ WebGLRenderer.prototype.showMesh = function showMesh(path) {
 WebGLRenderer.prototype.removeMesh = function removeMesh(path) {
     var keyLocation = this.meshRegistryKeys.indexOf(path);
     this.meshRegistryKeys.splice(keyLocation, 1);
-
-    var len = this.meshRegistryKeys.length;
-    var targetGeometry = this.meshRegistry[path].geometry;
-    var key;
-
     this.meshRegistry[path] = null;
-
-    for (var i = 0; i < len; i++) {
-        key = this.meshRegistryKeys[i];
-
-        // If geometry is being used in another mesh return
-
-        if (this.meshRegistry[key].geometry === targetGeometry) {
-            return;
-        }
-    }
-
-    // Deallocate WebGL buffers for geometry if no longer necessary
-
-    this.bufferRegistry.deallocate(targetGeometry);
 };
 
 

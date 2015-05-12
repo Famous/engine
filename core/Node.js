@@ -1156,15 +1156,15 @@ Node.prototype.update = function update (time){
     this._inUpdate = false;
     this._requestingUpdate = false;
 
-    if (this._nextUpdateQueue.length) {
-        this._globalUpdater.requestUpdateOnNextTick(this);
-        this._requestingUpdate = true;
-    }
     if (!this.isMounted()) {
         // last update
         this._parent = null;
         this.value.location = null;
         this._globalUpdater = null;
+    }
+    else if (this._nextUpdateQueue.length) {
+        this._globalUpdater.requestUpdateOnNextTick(this);
+        this._requestingUpdate = true;
     }
     return this;
 };
