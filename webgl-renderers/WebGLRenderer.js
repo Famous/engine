@@ -48,18 +48,21 @@ var globalUniforms = keyValueToArrays({
 
 /**
  * WebGLRenderer is a private class that manages all interactions with the WebGL
- * API.  Each frame it receives commands from the compositor and updates its registries
- * accordingly.  Subsequently, the draw function is called and the WebGLRenderer
- * issues draw calls for all meshes in its registry.
+ * API.  Each frame it receives commands from the compositor and updates its
+ * registries accordingly.  Subsequently, the draw function is called and the
+ * WebGLRenderer issues draw calls for all meshes in its registry.
  *
  * @class WebGLRenderer
  * @constructor
  *
- * @param {DOMElement} canvas The dom element that GL will paint itself onto.
+ * @param {Element} canvas          The DOM element that GL will paint itself
+ *                                  onto.
+ * @param {Compositor} compositor   Compositor used for querying the time from.
  *
  */
-function WebGLRenderer(canvas) {
+function WebGLRenderer(canvas, compositor) {
     this.canvas = canvas;
+    this.compositor = compositor;
     
     for (var key in this.constructor.DEFAULT_STYLES) {
         this.canvas.style[key] = this.constructor.DEFAULT_STYLES[key];
@@ -94,7 +97,7 @@ function WebGLRenderer(canvas) {
     this.lightPositions = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     this.lightColors = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
-    this.textureManager = new TextureManager(gl);
+    this.textureManager = new TextureManager(gl, compositor);
     this.texCache = {};
     this.bufferRegistry = new BufferRegistry(gl);
     this.program = new Program(gl, { debug: true });
