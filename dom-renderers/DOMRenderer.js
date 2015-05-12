@@ -90,7 +90,7 @@ function DOMRenderer (element, selector, compositor) {
  * `sendEvent` method.
  * Delegates events if possible by attaching the event listener to the context.
  *
- * @method  addEventListener
+ * @method  subscribe
  *
  * @param  {String} path            Path uniquely describing the location of the
  *                                  element in the scene graph.
@@ -98,7 +98,7 @@ function DOMRenderer (element, selector, compositor) {
  * @param  {Boolean} preventDefault Whether or not the default browser action
  *                                  should be prevented.
  */ 
-DOMRenderer.prototype.addEventListener = function addEventListener(type, preventDefault) {
+DOMRenderer.prototype.subscribe = function subscribe(type, preventDefault) {
     // TODO preventDefault should be a separate command
     this._assertTargetLoaded();
     

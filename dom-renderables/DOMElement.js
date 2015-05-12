@@ -257,10 +257,10 @@ DOMElement.prototype.onOpacityChange = function onOpacityChange (opacity) {
  */
 DOMElement.prototype.onAddUIEvent = function onAddUIEvent (UIEvent) {
     if (this._UIEvents.indexOf(UIEvent) === -1) {
-        this._addEventListener(UIEvent);
+        this._subscribe(UIEvent);
         this._UIEvents.push(UIEvent);
     } else if (this._inDraw) {
-        this._addEventListener(UIEvent);
+        this._subscribe(UIEvent);
     }
     return this;
 };
@@ -270,9 +270,9 @@ DOMElement.prototype.onAddUIEvent = function onAddUIEvent (UIEvent) {
  *
  * @param  {String} UIEvent Event type (e.g. `click`)
  */
-DOMElement.prototype._addEventListener = function _addEventListener (UIEvent) {
+DOMElement.prototype._subscribe = function _subscribe (UIEvent) {
     if (this._initialized) {
-        this._changeQueue.push('ADD_EVENT_LISTENER', UIEvent, true, 'EVENT_END');
+        this._changeQueue.push('SUBSCRIBE', UIEvent, true);
     }
     if (!this._requestingUpdate) {
         this._requestUpdate();

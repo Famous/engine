@@ -169,9 +169,9 @@ Context.prototype.receive = function receive(pathArr, path, commands, iterator) 
                 this.DOMRenderer.removeClass(commands[++localIterator]);
                 break;
                 
-            case 'ADD_EVENT_LISTENER':
+            case 'SUBSCRIBE':
                 if (this.WebGLRenderer) this.WebGLRenderer.getOrSetCutout(path);
-                this.DOMRenderer.addEventListener(commands[++localIterator], commands[++localIterator]);
+                this.DOMRenderer.subscribe(commands[++localIterator], commands[++localIterator]);
                 break;
 
             case 'GL_SET_DRAW_OPTIONS':
