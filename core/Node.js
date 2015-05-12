@@ -573,6 +573,9 @@ Node.prototype.removeChild = function removeChild (child) {
  * @method addComponent
  *
  * @param {Object} component    An component to be added.
+ * @return {Number} index       The index at which the component has been
+ *                              registered. Indices aren't necessarily
+ *                              consecutive.
  */
 Node.prototype.addComponent = function addComponent (component) {
     var index = this._components.indexOf(component);
@@ -588,6 +591,18 @@ Node.prototype.addComponent = function addComponent (component) {
     }
 
     return index;
+};
+
+/**
+ * @method  getComponent
+ *  
+ * @param  {Number} index   Index at which the component has been regsitered
+ *                          (using `Node#addComponent`).
+ * @return {*}              The component registered at the passed in index (if
+ *                          any).
+ */ 
+Node.prototype.getComponent = function getComponent (index) {
+    return this._components[index];
 };
 
 /**
