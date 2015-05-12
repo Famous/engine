@@ -121,6 +121,10 @@ Context.prototype.receive = function receive(pathArr, path, commands, iterator) 
                 this.DOMRenderer.insertEl(commands[++localIterator]);
                 break;
 
+            case 'DOM_RENDER_SIZE':
+                this.DOMRenderer.getSizeOf(commands[++localIterator]);
+                break;
+
             case 'CHANGE_TRANSFORM':
                 for (var i = 0 ; i < 16 ; i++) this._meshTransform[i] = commands[++localIterator];
 
