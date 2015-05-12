@@ -32,7 +32,7 @@ function MockColor() {
 
 MockColor.prototype.getNormalizedRGB = function getNormalizedRGB() {
     // Stringified for easing checking
-    return [this._r, this._g, this._b].toString();
+    return [this._r, this._g, this._b].prototype.toString();
 };
 
 MockColor.prototype.getColor = function getColor(option) {

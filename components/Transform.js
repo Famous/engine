@@ -177,13 +177,13 @@ function Transform(node) {
     this._dirty = false;
 }
 
-Transform.toString = function toString() {
+Transform.prototype.toString = function toString() {
     return 'Transform';
 };
 
 Transform.prototype.getValue = function getValue() {
     return {
-        component: this.constructor.toString(),
+        component: this.toString(),
         origin: this.origin && this.origin.get(),
         mountPoint: this.mountPoint && this.mountPoint.get(),
         align: this.align && this.align.get(),
@@ -194,7 +194,7 @@ Transform.prototype.getValue = function getValue() {
 };
 
 Transform.prototype.setState = function setState(state) {
-    if (state.component === this.constructor.toString()) {
+    if (this.toString() === state.component) {
         state.origin && this.setOrigin(state.origin.x, state.origin.y, state.origin.z);
         state.mountPoint && this.setMountPoint(state.mountPoint.x, state.mountPoint.y, state.mountPoint.z);
         state.align && this.setAlign(state.align.x, state.align.y, state.align.z);

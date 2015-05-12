@@ -39,14 +39,7 @@ function Scale(node) {
     this._z.set(1);
 }
 
-/**
-*
-* stringifies Scale
-*
-* @method 
-* @return {String} the name of the Component Class: 'Scale'
-*/
-Scale.toString = function toString() {
+Scale.prototype.toString = function toString() {
     return 'Scale';
 };
 

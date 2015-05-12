@@ -102,12 +102,12 @@ test('PointLight', function(t) {
         t.end();
     });
 
-    t.test('PointLight.toString', function(t) {
+    t.test('PointLight.prototype.toString', function(t) {
 
-        t.equal(typeof PointLight.toString, 'function',
+        t.equal(typeof PointLight.prototype.toString, 'function',
             'should be a function');
 
-        t.equal(PointLight.toString(), 'PointLight');
+        t.equal(PointLight.prototype.toString(), 'PointLight');
 
         t.end();
     });

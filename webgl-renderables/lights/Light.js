@@ -48,7 +48,7 @@ function Light(node) {
 * @method toString
 * @return {String} definition
 */
-Light.toString = function toString() {
+Light.prototype.toString = function toString() {
     return 'Light';
 };
 

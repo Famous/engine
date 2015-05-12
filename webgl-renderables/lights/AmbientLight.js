@@ -49,7 +49,7 @@ function AmbientLight(node) {
 * @method toString
 * @return {string} definition
 */
-AmbientLight.toString = function toString() {
+AmbientLight.prototype.toString = function toString() {
     return 'AmbientLight';
 };
 

@@ -74,14 +74,7 @@ Size.prototype.setMode = function setMode(x, y, z) {
     return this;
 };
 
-/**
-* Stringifies Size.
-*
-* @method toString
-*
-* @return {String} `Size`
-*/
-Size.toString = function toString() {
+Size.prototype.toString = function toString() {
     return 'Size';
 };
 
@@ -151,7 +144,7 @@ Size.prototype.getValue = function getValue() {
 *                                                    been applied
 */
 Size.prototype.setValue = function setValue(state) {
-    if (state.component === this.constructor.toString()) {
+    if (this.toString() === state.component) {
         this.setMode.apply(this, state.sizeMode);
         if (state.absolute) {
             this.setAbsolute(state.absolute.x, state.absolute.y, state.absolute.z);

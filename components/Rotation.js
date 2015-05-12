@@ -58,14 +58,7 @@ function Rotation(node) {
     this._z.set(rz);
 }
 
-/**
-*
-* stringifies Rotation
-*
-* @method
-* @return {String} the name of the Component Class: 'Rotation'
-*/
-Rotation.toString = function toString() {
+Rotation.prototype.toString = function toString() {
     return 'Rotation';
 };
 

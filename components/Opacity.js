@@ -41,14 +41,7 @@ function Opacity(node) {
     this._requestingUpdate = false;
 }
 
-/**
-*
-* returns stringified Opacity
-*
-* @method
-* @return {String} the name of the Component Class: 'Opacity'
-*/
-Opacity.toString = function toString() {
+Opacity.prototype.toString = function toString() {
     return 'Opacity';
 };
 
@@ -62,7 +55,7 @@ Opacity.toString = function toString() {
 */
 Opacity.prototype.getValue = function getValue() {
     return {
-        component: this.constructor.toString(),
+        component: this.toString(),
         value: this._value.get()
     };
 };
@@ -76,7 +69,7 @@ Opacity.prototype.getValue = function getValue() {
 * @return {Boolean} true if set is successful, false otherwise
 */
 Opacity.prototype.setValue = function setValue(value) {
-    if (this.constructor.toString() === value.component) {
+    if (this.toString() === value.component) {
         this.set(value.value);
         return true;
     }

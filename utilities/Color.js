@@ -47,7 +47,7 @@ function Color(color, transition, cb) {
 * @method toString
 * @return {String} definition
 */
-Color.toString = function toString() {
+Color.prototype.toString = function toString() {
     return 'Color';
 };
 

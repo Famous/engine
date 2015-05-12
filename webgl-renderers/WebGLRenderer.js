@@ -149,7 +149,7 @@ WebGLRenderer.prototype.getWebGLContext = function getWebGLContext(canvas) {
             context = canvas.getContext(names[i]);
         }
         catch (error) {
-            var msg = 'Error creating WebGL context: ' + error.toString();
+            var msg = 'Error creating WebGL context: ' + error.prototype.toString();
             console.error(msg);
         }
         if (context) {

@@ -42,15 +42,7 @@ function Origin(node) {
     this._z.set(initial[2]);
 }
 
-
-/**
-*
-* returns stringified Origin
-*
-* @method
-* @return {String} the name of the Component Class: 'Origin'
-*/
-Origin.toString = function toString() {
+Origin.prototype.toString = function toString() {
     return 'Origin';
 };
 

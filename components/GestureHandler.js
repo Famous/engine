@@ -135,14 +135,7 @@ GestureHandler.prototype.onReceive = function onReceive (ev, payload) {
     }
 };
 
-/**
- * Returns the name of GestureHandler as a string.
- *
- * @method toString
- * @static
- * @return {String} 'GestureHandler'
- */
-GestureHandler.toString = function toString() {
+GestureHandler.prototype.toString = function toString() {
     return 'GestureHandler';
 };
 

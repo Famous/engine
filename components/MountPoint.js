@@ -42,14 +42,7 @@ function MountPoint(node) {
     this._z.set(initial[2]);
 }
 
-/**
-*
-* Stringifies MountPoint
-*
-* @method
-* @return {String} the name of the Component Class: 'MountPoint'
-*/
-MountPoint.toString = function toString() {
+MountPoint.prototype.toString = function toString() {
     return 'MountPoint';
 };
 

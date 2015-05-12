@@ -43,15 +43,8 @@ function Align(node) {
     this._z.set(initial[2]);
 }
 
-/**
-*
-* stringifies Align
-*
-* @method
-* @return {String} the name of the Component Class: 'Align'
-*/
-Align.toString = function toString() {
-    return Align.toString;
+Align.prototype.toString = function toString() {
+    return 'Align';
 };
 
 Align.prototype = Object.create(Position.prototype);
