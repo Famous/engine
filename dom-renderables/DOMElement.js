@@ -55,6 +55,18 @@ var RENDER_SIZE = 2;
  *                                      for DOM and WebGL layering.  On by default.
  */
 function DOMElement (node, options) {
+    if (!node) throw new Error('DOMElement must be instantiated on a node');
+
+    if (typeof options === 'string') {
+        console.warn(
+            'HTMLElement constructor signature changed!\n' +
+            'Pass in an options object with {tagName: ' + options + '} instead.'
+        );
+        options = {
+            tagName: options
+        };
+    }
+
     this._node = node;
     this._parent = null;
     this._children = [];
