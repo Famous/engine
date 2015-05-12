@@ -49,7 +49,7 @@ function WheelEvent(ev) {
     this.deltaMode = ev.deltaMode;
 }
 
-WheelEvent.prototype = MouseEvent.prototype;
+WheelEvent.prototype = Object.create(MouseEvent.prototype);
 WheelEvent.prototype.constructor = WheelEvent;
 
 module.exports = WheelEvent;

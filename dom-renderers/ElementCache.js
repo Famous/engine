@@ -53,6 +53,9 @@ function ElementCache (element, path) {
     this.invertedParent = new Float32Array(ident);
     this.finalTransform = new Float32Array(ident);
     this.postRenderSize = new Float32Array(2);
+    this.listeners = {};
+    this.preventDefault = {};
+    this.subscribe = {};
 }
 
 module.exports = ElementCache;

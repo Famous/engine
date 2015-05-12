@@ -34,47 +34,57 @@ var TouchEvent = require('./TouchEvent');
 var UIEvent = require('./UIEvent');
 var WheelEvent = require('./WheelEvent');
 
+var compositionEvent = new CompositionEvent({});
+var event = new Event({});
+var focusEvent = new FocusEvent({});
+var inputEvent = new InputEvent({});
+var keyboardEvent = new KeyboardEvent({});
+var mouseEvent = new MouseEvent({});
+var touchEvent = new TouchEvent({});
+var uiEvent = new UIEvent({});
+var wheelEvent = new WheelEvent({});
+
 var EventMap = {
     // UI Events (http://www.w3.org/TR/uievents/)
-    'abort': [Event, false],
-    'beforeinput': [InputEvent, true],
-    'blur': [FocusEvent, false],
-    'click': [MouseEvent, true],
-    'compositionend': [CompositionEvent, true],
-    'compositionstart': [CompositionEvent, true],
-    'compositionupdate': [CompositionEvent, true],
-    'dblclick': [MouseEvent, true],
-    'focus': [FocusEvent, false],
+    'abort': [event, false],
+    'beforeinput': [inputEvent, true],
+    'blur': [focusEvent, false],
+    'click': [mouseEvent, true],
+    'compositionend': [compositionEvent, true],
+    'compositionstart': [compositionEvent, true],
+    'compositionupdate': [compositionEvent, true],
+    'dblclick': [mouseEvent, true],
+    'focus': [focusEvent, false],
     'focusin': [FocusEvent, true],
     'focusout': [FocusEvent, true],
-    'input': [InputEvent, true],
-    'keydown': [KeyboardEvent, true],
-    'keyup': [KeyboardEvent, true],
-    'load': [Event, false],
-    'mousedown': [MouseEvent, true],
-    'mouseenter': [MouseEvent, false],
-    'mouseleave': [MouseEvent, false],
+    'input': [inputEvent, true],
+    'keydown': [keyboardEvent, true],
+    'keyup': [keyboardEvent, true],
+    'load': [event, false],
+    'mousedown': [mouseEvent, true],
+    'mouseenter': [mouseEvent, false],
+    'mouseleave': [mouseEvent, false],
 
     // bubbles, but will be triggered very frequently
-    'mousemove': [MouseEvent, false],
+    'mousemove': [mouseEvent, false],
 
-    'mouseout': [MouseEvent, true],
-    'mouseover': [MouseEvent, true],
-    'mouseup': [MouseEvent, true],
-    'resize': [UIEvent, false],
+    'mouseout': [mouseEvent, true],
+    'mouseover': [mouseEvent, true],
+    'mouseup': [mouseEvent, true],
+    'resize': [uiEvent, false],
 
     // might bubble
-    'scroll': [UIEvent, false],
+    'scroll': [uiEvent, false],
     
-    'select': [Event, true],
-    'unload': [Event, false],
-    'wheel': [WheelEvent, true],
+    'select': [event, true],
+    'unload': [event, false],
+    'wheel': [wheelEvent, true],
 
     // Touch Events Extension (http://www.w3.org/TR/touch-events-extensions/)
-    'touchcancel': [TouchEvent, true],
-    'touchend': [TouchEvent, true],
-    'touchmove': [TouchEvent, true],
-    'touchstart': [TouchEvent, true],
+    'touchcancel': [touchEvent, true],
+    'touchend': [touchEvent, true],
+    'touchmove': [touchEvent, true],
+    'touchstart': [touchEvent, true],
 };
 
 module.exports = EventMap;

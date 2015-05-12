@@ -26,6 +26,8 @@
 
 var UIEvent = require('./UIEvent');
 
+var EMPTY_ARRAY = [];
+
 function Touch(touch) {
     // interface Touch {
     //     readonly    attribute long        identifier;
@@ -49,6 +51,7 @@ function Touch(touch) {
 }
 
 function cloneTouchList(touchList) {
+    if (!touchList) return EMPTY_ARRAY;
     // interface TouchList {
     //     readonly    attribute unsigned long length;
     //     getter Touch? item (unsigned long index);
@@ -71,7 +74,6 @@ function TouchEvent(ev) {
     //     readonly    attribute boolean   ctrlKey;
     //     readonly    attribute boolean   shiftKey;
     // };
-
     UIEvent.call(this, ev);
     this.touches = cloneTouchList(ev.touches);
     this.targetTouches = cloneTouchList(ev.targetTouches);
@@ -82,8 +84,7 @@ function TouchEvent(ev) {
     this.shiftKey = ev.shiftKey;
 }
 
-
-TouchEvent.prototype = UIEvent.prototype;
+TouchEvent.prototype = Object.create(UIEvent.prototype);
 TouchEvent.prototype.constructor = TouchEvent;
 
 module.exports = TouchEvent;
