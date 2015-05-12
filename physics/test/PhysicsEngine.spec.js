@@ -40,8 +40,8 @@ test('PhysicsEngine', function(t) {
     t.test('event methods', function(t) {
         t.assert(world.events, '.events should exist');
         t.assert(world.on instanceof Function, '.on should be a function');
-        t.assert(world.off instanceof Function, '.on should be a function');
-        t.assert(world.trigger instanceof Function, '.on should be a function');
+        t.assert(world.off instanceof Function, '.off should be a function');
+        t.assert(world.trigger instanceof Function, '.trigger should be a function');
 
         t.end();
     });

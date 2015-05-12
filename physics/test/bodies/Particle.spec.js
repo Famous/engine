@@ -44,8 +44,8 @@ test('Particle', function(t) {
     t.test('event methods', function(t) {
         t.assert(p.events, '.events should exist');
         t.assert(p.on instanceof Function, '.on should be a function');
-        t.assert(p.off instanceof Function, '.on should be a function');
-        t.assert(p.trigger instanceof Function, '.on should be a function');
+        t.assert(p.off instanceof Function, '.off should be a function');
+        t.assert(p.trigger instanceof Function, '.trigger should be a function');
 
         t.end();
     });
