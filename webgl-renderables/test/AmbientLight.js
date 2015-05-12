@@ -102,12 +102,12 @@ test('AmbientLight', function(t) {
         t.end();
     });
 
-    t.test('AmbientLight.toString', function(t) {
+    t.test('AmbientLight.prototype.toString', function(t) {
 
-        t.equal(typeof AmbientLight.toString, 'function',
+        t.equal(typeof AmbientLight.prototype.toString, 'function',
             'should be a function');
 
-        t.equal(AmbientLight.toString(), 'AmbientLight');
+        t.equal(AmbientLight.prototype.toString(), 'AmbientLight');
 
         t.end();
     });

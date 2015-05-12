@@ -100,11 +100,11 @@ test('Color', function(t) {
         t.end();
     });
 
-    t.test('Color.toString', function(t) {
-        t.equal(typeof Color.toString, 'function',
+    t.test('Color.prototype.toString', function(t) {
+        t.equal(typeof Color.prototype.toString, 'function',
             'should be a method');
 
-        t.equal(Color.toString(), 'Color',
+        t.equal(Color.prototype.toString(), 'Color',
             'should return string "Color"');
 
         t.end();

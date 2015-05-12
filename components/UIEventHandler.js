@@ -45,14 +45,7 @@ function UIEventHandler (dispatch, events) {
     }
 }
 
-/**
- * Returns the name of UIEventHandler as a string.
- *
- * @method toString
- * @static
- * @return {String} 'UIEventHandler'
- */
-UIEventHandler.toString = function toString() {
+UIEventHandler.prototype.toString = function toString() {
     return 'UIEventHandler';
 };
 

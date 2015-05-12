@@ -45,14 +45,7 @@ function Position(node) {
     this._z = new Transitionable(initialPosition[2]);
 }
 
-/** 
-*
-* stringifies Position constructor
-*
-* @method
-* @return {String} the definition of the Component Class: 'Position'
-*/
-Position.toString = function toString() {
+Position.prototype.toString = function toString() {
     return 'Position';
 };
 
@@ -65,7 +58,7 @@ Position.toString = function toString() {
 */
 Position.prototype.getValue = function getValue() {
     return {
-        component: this.constructor.toString(),
+        component: this.toString(),
         x: this._x.get(),
         y: this._y.get(),
         z: this._z.get()
@@ -81,7 +74,7 @@ Position.prototype.getValue = function getValue() {
 * @return {Boolean} true on success
 */
 Position.prototype.setValue = function setValue(state) {
-    if (state.component === this.constructor.toString()) {
+    if (this.toString() === state.component) {
         this.set(state.x, state.y, state.z);
         return true;
     }

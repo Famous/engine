@@ -48,14 +48,13 @@ Camera.FRUSTUM_PROJECTION = 0;
 Camera.PINHOLE_PROJECTION = 1;
 Camera.ORTHOGRAPHIC_PROJECTION = 2;
 
-// Return the name of the Element Class: 'Camera'
-Camera.toString = function toString() {
+Camera.prototype.toString = function toString() {
     return 'Camera';
 };
 
 Camera.prototype.getValue = function getValue() {
     return {
-        component: this.constructor.toString(),
+        component: this.toString(),
         projectionType: this._projectionType,
         focalDepth: this._focalDepth,
         near: this._near,
@@ -64,7 +63,7 @@ Camera.prototype.getValue = function getValue() {
 };
 
 Camera.prototype.setValue = function setValue(state) {
-    if (state.component === this.constructor.toString()) {
+    if (this.toString() === state.component) {
         this.set(state.projectionType, state.focalDepth, state.near, state.far);
         return true;
     }

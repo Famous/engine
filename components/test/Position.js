@@ -54,9 +54,9 @@ test('Position', function(t) {
         t.end();
     });
 
-    t.test('toString method', function(t) {
-        t.equal(typeof Position.toString, 'function', 'Position.toString should be a function');
-        t.equal(Position.toString(), 'Position');
+    t.test('prototype.toString method', function(t) {
+        t.equal(typeof Position.prototype.toString, 'function', 'Position.prototype.toString should be a function');
+        t.equal(Position.prototype.toString(), 'Position');
         t.end();
     });
 

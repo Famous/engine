@@ -49,9 +49,9 @@ test('UIEventHandler', function(t) {
         }
     });
 
-    t.test('toString static method', function(t) {
-        t.equal(typeof UIEventHandler.toString, 'function', 'UIEventHandler.toString should be a function');
-        t.equal(UIEventHandler.toString(), 'UIEventHandler');
+    t.test('prototype.toString static method', function(t) {
+        t.equal(typeof UIEventHandler.prototype.toString, 'function', 'UIEventHandler.prototype.toString should be a function');
+        t.equal(UIEventHandler.prototype.toString(), 'UIEventHandler');
         t.end();
     });
 

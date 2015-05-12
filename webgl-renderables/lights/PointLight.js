@@ -48,7 +48,7 @@ function PointLight(node) {
 * @method toString
 * @return {string} definition
 */
-PointLight.toString = function toString() {
+PointLight.prototype.toString = function toString() {
     return 'PointLight';
 };
 

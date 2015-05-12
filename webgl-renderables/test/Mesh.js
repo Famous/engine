@@ -125,12 +125,12 @@ test('Mesh', function(t) {
         t.end();
     });
 
-    t.test('Mesh.toString', function(t) {
+    t.test('Mesh.prototype.toString', function(t) {
 
-        t.equal(typeof Mesh.toString, 'function',
+        t.equal(typeof Mesh.prototype.toString, 'function',
             'should be a function');
 
-        t.equal(Mesh.toString(), 'Mesh');
+        t.equal(Mesh.prototype.toString(), 'Mesh');
 
         t.end();
     });
