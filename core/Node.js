@@ -884,9 +884,9 @@ Node.prototype.setSizeMode = function setSizeMode (x, y, z) {
     var vec3 = this.value.size.sizeMode;
     var propogate = false;
     
-    propogate = this._resolveSizeMode(vec3, 0, x) || propogate;
-    propogate = this._resolveSizeMode(vec3, 1, y) || propogate;
-    propogate = this._resolveSizeMode(vec3, 2, z) || propogate;
+    if (x != null) propogate = this._resolveSizeMode(vec3, 0, x) || propogate;
+    if (y != null) propogate = this._resolveSizeMode(vec3, 1, y) || propogate;
+    if (z != null) propogate = this._resolveSizeMode(vec3, 2, z) || propogate;
 
     if (propogate) {
         var i = 0;
