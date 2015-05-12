@@ -511,6 +511,6 @@ GeometryHelper.createBackfaceIndices = function createBackfaceIndices(indices, o
     }
 
     return out;
-}
+};
 
 module.exports = GeometryHelper;

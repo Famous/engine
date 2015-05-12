@@ -25,6 +25,7 @@
 'use strict';
 
 var Geometry = require('../Geometry');
+var GeometryHelper = require('../GeometryHelper');
 
 /**
  * This function returns a new static geometry, which is passed
@@ -43,6 +44,10 @@ function Circle (options) {
     var detail   = options.detail || 30;
     var buffers  = getBuffers(detail);
 
+    if (options.backface !== false) {
+        buffers.vertices.push.apply(buffers.vertices, getBackFaces(buffers.vertices));
+    }
+
     return new Geometry({
         type: 'TRIANGLE_FAN',
         buffers: [
@@ -51,6 +56,28 @@ function Circle (options) {
             { name: 'normals', data: buffers.normals }
         ]
     });
+}
+
+function getBackFaces (vertices) {
+    var out = [];
+    var offset = 3;
+    var nFaces = (vertices.length - offset) / 3;
+
+    out[0] = vertices[0];
+    out[1] = vertices[1];
+    out[2] = vertices[2];
+
+    for (var i = 0; i < nFaces; i++) {
+        var x = vertices[offset + i * 3],
+            y = vertices[offset + i * 3 + 1],
+            z = vertices[offset + i * 3 + 2];
+
+        out[offset + (nFaces - i) * 3] = x;
+        out[offset + (nFaces - i) * 3 + 1] = y;
+        out[offset + (nFaces - i) * 3 + 2] = z;
+    }
+
+    return out;
 }
     
 /**
