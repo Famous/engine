@@ -97,7 +97,7 @@ function WebGLRenderer(canvas, compositor) {
     this.lightPositions = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     this.lightColors = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
-    this.textureManager = new TextureManager(gl, compositor);
+    this.textureManager = new TextureManager(gl);
     this.texCache = {};
     this.bufferRegistry = new BufferRegistry(gl);
     this.program = new Program(gl, { debug: true });
@@ -470,8 +470,10 @@ WebGLRenderer.prototype.bufferData = function bufferData(path, geometryId, buffe
  * affect the rendering of all renderables.
  */
 WebGLRenderer.prototype.draw = function draw(renderState) {
+    var time = this.compositor.getTime();
+    
     this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
-    this.textureManager.update();
+    this.textureManager.update(time);
     
     this.setGlobalUniforms(renderState);
     this.meshRegistryKeys = sorter(this.meshRegistryKeys, this.meshRegistry);
