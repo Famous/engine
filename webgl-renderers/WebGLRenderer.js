@@ -110,7 +110,7 @@ function WebGLRenderer(canvas, compositor) {
         enabledAttributesKeys: []
     };
 
-    this.resolutionName = ['resolution'];
+    this.resolutionName = ['u_resolution'];
     this.resolutionValues = [];
 
     this.cachedSize = [];
