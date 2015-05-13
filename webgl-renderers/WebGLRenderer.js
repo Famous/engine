@@ -48,18 +48,21 @@ var globalUniforms = keyValueToArrays({
 
 /**
  * WebGLRenderer is a private class that manages all interactions with the WebGL
- * API.  Each frame it receives commands from the compositor and updates its registries
- * accordingly.  Subsequently, the draw function is called and the WebGLRenderer
- * issues draw calls for all meshes in its registry.
+ * API.  Each frame it receives commands from the compositor and updates its
+ * registries accordingly.  Subsequently, the draw function is called and the
+ * WebGLRenderer issues draw calls for all meshes in its registry.
  *
  * @class WebGLRenderer
  * @constructor
  *
- * @param {DOMElement} canvas The dom element that GL will paint itself onto.
+ * @param {Element} canvas          The DOM element that GL will paint itself
+ *                                  onto.
+ * @param {Compositor} compositor   Compositor used for querying the time from.
  *
  */
-function WebGLRenderer(canvas) {
+function WebGLRenderer(canvas, compositor) {
     this.canvas = canvas;
+    this.compositor = compositor;
     
     for (var key in this.constructor.DEFAULT_STYLES) {
         this.canvas.style[key] = this.constructor.DEFAULT_STYLES[key];
@@ -467,8 +470,10 @@ WebGLRenderer.prototype.bufferData = function bufferData(path, geometryId, buffe
  * affect the rendering of all renderables.
  */
 WebGLRenderer.prototype.draw = function draw(renderState) {
+    var time = this.compositor.getTime();
+    
     this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
-    this.textureManager.update();
+    this.textureManager.update(time);
     
     this.setGlobalUniforms(renderState);
     this.meshRegistryKeys = sorter(this.meshRegistryKeys, this.meshRegistry);
@@ -571,7 +576,7 @@ WebGLRenderer.prototype.setGlobalUniforms = function setGlobalUniforms(renderSta
     this.projectionTransform[11] = renderState.perspectiveTransform[11];
 
     globalUniforms.values[4] = this.projectionTransform;
-    globalUniforms.values[5] = Date.now() % 100000 / 1000;
+    globalUniforms.values[5] = this.compositor.getTime() % 100000 / 1000;
     globalUniforms.values[6] = renderState.viewTransform;
 
     this.program.setUniforms(globalUniforms.keys, globalUniforms.values);

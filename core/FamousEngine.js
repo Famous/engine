@@ -33,6 +33,7 @@ var Engine = require('../engine/Engine');
 
 var ENGINE_START = ['ENGINE', 'START'];
 var ENGINE_STOP = ['ENGINE', 'STOP'];
+var TIME_UPDATE = ['TIME', null];
 
 /**
  * Famous has two responsibilities, one to act as the highest level
@@ -53,8 +54,8 @@ function FamousEngine() {
     this._scenes = {}; // a hash of all of the scenes's that the FamousEngine
                          // is responsible for.
 
-    this._messages = []; // a queue of all of the draw commands to send to the
-                         // the renderers this frame.
+    this._messages = TIME_UPDATE;   // a queue of all of the draw commands to
+                                    // send to the the renderers this frame.
 
     this._inUpdate = false; // when the famous is updating this is true.
                             // all requests for updates will get put in the
@@ -115,6 +116,8 @@ FamousEngine.prototype._update = function _update () {
     var nextQueue = this._nextUpdateQueue;
     var queue = this._updateQueue;
     var item;
+
+    this._messages[1] = time;
 
     while (nextQueue.length) queue.unshift(nextQueue.pop());
 
@@ -251,7 +254,7 @@ FamousEngine.prototype.step = function step (time) {
 
     if (this._messages.length) {
         this._channel.sendMessage(this._messages);
-        this._messages.length = 0;
+        this._messages.length = 2;
     }
 
     return this;

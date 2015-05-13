@@ -36,18 +36,16 @@ var Clock = null;
  * @param {WebGL_Context} gl Context used to create and bind textures.
  */
 function TextureManager(gl) {
-    Clock = Clock || require('../core/FamousEngine').getClock();
     this.registry = [];
     this._needsResample = [];
 
     this._activeTexture = 0;
-    this._boundTexture;
+    this._boundTexture = null;
 
     this.gl = gl;
 }
 
-TextureManager.prototype.update = function update() {
-    var time = Clock.getTime();
+TextureManager.prototype.update = function update(time) {
     var registryLength = this.registry.length;
 
     for (var i = 1; i < registryLength; i++) {
