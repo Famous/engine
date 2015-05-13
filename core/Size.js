@@ -51,7 +51,7 @@ Size.DEFAULT = Size.RELATIVE;
  * @return {Boolean} true if the size of the node has changed.
  */
 Size.prototype.fromSpecWithParent = function fromSpecWithParent (parentSize, node, target) {
-    var spec = node.getValue().spec;
+    var spec = node.value;
     var components = node.getComponents();
     var mode = spec.size.sizeMode;
     var prev;
