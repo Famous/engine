@@ -26,10 +26,8 @@
 
 'use strict';
 
-// TODO: Dispatch should be generalized so that it can work on any Node
-// not just Contexts.
-
 var Event = require('./Event');
+var PathUtils = require('./Path');
 
 /**
  * The Dispatch class is used to propogate events down the
@@ -39,13 +37,13 @@ var Event = require('./Event');
  * @param {Scene} context The context on which it operates
  * @constructor
  */
-function Dispatch (context) {
-
-    if (!context) throw new Error('Dispatch needs to be instantiated on a node');
+function Dispatch () {
 
     this._context = context; // A reference to the context
                              // on which the dispatcher
                              // operates
+
+    this._nodes = {}; // a container for constant time lookup of nodes
 
     this._queue = []; // The queue is used for two purposes
                       // 1. It is used to list indicies in the
@@ -55,6 +53,211 @@ function Dispatch (context) {
                       //    such that it is possible to do a breadth first
                       //    traversal of the scene graph.
 }
+
+/**
+ * Associates a node with a path. Commands issued to this path will be sent to the
+ * registered node. Throws if there is already a node registered at that path.
+ *
+ * @method registerNodeAtPath
+ * @return {void}
+ *
+ * @param {String} path to register the node to.
+ * @param {Node} node to register at that path.
+ */
+Dispatch.prototype.registerNodeAtPath = function registerNodeAtPath (path, node) {
+    if (this._nodes[path]) throw new Error('Node already defined at path: ' + path);
+    this._nodes[path] = node;
+    this.mount(path);
+};
+
+/**
+ * Ends the association between a node and a path name. Messages sent to that path
+ * while there is no node associated with it will throw errors. If the given node
+ * is not currently registered to that path, an error is thrown.
+ *
+ * @method deregisterNodeAtPath
+ * @return {void}
+ *
+ * @param {String} path to remove the node from.
+ * @param {Node} node to remove.
+ */
+Dispatch.prototype.deregisterNodeAtPath = function deregisterNodeAtPath (path, node) {
+    if (this._nodes[path] !== node) throw new Error('Node is not registered at this path: ' + path);
+    this._nodes[path] = null;
+    this.dismount(node, path);
+};
+
+/**
+ * Enque the children of a node within the dispatcher. Does not clear
+ * the dispatchers queue first.
+ *
+ * @method addChildrenToQueue
+ * @return {void}
+ *
+ * @param {Node} node from which to add children to the queue
+ */
+Dispatch.prototype.addChildrenToQueue = function addChildrenToQueue (node) {
+    var children = node.getChildren();
+    var child;
+    for (var i = 0, len = children.length ; i < len ; i++) {
+        child = children[i];
+        if (child) this._queue.push(child);
+    }
+};
+
+/**
+ * Returns the next item in the Dispatch's queue.
+ *
+ * @method next
+ * @return {Node} next node in the queue
+ */
+Dispatch.prototype.next = function next () {
+    return this._queue.shift();
+};
+
+/**
+ * Returns the next node in the queue, but also adds its children to
+ * the end of the queue. Continually calling this method will result
+ * in a breadth first traversal of the render tree.
+ *
+ * @method breadthFirstNext
+ * @return {Node} the next node in the traversal.
+ */
+Dispatch.prototype.breadthFirstNext = function breadthFirstNext () {
+    var child = this._queue.shift();
+    if (!child) return;
+    this.addChildrenToQueue(child);
+    return child;
+};
+
+/**
+ * Calls the onMount method for the node at a given path and
+ * properly registers all of that nodes children to their proper
+ * paths. Throws if that path doesn't have a node registered as
+ * a parent or if there is no node registered at that path.
+ *
+ * @method mount
+ * @return {void}
+ *
+ * @param {String} path at which to begin mounting
+ */
+Dispatch.prototype.mount = function mount (path) {
+    var node = this._nodes[path];
+    var parentPath = PathUtils.parent(path);
+
+    // scenes are their own parents
+    var parent = !parentPath ? node : this._nodes[parentPath];
+ 
+    if (!node)
+        throw new Error(
+                'No node registered to path: ' + path
+        );
+    if (!parent)
+        throw new Error(
+                'Parent to path: ' + path + 
+                ' doesn\'t exist at expected path: ' + parentPath 
+        );
+
+    if (node.onMount) node.onMount(parent, path);
+    var children = node.getChildren();
+
+    for (var i = 0, len = children.length ; i < len ; i++)
+        this.registerNodeAtPath(children[i], path + '/' + i); 
+};
+
+/**
+ * Calls the onDismount method for the node at a given path
+ * and deregisters all of that nodes children. Throws if there
+ * is no node registered at that path.
+ *
+ * @method dismount
+ * @return {void}
+ *
+ * @param {String} path at which to begin dismounting
+ */
+Dispatch.prototype.dismount = function dismount (path) {
+    var node = this._nodes[path];
+
+    if (!node)
+        throw new Error(
+                'No node registered to path: ' + path
+        );
+
+    if (node.onDismount) node.onDismount();
+    var children = node.getChildren();
+
+    for (var i = 0, len = children.length ; i < len ; i++)
+        this.deregisterNodeAtPath(children[i], path + '/' + i);
+};
+
+/**
+ * Returns a the node registered to the given path, or none
+ * if no node exists at that path.
+ *
+ * @method getNode
+ * @return {Node | void} node at the given path
+ *
+ * @param {String} path at which to look up the node
+ */
+Dispatch.prototype.getNode = function getNode (path) {
+    return this._nodes[path];
+};
+
+/**
+ * Issues the onShow method to the node registered at the given path,
+ * and shows the entire subtree below that node. Throws if no node
+ * is registered to this path.
+ *
+ * @method show
+ * @return {void}
+ *
+ * @param {String} path
+ */
+Dispatch.prototype.show = function show (path) {
+    var node = this._nodes[path];
+
+    if (!node)
+        throw new Error(
+                'No node registered to path: ' + path
+        );
+
+    if (node.onShow) node.onShow();
+
+    this.addChildrenToQueue(node);
+    var child;
+
+    while ((child = this.breadthFirstNext()))
+        this.show(child.getLocation());
+
+};
+
+/**
+ * Issues the onHide method to the node registered at the given path,
+ * and hides the entire subtree below that node. Throws if no node
+ * is registered to this path.
+ *
+ * @method hide
+ * @return {void}
+ *
+ * @param {String} path
+ */
+Dispatch.prototype.hide = function hide (path) {
+    var node = this._nodes[path];
+
+    if (!node)
+        throw new Error(
+                'No node registered to path: ' + path
+        );
+
+    if (node.onHide) node.onHide();
+
+    this.addChildrenToQueue(node);
+    var child;
+
+    while ((child = this.breadthFirstNext()))
+        this.hide(child.getLocation());
+
+};
 
 /**
  * lookupNode takes a path and returns the node at the location specified
@@ -67,26 +270,15 @@ function Dispatch (context) {
 Dispatch.prototype.lookupNode = function lookupNode (location) {
     if (!location) throw new Error('lookupNode must be called with a path');
 
+    this._queue.length = 0;
     var path = this._queue;
 
     _splitTo(location, path);
 
-    if (path[0] !== this._context.getSelector()) return void 0;
+    for (var i = 0, len = path.length ; i < len ; i++)
+        path[i] = this._nodes[path[i]];
 
-    var children = this._context.getChildren();
-    var child;
-    var i = 1;
-    path[0] = this._context;
-
-    while (i < path.length) {
-        child = children[path[i]];
-        path[i] = child;
-        if (child) children = child.getChildren();
-        else return void 0;
-        i++;
-    }
-
-    return child;
+    return path[path.length - 1];
 };
 
 /**
@@ -95,29 +287,25 @@ Dispatch.prototype.lookupNode = function lookupNode (location) {
  * receive the events in a breadth first traversal, meaning that parents
  * have the opportunity to react to the event before children.
  *
- * @param {String} event name of the event
- * @param {Any} payload the event payload
- *
- * @return {undefined} undefined
+ * @param {String} path name
+ * @param {String} event name
+ * @param {Any} payload
  */
-Dispatch.prototype.dispatch = function dispatch (event, payload) {
-    if (!event) throw new Error('dispatch requires an event name as it\'s first argument');
+Dispatch.prototype.dispatch = function dispatch (path, event, payload) {
+    if (!path) throw new Error('dispatch requires a path as it\'s first argument');
+    if (!event) throw new Error('dispatch requires an event name as it\'s second argument');
 
-    var queue = this._queue;
-    var item;
-    var i;
-    var len;
-    var children;
+    var node = this._nodes[path];
+    if (!node)
+        throw new Error('No node registered at path: ' + path);
 
-    queue.length = 0;
-    queue.push(this._context);
+    this.addChildrenToQueue(node);
+    var child;
 
-    while (queue.length) {
-        item = queue.shift();
-        if (item.onReceive) item.onReceive(event, payload);
-        children = item.getChildren();
-        for (i = 0, len = children.length ; i < len ; i++) queue.push(children[i]);
-    }
+    while ((child = this.breadthFirstNext())) 
+        if (child.onReceive)
+            child.onReceive(event, payload);
+
 };
 
 /**
@@ -178,4 +366,5 @@ function _splitTo (string, target) {
     return target;
 }
 
-module.exports = Dispatch;
+module.exports = new Dispatch();
+

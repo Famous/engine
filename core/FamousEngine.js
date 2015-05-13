@@ -27,9 +27,11 @@
 var Clock = require('./Clock');
 var Scene = require('./Scene');
 var Channel = require('./Channel');
+var Dispatch = require('./Dispatch');
 var UIManager = require('../renderers/UIManager');
 var Compositor = require('../renderers/Compositor');
 var RequestAnimationFrameLoop = require('../render-loops/RequestAnimationFrameLoop');
+var TransformSystem = require('./TransformSystem');
 
 var ENGINE_START = ['ENGINE', 'START'];
 var ENGINE_STOP = ['ENGINE', 'STOP'];
@@ -150,6 +152,8 @@ FamousEngine.prototype._update = function _update () {
         if (item && item.onUpdate) item.onUpdate(time);
     }
 
+    TransformSystem.onUpdate();
+
     this._inUpdate = false;
 };
 
@@ -246,7 +250,7 @@ FamousEngine.prototype.handleWith = function handleWith (messages) {
             var type = messages.shift();
             var ev = messages.shift();
 
-            this.getContext(path).getDispatch().dispatchUIEvent(path, type, ev);
+            Dispatch.dispatchUIEvent(path, type, ev);
             break;
         default:
             throw new Error('received unknown command: ' + command);
@@ -290,7 +294,7 @@ FamousEngine.prototype.step = function step (time) {
 
     if (this._messages.length) {
         this._channel.sendMessage(this._messages);
-        this._messages.length = 2;
+        while (this._messages.length > 2) this._messages.pop();
     }
 
     return this;

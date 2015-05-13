@@ -26,9 +26,9 @@
 
 'use strict';
 
-var Dispatch = require('./Dispatch');
 var Node = require('./Node');
 var Size = require('./Size');
+var Dispatch = require('./Dispatch');
 
 /**
  * Scene is the bottom of the scene graph. It is its own
@@ -54,18 +54,14 @@ function Scene (selector, updater) {
                              // send messages to the renderers
                              // and update dirty nodes
 
-    this._dispatch = new Dispatch(this); // instantiates a dispatcher
-                                         // to send events to the scene
-                                         // graph below this context
-
     this._selector = selector; // reference to the DOM selector
                                // that represents the element
                                // in the dom that this context
                                // inhabits
 
-    this.onMount(this, selector); // Mount the context to itself
-                                  // (it is its own parent)
-
+    this.mount(selector); // Mount the context to itself
+                          // (it is its own parent)
+    
     this._updater                  // message a request for the dom
         .message('NEED_SIZE_FOR')  // size of the context so that
         .message(selector);        // the scene graph has a total size
@@ -101,9 +97,11 @@ Scene.prototype.getSelector = function getSelector () {
  * to the nodes in the scene graph.
  *
  * @return {Dispatch} the Scene's Dispatch
+ * @DEPRICATED
  */
 Scene.prototype.getDispatch = function getDispatch () {
-    return this._dispatch;
+    console.warn('Scene.getDispatch is depricated, require the dispatch directly');
+    return Dispatch;
 };
 
 /**

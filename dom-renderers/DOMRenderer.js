@@ -327,51 +327,6 @@ DOMRenderer.prototype.findParent = function findParent () {
     return parent;
 };
 
-
-/**
- * Finds all children of the currently loaded element.
- *
- * @method
- * @private
- *
- * @param {Array} array Output-Array used for writing to (subsequently appending children)
- *
- * @return {Array} array of children elements
- */
-DOMRenderer.prototype.findChildren = function findChildren(array) {
-    // TODO: Optimize me.
-    this._assertPathLoaded();
-
-    var path = this._path + '/';
-    var keys = Object.keys(this._elements);
-    var i = 0;
-    var len;
-    array = array ? array : this._children;
-
-    this._children.length = 0;
-
-    while (i < keys.length) {
-        if (keys[i].indexOf(path) === -1 || keys[i] === path) keys.splice(i, 1);
-        else i++;
-    }
-    var currentPath;
-    var j = 0;
-    for (i = 0 ; i < keys.length ; i++) {
-        currentPath = keys[i];
-        for (j = 0 ; j < keys.length ; j++) {
-            if (i !== j && keys[j].indexOf(currentPath) !== -1) {
-                keys.splice(j, 1);
-                i--;
-            }
-        }
-    }
-    for (i = 0, len = keys.length ; i < len ; i++)
-        array[i] = this._elements[keys[i]];
-
-    return array;
-};
-
-
 /**
  * Used for determining the target loaded under the current path.
  *
@@ -415,20 +370,15 @@ DOMRenderer.prototype.insertEl = function insertEl (tagName) {
          this._target.element.tagName.toLowerCase() === tagName.toLowerCase()) {
 
         this.findParent();
-        this.findChildren();
 
         this._assertParentLoaded();
-        this._assertChildrenLoaded();
 
         if (this._target) this._parent.element.removeChild(this._target.element);
 
         this._target = new ElementCache(document.createElement(tagName), this._path);
+
         this._parent.element.appendChild(this._target.element);
         this._elements[this._path] = this._target;
-
-        for (var i = 0, len = this._children.length ; i < len ; i++) {
-            this._target.element.appendChild(this._children[i].element);
-        }
     }
 };
 
@@ -453,6 +403,9 @@ DOMRenderer.prototype.setProperty = function setProperty (name, value) {
  * Sets the size of the currently loaded target.
  * Removes any explicit sizing constraints when passed in `false`
  * ("true-sizing").
+ * 
+ * Invoking setSize is equivalent to a manual invocation of `setWidth` followed
+ * by `setHeight`.
  *
  * @method
  *
@@ -469,16 +422,16 @@ DOMRenderer.prototype.setSize = function setSize (width, height) {
 };
 
 /**
- * Sets the width of the currently loaded target.
- * Removes any explicit sizing constraints when passed in `false`
- * ("true-sizing").
- *
- * @method
- *
- * @param {Number|false} width Width to be set.
- *
- * @return {undefined} undefined
- */
+ * Sets the width of the currently loaded ElementCache.
+ * 
+ * @method  setWidth
+ *  
+ * @param  {Number|false} width     The explicit width to be set on the
+ *                                  ElementCache's target (and content) element.
+ *                                  `false` removes any explicit sizing
+ *                                  constraints from the underlying DOM
+ *                                  Elements.
+ */ 
 DOMRenderer.prototype.setWidth = function setWidth(width) {
     this._assertTargetLoaded();
 
@@ -500,16 +453,16 @@ DOMRenderer.prototype.setWidth = function setWidth(width) {
 };
 
 /**
- * Sets the height of the currently loaded target.
- * Removes any explicit sizing constraints when passed in `false`
- * ("true-sizing").
- *
- * @method
- *
- * @param {Number|false} height Height to be set.
- *
- * @return {undefined} undefined
- */
+ * Sets the height of the currently loaded ElementCache.
+ * 
+ * @method  setHeight
+ *  
+ * @param  {Number|false} height    The explicit height to be set on the
+ *                                  ElementCache's target (and content) element.
+ *                                  `false` removes any explicit sizing
+ *                                  constraints from the underlying DOM
+ *                                  Elements.
+ */ 
 DOMRenderer.prototype.setHeight = function setHeight(height) {
     this._assertTargetLoaded();
 
@@ -556,7 +509,6 @@ DOMRenderer.prototype.setAttribute = function setAttribute(name, value) {
  */
 DOMRenderer.prototype.setContent = function setContent(content) {
     this._assertTargetLoaded();
-    this.findChildren();
 
     if (!this._target.content) {
         this._target.content = document.createElement('div');
@@ -585,42 +537,9 @@ DOMRenderer.prototype.setContent = function setContent(content) {
  *
  * @return {undefined} undefined
  */
-DOMRenderer.prototype.setMatrix = function setMatrix(transform) {
-    // TODO Don't multiply matrics in the first place.
+DOMRenderer.prototype.setMatrix = function setMatrix (transform) {
     this._assertTargetLoaded();
-    this.findParent();
-    var worldTransform = this._target.worldTransform;
-    var changed = false;
-
-    var i;
-    var len;
-
-    if (transform)
-        for (i = 0, len = 16 ; i < len ; i++) {
-            changed = changed ? changed : worldTransform[i] === transform[i];
-            worldTransform[i] = transform[i];
-        }
-    else changed = true;
-
-    if (changed) {
-        math.invert(this._target.invertedParent, this._parent.worldTransform);
-        math.multiply(this._target.finalTransform, this._target.invertedParent, worldTransform);
-
-        // TODO: this is a temporary fix for draw commands
-        // coming in out of order
-        var children = this.findChildren([]);
-        var previousPath = this._path;
-        var previousTarget = this._target;
-        for (i = 0, len = children.length ; i < len ; i++) {
-            this._target = children[i];
-            this._path = this._target.path;
-            this.setMatrix();
-        }
-        this._path = previousPath;
-        this._target = previousTarget;
-    }
-
-    this._target.element.style[TRANSFORM] = this._stringifyMatrix(this._target.finalTransform);
+    this._target.element.style[TRANSFORM] = this._stringifyMatrix(transform);
 };
 
 

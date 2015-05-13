@@ -25,6 +25,7 @@
 'use strict';
 
 var CallbackStore = require('../utilities/CallbackStore');
+var TransformSystem = require('../core/TransformSystem');
 
 var RENDER_SIZE = 2;
 
@@ -131,7 +132,7 @@ DOMElement.prototype.getValue = function getValue() {
  *
  * @return {undefined} undefined
  */
-DOMElement.prototype.onUpdate = function onUpdate() {
+DOMElement.prototype.onUpdate = function onUpdate () {
     var node = this._node;
     var queue = this._changeQueue;
     var len = queue.length;
@@ -169,6 +170,7 @@ DOMElement.prototype.onMount = function onMount(node, id) {
     this._node = node;
     this._id = id;
     this._UIEvents = node.getUIEvents().slice(0);
+    TransformSystem.makeBreakPointAt(node.getLocation());
     this.draw();
     this.setAttribute('data-fa-path', node.getLocation());
 };
@@ -243,10 +245,11 @@ DOMElement.prototype.setCutoutState = function setCutoutState(usesCutout) {
  */
 DOMElement.prototype.onTransformChange = function onTransformChange (transform) {
     this._changeQueue.push('CHANGE_TRANSFORM');
+    transform = transform.getLocalTransform();
     for (var i = 0, len = transform.length ; i < len ; i++)
         this._changeQueue.push(transform[i]);
 
-    this.onUpdate();
+    if (!this._requestingUpdate) this._requestUpdate();
 };
 
 /**
@@ -379,7 +382,7 @@ DOMElement.prototype._requestUpdate = function _requestUpdate() {
 DOMElement.prototype.init = function init() {
     this._changeQueue.push('INIT_DOM', this._tagName);
     this._initialized = true;
-    this.onTransformChange(this._node.getTransform());
+    this.onTransformChange(TransformSystem.get(this._node.getLocation()));
     this.onSizeChange(this._node.getSize());
     if (!this._requestingUpdate) this._requestUpdate();
 };

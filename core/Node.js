@@ -26,10 +26,10 @@
 
 'use strict';
 
-var Transform = require('./Transform');
 var Size = require('./Size');
+var Dispatch = require('./Dispatch');
+var TransformSystem = require('./TransformSystem');
 
-var TRANSFORM_PROCESSOR = new Transform();
 var SIZE_PROCESSOR = new Size();
 
 var IDENT = [
@@ -82,12 +82,12 @@ var QUAT = [0, 0, 0, 1];
  */
 function Node () {
     this._calculatedValues = {
-        transform: new Float32Array(IDENT),
         size: new Float32Array(3)
     };
 
     this._requestingUpdate = false;
     this._inUpdate = false;
+    this._transformNeedsUpdate = false;
 
     this._updateQueue = [];
     this._nextUpdateQueue = [];
@@ -530,7 +530,7 @@ Node.prototype.getSize = function getSize () {
  * @return {Float32Array} a 16 value transform
  */
 Node.prototype.getTransform = function getTransform () {
-    return this._calculatedValues.transform;
+    return TransformSystem.get(this.getLocation());
 };
 
 /**
@@ -560,16 +560,13 @@ Node.prototype.addChild = function addChild (child) {
     child = child ? child : new Node();
 
     if (index === -1) {
-        index = this._freedChildIndicies.length ? this._freedChildIndicies.pop() : this._children.length;
+        index = this._freedChildIndicies.length ?
+                this._freedChildIndicies.pop() : this._children.length;
+
         this._children[index] = child;
-
-        if (this.isMounted() && child.onMount) {
-            var myId = this.getId();
-            var childId = myId + '/' + index;
-            child.onMount(this, childId);
-        }
-
     }
+
+    child.mount(this.getLocation() + '/' + index);
 
     return child;
 };
@@ -586,16 +583,16 @@ Node.prototype.addChild = function addChild (child) {
  */
 Node.prototype.removeChild = function removeChild (child) {
     var index = this._children.indexOf(child);
-    var added = index !== -1;
-    if (added) {
+
+    if (index > - 1) {
         this._freedChildIndicies.push(index);
 
         this._children[index] = null;
+ 
+        child.dismount();
 
-        if (this.isMounted() && child.onDismount)
-            child.onDismount();
-    }
-    return added;
+        return true;
+    } else throw new Error('Node is not a child of this node');
 };
 
 /**
@@ -735,6 +732,11 @@ Node.prototype._vecOptionalSet = function _vecOptionalSet (vec, index, val) {
  * @return {Node} this
  */
 Node.prototype.show = function show () {
+    Dispatch.show(this.getLocation());
+    return this;
+};
+
+Node.prototype.onShow = function onShow () {
     var i = 0;
     var items = this._components;
     var len = items.length;
@@ -746,16 +748,6 @@ Node.prototype.show = function show () {
         item = items[i];
         if (item && item.onShow) item.onShow();
     }
-
-    i = 0;
-    items = this._children;
-    len = items.length;
-
-    for (; i < len ; i++) {
-        item = items[i];
-        if (item && item.onParentShow) item.onParentShow();
-    }
-    return this;
 };
 
 /**
@@ -931,6 +923,7 @@ Node.prototype.setPosition = function setPosition (x, y, z) {
             item = list[i];
             if (item && item.onPositionChange) item.onPositionChange(x, y, z);
         }
+        this._transformNeedsUpdate = true;
     }
 
     return this;
@@ -1034,6 +1027,7 @@ Node.prototype.setRotation = function setRotation (x, y, z, w) {
             item = list[i];
             if (item && item.onRotationChange) item.onRotationChange(x, y, z, w);
         }
+        this._transformNeedsUpdate = true;
     }
     return this;
 };
@@ -1070,6 +1064,7 @@ Node.prototype.setScale = function setScale (x, y, z) {
             item = list[i];
             if (item && item.onScaleChange) item.onScaleChange(x, y, z);
         }
+        this._transformNeedsUpdate = true;
     }
     return this;
 };
@@ -1302,7 +1297,7 @@ Node.prototype.setAbsoluteSize = function setAbsoluteSize (x, y, z) {
  *
  * @return {undefined} undefined
  */
-Node.prototype._transformChanged = function _transformChanged (transform) {
+Node.prototype.onTransformChange = function onTransformChange (transform) {
     var i = 0;
     var items = this._components;
     var len = items.length;
@@ -1311,15 +1306,6 @@ Node.prototype._transformChanged = function _transformChanged (transform) {
     for (; i < len ; i++) {
         item = items[i];
         if (item && item.onTransformChange) item.onTransformChange(transform);
-    }
-
-    i = 0;
-    items = this._children;
-    len = items.length;
-
-    for (; i < len ; i++) {
-        item = items[i];
-        if (item && item.onParentTransformChange) item.onParentTransformChange(transform);
     }
 };
 
@@ -1400,16 +1386,14 @@ Node.prototype.update = function update (time){
         if (item && item.onUpdate) item.onUpdate(time);
     }
 
-    var mySize = this.getSize();
-    var myTransform = this.getTransform();
-    var parent = this.getParent();
-    var parentSize = parent.getSize();
-    var parentTransform = parent.getTransform();
-    var sizeChanged = SIZE_PROCESSOR.fromSpecWithParent(parentSize, this, mySize);
+    var sizeChanged = SIZE_PROCESSOR.fromSpecWithParent(this.getParent().getSize(), this, this.getSize());
 
-    var transformChanged = TRANSFORM_PROCESSOR.fromSpecWithParent(parentTransform, this.value, mySize, parentSize, myTransform);
-    if (transformChanged) this._transformChanged(myTransform);
-    if (sizeChanged) this._sizeChanged(mySize);
+    if (sizeChanged) this._sizeChanged(this.getSize());
+
+    if (sizeChanged || this._transformNeedsUpdate) {
+        TransformSystem.update();
+        this._transformNeedsUpdate = false;
+    }
 
     this._inUpdate = false;
     this._requestingUpdate = false;
@@ -1433,13 +1417,16 @@ Node.prototype.update = function update (time){
  *
  * @method mount
  *
- * @param  {Node} parent    parent node
  * @param  {String} myId    path to node (e.g. `body/0/1`)
  *
  * @return {Node} this
  */
-Node.prototype.mount = function mount (parent, myId) {
-    if (this.isMounted()) return this;
+Node.prototype.mount = function mount (path) {
+    if (this.isMounted())
+        throw new Error('Node is already mounted at: ' + this.getLocation());
+    Dispatch.registerNodeAtPath(path, this);
+};
+
     var i = 0;
     var list = this._components;
     var len = list.length;
@@ -1447,20 +1434,14 @@ Node.prototype.mount = function mount (parent, myId) {
 
     this._parent = parent;
     this._globalUpdater = parent.getUpdater();
-    this.value.location = myId;
+    this.value.location = path;
     this.value.showState.mounted = true;
+
+    TransformSystem.registerTransformAtPath(path);
 
     for (; i < len ; i++) {
         item = list[i];
         if (item && item.onMount) item.onMount(this, i);
-    }
-
-    i = 0;
-    list = this._children;
-    len = list.length;
-    for (; i < len ; i++) {
-        item = list[i];
-        if (item && item.onParentMount) item.onParentMount(this, myId, i);
     }
 
     if (!this._requestingUpdate) this._requestUpdate(true);
@@ -1476,7 +1457,10 @@ Node.prototype.mount = function mount (parent, myId) {
  * @return {Node} this
  */
 Node.prototype.dismount = function dismount () {
-    if (!this.isMounted()) return this;
+    if (!this.isMounted()) 
+        throw new Error('Node is not mounted');
+    Dispatch.deregisterNodeAtPath(this.getLocation(), this);
+
     var i = 0;
     var list = this._components;
     var len = list.length;
@@ -1491,44 +1475,8 @@ Node.prototype.dismount = function dismount () {
         if (item && item.onDismount) item.onDismount();
     }
 
-    i = 0;
-    list = this._children;
-    len = list.length;
-    for (; i < len ; i++) {
-        item = list[i];
-        if (item && item.onParentDismount) item.onParentDismount();
-    }
-
     if (!this._requestingUpdate) this._requestUpdate();
     return this;
-};
-
-/**
- * Function to be invoked by the parent as soon as the parent is
- * being mounted.
- *
- * @method onParentMount
- *
- * @param  {Node} parent        The parent node.
- * @param  {String} parentId    The parent id (path to parent).
- * @param  {Number} index       Id the node should be mounted to.
- *
- * @return {Node} this
- */
-Node.prototype.onParentMount = function onParentMount (parent, parentId, index) {
-    return this.mount(parent, parentId + '/' + index);
-};
-
-/**
- * Function to be invoked by the parent as soon as the parent is being
- * unmounted.
- *
- * @method onParentDismount
- *
- * @return {Node} this
- */
-Node.prototype.onParentDismount = function onParentDismount () {
-    return this.dismount();
 };
 
 /**
@@ -1638,26 +1586,6 @@ Node.prototype.onShow = Node.prototype.show;
  * @return {Node} this
  */
 Node.prototype.onHide = Node.prototype.hide;
-
-/**
- * A method which can execute logic when this node is added to
- * to the scene graph. Delegates to mount.
- *
- * @method
- *
- * @return {Node} this
- */
-Node.prototype.onMount = Node.prototype.mount;
-
-/**
- * A method which can execute logic when this node is removed from
- * the scene graph. Delegates to Node.dismount.
- *
- * @method
- *
- * @return {Node} this
- */
-Node.prototype.onDismount = Node.prototype.dismount;
 
 /**
  * A method which can execute logic when this node receives

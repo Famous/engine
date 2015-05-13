@@ -1,18 +1,18 @@
 /**
  * The MIT License (MIT)
- *
+ * 
  * Copyright (c) 2015 Famous Industries Inc.
- *
+ * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * 
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- *
+ * 
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -24,106 +24,146 @@
 
 'use strict';
 
-var pathUtils = require('./Path');
+var PathUtils = require('./Path');
+var Transform = require('./Transform');
+var Dispatch = require('./Dispatch');
 
 /**
  * The transform class is responsible for calculating the transform of a particular
  * node from the data on the node and its parent
  *
- * @constructor Transform
+ * @constructor {TransformSystem}
  */
-function Transform () {
-    this.local = new Float32Array(Transform.IDENT);
-    this.global = new Float32Array(Transform.IDENT);
-    this.needsUpdate = false;
-    this.parent = null;
-    this.breakPoint = false;
-    this.world = false;
+function TransformSystem () {
+    this._requestingUpdate = false;
+    this._transforms = [];
+    this._paths = [];
 }
 
-Transform.IDENT = [ 1, 0, 0, 0,
-                    0, 1, 0, 0,
-                    0, 0, 1, 0,
-                    0, 0, 0, 1 ];
-
-Transform.prototype.reset = function reset () {
-    this.needsUpdate = false;
-    this.parent = null;
-    this.breakPoint = false;
-};
-
-Transform.prototype.setParent = function setParent (parent) {
-    this.parent = parent;
-};
-
-Transform.prototype.getParent = function getParent () {
-    return this.parent;
-};
-
-Transform.prototype.setDirty = function setDirty () {
-    this.needsUpdate = true;
-};
-
-Transform.prototype.isDirty = function isDirty () {
-    return this.needsUpdate;
-};
-
-Transform.prototype.setBreakPoint = function setBreakPoint () {
-    this.breakPoint = true;
-};
-
-Transform.prototype.isBreakPoint = function isBreakPoint () {
-    return this.breakPoint;
-};
-
-Transform.prototype.getLocalTransform = function getLocalTransform () {
-    return this.local;
-};
-
-Transform.prototype.getGlobalTransform = function getGlobalTransform () {
-    if (!this.isBreakPoint())
-        throw new Error('This transform is not calculating world transforms');
-    return this.global;
-};
-
-Transform.prototype.from = function from (node) {
-    if (!this.parent || this.parent.isBreakPoint())
-        return this.fromNode(node);
-    else return this.fromNodeWithParent(node);
-};
-
-Transform.prototype.calculateWorldMatrix = function calculateWorldMatrix () {
-    var nearestBreakPoint = this.parent;
-
-    while (nearestBreakPoint && !nearestBreakPoint.isBreakPoint())
-        nearestBreakPoint = nearestBreakPoint.parent;
-
-    if (nearestBreakPoint) return multiply(this.global, nearestBreakPoint, this.local);
-    else {
-        for (var i = 0; i < 16 ; i++) this.global[i] = this.local[i];
-        return false;
+/**
+ * Internal method to request an update for the transform system.
+ *
+ * @method _requestUpdate
+ * @protected
+ */
+TransformSystem.prototype._requestUpdate = function _requestUpdate () {
+    if (!this._requestingUpdate) {
+        this._requestingUpdate = true;
     }
 };
 
+/**
+ * registers a new Transform for the given path. This transform will be updated
+ * when the TransformSystem updates.
+ *
+ * @method registerTransformAtPath
+ * @return {void}
+ *
+ * @param {String} path for the transform to be registered to.
+ */
+TransformSystem.prototype.registerTransformAtPath = function registerTransformAtPath (path) {
+    var paths = this._paths;
+    var index = paths.indexOf(path);
+    if (index !== -1) return;
+
+    var i = 0;
+    var targetDepth = PathUtils.depth(path);
+    var targetIndex = PathUtils.index(path);
+
+    while (
+            paths[i] &&
+            targetDepth <= PathUtils.depth(paths[i]) &&
+            targetIndex < PathUtils.index(paths[i])
+    ) i++;
+    paths.splice(i, 0, path);
+    var newTransform = new Transform();
+    newTransform.setParent(this._transforms[paths.indexOf(PathUtils.parent(path))]);
+    this._transforms.splice(i, 0, newTransform);
+    if (!this._requestingUpdate) this._requestUpdate();
+};
+
+/**
+ * deregisters a transform registered at the given path.
+ *
+ * @method deregisterTransformAtPath
+ * @return {void}
+ *
+ * @param {String} path at which to register the transform
+ */
+TransformSystem.prototype.deregisterTransformAtPath = function deregisterTransformAtPath (path) {
+    var paths = this._paths;
+    var index = paths.indexOf(path);
+    if (index === -1) throw new Error('No transform Registered at path: ' + path);
+
+    this._transforms.splice(index, 1)[0].reset();
+    this._paths.splice(index, 1);
+};
+
+
+TransformSystem.prototype.makeBreakPointAt = function makeBreakPointAt (path) {
+    var paths = this._paths;
+    var index = paths.indexOf(path);
+    if (index === -1) throw new Error('No transform Registered at path: ' + path);
+
+    var transform = this._transforms[index];
+    transform.setBreakPoint();
+};
+
+
+
+TransformSystem.prototype.get = function get (path) {
+    return this._transforms[this._paths.indexOf(path)];
+};
+
+/**
+ * Notifies the transform system that the a node's information has changed.
+ *
+ * @method update
+ * @return {void}
+ */
+TransformSystem.prototype.update = function update () {
+    if (!this._requestingUpdate) this._requestUpdate();
+};
+
+/**
+ * onUpdate is called when the transform system requires an update.
+ * It traverses the transform array and evaluates the necessary transforms
+ * in the scene graph with the information from the corresponding node
+ * in the scene graph
+ *
+ * @method onUpdate
+ */
+TransformSystem.prototype.onUpdate = function onUpdate () {
+    var transforms = this._transforms;
+    var paths = this._paths;
+    var transform;
+    var changed;
+    var node;
+
+    for (var i = 0, len = transforms.length ; i < len ; i++) {
+        node = Dispatch.getNode(paths[i]);
+        if (!node) continue;
+        transform = transforms[i];
+        if (transform.from(node) && node.onTransformChange)
+            node.onTransformChange(transform);
+    }
+};
 
 /**
  * Creates a transformation matrix from a Node's spec.
  *
  * @method fromSpec
- *
+ * 
  * @param {Node.Spec} spec of the node
  * @param {Array} size of the node
  * @param {Array} size of the node's parent
  * @param {Array} target array to write the matrix to
- *
+ * 
  * @return {Boolean} whether or not the target array was changed
  */
-Transform.prototype.fromNode = function fromNode (node) {
-    var target = this.getLocalTransform();
-    var mySize = node.getSize();
-    var spec = node.value;
-    var parentSize = node.getParent().getSize();
-    var changed = false;
+TransformSystem.prototype.fromSpec = function fromSpec (spec, mySize, parentSize, target) {
+    target = target ? target : this._matrix;
+    var changed = target ? false : true;
 
     var t00         = target[0];
     var t01         = target[1];
@@ -185,16 +225,14 @@ Transform.prototype.fromNode = function fromNode (node) {
                  (target[1] * originX + target[5] * originY + target[9] * originZ);
     target[14] = alignZ + posZ - mountPointZ + originZ -
                  (target[2] * originX + target[6] * originY + target[10] * originZ);
-    target[15] = 1;
-
-    if (this.isBreakPoint()) changed = this.calculateWorldMatrix();
+    target[15] = 0;
 
     return changed ||
         t00 !== target[0] ||
         t01 !== target[1] ||
         t02 !== target[2] ||
-        t10 !== target[4] ||
-        t11 !== target[5] ||
+        t10 !== target[4] || 
+        t11 !== target[5] || 
         t12 !== target[6] ||
         t20 !== target[8] ||
         t21 !== target[9] ||
@@ -208,16 +246,17 @@ Transform.prototype.fromNode = function fromNode (node) {
  * Uses the parent transform, the node's spec, the node's size, and the parent's size
  * to calculate a final transform for the node. Returns true if the transform has changed.
  *
+ * @param {Array} the parent matrix
+ * @param {Node.Spec} the target node's spec
+ * @param {Array} the size of the node
+ * @param {Array} the size of the parent
+ * @param {Array} the target array to write the resulting transform to
  *
  * @return {Boolean} whether or not the transform changed
  */
-Transform.prototype.fromNodeWithParent = function fromNodeWithParent (node) {
-    var target = this.getLocalTransform();
-    var parentMatrix = this.parent.getLocalTransform();
-    var mySize = node.getSize();
-    var spec = node.value;
-    var parentSize = node.getParent().getSize();
-    var changed = false;
+TransformSystem.prototype.fromSpecWithParent = function fromSpecWithParent (parentMatrix, spec, mySize, parentSize, target) {
+    target = target ? target : this._matrix;
+    var changed = target ? false : true;
 
     // local cache of everything
     var t00         = target[0];
@@ -305,8 +344,6 @@ Transform.prototype.fromNodeWithParent = function fromNodeWithParent (node) {
     target[14] = p02 * tx + p12 * ty + p22 * tz + p32;
     target[15] = 1;
 
-    if (this.isBreakPoint()) changed = this.calculateWorldMatrix();
-
     return changed ||
         t00 !== target[0] ||
         t01 !== target[1] ||
@@ -322,81 +359,4 @@ Transform.prototype.fromNodeWithParent = function fromNodeWithParent (node) {
         t32 !== target[14];
 };
 
-function multiply (out, a, b) {
-    var a00 = a[0], a01 = a[1], a02 = a[2],
-        a10 = a[4], a11 = a[5], a12 = a[6],
-        a20 = a[8], a21 = a[9], a22 = a[10],
-        a30 = a[12], a31 = a[13], a32 = a[14];
-
-    var changed = false;
-    var res;
-
-    // Cache only the current line of the second matrix
-    var b0  = b[0], b1 = b[1], b2 = b[2], b3 = b[3];
-
-    res = b0*a00 + b1*a10 + b2*a20 + b3*a30;
-    changed = changed ? changed : out[0] === res;
-    out[0] = res;
-
-    res = b0*a01 + b1*a11 + b2*a21 + b3*a31;
-    changed = changed ? changed : out[1] === res;
-    out[1] = res;
-
-    res = b0*a02 + b1*a12 + b2*a22 + b3*a32;
-    changed = changed ? changed : out[2] === res;
-    out[2] = res;
-
-    out[3] = 0;
-
-    b0 = b[4]; b1 = b[5]; b2 = b[6]; b3 = b[7];
-
-    res = b0*a00 + b1*a10 + b2*a20 + b3*a30;
-    changed = changed ? changed : out[4] === res;
-    out[4] = res;
-
-    res = b0*a01 + b1*a11 + b2*a21 + b3*a31;
-    changed = changed ? changed : out[5] === res;
-    out[5] = res;
-
-    res = b0*a02 + b1*a12 + b2*a22 + b3*a32;
-    changed = changed ? changed : out[6] === res;
-    out[6] = res;
-
-    out[7] = 0;
-
-    b0 = b[8]; b1 = b[9]; b2 = b[10]; b3 = b[11];
-
-    res = b0*a00 + b1*a10 + b2*a20 + b3*a30;
-    changed = changed ? changed : out[8] === res;
-    out[8] = res;
-
-    res = b0*a01 + b1*a11 + b2*a21 + b3*a31;
-    changed = changed ? changed : out[9] === res;
-    out[9] = res;
-
-    res = b0*a02 + b1*a12 + b2*a22 + b3*a32;
-    changed = changed ? changed : out[10] === res;
-    out[10] = res;
-
-    out[11] = 0;
-
-    b0 = b[12]; b1 = b[13]; b2 = b[14]; b3 = b[15];
-
-    res = b0*a00 + b1*a10 + b2*a20 + b3*a30;
-    changed = changed ? changed : out[12] === res;
-    out[12] = res;
-
-    res = b0*a01 + b1*a11 + b2*a21 + b3*a31;
-    changed = changed ? changed : out[13] === res;
-    out[13] = res;
-
-    res = b0*a02 + b1*a12 + b2*a22 + b3*a32;
-    changed = changed ? changed : out[14] === res;
-    out[14] = res;
-
-    out[15] = 1;
-
-    return changed;
-}
-
-module.exports = Transform;
+module.exports = new TransformSystem();
