@@ -22,6 +22,8 @@
  * THE SOFTWARE.
  */
 
+'use strict';
+
 var UIEvent = require('./UIEvent');
 
 function InputEvent(ev) {

@@ -22,11 +22,12 @@
  * THE SOFTWARE.
  */
 
+/*jshint -W079 */
+
 'use strict';
 
 var test = require('tape');
 var Context = require('../Context');
-var Node = require('../Node');
 var Dispatch = require('../Dispatch');
 
 test('Context', function(t) {
