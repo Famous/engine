@@ -52,17 +52,21 @@ function Triangle (options) {
         0, 1, 2
     ];
     var vertices = [
-        -1,  1, 0,
-         0, -1, 0,
-         1,  1, 0
+        -1, -1, 0,
+         0,  1, 0,
+         1, -1, 0
     ];
+    var backface;
 
     while(--detail) GeometryHelper.subdivide(indices, vertices, textureCoords);
-    normals       = GeometryHelper.computeNormals(vertices, indices);
 
     if (options.backface !== false) {
-        indices = GeometryHelper.createBackfaceIndices(indices);
+        backface = GeometryHelper.createBackfaces(vertices, indices);
+        indices.push.apply(indices, backface.indices);
+        vertices.push.apply(vertices, backface.vertices);
     }
+
+    normals = GeometryHelper.computeNormals(vertices, indices);
 
     return new Geometry({
         buffers: [

@@ -58,14 +58,13 @@ var GeometryHelper = {};
  * 
  * @return {Object} Object containing generated vertices and indices.
  */
-GeometryHelper.generateParametric = function generateParametric(detailX, detailY, func) {
+GeometryHelper.generateParametric = function generateParametric(detailX, detailY, func, wrap) {
     var vertices = [],
         i, theta, phi, result, j;
 
-    // We must wrap around slightly more than once for uv coordinates to look correct.
+    // We can wrap around slightly more than once for uv coordinates to look correct.
 
-    // var Xrange = Math.PI + (Math.PI / (detailX - 1));
-    var Xrange = Math.PI;
+    var Xrange = wrap ? Math.PI + (Math.PI / (detailX - 1)) : Math.PI;
     var out = [];
 
     for (i = 0; i < detailX + 1; i++) {
@@ -502,16 +501,29 @@ GeometryHelper.trianglesToLines = function triangleToLines(indices, out) {
     return out;
 };
 
-GeometryHelper.createBackfaceIndices = function createBackfaceIndices(indices, out) {
-    var out = out || [];
+GeometryHelper.createBackfaces = function createBackfaces(vertices, indices) {
     var nFaces = indices.length / 3;
+    var backfaceVertices = vertices.slice();
+    var backfaceIndices  = [];
+
+    var maxIndex = 0;
+    var i = indices.length;
+    while (i--) if (indices[i] > maxIndex) maxIndex = indices[i];
+
+    maxIndex++;
 
     for (var i = 0; i < nFaces; i++) {
-        out.push(indices[i * 3], indices[i * 3 + 1], indices[i * 3 + 2]);
-        out.push(indices[i * 3], indices[i * 3 + 2], indices[i * 3 + 1]);
+        var indexOne = indices[i * 3],
+            indexTwo = indices[i * 3 + 1],
+            indexThree = indices[i * 3 + 2];
+
+        backfaceIndices.push(indexOne + maxIndex, indexThree + maxIndex, indexTwo + maxIndex);
     }
 
-    return out;
+    return {
+        vertices: backfaceVertices,
+        indices: backfaceIndices
+    };
 };
 
 module.exports = GeometryHelper;

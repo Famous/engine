@@ -42,40 +42,43 @@ var GeometryHelper = require('../GeometryHelper');
 function Circle (options) {
     var options  = options || {};
     var detail   = options.detail || 30;
-    var buffers  = getBuffers(detail);
+    var buffers  = getCircleBuffers(detail, true);
+    var backface;
 
     if (options.backface !== false) {
-        buffers.vertices.push.apply(buffers.vertices, getBackFaces(buffers.vertices));
+        backface = GeometryHelper.createBackfaces(buffers.vertices, buffers.indices);
+        buffers.indices.push.apply(buffers.indices, backface.indices);
+        buffers.vertices.push.apply(buffers.vertices, backface.vertices);
     }
 
+    var textureCoords = getCircleTexCoords(buffers.vertices);
+    var normals = GeometryHelper.computeNormals(buffers.vertices, buffers.indices);
+
     return new Geometry({
-        type: 'TRIANGLE_FAN',
         buffers: [
             { name: 'pos', data: buffers.vertices },
-            { name: 'texCoord', data: buffers.textureCoords, size: 2 },
-            { name: 'normals', data: buffers.normals }
+            { name: 'texCoord', data: textureCoords, size: 2 },
+            { name: 'normals', data: normals },
+            { name: 'indices', data: buffers.indices, size: 1 }
         ]
     });
 }
 
-function getBackFaces (vertices) {
-    var out = [];
-    var offset = 3;
+function getCircleTexCoords (vertices) {
+    var textureCoords = [];
     var nFaces = vertices.length / 3;
 
-    for (var i = 1; i < nFaces; i++) {
+    for (var i = 0; i < nFaces; i++) {
         var x = vertices[i * 3],
             y = vertices[i * 3 + 1],
             z = vertices[i * 3 + 2];
 
-        out[(nFaces - i - 1) * 3] = x;
-        out[(nFaces - i - 1) * 3 + 1] = y;
-        out[(nFaces - i - 1) * 3 + 2] = z;
+        textureCoords.push(0.5 + x * 0.5, 0.5 + -y * 0.5);
     }
 
-    return out;
+    return textureCoords;
 }
-    
+
 /**
  * Calculates and returns all vertex positions, texture
  * coordinates and normals of the circle primitive.
@@ -87,29 +90,29 @@ function getBackFaces (vertices) {
  * 
  * @return {Object} constructed geometry
  */
-function getBuffers(detail) {
-    var theta = 0;
+function getCircleBuffers(detail) {
+    var detail = detail;
+    var vertices = [0, 0, 0];
+    var indices = [];
+    var counter = 1;
+    var theta;
     var x;
     var y;
-    var index = detail + 1;
-    var nextTheta;
-    var vertices      = [0, 0, 0];
-    var normals       = [0, 0, 1];
-    var textureCoords = [0.5, 0.5];
 
-    while (index--) {
-        theta = index / detail * Math.PI * 2;
+    for (var i = 0; i < detail + 1; i++) {
+        theta = i / detail * Math.PI * 2;
 
-        x = Math.cos(theta), y = Math.sin(theta);
-        vertices.unshift(x, y, 0);
-        normals.unshift(0, 0, 1);
-        textureCoords.unshift(0.5 + x * 0.5, 0.5 + -y * 0.5);
+        x = Math.cos(theta),
+        y = Math.sin(theta);
+
+        vertices.push(x, y, 0);
+
+        if (i > 0) indices.push(0, counter, ++counter);
     }
 
     return {
         vertices: vertices,
-        normals: normals,
-        textureCoords: textureCoords
+        indices: indices
     };
 }
 
