@@ -211,6 +211,12 @@ WebGLRenderer.prototype.createMesh = function createMesh(path) {
 };
 
 
+WebGLRenderer.prototype.setCutoutState = function setCutoutState(path, usesCutout) {
+    var cutout = this.getOrSetCutout(path);
+
+    cutout.visible = usesCutout;
+}
+
 /**
  * Creates or retreives cutout
  *
@@ -242,35 +248,17 @@ WebGLRenderer.prototype.getOrSetCutout = function getOrSetCutout(path) {
             uniformKeys: uniforms.keys,
             uniformValues: uniforms.values,
             geometry: this.cutoutGeometry.id,
-            drawType: 4
+            drawType: 4,
+            visible: true
         };
     }
 };
 
-/**
- * Prevents a mesh from being drawn to the canvas.
- *
- * @method hideMesh
- *
- * @param {String} path Path used as id of mesh in mesh registry.
- *
- */
-WebGLRenderer.prototype.hideMesh = function hideMesh(path) {
-    var mesh = this.meshRegistry[path] || this.createMesh(path);
-    mesh.visible = false;
-};
 
-/**
- * Allows a mesh to be drawn to the canvas.
- *
- * @method showMesh
- *
- * @param {String} path Path used as id of mesh in mesh registry.
- *
- */
-WebGLRenderer.prototype.showMesh = function showMesh(path) {
+WebGLRenderer.prototype.setMeshVisibility = function setMeshVisibility(path, visibility) {
     var mesh = this.meshRegistry[path] || this.createMesh(path);
-    mesh.visible = true;
+    
+    mesh.visible = visibility;
 };
 
 WebGLRenderer.prototype.removeMesh = function removeMesh(path) {
@@ -537,6 +525,8 @@ WebGLRenderer.prototype.drawCutouts = function drawCutouts() {
     for (var i = 0; i < len; i++) {
         cutout = this.cutoutRegistry[this.cutoutRegistryKeys[i]];
         buffers = this.bufferRegistry.registry[cutout.geometry];
+
+        if (!cutout.visible) continue;
 
         this.program.setUniforms(cutout.uniformKeys, cutout.uniformValues);
         this.drawBuffers(buffers, cutout.drawType, cutout.geometry);
