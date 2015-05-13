@@ -300,7 +300,8 @@ Node.prototype.getParent = function getParent () {
  *                              the node.
  */
 Node.prototype.requestUpdate = function requestUpdate (requester) {
-    if (this._inUpdate) return this.requestUpdateOnNextTick(requester);
+    if (this._inUpdate || !this.isMounted())
+        return this.requestUpdateOnNextTick(requester);
     this._updateQueue.push(requester);
     if (!this._requestingUpdate) this._requestUpdate();
     return this;
@@ -882,10 +883,10 @@ Node.prototype.setOpacity = function setOpacity (val) {
 Node.prototype.setSizeMode = function setSizeMode (x, y, z) {
     var vec3 = this.value.size.sizeMode;
     var propogate = false;
-
-    propogate = this._vecOptionalSet(vec3, 0, x) || propogate;
-    propogate = this._vecOptionalSet(vec3, 1, y) || propogate;
-    propogate = this._vecOptionalSet(vec3, 2, z) || propogate;
+    
+    if (x != null) propogate = this._resolveSizeMode(vec3, 0, x) || propogate;
+    if (y != null) propogate = this._resolveSizeMode(vec3, 1, y) || propogate;
+    if (z != null) propogate = this._resolveSizeMode(vec3, 2, z) || propogate;
 
     if (propogate) {
         var i = 0;
@@ -902,6 +903,30 @@ Node.prototype.setSizeMode = function setSizeMode (x, y, z) {
     }
     return this;
 };
+
+/**
+ * A protected method that resolves string representations of size mode
+ * to numeric values and applies them.
+ *
+ * @method _resolveSizeMode
+ *
+ * @return {Bool} whether or not the sizemode has been changed for this index.
+ */
+Node.prototype._resolveSizeMode = function _resolveSizeMode (vec, index, val) {
+    if (val.constructor === String) {
+        switch (val.toLowerCase()) {
+            case 'relative':
+            case 'default':
+                return this._vecOptionalSet(vec, index, 0);
+            case 'absolute':
+                return this._vecOptionalSet(vec, index, 1);
+            case 'render':
+                return this._vecOptionalSet(vec, index, 2);
+            default: throw new Error('unknown size mode: ' + val);
+        }
+    }
+    else return this._vecOptionalSet(vec, index, val);
+}
 
 /**
  * A proportional size defines the node's dimensions relative to its parents
@@ -1059,6 +1084,18 @@ Node.prototype.getFrame = function getFrame () {
 };
 
 /**
+ * returns an array of the components currently attached to this
+ * node.
+ *
+ * @method getComponents
+ *
+ * @return {Array} list of components.
+ */
+Node.prototype.getComponents = function getComponents () {
+    return this._components;
+};
+
+/**
  * Enters the node's update phase while updating its own spec and updating its components.
  *
  * @method update
@@ -1084,7 +1121,7 @@ Node.prototype.update = function update (time){
     var parent = this.getParent();
     var parentSize = parent.getSize();
     var parentTransform = parent.getTransform();
-    var sizeChanged = SIZE_PROCESSOR.fromSpecWithParent(parentSize, this.value, mySize);
+    var sizeChanged = SIZE_PROCESSOR.fromSpecWithParent(parentSize, this, mySize);
 
     var transformChanged = TRANSFORM_PROCESSOR.fromSpecWithParent(parentTransform, this.value, mySize, parentSize, myTransform);
     if (transformChanged) this._transformChanged(myTransform);

@@ -146,6 +146,24 @@ DOMRenderer.prototype._triggerEvent = function _triggerEvent(ev) {
     }
 };
 
+
+/**
+ * getSizeOf gets the dom size of a particular famo.us element
+ *
+ * @method getSizeOf
+ * @param {String} path
+ *
+ * @return {Array} a vec3 of the offset size of the dom element
+ */
+DOMRenderer.prototype.getSizeOf = function getSizeOf (path) {
+    var element = this._elements[path];
+    if (!element) return;
+    element = element.element;
+    var res = {val: [element.offsetWidth, element.offsetHeight, 0]};
+    this._compositor.sendEvent(path, 'resize', res);
+    return res;
+};
+
 function _getPath (ev) {
     // TODO move into _triggerEvent, avoid object allocation
     var path = [];
@@ -415,8 +433,8 @@ DOMRenderer.prototype.setProperty = function setProperty (name, value) {
  */
 DOMRenderer.prototype.setSize = function setSize (width, height) {
     this._assertTargetLoaded();
-    this._target.element.style.width = (width === true) ? '' : width + 'px';
-    this._target.element.style.height = (height === true) ? '' : height + 'px';
+    this._target.element.style.width = (width === false) ? '' : width + 'px';
+    this._target.element.style.height = (height === false) ? '' : height + 'px';
 };
 
 

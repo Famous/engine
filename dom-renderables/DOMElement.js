@@ -29,9 +29,11 @@ var CallbackStore = require('../utilities/CallbackStore');
 var RENDER_SIZE = 2;
 
 /**
- * DOMElements send draw commands through the node they are attached to.
+ * A DOMElement is a renderable that can be added just like a "normal"
+ * component to a node using `addComponent`.
+ * Renderables send draw commands to the node they are attached to.
  * Those commands then get interpreted by the `DOMRenderer` in the Main thread
- * to build the actual DOM tree.
+ * to build the actual DOM representation.
  *
  * @class DOMElement
  * @constructor
@@ -53,9 +55,25 @@ var RENDER_SIZE = 2;
  *                                      for DOM and WebGL layering.  On by default.
  */
 function DOMElement (node, options) {
+    if (!node) throw new Error('DOMElement must be instantiated on a node');
+
+    if (typeof options === 'string') {
+        console.warn(
+            'HTMLElement constructor signature changed!\n' +
+            'Pass in an options object with {tagName: ' + options + '} instead.'
+        );
+        options = {
+            tagName: options
+        };
+    }
+
     this._node = node;
+    this._parent = null;
+    this._children = [];
 
     this._requestingUpdate = false;
+    this._renderSized = false;
+    this._requestRenderSize = false;
 
     this._changeQueue = [];
 
@@ -70,7 +88,9 @@ function DOMElement (node, options) {
     this._content = '';
 
     this._tagName = options && options.tagName ? options.tagName : 'div';
-    this._id = node.addComponent(this);
+    this._id = node ? node.addComponent(this) : null;
+
+    this._renderSize = [0, 0, 0];
 
     this._callbacks = new CallbackStore();
 
@@ -82,6 +102,8 @@ function DOMElement (node, options) {
     }
 
     if (!options) return;
+
+    var key;
 
     if (options.classes) {
         for (var i = 0; i < options.classes.length; i++)
@@ -143,9 +165,73 @@ DOMElement.prototype.onUpdate = function onUpdate () {
         node.sendDrawCommand('DOM');
 
         while (len--) node.sendDrawCommand(queue.shift());
+        if (this._requestRenderSize) {
+            node.sendDrawCommand('DOM_RENDER_SIZE');
+            node.sendDrawCommand(node.getLocation());
+            this._requestRenderSize = false;
+        }
+ 
     }
 
     this._requestingUpdate = false;
+};
+
+/**
+ * Private method which sets the parent of the element in the DOM
+ * hierarchy.
+ *
+ * @method _setParent
+ * @protected
+ *
+ * @param {String} path of the parent
+ */
+DOMElement.prototype._setParent = function _setParent (path) {
+    if (this._node) {
+        var location = this._node.getLocation();
+        if (location === path || location.indexOf(path) === -1)
+            throw new Error('The given path isn\'t an ancestor');
+        this._parent = path;
+    } else throw new Error('_setParent called on an Element that isn\'t in the scene graph');
+};
+
+/**
+ * Private method which adds a child of the element in the DOM
+ * hierarchy.
+ *
+ * @method _addChild
+ * @protected
+ *
+ * @param {String} path of the child
+ */
+DOMElement.prototype._addChild = function _addChild (path) {
+    if (this._node) {
+        var location = this._node.getLocation();
+        if (path === location || path.indexOf(location) === -1)
+            throw new Error('The given path isn\'t a descendent');
+        if (this._children.indexOf(path) === -1) this._children.push(path);
+        else throw new Error('The given path is already a child of this element');
+    } else throw new Error('_addChild called on an Element that isn\'t in the scene graph');
+};
+
+/**
+ * Private method which returns the path of the parent of this element
+ *
+ * @method _getParent
+ * @protected
+ */
+DOMElement.prototype._getParent = function _getParent () {
+    return this._parent;
+};
+
+/**
+ * Private method which returns an array of paths of the children elements
+ * of this element
+ *
+ * @method _getChildren
+ * @protected
+ */
+DOMElement.prototype._getChildren = function _getChildren () {
+    return this._children;
 };
 
 /**
@@ -271,7 +357,7 @@ DOMElement.prototype.onOpacityChange = function onOpacityChange (opacity) {
 /**
  * Method to be invoked by the node as soon as a new UIEvent is being added.
  * This results into an `ADD_EVENT_LISTENER` command being send.
- *
+ * 
  * @param  {String} UIEvent     UIEvent to be subscribed to (e.g. `click`).
  */
 DOMElement.prototype.onAddUIEvent = function onAddUIEvent (UIEvent) {
@@ -296,6 +382,7 @@ DOMElement.prototype._subscribe = function _subscribe (UIEvent) {
     if (!this._requestingUpdate) {
         this._requestUpdate();
     }
+    if (!this._requestingUpdate) this._requestUpdate();
 };
 
 /**
@@ -305,8 +392,17 @@ DOMElement.prototype._subscribe = function _subscribe (UIEvent) {
  *
  * @method onSizeModeChange
  */
-DOMElement.prototype.onSizeModeChange = function onSizeModeChange () {
+DOMElement.prototype.onSizeModeChange = function onSizeModeChange (x, y, z) {
+    if (x === RENDER_SIZE || y === RENDER_SIZE || z === RENDER_SIZE) {
+        this._renderSized = true;
+        this._requestRenderSize = true;
+    }
     this.onSizeChange(this._node.getSize());
+};
+
+
+DOMElement.prototype.getRenderSize = function getRenderSize () {
+    return this._renderSize;
 };
 
 DOMElement.prototype._requestUpdate = function _requestUpdate () {
@@ -358,6 +454,7 @@ DOMElement.prototype.addClass = function addClass (value) {
         if (this._initialized) this._changeQueue.push('ADD_CLASS', value);
         this._classes.push(value);
         if (!this._requestingUpdate) this._requestUpdate();
+        if (this._renderSized) this._requestRenderSize = true;
         return this;
     }
 
@@ -421,6 +518,7 @@ DOMElement.prototype.setProperty = function setProperty (name, value) {
         this._styles[name] = value;
         if (this._initialized) this._changeQueue.push('CHANGE_PROPERTY', name, value);
         if (!this._requestingUpdate) this._requestUpdate();
+        if (this._renderSized) this._requestRenderSize = true;
     }
     return this;
 };
@@ -438,6 +536,7 @@ DOMElement.prototype.setContent = function setContent (content) {
         this._content = content;
         if (this._initialized) this._changeQueue.push('CHANGE_CONTENT', content);
         if (!this._requestingUpdate) this._requestUpdate();
+        if (this._renderSized) this._requestRenderSize = true;
     }
     return this;
 };
@@ -471,6 +570,11 @@ DOMElement.prototype.on = function on (event, listener) {
  * @param  {Object} payload Event object.
  */
 DOMElement.prototype.onReceive = function onReceive (event, payload) {
+    if (event === 'resize') {
+        this._renderSize[0] = payload.val[0];
+        this._renderSize[1] = payload.val[1];
+        if (!this._requestingUpdate) this._requestUpdate();
+    }
     this._callbacks.trigger(event, payload);
 };
 
