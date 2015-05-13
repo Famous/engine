@@ -27,8 +27,6 @@
 var test = require('tape');
 var Position = require('../Position');
 
-function noop() {}
-
 test('Position', function(t) {
     t.test('constructor', function(t) {
         var addedComponent = null;
