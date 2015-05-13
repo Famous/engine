@@ -1,0 +1,12 @@
+language: node_js
+
+node_js:
+  - '0.10'
+  - 'iojs'
+
+notifications:
+  email:
+    - mike@famo.us
+    - myles@famo.us
+    - marianna@famo.us
+  slack: famous-community:vd2V7VQpJ5IXTcyVr4L6cddV#notifications
