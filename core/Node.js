@@ -513,6 +513,15 @@ Node.prototype.addComponent = function addComponent (component) {
             component.onShow();
     }
 
+    var i = 0;
+    var list = this._children;
+    var len = list.length;
+    var item;
+    for (; i < len ; i++) {
+        item = list[i];
+        if (item.onParentComponentRemove) item.onParentComponentRemove();
+    }
+
     return index;
 };
 
@@ -548,6 +557,16 @@ Node.prototype.removeComponent = function removeComponent (component) {
 
         this._components[index] = null;
     }
+    
+    var i = 0;
+    var list = this._children;
+    var len = list.length;
+    var item;
+    for (; i < len ; i++) {
+        item = list[i];
+        if (item.onParentComponentRemove) item.onParentComponentRemove();
+    }
+    
     return component;
 };
 
@@ -1237,6 +1256,46 @@ Node.prototype.onParentMount = function onParentMount (parent, parentId, index) 
  */
 Node.prototype.onParentDismount = function onParentDismount () {
     return this.dismount();
+};
+
+Node.prototype.onParentComponentAdd = function onParentComponentAdd(node, component) {
+    var i = 0;
+    var list = this._components;
+    var len = list.length;
+    var item;
+
+    for (; i < len ; i++) {
+        item = list[i];
+        if (item.onParentComponentAdd) item.onParentComponentAdd();
+    }
+
+    i = 0;
+    list = this._children;
+    len = list.length;
+    for (; i < len ; i++) {
+        item = list[i];
+        if (item.onParentComponentAdd) item.onParentComponentAdd();
+    }
+};
+
+Node.prototype.onParentComponentRemove = function onParentComponentRemove(node, component) {
+    var i = 0;
+    var list = this._components;
+    var len = list.length;
+    var item;
+
+    for (; i < len ; i++) {
+        item = list[i];
+        if (item.onParentComponentRemove) item.onParentComponentRemove();
+    }
+
+    i = 0;
+    list = this._children;
+    len = list.length;
+    for (; i < len ; i++) {
+        item = list[i];
+        if (item.onParentComponentRemove) item.onParentComponentRemove();
+    }
 };
 
 /**
