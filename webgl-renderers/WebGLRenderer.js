@@ -211,6 +211,12 @@ WebGLRenderer.prototype.createMesh = function createMesh(path) {
 };
 
 
+WebGLRenderer.prototype.setCutoutState = function setCutoutState(path, usesCutout) {
+    var cutout = this.getOrSetCutout(path);
+
+    cutout.visible = usesCutout;
+}
+
 /**
  * Creates or retreives cutout
  *
@@ -242,7 +248,8 @@ WebGLRenderer.prototype.getOrSetCutout = function getOrSetCutout(path) {
             uniformKeys: uniforms.keys,
             uniformValues: uniforms.values,
             geometry: this.cutoutGeometry.id,
-            drawType: 4
+            drawType: 4,
+            visible: true
         };
     }
 };
@@ -537,6 +544,8 @@ WebGLRenderer.prototype.drawCutouts = function drawCutouts() {
     for (var i = 0; i < len; i++) {
         cutout = this.cutoutRegistry[this.cutoutRegistryKeys[i]];
         buffers = this.bufferRegistry.registry[cutout.geometry];
+
+        if (!cutout.visible) continue;
 
         this.program.setUniforms(cutout.uniformKeys, cutout.uniformValues);
         this.drawBuffers(buffers, cutout.drawType, cutout.geometry);

@@ -96,6 +96,7 @@ function DOMElement (node, options) {
 
     if (options.id) this.setId(options.id);
     if (options.content) this.setContent(options.content);
+    if (options.cutout === false) this.setCutoutState(options.cutout);
 }
 
 /**
@@ -194,6 +195,12 @@ DOMElement.prototype.onShow = function onShow () {
  */
 DOMElement.prototype.onHide = function onHide () {
     this.setProperty('display', 'none');
+};
+
+DOMElement.prototype.setCutoutState = function setCutoutState (usesCutout) {
+    this._changeQueue.push('GL_CUTOUT_STATE', usesCutout);
+
+    if (this._initialized) this._requestUpdate();
 };
 
 /**

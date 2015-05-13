@@ -249,6 +249,11 @@ Context.prototype.receive = function receive(pathArr, path, commands, iterator) 
                 );
                 break;
 
+            case 'GL_CUTOUT_STATE':
+                if (!this.WebGLRenderer) this.initWebGL();
+                this.WebGLRenderer.setCutoutState(path, commands[++localIterator]);
+                break;
+
             case 'GL_HIDE_MESH':
                 if (!this.WebGLRenderer) this.initWebGL();
                 this.WebGLRenderer.hideMesh(path);
