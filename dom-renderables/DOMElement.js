@@ -100,10 +100,20 @@ function DOMElement (node, options) {
     for (key in this.constructor.DEFAULT_STYLES) {
         this.setProperty(key, this.constructor.DEFAULT_STYLES[key]);
     }
+    
+    // TODO Refactor using system.
+    // Handle opacity when being mounted to a node that does not have a
+    // DOMElement component
+    this._intermediaryNodes = [];
+    this._opacityUpdateComponentIndices = [];
+    var _this = this;
+    this._opacityUpdateComponent = {
+        onOpacityChange: function() {
+            _this._reapplyOpacity();
+        }
+    };
 
     if (!options) return;
-
-    var key;
 
     if (options.classes) {
         for (var i = 0; i < options.classes.length; i++)
@@ -124,6 +134,49 @@ function DOMElement (node, options) {
     if (options.content) this.setContent(options.content);
     if (options.cutout === false) this.setCutoutState(options.cutout);
 }
+
+DOMElement.prototype._updateIntermediaryNodes = function _updateIntermediaryNodes() {
+    for (var i = 0; i < this._intermediaryNodes.length; i++) {
+        this._intermediaryNodes[i].removeComponent(
+            this._opacityUpdateComponentIndices[i]
+        );
+    }
+    this._intermediaryNodes.length = 0;
+    this._opacityUpdateComponentIndices.length = 0;
+    
+    var parent = this._node.getParent();
+    
+    while (parent && !parent.hasComponent(DOMElement)) {
+        var componentIndex = parent.addComponent(
+            this._opacityUpdateComponent
+        );
+        this._intermediaryNodes.push(parent);
+        this._opacityUpdateComponentIndices.push(componentIndex);
+        
+        if (parent.isScene) break;
+        
+        parent = parent.getParent();
+    }
+    
+    this._reapplyOpacity();
+};
+
+DOMElement.prototype._handleComponentMutation = function _handleComponentMutation(component, node) {
+    if (component instanceof DOMElement) {
+        this._updateIntermediaryNodes();
+    }
+};
+
+DOMElement.prototype.onParentComponentAdd = DOMElement.prototype._handleComponentMutation;
+
+DOMElement.prototype._reapplyOpacity = function _reapplyOpacity() {
+    var localOpacity = 1;
+    for (var i = 0; i < this._intermediaryNodes.length; i++) {
+        localOpacity *= this._intermediaryNodes[i].getOpacity();
+    }
+    localOpacity *= this._node.getOpacity();
+    this.setProperty('opacity', localOpacity);
+};
 
 /**
  * Serializes the state of the DOMElement. This method will be invoked by
@@ -251,6 +304,8 @@ DOMElement.prototype.onMount = function onMount (node, id) {
     this._UIEvents = node.getUIEvents().slice(0);
     this.draw();
     this.setAttribute('data-fa-path', node.getLocation());
+    
+    this._updateIntermediaryNodes();
 };
 
 /**
@@ -263,6 +318,8 @@ DOMElement.prototype.onDismount = function onDismount () {
     this.setProperty('display', 'none');
     this.setAttribute('data-fa-path', '');
     this._initialized = false;
+    
+    this._updateIntermediaryNodes();
 };
 
 /**
@@ -351,7 +408,7 @@ DOMElement.prototype.onSizeChange = function onSizeChange (size) {
  * @return {DOMElement} this
  */
 DOMElement.prototype.onOpacityChange = function onOpacityChange (opacity) {
-    return this.setProperty('opacity', opacity);
+    this._reapplyOpacity();
 };
 
 /**

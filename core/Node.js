@@ -525,6 +525,18 @@ Node.prototype.addComponent = function addComponent (component) {
     return index;
 };
 
+Node.prototype.hasComponent = function hasComponent(Constructor) {
+    var i = 0;
+    var list = this._components;
+    var len = list.length;
+    var item;
+    for (; i < len ; i++) {
+        item = list[i];
+        if (item && item.constructor === Constructor) return true;
+    }
+    return false;
+};
+
 /**
  * @method  getComponent
  *  
