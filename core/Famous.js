@@ -242,22 +242,6 @@ Famous.prototype.step = function step (time) {
     return this;
 };
 
-Famous.prototype.onmessage = function () {
-    console.error(
-        'Famous#onmessage has been moved to Channel!\n' +
-        'Use new ThreadManager(Famous.getChannel(), compositor) \n' +
-        'instead of new ThreadManager(Famous, compositor).'
-    );
-};
-
-Famous.prototype.postMessage = function () {
-    console.error(
-        'Famous#postMessage has been moved to Channel!\n' +
-        'Use new ThreadManager(Famous.getChannel(), compositor) \n' +
-        'instead of new ThreadManager(Famous, compositor).'
-    );
-};
-
 /**
  * returns the context of a particular path. The context is looked up by the selector
  * portion of the path and is listed from the start of the string to the first
