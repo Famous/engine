@@ -43,12 +43,9 @@ function Circle (options) {
     var options  = options || {};
     var detail   = options.detail || 30;
     var buffers  = getCircleBuffers(detail, true);
-    var backface;
 
     if (options.backface !== false) {
-        backface = GeometryHelper.createBackfaces(buffers.vertices, buffers.indices);
-        buffers.indices.push.apply(buffers.indices, backface.indices);
-        buffers.vertices.push.apply(buffers.vertices, backface.vertices);
+        GeometryHelper.addBackfaceTriangles(buffers.vertices, buffers.indices);
     }
 
     var textureCoords = getCircleTexCoords(buffers.vertices);
