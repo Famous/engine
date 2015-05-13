@@ -131,10 +131,12 @@ function WebGLRenderer(canvas, compositor) {
     
     this.projectionTransform = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, -0.000001, 0, -1, 1, 0, 1];
 
+    // TODO: remove this hack
+
     var cutout = this.cutoutGeometry = new Plane();
-    this.bufferRegistry.allocate(cutout.id, 'pos', cutout.spec.bufferValues[0], 3);
-    this.bufferRegistry.allocate(cutout.id, 'texCoord', cutout.spec.bufferValues[1], 2);
-    this.bufferRegistry.allocate(cutout.id, 'normals', cutout.spec.bufferValues[2], 3);
+    this.bufferRegistry.allocate(cutout.id, 'a_pos', cutout.spec.bufferValues[0], 3);
+    this.bufferRegistry.allocate(cutout.id, 'a_texCoord', cutout.spec.bufferValues[1], 2);
+    this.bufferRegistry.allocate(cutout.id, 'a_normals', cutout.spec.bufferValues[2], 3);
     this.bufferRegistry.allocate(cutout.id, 'indices', cutout.spec.bufferValues[3], 1);
 }
 
@@ -434,6 +436,7 @@ WebGLRenderer.prototype.setMeshUniform = function setMeshUniform(path, uniformNa
     var mesh = this.meshRegistry[path] || this.createMesh(path);
 
     var index = mesh.uniformKeys.indexOf(uniformName);
+
     if (index === -1) {
         mesh.uniformKeys.push(uniformName);
         mesh.uniformValues.push(uniformValue);
@@ -577,7 +580,7 @@ WebGLRenderer.prototype.setGlobalUniforms = function setGlobalUniforms(renderSta
     this.projectionTransform[11] = renderState.perspectiveTransform[11];
 
     globalUniforms.values[4] = this.projectionTransform;
-    globalUniforms.values[5] = this.compositor.getTime() % 100000 / 1000;
+    globalUniforms.values[5] = this.compositor.getTime() * 0.001;
     globalUniforms.values[6] = renderState.viewTransform;
 
     this.program.setUniforms(globalUniforms.keys, globalUniforms.values);
