@@ -46,9 +46,10 @@ function ParametricSphere (options) {
     var detailY = options.detailY || detail;
 
     var buffers = GeometryHelper.generateParametric(
-          detailX,
-          detailY,
-          ParametricSphere.generator
+        detailX,
+        detailY,
+        ParametricSphere.generator,
+        true
     );
 
     GeometryHelper.getUniqueFaces(buffers.vertices, buffers.indices);

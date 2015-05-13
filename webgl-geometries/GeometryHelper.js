@@ -58,14 +58,13 @@ var GeometryHelper = {};
  * 
  * @return {Object} Object containing generated vertices and indices.
  */
-GeometryHelper.generateParametric = function generateParametric(detailX, detailY, func) {
+GeometryHelper.generateParametric = function generateParametric(detailX, detailY, func, wrap) {
     var vertices = [],
         i, theta, phi, result, j;
 
-    // We must wrap around slightly more than once for uv coordinates to look correct.
+    // We can wrap around slightly more than once for uv coordinates to look correct.
 
-    // var Xrange = Math.PI + (Math.PI / (detailX - 1));
-    var Xrange = Math.PI;
+    var Xrange = wrap ? Math.PI + (Math.PI / (detailX - 1)) : Math.PI;
     var out = [];
 
     for (i = 0; i < detailX + 1; i++) {
@@ -512,7 +511,7 @@ GeometryHelper.createBackfaces = function createBackfaces(vertices, indices) {
     while (i--) if (indices[i] > maxIndex) maxIndex = indices[i];
 
     maxIndex++;
-    
+
     for (var i = 0; i < nFaces; i++) {
         var indexOne = indices[i * 3],
             indexTwo = indices[i * 3 + 1],
