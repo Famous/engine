@@ -42,6 +42,15 @@ var RENDER_SIZE = 2;
  *                                      the Node.
  * @param {Object} options.properties   CSS properties that should be added to
  *                                      the actual DOMElement on the initial draw.
+ * @param {Object} options.attributes   Element attributes that should be added to
+ *                                      the actual DOMElement.
+ * @param {String} options.id           String to be applied as 'id' of the actual
+ *                                      DOMElement.
+ * @param {String} options.content      String to be applied as the content of the
+ *                                      actual DOMElement.
+ * @param {Boolean} options.cutout      Specifies the presence of a 'cutout' in the
+ *                                      WebGL canvas over this element which allows
+ *                                      for DOM and WebGL layering.  On by default.
  */
 function DOMElement (node, options) {
     if (typeof options === 'string') {
@@ -197,6 +206,14 @@ DOMElement.prototype.onHide = function onHide () {
     this.setProperty('display', 'none');
 };
 
+/**
+ * Enables or disables WebGL 'cutout' for this element, which affects
+ * how the element is layered with WebGL objects in the scene.
+ *
+ * @method setCutoutState
+ *
+ * @param {Boolean} usesCutout  The presence of a WebGL 'cutout' for this element.
+ */
 DOMElement.prototype.setCutoutState = function setCutoutState (usesCutout) {
     this._changeQueue.push('GL_CUTOUT_STATE', usesCutout);
 
