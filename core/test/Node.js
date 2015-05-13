@@ -29,7 +29,7 @@
 var test = require('tape');
 var Node = require('../Node');
 var Size = require('../Size');
-var Context = require('../Context');
+var Scene = require('../Scene');
 var DefaultNodeSpec = require('./expected/DefaultNodeSpec');
 
 test('Node', function(t) {
@@ -55,7 +55,7 @@ test('Node', function(t) {
 
     t.test('deprecated methods (for backwards compatibility)', function(t) {
         var node = new Node();
-        var deprecatedMethods = ['getContext', 'getDispatch', 'getRenderProxy', 'getRenderPath', 'addRenderable'];
+        var deprecatedMethods = ['getScene', 'getDispatch', 'getRenderProxy', 'getRenderPath', 'addRenderable'];
         deprecatedMethods.forEach(function (deprecatedMethod) {
             t.equal(typeof node[deprecatedMethod], 'function', 'node.' + deprecatedMethod + ' should be a function');
         });
@@ -362,7 +362,7 @@ test('Node', function(t) {
                 return updater;
             }
         };
-        var root = new Context('body', updater);
+        var root = new Scene('body', updater);
 
         var child0 = root.addChild();
         var child1 = root.addChild();

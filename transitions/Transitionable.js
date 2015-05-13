@@ -25,7 +25,7 @@
 'use strict';
 
 var Curves = require('./Curves');
-var Famous = require('../core/Famous');
+var FamousEngine = require('../core/FamousEngine');
 
 /**
  * A state maintainer for a smooth transition between
@@ -87,7 +87,7 @@ function Transitionable(initialState) {
  *
  * @type {Performance|Date|Clock}
  */
-Transitionable.Clock = Famous.getClock();
+Transitionable.Clock = FamousEngine.getClock();
 
 /**
  * Registers a transition to be pushed onto the internal queue.
@@ -374,7 +374,7 @@ Transitionable.prototype.reset = function(start) {
  * @chainable
  * @deprecated Use `.to` instead!
  *
- * @param {Number|FamousMatrix|Array.Number|Object.<number, number>} endState
+ * @param {Number|FamousEngineMatrix|Array.Number|Object.<number, number>} endState
  *    end state to which we interpolate
  * @param {transition=} transition object of type {duration: number, curve:
  *    f[0,1] -> [0,1] or name}. If transition is omitted, change will be
