@@ -87,9 +87,9 @@ var uniforms = keyValueToArrays({
  * Attributes keys and values
  */
 var attributes = keyValueToArrays({
-    pos: [0, 0, 0],
-    texCoord: [0, 0],
-    normals: [0, 0, 0]
+    a_pos: [0, 0, 0],
+    a_texCoord: [0, 0],
+    a_normals: [0, 0, 0]
 });
 
 /**

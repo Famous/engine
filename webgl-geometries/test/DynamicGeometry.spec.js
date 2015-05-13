@@ -101,7 +101,7 @@ test('DynamicGeometry', function(t) {
 
         var geometry = new DynamicGeometry({
             buffers: [{
-                name: 'pos', data: posAttribArray
+                name: 'a_pos', data: posAttribArray
             }]
         });
 

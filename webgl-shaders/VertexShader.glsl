@@ -165,11 +165,10 @@ vec3 calculateOffset(vec3 ID) {
  *
  */
 void main() {
-    gl_PointSize = 10.0;
-    v_textureCoordinate = texCoord;
-    vec3 invertedNormals = normals + (u_normals.x < 0.0 ? calculateOffset(u_normals) * 2.0 - 1.0 : vec3(0.0));
+    v_textureCoordinate = a_texCoord;
+    vec3 invertedNormals = a_normals + (u_normals.x < 0.0 ? calculateOffset(u_normals) * 2.0 - 1.0 : vec3(0.0));
     invertedNormals.y *= -1.0;
     v_normal = transpose(mat3(inverse(u_transform))) * invertedNormals;
-    vec3 offsetPos = pos + calculateOffset(u_positionOffset);
+    vec3 offsetPos = a_pos + calculateOffset(u_positionOffset);
     gl_Position = applyTransform(vec4(offsetPos, 1.0));
 }

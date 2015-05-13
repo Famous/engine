@@ -56,9 +56,9 @@ function ParametricSphere (options) {
 
     return new Geometry({
         buffers: [
-            { name: 'pos', data: buffers.vertices },
-            { name: 'texCoord', data: GeometryHelper.getSpheroidUV(buffers.vertices), size: 2 },
-            { name: 'normals', data: GeometryHelper.getSpheroidNormals(buffers.vertices) },
+            { name: 'a_pos', data: buffers.vertices },
+            { name: 'a_texCoord', data: GeometryHelper.getSpheroidUV(buffers.vertices), size: 2 },
+            { name: 'a_normals', data: GeometryHelper.getSpheroidNormals(buffers.vertices) },
             { name: 'indices', data: buffers.indices, size: 1 }
         ]
     });

@@ -53,9 +53,9 @@ function Circle (options) {
 
     return new Geometry({
         buffers: [
-            { name: 'pos', data: buffers.vertices },
-            { name: 'texCoord', data: textureCoords, size: 2 },
-            { name: 'normals', data: normals },
+            { name: 'a_pos', data: buffers.vertices },
+            { name: 'a_texCoord', data: textureCoords, size: 2 },
+            { name: 'a_normals', data: normals },
             { name: 'indices', data: buffers.indices, size: 1 }
         ]
     });
