@@ -60,15 +60,7 @@ function ThreadManager (thread, compositor, engine) {
     this._thread = thread;
     this._compositor = compositor;
     this._engine = engine;
-
-    if (engine) {
-        this._engine.update(this);
-    } else {
-        console.warn(
-            'Not passing in the engine into the ThreadManager is ' +
-            'deprecated!\n Use `new ThreadManager(thread, compositor, engine)`'
-        );
-    }
+    this._engine.update(this);
 
     var _this = this;
     this._thread.onmessage = function (ev) {
