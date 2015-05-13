@@ -44,16 +44,6 @@ var RENDER_SIZE = 2;
  *                                      the actual DOMElement on the initial draw.
  */
 function DOMElement (node, options) {
-    if (typeof options === 'string') {
-        console.warn(
-            'HTMLElement constructor signature changed!\n' +
-            'Pass in an options object with {tagName: ' + options + '} instead.'
-        );
-        options = {
-            tagName: options
-        };
-    }
-
     this._node = node;
 
     this._requestingUpdate = false;
