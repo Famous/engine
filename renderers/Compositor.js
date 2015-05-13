@@ -25,7 +25,6 @@
 'use strict';
 
 var Context = require('./Context');
-require('../stylesheets');
 
 /**
  * Instantiates a new Compositor, used for routing commands received from the
