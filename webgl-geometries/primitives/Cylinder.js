@@ -45,6 +45,7 @@ function Cylinder (options) {
     var radius   = options.radius || 1;
     var detail   = options.detail || 15;
     var buffers;
+    var backface;
 
     buffers = GeometryHelper.generateParametric(
         detail,
@@ -53,7 +54,9 @@ function Cylinder (options) {
     );
 
     if (options.backface !== false) {
-        buffers.indices = GeometryHelper.createBackfaceIndices(buffers.indices);
+        backface = GeometryHelper.createBackfaces(buffers.vertices, buffers.indices);
+        buffers.indices.push.apply(buffers.indices, backface.indices);
+        buffers.vertices.push.apply(buffers.vertices, backface.vertices);
     }
 
     return new Geometry({

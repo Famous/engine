@@ -43,6 +43,8 @@ function ParametricCone (options) {
     var options  = options || {};
     var detail   = options.detail || 15;
     var radius   = options.radius || 1 / Math.PI;
+    var backface;
+
 
     var buffers = GeometryHelper.generateParametric(
         detail,
@@ -51,7 +53,9 @@ function ParametricCone (options) {
     );
 
     if (options.backface !== false) {
-        buffers.indices = GeometryHelper.createBackfaceIndices(buffers.indices);
+        backface = GeometryHelper.createBackfaces(buffers.vertices, buffers.indices);
+        buffers.indices.push.apply(buffers.indices, backface.indices);
+        buffers.vertices.push.apply(buffers.vertices, backface.vertices);
     }
 
     return new Geometry({
