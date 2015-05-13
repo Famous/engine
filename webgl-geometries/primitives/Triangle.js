@@ -56,14 +56,11 @@ function Triangle (options) {
          0,  1, 0,
          1, -1, 0
     ];
-    var backface;
 
     while(--detail) GeometryHelper.subdivide(indices, vertices, textureCoords);
 
     if (options.backface !== false) {
-        backface = GeometryHelper.createBackfaces(vertices, indices);
-        indices.push.apply(indices, backface.indices);
-        vertices.push.apply(vertices, backface.vertices);
+        GeometryHelper.addBackfaceTriangles(vertices, indices);
     }
 
     normals = GeometryHelper.computeNormals(vertices, indices);

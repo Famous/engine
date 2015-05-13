@@ -66,9 +66,12 @@ function Plane(options) {
     }
 
     if (options.backface !== false) {
-        backface = GeometryHelper.createBackfaces(vertices, indices);
-        indices.push.apply(indices, backface.indices);
-        vertices.push.apply(vertices, backface.vertices);
+        GeometryHelper.addBackfaceTriangles(vertices, indices);
+        
+        // duplicate texture coordinates as well
+
+        var len = textureCoords.length;
+        for (var i = 0; i < len; i++) textureCoords.push(textureCoords[i]);
     }
 
     var normals = GeometryHelper.computeNormals(vertices, indices);

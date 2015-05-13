@@ -501,11 +501,9 @@ GeometryHelper.trianglesToLines = function triangleToLines(indices, out) {
     return out;
 };
 
-GeometryHelper.createBackfaces = function createBackfaces(vertices, indices) {
+GeometryHelper.addBackfaceTriangles = function addBackfaceTriangles(vertices, indices) {
     var nFaces = indices.length / 3;
-    var backfaceVertices = vertices.slice();
-    var backfaceIndices  = [];
-
+    
     var maxIndex = 0;
     var i = indices.length;
     while (i--) if (indices[i] > maxIndex) maxIndex = indices[i];
@@ -517,13 +515,15 @@ GeometryHelper.createBackfaces = function createBackfaces(vertices, indices) {
             indexTwo = indices[i * 3 + 1],
             indexThree = indices[i * 3 + 2];
 
-        backfaceIndices.push(indexOne + maxIndex, indexThree + maxIndex, indexTwo + maxIndex);
+        indices.push(indexOne + maxIndex, indexThree + maxIndex, indexTwo + maxIndex);
     }
 
-    return {
-        vertices: backfaceVertices,
-        indices: backfaceIndices
-    };
+    // Iterating instead of .slice() here to avoid max call stack issue.
+
+    var nVerts = vertices.length;
+    for (var i = 0; i < nVerts; i++) {
+        vertices.push(vertices[i]);
+    }
 };
 
 module.exports = GeometryHelper;
