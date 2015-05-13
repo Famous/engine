@@ -41,7 +41,6 @@ function Touch(touch) {
     // };
     
     this.identifier = touch.identifier;
-    this.target = touch.target;
     this.screenX = touch.screenX;
     this.screenY = touch.screenY;
     this.clientX = touch.clientX;
