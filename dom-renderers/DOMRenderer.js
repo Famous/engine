@@ -26,7 +26,7 @@
 
 var ElementCache = require('./ElementCache');
 var math = require('./Math');
-var vendorPrefix = require('./VendorPrefix');
+var vendorPrefix = require('../utilities/vendorPrefix');
 var eventMap = require('./events/EventMap');
 
 var TRANSFORM = vendorPrefix('transform');

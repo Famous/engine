@@ -24,6 +24,7 @@
 
 'use strict';
 
+var Transitionable = require('../../transitions/Transitionable');
 var test = require('tape');
 var Color = require('../Color');
 
@@ -63,8 +64,9 @@ function callback(t, input) {
 }
 
 test('Color', function(t) {
-
     t.test('Time setup', function(t) {
+        Transitionable.Clock = Date;
+        
         time = 0;
 
         Date.now = function() { return time; };

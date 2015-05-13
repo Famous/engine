@@ -35,6 +35,7 @@ module.exports = {
     loadURL: require('./loadURL'),
     MethodStore: require('./MethodStore'),
     ObjectManager: require('./ObjectManager'),
-    strip: require('./strip')
+    strip: require('./strip'),
+    vendorPrefix: require('./vendorPrefix')
 };
 
