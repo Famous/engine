@@ -99,7 +99,6 @@ Context.prototype.getRootSize = function getRootSize() {
 
 Context.prototype.initWebGL = function initWebGL() {
     this.canvas = document.createElement('canvas');
-    this.canvas.className = 'famous-webgl';
     this._rootEl.appendChild(this.canvas);
     this.WebGLRenderer = new WebGLRenderer(this.canvas);
     this.updateSize();

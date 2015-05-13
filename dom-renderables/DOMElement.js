@@ -61,7 +61,7 @@ function DOMElement (node, options) {
     this._changeQueue = [];
 
     this._UIEvents = node.getUIEvents().slice(0);
-    this._classes = ['fa-surface'];
+    this._classes = [];
     this._requestingEventListeners = [];
     this._styles = {
         display: node.isShown(),
@@ -75,14 +75,19 @@ function DOMElement (node, options) {
 
     this._callbacks = new CallbackStore();
 
+    
+    var key;
+    
+    for (key in this.constructor.DEFAULT_STYLES) {
+        this.setProperty(key, this.constructor.DEFAULT_STYLES[key]);
+    }
+
     if (!options) return;
 
     if (options.classes) {
         for (var i = 0; i < options.classes.length; i++)
             this.addClass(options.classes[i]);
     }
-
-    var key;
 
     if (options.attributes) {
         for (key in options.attributes)
@@ -488,6 +493,19 @@ DOMElement.prototype.draw = function draw () {
         this.onAddUIEvent(this._UIEvents[i]);
 
     this._inDraw = false;
+};
+
+DOMElement.DEFAULT_STYLES = {
+    'position': 'absolute',
+    '-webkit-transform-origin': '0% 0%',
+    'transform-origin': '0% 0%',
+    '-webkit-backface-visibility': 'visible',
+    'backface-visibility': 'visible',
+    '-webkit-transform-style': 'preserve-3d',
+    'transform-style': 'preserve-3d; /* performance *',
+    '-webkit-tap-highlight-color': 'transparent',
+    'pointer-events': 'auto',
+    'z-index': '1'
 };
 
 module.exports = DOMElement;
