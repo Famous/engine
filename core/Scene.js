@@ -31,10 +31,10 @@ var Node = require('./Node');
 var Size = require('./Size');
 
 /**
- * Context is the bottom of the scene graph. It is it's own
+ * Scene is the bottom of the scene graph. It is it's own
  * parent and provides the global updater to the scene graph.
  *
- * @class Context
+ * @class Scene
  * @constructor
  *
  * @param {String} selector a string which is a dom selector
@@ -44,11 +44,11 @@ var Size = require('./Size');
  *                 it needs to be able to send methods to
  *                 the renderers and update nodes in the scene graph
  */
-function Context (selector, updater) {
-    if (!selector) throw new Error('Context needs to be created with a DOM selector');
-    if (!updater) throw new Error('Context needs to be created with a class like Famous');
+function Scene (selector, updater) {
+    if (!selector) throw new Error('Scene needs to be created with a DOM selector');
+    if (!updater) throw new Error('Scene needs to be created with a class like Famous');
 
-    Node.call(this);         // Context inherits from node
+    Node.call(this);         // Scene inherits from node
 
     this._updater = updater; // The updater that will both
                              // send messages to the renderers
@@ -74,16 +74,16 @@ function Context (selector, updater) {
 
 }
 
-// Context inherits from node
-Context.prototype = Object.create(Node.prototype);
-Context.prototype.constructor = Context;
+// Scene inherits from node
+Scene.prototype = Object.create(Node.prototype);
+Scene.prototype.constructor = Scene;
 
 /**
- * Context getUpdater function returns the passed in updater
+ * Scene getUpdater function returns the passed in updater
  *
- * @return {Famous} the updater for this Context
+ * @return {Famous} the updater for this Scene
  */
-Context.prototype.getUpdater = function getUpdater () {
+Scene.prototype.getUpdater = function getUpdater () {
     return this._updater;
 };
 
@@ -92,7 +92,7 @@ Context.prototype.getUpdater = function getUpdater () {
  *
  * @return {String} dom selector
  */
-Context.prototype.getSelector = function getSelector () {
+Scene.prototype.getSelector = function getSelector () {
     return this._selector;
 };
 
@@ -100,9 +100,9 @@ Context.prototype.getSelector = function getSelector () {
  * Returns the dispatcher of the context. Used to send events
  * to the nodes in the scene graph.
  *
- * @return {Dispatch} the Context's Dispatch
+ * @return {Dispatch} the Scene's Dispatch
  */
-Context.prototype.getDispatch = function getDispatch () {
+Scene.prototype.getDispatch = function getDispatch () {
     return this._dispatch;
 };
 
@@ -114,7 +114,7 @@ Context.prototype.getDispatch = function getDispatch () {
  * @param {String} event
  * @param {*} payload
  */
-Context.prototype.onReceive = function onReceive (event, payload) {
+Scene.prototype.onReceive = function onReceive (event, payload) {
     // TODO: In the future the dom element that the context is attached to
     // should have a representation as a component. It would be render sized
     // and the context would receive its size the same way that any render size
@@ -135,5 +135,5 @@ Context.prototype.onReceive = function onReceive (event, payload) {
     }
 };
 
-module.exports = Context;
+module.exports = Scene;
 

@@ -30,13 +30,13 @@ var Buffer = require('./Buffer');
 var BufferRegistry = require('./BufferRegistry');
 var Plane = require('../webgl-geometries').Plane;
 var sorter = require('./radixSort');
-var Utility = require('../utilities');
+var keyValueToArrays = require('../utilities/keyValueToArrays');
 var TextureManager = require('./TextureManager');
 var compileMaterial = require('./compileMaterial');
 
 var identity = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
 
-var globalUniforms = Utility.keyValueToArrays({
+var globalUniforms = keyValueToArrays({
     'u_NumLights': 0,
     'u_AmbientLight': new Array(3),
     'u_LightPosition': new Array(3),
@@ -192,7 +192,7 @@ WebGLRenderer.prototype.createLight = function createLight(path) {
  */
 WebGLRenderer.prototype.createMesh = function createMesh(path) {
     this.meshRegistryKeys.push(path);
-    var uniforms = Utility.keyValueToArrays({
+    var uniforms = keyValueToArrays({
         opacity: 1,
         transform: identity,
         size: [0, 0, 0],
@@ -214,7 +214,6 @@ WebGLRenderer.prototype.createMesh = function createMesh(path) {
     };
 };
 
-
 WebGLRenderer.prototype.setCutoutState = function setCutoutState(path, usesCutout) {
     var cutout = this.getOrSetCutout(path);
 
@@ -230,7 +229,6 @@ WebGLRenderer.prototype.setCutoutState = function setCutoutState(path, usesCutou
  *
  * @return {Object} Newly created cutout spec.
  */
-
 WebGLRenderer.prototype.getOrSetCutout = function getOrSetCutout(path) {
     var geometry;
 
@@ -238,7 +236,7 @@ WebGLRenderer.prototype.getOrSetCutout = function getOrSetCutout(path) {
         return this.cutoutRegistry[path];
     }
     else {
-        var uniforms = Utility.keyValueToArrays({
+        var uniforms = keyValueToArrays({
             opacity: 0,
             transform: identity,
             size: [0, 0, 0],
@@ -271,7 +269,6 @@ WebGLRenderer.prototype.removeMesh = function removeMesh(path) {
     this.meshRegistry[path] = null;
 };
 
-
 /**
  * Creates or retreives cutout
  *
@@ -282,7 +279,6 @@ WebGLRenderer.prototype.removeMesh = function removeMesh(path) {
  * @param {Array} value of uniform data
  *
  */
-
 WebGLRenderer.prototype.setCutoutUniform = function setCutoutUniform(path, uniformName, uniformValue) {
     var cutout = this.getOrSetCutout(path);
 
@@ -290,7 +286,6 @@ WebGLRenderer.prototype.setCutoutUniform = function setCutoutUniform(path, unifo
 
     cutout.uniformValues[index] = uniformValue;
 };
-
 
 /**
  * Edits the options field on a mesh
@@ -307,7 +302,6 @@ WebGLRenderer.prototype.setMeshOptions = function(path, options) {
     mesh.options = options;
     return this;
 };
-
 
 /**
  * Changes the color of the fixed intensity lighting in the scene
@@ -326,7 +320,6 @@ WebGLRenderer.prototype.setAmbientLightColor = function setAmbientLightColor(pat
     this.ambientLightColor[2] = b;
     return this;
 };
-
 
 /**
  * Changes the location of the light in the scene
@@ -348,7 +341,6 @@ WebGLRenderer.prototype.setLightPosition = function setLightPosition(path, x, y,
     return this;
 };
 
-
 /**
  * Changes the color of a dynamic intensity lighting in the scene
  *
@@ -368,6 +360,7 @@ WebGLRenderer.prototype.setLightColor = function setLightColor(path, r, g, b) {
     light.color[2] = b;
     return this;
 };
+
 /**
  * Compiles material spec into program shader
  *
@@ -413,7 +406,6 @@ WebGLRenderer.prototype.handleMaterialInput = function handleMaterialInput(path,
  * @param {Boolean} will the geometry data change?
  *
 **/
-
 WebGLRenderer.prototype.setGeometry = function setGeometry(path, geometry, drawType, dynamic) {
     var mesh = this.meshRegistry[path] || this.createMesh(path);
 
@@ -459,8 +451,6 @@ WebGLRenderer.prototype.setMeshUniform = function setMeshUniform(path, uniformNa
  * @param {Array} Vertex data
  * @param {Number} The dimensions of the vertex
  */
-
-
 WebGLRenderer.prototype.bufferData = function bufferData(path, geometryId, bufferName, bufferValue, bufferSpacing, isDynamic) {
     this.bufferRegistry.allocate(geometryId, bufferName, bufferValue, bufferSpacing, isDynamic);
 

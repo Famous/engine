@@ -30,7 +30,6 @@ module.exports = {
     math: require('./math'),
     physics: require('./physics'),
     renderers: require('./renderers'),
-    stylesheets: require('./stylesheets'),
     router: require('./router'),
     transitions: require('./transitions'),
     utilities: require('./utilities'),

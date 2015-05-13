@@ -26,7 +26,6 @@
 
 var Light = require('./Light');
 
-
 /**
  * AmbientLight extends the functionality of Light. It sets the ambience in
  * the scene. Ambience is a light source that emits light in the entire

@@ -25,9 +25,9 @@
 'use strict';
 
 /**
- * The ThreadManager is being updated by an Engine by consecutively calling its
+ * The UIManager is being updated by an Engine by consecutively calling its
  * `update` method. It can either manage a real Web-Worker or the global
- * Famous core singleton.
+ * FamousEngine core singleton.
  *
  * @example
  * var compositor = new Compositor();
@@ -35,12 +35,12 @@
  * 
  * // Using a Web Worker
  * var worker = new Worker('worker.bundle.js');
- * var threadmanger = new ThreadManager(worker, compositor, engine);
+ * var threadmanger = new UIManager(worker, compositor, engine);
  * 
  * // Without using a Web Worker
- * var threadmanger = new ThreadManager(Famous, compositor, engine);
+ * var threadmanger = new UIManager(Famous, compositor, engine);
  * 
- * @class  ThreadManager
+ * @class  UIManager
  * @constructor
  * 
  * @param {Famous|Worker} thread        The thread being used to receive
@@ -56,10 +56,11 @@
  * @param {Engine} engine               an instance of Engine used for
  *                                      executing the `ENGINE` commands on.
  */
-function ThreadManager (thread, compositor, engine) {
+function UIManager (thread, compositor, engine) {
     this._thread = thread;
     this._compositor = compositor;
     this._engine = engine;
+
     this._engine.update(this);
 
     var _this = this;
@@ -89,36 +90,36 @@ function ThreadManager (thread, compositor, engine) {
 }
 
 /**
- * Returns the thread being used by the ThreadManager.
- * This could either be an an actual web worker or a `Famous` singleton.
+ * Returns the thread being used by the UIManager.
+ * This could either be an an actual web worker or a `FamousEngine` singleton.
  *
  * @method getThread
  * 
- * @return {Worker|Famous}  Either a web worker or a `Famous` singleton.
+ * @return {Worker|FamousEngine}  Either a web worker or a `FamousEngine` singleton.
  */
-ThreadManager.prototype.getThread = function getThread() {
+UIManager.prototype.getThread = function getThread() {
     return this._thread;
 };
 
 /**
- * Returns the compositor being used by this ThreadManager.
+ * Returns the compositor being used by this UIManager.
  *
  * @method getCompositor
  * 
- * @return {Compositor}     The compositor used by the ThreadManager.
+ * @return {Compositor}     The compositor used by the UIManager.
  */
-ThreadManager.prototype.getCompositor = function getCompositor() {
+UIManager.prototype.getCompositor = function getCompositor() {
     return this._compositor;
 };
 
 /**
- * Returns the engine being used by this ThreadManager.
+ * Returns the engine being used by this UIManager.
  *
  * @method getEngine
  * 
- * @return {Engine}     The engine used by the ThreadManager.
+ * @return {Engine}     The engine used by the UIManager.
  */
-ThreadManager.prototype.getEngine = function getEngine() {
+UIManager.prototype.getEngine = function getEngine() {
     return this._engine;
 };
 
@@ -132,11 +133,11 @@ ThreadManager.prototype.getEngine = function getEngine() {
  * @param  {Number} time unix timestamp to be passed down to the worker as a
  *                       FRAME command
  */
-ThreadManager.prototype.update = function update (time) {
+UIManager.prototype.update = function update (time) {
     this._thread.postMessage(['FRAME', time]);
     var threadMessages = this._compositor.drawCommands();
     this._thread.postMessage(threadMessages);
     this._compositor.clearCommands();
 };
 
-module.exports = ThreadManager;
+module.exports = UIManager;

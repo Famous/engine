@@ -24,7 +24,8 @@
 
 'use strict';
 
-var Utility = require('../utilities');
+var clone = require('../utilities/clone');
+var keyValueToArrays = require('../utilities/keyValueToArrays')
 
 var vertexWrapper = require('../webgl-shaders').vertex;
 var fragmentWrapper = require('../webgl-shaders').fragment;
@@ -62,7 +63,7 @@ var masks =  {
 /**
  * Uniform keys and values
  */
-var uniforms = Utility.keyValueToArrays({
+var uniforms = keyValueToArrays({
     perspective: identityMatrix,
     view: identityMatrix,
     resolution: [0, 0, 0],
@@ -85,7 +86,7 @@ var uniforms = Utility.keyValueToArrays({
 /**
  * Attributes keys and values
  */
-var attributes = Utility.keyValueToArrays({
+var attributes = keyValueToArrays({
     pos: [0, 0, 0],
     texCoord: [0, 0],
     normals: [0, 0, 0]
@@ -94,7 +95,7 @@ var attributes = Utility.keyValueToArrays({
 /**
  * Varyings keys and values
  */
-var varyings = Utility.keyValueToArrays({
+var varyings = keyValueToArrays({
     v_TextureCoordinate: [0, 0],
     v_Normal: [0, 0, 0],
     v_Position: [0, 0, 0],
@@ -233,14 +234,14 @@ Program.prototype.resetProgram = function resetProgram() {
     this.uniformLocations   = [];
     this.attributeLocations = {};
 
-    this.attributeNames = Utility.clone(attributes.keys);
-    this.attributeValues = Utility.clone(attributes.values);
+    this.attributeNames = clone(attributes.keys);
+    this.attributeValues = clone(attributes.values);
 
-    this.varyingNames = Utility.clone(varyings.keys);
-    this.varyingValues = Utility.clone(varyings.values);
+    this.varyingNames = clone(varyings.keys);
+    this.varyingValues = clone(varyings.values);
 
-    this.uniformNames = Utility.clone(uniforms.keys);
-    this.uniformValues = Utility.clone(uniforms.values);
+    this.uniformNames = clone(uniforms.keys);
+    this.uniformValues = clone(uniforms.values);
 
     this.flaggedUniforms = [];
     this.cachedUniforms = {};

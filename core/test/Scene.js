@@ -27,12 +27,13 @@
 'use strict';
 
 var test = require('tape');
-var Context = require('../Context');
+var Scene = require('../Scene');
+var Node = require('../Node');
 var Dispatch = require('../Dispatch');
 
-test('Context', function(t) {
+test('Scene', function(t) {
     t.test('constructor', function(t) {
-        t.equal(typeof Context, 'function', 'Context should be a constructor function');
+        t.equal(typeof Scene, 'function', 'Scene should be a constructor function');
     
         var receivedMessages = [];
         var mockFamous = {
@@ -41,9 +42,9 @@ test('Context', function(t) {
                 return mockFamous;
             }
         };
-        new Context('.context-constructor', mockFamous);
+        new Scene('.scene-constructor', mockFamous);
 
-        t.deepEqual(receivedMessages, ['NEED_SIZE_FOR', '.context-constructor']);
+        t.deepEqual(receivedMessages, ['NEED_SIZE_FOR', '.scene-constructor']);
         t.end();
     });
 
@@ -51,9 +52,9 @@ test('Context', function(t) {
         var mockFamous = {
             message: function() { return mockFamous; }
         };
-        var context = new Context('.context-get-updater', mockFamous);
-        t.equal(typeof context.getUpdater, 'function', 'context.getUpdater should be a function');
-        t.equal(context.getUpdater(), mockFamous);
+        var scene = new Scene('.scene-get-updater', mockFamous);
+        t.equal(typeof scene.getUpdater, 'function', 'scene.getUpdater should be a function');
+        t.equal(scene.getUpdater(), mockFamous);
         t.end();
     });
 
@@ -61,9 +62,9 @@ test('Context', function(t) {
         var mockFamous = {
             message: function() { return mockFamous; }
         };
-        var context = new Context('.context-get-selector', mockFamous);
-        t.equal(typeof context.getUpdater, 'function', 'context.getUpdater should be a function');
-        t.equal(context.getSelector(), '.context-get-selector');
+        var scene = new Scene('.scene-get-selector', mockFamous);
+        t.equal(typeof scene.getUpdater, 'function', 'scene.getUpdater should be a function');
+        t.equal(scene.getSelector(), '.scene-get-selector');
         t.end();
     });
 
@@ -71,9 +72,9 @@ test('Context', function(t) {
         var mockFamous = {
             message: function() { return mockFamous; }
         };
-        var context = new Context('.context-get-dispatch', mockFamous);
-        t.equal(typeof context.getUpdater, 'function', 'context.getDispatch should be a function');
-        t.equal(context.getDispatch().constructor, Dispatch, 'context.getDispatch should return Dispatch instance');
+        var scene = new Scene('.scene-get-dispatch', mockFamous);
+        t.equal(typeof scene.getUpdater, 'function', 'scene.getDispatch should be a function');
+        t.equal(scene.getDispatch().constructor, Dispatch, 'scene.getDispatch should return Dispatch instance');
         t.end();
     });
 
@@ -83,15 +84,15 @@ test('Context', function(t) {
                 return mockFamous;
             },
             requestUpdate: function () {
-                t.pass('Context should request update on size change');
+                t.pass('Scene should request update on size change');
             }
         };
-        var context = new Context('.context-on-receive', mockFamous);
-        t.equal(typeof context.onReceive, 'function', 'context.onReceive should be a function');
-        context.onReceive('CONTEXT_RESIZE', [100, 200]);
-        t.deepEqual(context.getComputedValue().computedValues.size, [0, 0, 0]);
-        context.onUpdate(100);
-        t.deepEqual(context.getComputedValue().computedValues.size, [100, 200, 0]);
+        var scene = new Scene('.scene-on-receive', mockFamous);
+        t.equal(typeof scene.onReceive, 'function', 'scene.onReceive should be a function');
+        scene.onReceive('CONTEXT_RESIZE', [100, 200]);
+        t.deepEqual(scene.getComputedValue().computedValues.size, [0, 0, 0]);
+        scene.onUpdate(100);
+        t.deepEqual(scene.getComputedValue().computedValues.size, [100, 200, 0]);
         t.end();
     });
 });
