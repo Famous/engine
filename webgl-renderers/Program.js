@@ -47,11 +47,11 @@ var TYPES = {
 };
 
 var inputTypes = {
-    baseColor: 'vec4',
+    u_BaseColor: 'vec4',
     u_Normals: 'vert',
-    glossiness: 'vec4',
-    metalness: 'float',
-    positionOffset: 'vert'
+    u_Glossiness: 'vec4',
+    u_Metalness: 'float',
+    u_PositionOffset: 'vert'
 };
 
 var masks =  {
@@ -63,19 +63,19 @@ var masks =  {
 /**
  * Uniform keys and values
  */
-var uniforms = keyValueToArrays({
-    perspective: identityMatrix,
-    view: identityMatrix,
-    resolution: [0, 0, 0],
-    transform: identityMatrix,
-    size: [1, 1, 1],
-    time: [0],
-    opacity: [1],
-    metalness: [0],
-    glossiness: [0, 0, 0, 0],
-    baseColor: [1, 1, 1, 1],
+var uniforms = Utility.keyValueToArrays({
+    u_Perspective: identityMatrix,
+    u_View: identityMatrix,
+    u_Resolution: [0, 0, 0],
+    u_Transform: identityMatrix,
+    u_Size: [1, 1, 1],
+    u_Time: [0],
+    u_Opacity: [1],
+    u_Metalness: [0],
+    u_Glossiness: [0, 0, 0, 0],
+    u_BaseColor: [1, 1, 1, 1],
     u_Normals: [1, 1, 1],
-    positionOffset: [0, 0, 0],
+    u_PositionOffset: [0, 0, 0],
     u_LightPosition: identityMatrix,
     u_LightColor: identityMatrix,
     u_AmbientLight: [0, 0, 0],

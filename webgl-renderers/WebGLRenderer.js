@@ -41,9 +41,9 @@ var globalUniforms = keyValueToArrays({
     'u_AmbientLight': new Array(3),
     'u_LightPosition': new Array(3),
     'u_LightColor': new Array(3),
-    'perspective': new Array(16),
-    'time': 0,
-    'view': new Array(16)
+    'u_Perspective': new Array(16),
+    'u_Time': 0,
+    'u_View': new Array(16)
 });
 
 /**
@@ -195,15 +195,16 @@ WebGLRenderer.prototype.createLight = function createLight(path) {
  */
 WebGLRenderer.prototype.createMesh = function createMesh(path) {
     this.meshRegistryKeys.push(path);
-    var uniforms = keyValueToArrays({
-        opacity: 1,
-        transform: identity,
-        size: [0, 0, 0],
-        baseColor: [0.5, 0.5, 0.5, 1],
-        positionOffset: [0, 0, 0],
+
+    var uniforms = Utility.keyValueToArrays({
+        u_Opacity: 1,
+        u_Transform: identity,
+        u_Size: [0, 0, 0],
+        u_BaseColor: [0.5, 0.5, 0.5, 1],
+        u_PositionOffset: [0, 0, 0],
         u_Normals: [0, 0, 0],
         u_FlatShading: 0,
-        glossiness: [0, 0, 0, 0]
+        u_Glossiness: [0, 0, 0, 0]
     });
     return this.meshRegistry[path] = {
         depth: null,
@@ -239,12 +240,12 @@ WebGLRenderer.prototype.getOrSetCutout = function getOrSetCutout(path) {
         return this.cutoutRegistry[path];
     }
     else {
-        var uniforms = keyValueToArrays({
-            opacity: 0,
-            transform: identity,
-            size: [0, 0, 0],
-            origin: [0, 0, 0],
-            baseColor: [0, 0, 0, 1]
+        var uniforms = Utility.keyValueToArrays({
+            u_Opacity: 0,
+            u_Transform: identity,
+            u_Size: [0, 0, 0],
+            u_Origin: [0, 0, 0],
+            u_BaseColor: [0, 0, 0, 1]
         });
 
         this.cutoutRegistryKeys.push(path);

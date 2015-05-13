@@ -35,7 +35,7 @@
  *
  */
 void main() {
-    vec4 material = baseColor.r >= 0.0 ? baseColor : applyMaterial(baseColor);
+    vec4 material = u_BaseColor.r >= 0.0 ? u_BaseColor : applyMaterial(u_BaseColor);
 
     /**
      * Apply lights only if flat shading is false
@@ -44,10 +44,10 @@ void main() {
     bool lightsEnabled = (u_FlatShading == 0.0) && (u_NumLights > 0.0 || length(u_AmbientLight) > 0.0);
 
     vec3 normal = normalize(v_Normal);
-    vec4 gloss = glossiness.x < 0.0 ? applyMaterial(glossiness) : glossiness;
+    vec4 glossiness = u_Glossiness.x < 0.0 ? applyMaterial(u_Glossiness) : u_Glossiness;
 
-    vec4 color = lightsEnabled ? applyLight(material, normalize(v_Normal), gloss) : material;
+    vec4 color = lightsEnabled ? applyLight(material, normalize(v_Normal), glossiness) : material;
 
     gl_FragColor = color;
-    gl_FragColor.a *= opacity;   
+    gl_FragColor.a *= u_Opacity;   
 }
