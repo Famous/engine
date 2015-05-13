@@ -254,30 +254,11 @@ WebGLRenderer.prototype.getOrSetCutout = function getOrSetCutout(path) {
     }
 };
 
-/**
- * Prevents a mesh from being drawn to the canvas.
- *
- * @method hideMesh
- *
- * @param {String} path Path used as id of mesh in mesh registry.
- *
- */
-WebGLRenderer.prototype.hideMesh = function hideMesh(path) {
-    var mesh = this.meshRegistry[path] || this.createMesh(path);
-    mesh.visible = false;
-};
 
-/**
- * Allows a mesh to be drawn to the canvas.
- *
- * @method showMesh
- *
- * @param {String} path Path used as id of mesh in mesh registry.
- *
- */
-WebGLRenderer.prototype.showMesh = function showMesh(path) {
+WebGLRenderer.prototype.setMeshVisibility = function setMeshVisibility(path, visibility) {
     var mesh = this.meshRegistry[path] || this.createMesh(path);
-    mesh.visible = true;
+    
+    mesh.visible = visibility;
 };
 
 WebGLRenderer.prototype.removeMesh = function removeMesh(path) {
