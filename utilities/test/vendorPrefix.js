@@ -24,9 +24,22 @@
 
 'use strict';
 
-module.exports = {
-    DOMRenderer: require('./DOMRenderer'),
-    ElementCache: require('./ElementCache'),
-    Events: require('./events'),
-    Math: require('./Math')
-};
+var test = require('tape');
+var vendorPrefix = require('../vendorPrefix');
+
+test('vendorPrefix', function(t) {
+    t.notEqual(
+        [
+            'transform',
+            '-ms-transform',
+            '-webkit-transform',
+            '-moz-transform',
+            '-o-transform'
+        ].indexOf(vendorPrefix('transform')),
+        -1,
+        'vendorPrefix(\"transform\" should evaluate to a vendor prefixed ' +
+        'version of the transform property)'
+    );
+    
+    t.end();
+});
