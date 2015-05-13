@@ -110,8 +110,6 @@ function getCircleBuffers(detail) {
         if (i > 0) indices.push(0, counter, ++counter);
     }
 
-    console.log(indices)
-
     return {
         vertices: vertices,
         indices: indices
