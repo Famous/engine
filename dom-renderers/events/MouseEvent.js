@@ -67,4 +67,8 @@ function MouseEvent(ev) {
 MouseEvent.prototype = Object.create(UIEvent.prototype);
 MouseEvent.prototype.constructor = MouseEvent;
 
+MouseEvent.prototype.toString = function toString () {
+    return 'MouseEvent';
+};
+
 module.exports = MouseEvent;

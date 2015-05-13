@@ -40,4 +40,8 @@ function UIEvent(ev) {
 UIEvent.prototype = Object.create(Event.prototype);
 UIEvent.prototype.constructor = UIEvent;
 
+UIEvent.prototype.toString = function toString () {
+    return 'UIEvent';
+};
+
 module.exports = UIEvent;

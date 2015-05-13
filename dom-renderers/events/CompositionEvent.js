@@ -39,4 +39,8 @@ function CompositionEvent(ev) {
 CompositionEvent.prototype = Object.create(UIEvent.prototype);
 CompositionEvent.prototype.constructor = CompositionEvent;
 
+CompositionEvent.prototype.toString = function toString () {
+    return 'CompositionEvent';
+};
+
 module.exports = CompositionEvent;
