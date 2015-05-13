@@ -52,7 +52,7 @@ TextureManager.prototype.update = function update(time) {
         var texture = this.registry[i];
 
         if (texture && texture.isLoaded && texture.resampleRate) {
-            if (time - texture.lastResample > texture.resampleRate) {
+            if (!texture.lastResample || time - texture.lastResample > texture.resampleRate) {
                 if (!this._needsResample[texture.id]) {
                     this._needsResample[texture.id] = true;
                     texture.lastResample = time;
@@ -111,7 +111,7 @@ TextureManager.prototype.register = function register(input, slot) {
 
         this.registry[textureId] = {
             resampleRate: options.resampleRate || null,
-            lastResample: Clock.getTime(),
+            lastResample: null,
             isLoaded: isLoaded,
             texture: texture,
             source: source,

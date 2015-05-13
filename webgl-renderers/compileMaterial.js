@@ -116,7 +116,7 @@ function _processGLSL(str, inputs, textureSlot) {
         .replace(/%\d/g, function (s) {
             return _makeLabel(inputs[s[1]-1]);
         })
-        .replace(/\$TEXTURE/, 'u_Textures[' + textureSlot + ']');
+        .replace(/\$TEXTURE/, 'u_textures[' + textureSlot + ']');
 }
 
 function _makeLabel (n) {
