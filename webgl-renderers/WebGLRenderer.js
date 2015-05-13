@@ -30,13 +30,13 @@ var Buffer = require('./Buffer');
 var BufferRegistry = require('./BufferRegistry');
 var Plane = require('../webgl-geometries').Plane;
 var sorter = require('./radixSort');
-var Utility = require('../utilities');
+var keyValueToArrays = require('../utilities/keyValueToArrays');
 var TextureManager = require('./TextureManager');
 var compileMaterial = require('./compileMaterial');
 
 var identity = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
 
-var globalUniforms = Utility.keyValueToArrays({
+var globalUniforms = keyValueToArrays({
     'u_NumLights': 0,
     'u_AmbientLight': new Array(3),
     'u_LightPosition': new Array(3),
@@ -192,7 +192,7 @@ WebGLRenderer.prototype.createLight = function createLight(path) {
  */
 WebGLRenderer.prototype.createMesh = function createMesh(path) {
     this.meshRegistryKeys.push(path);
-    var uniforms = Utility.keyValueToArrays({
+    var uniforms = keyValueToArrays({
         opacity: 1,
         transform: identity,
         size: [0, 0, 0],
@@ -236,7 +236,7 @@ WebGLRenderer.prototype.getOrSetCutout = function getOrSetCutout(path) {
         return this.cutoutRegistry[path];
     }
     else {
-        var uniforms = Utility.keyValueToArrays({
+        var uniforms = keyValueToArrays({
             opacity: 0,
             transform: identity,
             size: [0, 0, 0],
