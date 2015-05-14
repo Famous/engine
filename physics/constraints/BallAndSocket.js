@@ -1,18 +1,18 @@
 /**
  * The MIT License (MIT)
- * 
+ *
  * Copyright (c) 2015 Famous Industries Inc.
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -38,13 +38,13 @@ var WxR_REGISTER = new Vec3();
 /**
  *  A constraint that maintains positions and orientations with respect to a specific anchor point.
  *
- *  @class Point2Point
+ *  @class BallAndSocket
  *  @extends Constraint
  *  @param {Particle} a One of the bodies.
  *  @param {Particle} b The other body.
  *  @param {Options} options An object of configurable options.
  */
-function Point2Point(a, b, options) {
+function BallAndSocket(a, b, options) {
     this.a = a;
     this.b = b;
 
@@ -57,15 +57,15 @@ function Point2Point(a, b, options) {
     this.effMassMatrix = new Mat33();
 }
 
-Point2Point.prototype = Object.create(Constraint.prototype);
-Point2Point.prototype.constructor = Point2Point;
+BallAndSocket.prototype = Object.create(Constraint.prototype);
+BallAndSocket.prototype.constructor = BallAndSocket;
 
 /**
- * Initialize the Point2Point. Sets defaults if a property was not already set.
+ * Initialize the BallAndSocket. Sets defaults if a property was not already set.
  *
  * @method init
  */
-Point2Point.prototype.init = function() {
+BallAndSocket.prototype.init = function() {
     var w = this.anchor;
 
     var a = this.a;
@@ -88,7 +88,7 @@ Point2Point.prototype.init = function() {
  * @param {Number} time The current time in the physics engine.
  * @param {Number} dt The physics engine frame delta.
  */
-Point2Point.prototype.update = function(time, dt) {
+BallAndSocket.prototype.update = function(time, dt) {
     var a = this.a;
     var b = this.b;
 
@@ -137,7 +137,7 @@ Point2Point.prototype.update = function(time, dt) {
  *
  * @method resolve
  */
-Point2Point.prototype.resolve = function resolve() {
+BallAndSocket.prototype.resolve = function resolve() {
     var a = this.a;
     var b = this.b;
 
@@ -163,4 +163,4 @@ Point2Point.prototype.resolve = function resolve() {
     this.angImpulseB.add(angImpulseB);
 };
 
-module.exports = Point2Point;
+module.exports = BallAndSocket;
