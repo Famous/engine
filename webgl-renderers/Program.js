@@ -25,7 +25,7 @@
 'use strict';
 
 var clone = require('../utilities/clone');
-var keyValueToArrays = require('../utilities/keyValueToArrays')
+var keyValueToArrays = require('../utilities/keyValueToArrays');
 
 var vertexWrapper = require('../webgl-shaders').vertex;
 var fragmentWrapper = require('../webgl-shaders').fragment;
@@ -152,21 +152,23 @@ Program.prototype.registerMaterial = function registerMaterial(name, material) {
 
     if ((this.registeredMaterials[material._id] & mask) === mask) return;
 
-    for (var k in compiled.uniforms) {
+    var k;
+
+    for (k in compiled.uniforms) {
         if (uniforms.keys.indexOf(k) === -1) {
             uniforms.keys.push(k);
             uniforms.values.push(compiled.uniforms[k]);
         }
     }
 
-    for (var k in compiled.varyings) {
+    for (k in compiled.varyings) {
         if (varyings.keys.indexOf(k) === -1) {
             varyings.keys.push(k);
             varyings.values.push(compiled.varyings[k]);
         }
     }
 
-    for (var k in compiled.attributes) {
+    for (k in compiled.attributes) {
         if (attributes.keys.indexOf(k) === -1) {
             attributes.keys.push(k);
             attributes.values.push(compiled.attributes[k]);
@@ -175,25 +177,25 @@ Program.prototype.registerMaterial = function registerMaterial(name, material) {
 
     this.registeredMaterials[material._id] |= mask;
 
-    if (type == 'float') {
+    if (type === 'float') {
         this.definitionFloat.push(material.defines);
         this.definitionFloat.push('float fa_' + material._id + '() {\n '  + compiled.glsl + ' \n}');
         this.applicationFloat.push('if (int(abs(ID)) == ' + material._id + ') return fa_' + material._id  + '();');
     }
 
-    if (type == 'vec3') {
+    if (type === 'vec3') {
         this.definitionVec3.push(material.defines);
         this.definitionVec3.push('vec3 fa_' + material._id + '() {\n '  + compiled.glsl + ' \n}');
         this.applicationVec3.push('if (int(abs(ID.x)) == ' + material._id + ') return fa_' + material._id + '();');
     }
 
-    if (type == 'vec4') {
+    if (type === 'vec4') {
         this.definitionVec4.push(material.defines);
         this.definitionVec4.push('vec4 fa_' + material._id + '() {\n '  + compiled.glsl + ' \n}');
         this.applicationVec4.push('if (int(abs(ID.x)) == ' + material._id + ') return fa_' + material._id + '();');
     }
 
-    if (type == 'vert') {
+    if (type === 'vert') {
         this.definitionVert.push(material.defines);
         this.definitionVert.push('vec3 fa_' + material._id + '() {\n '  + compiled.glsl + ' \n}');
         this.applicationVert.push('if (int(abs(ID.x)) == ' + material._id + ') return fa_' + material._id + '();');
@@ -214,19 +216,12 @@ Program.prototype.registerMaterial = function registerMaterial(name, material) {
  * @return {Program} Current program.
  */
 Program.prototype.resetProgram = function resetProgram() {
-    var vsChunkDefines = [];
-    var vsChunkApplies = [];
-    var fsChunkDefines = [];
-    var fsChunkApplies = [];
-
     var vertexHeader = [header];
     var fragmentHeader = [header];
 
     var fragmentSource;
     var vertexSource;
-    var material;
     var program;
-    var chunk;
     var name;
     var value;
     var i;
@@ -373,7 +368,6 @@ Program.prototype.setUniforms = function (uniformNames, uniformValue) {
     var location;
     var value;
     var name;
-    var flag;
     var len;
     var i;
 

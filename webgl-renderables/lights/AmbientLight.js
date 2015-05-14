@@ -40,7 +40,7 @@ var Light = require('./Light');
 function AmbientLight(node) {
     Light.call(this, node);
     this.commands.color = 'GL_AMBIENT_LIGHT';
-};
+}
 
 /**
 * Returns the definition of the Class: 'AmbientLight'

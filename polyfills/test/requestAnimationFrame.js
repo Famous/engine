@@ -22,6 +22,8 @@
  * THE SOFTWARE.
  */
 
+'use strict';
+
 var rAF = require('../requestAnimationFrame');
 var test = require('tape');
 

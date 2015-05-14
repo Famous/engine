@@ -52,13 +52,13 @@ function _request(pool, Constructor) {
     return function request() {
         if (pool.length !== 0) return pool.pop();
         else return new Constructor();
-    }
+    };
 }
 
 function _free(pool) {
     return function free(obj) {
         pool.push(obj);
-    }
+    };
 }
 
 /**

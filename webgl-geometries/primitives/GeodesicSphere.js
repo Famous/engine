@@ -56,7 +56,7 @@ function GeodesicSphere (options) {
 
     vertices = GeometryHelper.normalizeAll(vertices);
 
-    var options = options || {};
+    options = options || {};
     var detail  = options.detail || 3;
 
     while(--detail) GeometryHelper.subdivideSpheroid(vertices, indices);

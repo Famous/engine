@@ -55,7 +55,7 @@ test('Texture', function(t) {
         t.equals(testingContext.bindTexture.callCount, 3, 'should call the bindTexture method on the context');
 
         texture.bind(5);
-        t.equals(testingContext.activeTexture.history[3][0], 33989, 'should call activeTexture with correct texture slot')
+        t.equals(testingContext.activeTexture.history[3][0], 33989, 'should call activeTexture with correct texture slot');
 
         t.end();
     });
@@ -72,7 +72,7 @@ test('Texture', function(t) {
         t.equals(testingContext.bindTexture.callCount, 3, 'should call the bindTexture method on the context');
 
         texture.unbind(5);
-        t.equal(testingContext.activeTexture.history[3][0], 33989, 'should call activeTexture with correct texture slot')
+        t.equal(testingContext.activeTexture.history[3][0], 33989, 'should call activeTexture with correct texture slot');
 
         t.end();
     });
@@ -99,7 +99,7 @@ test('Texture', function(t) {
 
         t.ok(texture.readBack instanceof Function, 'should have a readBack method');
 
-        var returned = texture.readBack();
+        texture.readBack();
 
         t.ok(testingContext.createFramebuffer.callCount === 1, 'should call createFrameBuffer on the context');
         t.ok(testingContext.bindFramebuffer.callCount === 1, 'should call bindFramebuffer on the context');
@@ -128,7 +128,7 @@ test('Texture', function(t) {
             'should use input values as arguments to readBack'
         );
 
-        t.equal(testingContext.readPixels.history[1][6].length, width * height * 4, 'should pass an array of width length of width * height * 4 into readPixels')
+        t.equal(testingContext.readPixels.history[1][6].length, width * height * 4, 'should pass an array of width length of width * height * 4 into readPixels');
 
         t.end();
     });

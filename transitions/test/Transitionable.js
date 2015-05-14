@@ -234,7 +234,7 @@ test('Transitionable', function(t) {
         time = 500;
         t.equal(transitionable.get(), 1);
         t.equal(transitionable.get(), 2);
-        t.ok(test1)
+        t.ok(test1);
         time = 1000;
         t.equal(transitionable.get(), 3);
         t.ok(test2);

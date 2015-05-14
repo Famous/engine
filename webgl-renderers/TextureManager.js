@@ -62,7 +62,7 @@ TextureManager.prototype.update = function update(time) {
             }
         }
     }
-}
+};
 
 TextureManager.prototype.register = function register(input, slot) {
     var source = input.data;
@@ -119,11 +119,11 @@ TextureManager.prototype.register = function register(input, slot) {
             source: source,
             id: textureId,
             slot: slot
-        }
+        };
     }
 
     return textureId;
-}
+};
 
 /**
  * Loads an image from a string or Image object and executes a callback function.
@@ -168,6 +168,6 @@ TextureManager.prototype.bindTexture = function bindTexture(id) {
         spec.texture.setImage(spec.source);
         this._needsResample[spec.id] = false;
     }
-}
+};
 
 module.exports = TextureManager;

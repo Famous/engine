@@ -37,12 +37,12 @@ function Compositor() {
     this._contexts = {};
     this._outCommands = [];
     this._inCommands = [];
-    this._time = null
+    this._time = null;
 
     this._resized = false;
 
     var _this = this;
-    window.addEventListener('resize', function(ev) {
+    window.addEventListener('resize', function() {
         _this._resized = true;
     });
 }

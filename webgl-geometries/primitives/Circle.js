@@ -40,7 +40,7 @@ var GeometryHelper = require('../GeometryHelper');
  * @return {Object} constructed geometry
  */
 function Circle (options) {
-    var options  = options || {};
+    options  = options || {};
     var detail   = options.detail || 30;
     var buffers  = getCircleBuffers(detail, true);
 
@@ -67,8 +67,7 @@ function getCircleTexCoords (vertices) {
 
     for (var i = 0; i < nFaces; i++) {
         var x = vertices[i * 3],
-            y = vertices[i * 3 + 1],
-            z = vertices[i * 3 + 2];
+            y = vertices[i * 3 + 1];
 
         textureCoords.push(0.5 + x * 0.5, 0.5 + -y * 0.5);
     }
@@ -88,7 +87,6 @@ function getCircleTexCoords (vertices) {
  * @return {Object} constructed geometry
  */
 function getCircleBuffers(detail) {
-    var detail = detail;
     var vertices = [0, 0, 0];
     var indices = [];
     var counter = 1;

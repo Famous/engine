@@ -40,7 +40,7 @@ function PointLight(node) {
     Light.call(this, node);
     this.commands.position = 'GL_LIGHT_POSITION';
     this.onTransformChange(node.getTransform());
-};
+}
 
 /**
 * Returns the definition of the Class: 'PointLight'

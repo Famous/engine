@@ -49,8 +49,6 @@ test('Context', function(t) {
 
     t.test('draw method', function(t) {
         var context = new Context('body');
-        var dummyRenderers = [];
-        var drawCallsIssued = 0;
 
         context.DOMRenderer = { draw: function() { this.wasDrawn = true; } };
         context.WebGLRenderer = { draw: function() { this.wasDrawn = true; } };

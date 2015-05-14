@@ -22,6 +22,8 @@
  * THE SOFTWARE.
  */
 
+/*jshint -W079 */
+
 'use strict';
 
 var MouseEvent = require('./MouseEvent');

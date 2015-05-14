@@ -40,7 +40,7 @@ var GeometryHelper = require('../GeometryHelper');
  * @return {Object} constructed geometry
  */
 function ParametricCone (options) {
-    var options  = options || {};
+    options  = options || {};
     var detail   = options.detail || 15;
     var radius   = options.radius || 1 / Math.PI;
 
@@ -79,6 +79,6 @@ ParametricCone.generator = function generator(r, u, v, pos) {
     pos[0] = -r * u * Math.cos(v);
     pos[1] = r * u * Math.sin(v);
     pos[2] = -u / (Math.PI / 2) + 1;
-}
+};
 
 module.exports = ParametricCone;

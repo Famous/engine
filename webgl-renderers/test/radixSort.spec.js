@@ -28,11 +28,11 @@ var sort = require('../radixSort');
 
 test('radixSort', function(t) {
     var source = [];
-    while (source.length < 1e3) source.push((.5 - Math.random()) * 100)
+    while (source.length < 1e3) source.push((.5 - Math.random()) * 100);
     var test = sort(source.slice());
-    var reference = source.slice().sort(function (a, b) { return a - b });
+    var reference = source.slice().sort(function (a, b) { return a - b; });
 
-    assert(checkSorted(test));;
+    assert(checkSorted(test));
     assert(reference.join('') === reference.join(''));
 
     function checkSorted (test){

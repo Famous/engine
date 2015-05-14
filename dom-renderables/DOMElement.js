@@ -103,8 +103,6 @@ function DOMElement (node, options) {
 
     if (!options) return;
 
-    var key;
-
     if (options.classes) {
         for (var i = 0; i < options.classes.length; i++)
             this.addClass(options.classes[i]);

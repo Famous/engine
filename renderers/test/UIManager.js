@@ -73,10 +73,10 @@ test('UIManager', function(t) {
         };
         var compositor = {
             drawCommands: function() {
-                actions.push(['drawCommands'])
+                actions.push(['drawCommands']);
             },
             clearCommands: function() {
-                actions.push(['clearCommands'])
+                actions.push(['clearCommands']);
             }
         };
         var uiManager = new UIManager(thread, compositor, {
