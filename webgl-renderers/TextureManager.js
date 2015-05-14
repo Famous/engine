@@ -25,7 +25,6 @@
 
 var Texture = require('./Texture');
 var createCheckerboard = require('./createCheckerboard');
-var Clock = null;
 
 /**
  * Handles loading, binding, and resampling of textures for WebGLRenderer.
