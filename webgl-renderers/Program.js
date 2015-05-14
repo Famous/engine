@@ -69,9 +69,9 @@ var uniforms = keyValueToArrays({
     u_resolution: [0, 0, 0],
     u_transform: identityMatrix,
     u_size: [1, 1, 1],
-    u_time: [0],
-    u_opacity: [1],
-    u_metalness: [0],
+    u_time: 0,
+    u_opacity: 1,
+    u_metalness: 0,
     u_glossiness: [0, 0, 0, 0],
     u_baseColor: [1, 1, 1, 1],
     u_normals: [1, 1, 1],
@@ -79,8 +79,8 @@ var uniforms = keyValueToArrays({
     u_lightPosition: identityMatrix,
     u_lightColor: identityMatrix,
     u_ambientLight: [0, 0, 0],
-    u_flatShading: [0],
-    u_numLights: [0]
+    u_flatShading: 0,
+    u_numLights: 0
 });
 
 /**
@@ -403,7 +403,7 @@ Program.prototype.setUniforms = function (uniformNames, uniformValue) {
         }
 
         // Call uniform setter function on WebGL context with correct value
-        if (this.uniformTypes[name] === 'uniform1fv') console.log(name);
+
         switch (this.uniformTypes[name]) {
             case 'uniform4fv':  gl.uniform4fv(location, value); break;
             case 'uniform3fv':  gl.uniform3fv(location, value); break;
@@ -412,7 +412,6 @@ Program.prototype.setUniforms = function (uniformNames, uniformValue) {
             case 'uniform1f' :  gl.uniform1f(location, value); break;
             case 'uniformMatrix3fv': gl.uniformMatrix3fv(location, false, value); break;
             case 'uniformMatrix4fv': gl.uniformMatrix4fv(location, false, value); break;
-            default: throw 'wat';
         }
     }
 
