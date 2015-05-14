@@ -229,10 +229,11 @@ Node.prototype.getValue = function getValue () {
     };
 
     for (; i < numberOfChildren ; i++)
-        value.children[i] = this._children[i].getValue();
+        if (this._children[i] && this._children[i].getValue)
+            value.children[i] = this._children[i].getValue();
 
     for (i = 0 ; i < numberOfComponents ; i++)
-        if (this._components[i].getValue)
+        if (this._components[i] && this._components[i].getValue)
             value.components[i] = this._components[i].getValue();
 
     return value;
@@ -561,7 +562,7 @@ Node.prototype.addUIEvent = function addUIEvent (eventName) {
         UIEvents.push(eventName);
         for (var i = 0, len = components.length ; i < len ; i++) {
             component = components[i];
-            if (component.onAddUIEvent) component.onAddUIEvent(eventName);
+            if (component && component.onAddUIEvent) component.onAddUIEvent(eventName);
         }
     }
     return added;
@@ -1166,7 +1167,7 @@ Node.prototype.mount = function mount (parent, myId) {
 
     for (; i < len ; i++) {
         item = list[i];
-        if (item.onMount) item.onMount(this, i);
+        if (item && item.onMount) item.onMount(this, i);
     }
 
     i = 0;
@@ -1174,7 +1175,7 @@ Node.prototype.mount = function mount (parent, myId) {
     len = list.length;
     for (; i < len ; i++) {
         item = list[i];
-        if (item.onParentMount) item.onParentMount(this, myId, i);
+        if (item && item.onParentMount) item.onParentMount(this, myId, i);
     }
 
     if (this._requestingUpdate) this._requestUpdate(true);
@@ -1200,7 +1201,7 @@ Node.prototype.dismount = function dismount () {
 
     for (; i < len ; i++) {
         item = list[i];
-        if (item.onDismount) item.onDismount();
+        if (item && item.onDismount) item.onDismount();
     }
 
     i = 0;
@@ -1208,7 +1209,7 @@ Node.prototype.dismount = function dismount () {
     len = list.length;
     for (; i < len ; i++) {
         item = list[i];
-        if (item.onParentDismount) item.onParentDismount();
+        if (item && item.onParentDismount) item.onParentDismount();
     }
 
     if (!this._requestingUpdate) this._requestUpdate();
