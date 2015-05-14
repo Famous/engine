@@ -33,7 +33,6 @@ module.exports = {
     KeyCodes: require('./KeyCodes'),
     keyValueToArrays: require('./keyValueToArrays'),
     loadURL: require('./loadURL'),
-    MethodStore: require('./MethodStore'),
     ObjectManager: require('./ObjectManager'),
     strip: require('./strip'),
     vendorPrefix: require('./vendorPrefix')
