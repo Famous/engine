@@ -121,6 +121,7 @@ function Program(gl, options) {
     this.registeredMaterials = {};
     this.flaggedUniforms = [];
     this.cachedUniforms  = {};
+    this.uniformTypes = [];
 
     this.definitionVec4 = [];
     this.definitionVec3 = [];
@@ -228,6 +229,8 @@ Program.prototype.resetProgram = function resetProgram() {
 
     this.uniformLocations   = [];
     this.attributeLocations = {};
+
+    this.uniformTypes = {};
 
     this.attributeNames = clone(attributes.keys);
     this.attributeValues = clone(attributes.values);
@@ -395,25 +398,43 @@ Program.prototype.setUniforms = function (uniformNames, uniformValue) {
         // Determine the correct function and pass the uniform
         // value to WebGL.
 
-        if (Array.isArray(value) || value instanceof Float32Array) {
-            switch (value.length) {
-                case 4:  gl.uniform4fv(location, value); break;
-                case 3:  gl.uniform3fv(location, value); break;
-                case 2:  gl.uniform2fv(location, value); break;
-                case 16: gl.uniformMatrix4fv(location, false, value); break;
-                case 1:  gl.uniform1fv(location, value); break;
-                case 9:  gl.uniformMatrix3fv(location, false, value); break;
-                default: throw 'cant load uniform "' + name + '" with value:' + JSON.stringify(value);
-            }
+        if (!this.uniformTypes[name]) {
+            this.uniformTypes[name] = this.getUniformTypeFromValue(value);
         }
-        else if (! isNaN(parseFloat(value)) && isFinite(value)) {
-            gl.uniform1f(location, value);
-        }
-        else {
-            throw 'set uniform "' + name + '" to invalid type :' + value;
+
+        // Call uniform setter function on WebGL context with correct value
+        if (this.uniformTypes[name] === 'uniform1fv') console.log(name);
+        switch (this.uniformTypes[name]) {
+            case 'uniform4fv':  gl.uniform4fv(location, value); break;
+            case 'uniform3fv':  gl.uniform3fv(location, value); break;
+            case 'uniform2fv':  gl.uniform2fv(location, value); break;
+            case 'uniform1fv':  gl.uniform1fv(location, value); break;
+            case 'uniform1f' :  gl.uniform1f(location, value); break;
+            case 'uniformMatrix3fv': gl.uniformMatrix3fv(location, false, value); break;
+            case 'uniformMatrix4fv': gl.uniformMatrix4fv(location, false, value); break;
+            default: throw 'wat';
         }
     }
+
     return this;
+};
+
+Program.prototype.getUniformTypeFromValue = function getUniformTypeFromValue(value) {
+    if (Array.isArray(value) || value instanceof Float32Array) {
+        switch (value.length) {
+            case 1:  return 'uniform1fv';
+            case 2:  return 'uniform2fv';
+            case 3:  return 'uniform3fv';
+            case 4:  return 'uniform4fv';
+            case 9:  return 'uniformMatrix3fv';
+            case 16: return 'uniformMatrix4fv';
+        }
+    }
+    else if (!isNaN(parseFloat(value)) && isFinite(value)) {
+        return 'uniform1f';
+    }
+    
+    throw 'cant load uniform "' + name + '" with value:' + JSON.stringify(value);
 };
 
 /**
