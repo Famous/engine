@@ -244,7 +244,7 @@ WebGLRenderer.prototype.getOrSetCutout = function getOrSetCutout(path) {
     else {
         var uniforms = keyValueToArrays({
             u_opacity: 0,
-            u_transform: identity,
+            u_transform: identity.slice(),
             u_size: [0, 0, 0],
             u_origin: [0, 0, 0],
             u_baseColor: [0, 0, 0, 1]
@@ -290,7 +290,14 @@ WebGLRenderer.prototype.setCutoutUniform = function setCutoutUniform(path, unifo
 
     var index = cutout.uniformKeys.indexOf(uniformName);
 
-    cutout.uniformValues[index] = uniformValue;
+    if (Array.isArray(uniformValue)) {
+        for (var i = 0, len = uniformValue.length; i < len; i++) {
+            cutout.uniformValues[index][i] = uniformValue[i];
+        }
+    }
+    else {
+        cutout.uniformValues[index] = uniformValue;
+    }
 };
 
 /**
