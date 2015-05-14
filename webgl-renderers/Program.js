@@ -418,6 +418,16 @@ Program.prototype.setUniforms = function (uniformNames, uniformValue) {
     return this;
 };
 
+/**
+ * Infers uniform setter function to be called on the WebGL context, based
+ * on an input value.
+ *
+ * @method getUniformTypeFromValue
+ *
+ * @param {Number | Array} value Value from which uniform type is inferred.
+ *
+ * @return {String} Name of uniform function for given value.
+ */
 Program.prototype.getUniformTypeFromValue = function getUniformTypeFromValue(value) {
     if (Array.isArray(value) || value instanceof Float32Array) {
         switch (value.length) {
