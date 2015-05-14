@@ -38,4 +38,8 @@ function FocusEvent(ev) {
 FocusEvent.prototype = Object.create(UIEvent.prototype);
 FocusEvent.prototype.constructor = FocusEvent;
 
+FocusEvent.prototype.toString = function toString () {
+    return 'FocusEvent';
+};
+
 module.exports = FocusEvent;

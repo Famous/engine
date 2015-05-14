@@ -54,4 +54,8 @@ function WheelEvent(ev) {
 WheelEvent.prototype = Object.create(MouseEvent.prototype);
 WheelEvent.prototype.constructor = WheelEvent;
 
+WheelEvent.prototype.toString = function toString () {
+    return 'WheelEvent';
+};
+
 module.exports = WheelEvent;

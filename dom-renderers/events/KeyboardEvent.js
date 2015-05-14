@@ -66,4 +66,8 @@ function KeyboardEvent(ev) {
 KeyboardEvent.prototype = Object.create(UIEvent.prototype);
 KeyboardEvent.prototype.constructor = KeyboardEvent;
 
+KeyboardEvent.prototype.toString = function toString () {
+    return 'KeyboardEvent';
+};
+
 module.exports = KeyboardEvent;

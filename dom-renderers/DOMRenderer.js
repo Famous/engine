@@ -125,25 +125,37 @@ DOMRenderer.prototype.subscribe = function subscribe(type, preventDefault) {
  * @param  {Event} ev  DOM Event payload.
  */
 DOMRenderer.prototype._triggerEvent = function _triggerEvent(ev) {
+    // Use ev.path, which is an array of Elements (polyfilled if needed).
     var evPath = ev.path ? ev.path : _getPath(ev);
+    // First element in the path is the element on which the event has actually
+    // been emitted.
     for (var i = 0; i < evPath.length; i++) {
+        // Skip nodes that don't have a dataset property or data-fa-path
+        // attribute.
         if (!evPath[i].dataset) continue;
         var path = evPath[i].dataset.faPath;
         if (!path) continue;
         
+        // Stop further event propogation and path traversal as soon as the
+        // first ElementCache subscribing for the emitted event has been found.
         if (this._elements[path].subscribe[ev.type]) {
             ev.stopPropagation();
 
+            // Optionally preventDefault. This needs forther consideration and
+            // should be optional. Eventually this should be a separate command/
+            // method.
             if (this._elements[path].preventDefault[ev.type]) {
                 ev.preventDefault();
             }
-    
-            var normalizedEvent = eventMap[ev.type][0];
-            normalizedEvent.proxy(ev);
-            this._compositor.sendEvent(path, ev.type, normalizedEvent);
+
+            var NormalizedEventConstructor = eventMap[ev.type][0];
+
+            // Finally send the event to the Worker Thread through the
+            // compositor.
+            this._compositor.sendEvent(path, ev.type, new NormalizedEventConstructor(ev));
+
+            break;
         }
-        
-        break;
     }
 };
 
