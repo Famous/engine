@@ -80,7 +80,7 @@ Light.prototype.setColor = function setColor(color) {
 * @method getColor
 * @returns {Color} Color.
 */
-Light.prototype.getColor = function getColor(option) {
+Light.prototype.getColor = function getColor() {
     return this._color;
 };
 
