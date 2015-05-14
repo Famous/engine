@@ -13,22 +13,6 @@ function Pool() {
     this._allocated = [];
 }
 
-
-/**
- * Used for mutating the internal map of deallocated objects.
- * 
- * @method  deallocate
- *  
- * @param  {Object} object          A previously via `Pool#allocate` allocated
- *                                  object.
- */ 
-Pool.prototype.deallocate = function deallocate(object) {
-    var id = object.toString();
-    this._deallocated[id] = this._deallocated[id] || [];
-    this._deallocated[id].push(object);
-};
-
-
 /**
  * Allocates a new object. If an object of the same class is available
  * ("allocated"), it will be recycled, otherwise a new object is being
@@ -53,7 +37,7 @@ Pool.prototype.allocate = function allocate(Constructor, options) {
         object = new Constructor(options);
     } else {
         object = this._deallocated[id].pop();
-        Constructor.call(object, options);
+        if (options) Constructor.call(object, options);
     }
     
     this._allocated.push(object);
@@ -68,7 +52,10 @@ Pool.prototype.allocate = function allocate(Constructor, options) {
  */ 
 Pool.prototype.deallocateAll = function deallocateAll() {
     for (var i = 0; i < this._allocated.length; i++) {
-        this.deallocate(this._allocated[i]);
+        var object = this._allocated[i];
+        var id = object.toString();
+        this._deallocated[id] = this._deallocated[id] || [];
+        this._deallocated[id].push(object);
     }
     this._allocated.length = 0;
 };
