@@ -24,7 +24,7 @@
 'use strict';
 
 var Texture = require('./Texture');
-var Checkerboard = require('./Checkerboard');
+var createCheckerboard = require('./createCheckerboard');
 var Clock = null;
 
 /**
@@ -41,6 +41,8 @@ function TextureManager(gl) {
 
     this._activeTexture = 0;
     this._boundTexture = null;
+    
+    this._checkerboard = createCheckerboard();
 
     this.gl = gl;
 }
@@ -72,7 +74,7 @@ TextureManager.prototype.register = function register(input, slot) {
     if (!texture) {
 
         texture = new Texture(this.gl, options);
-        texture.setImage(Checkerboard);
+        texture.setImage(this._checkerboard);
 
         // Handle array
 

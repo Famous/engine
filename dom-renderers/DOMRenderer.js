@@ -29,7 +29,7 @@ var math = require('./Math');
 var vendorPrefix = require('../utilities/vendorPrefix');
 var eventMap = require('./events/EventMap');
 
-var TRANSFORM = vendorPrefix('transform');
+var TRANSFORM = null;
 
 /**
  * DOMRenderer is a class responsible for adding elements
@@ -45,6 +45,7 @@ var TRANSFORM = vendorPrefix('transform');
  * @param {Compositor}
  */
 function DOMRenderer (element, selector, compositor) {
+    TRANSFORM = TRANSFORM || vendorPrefix('transform');
     this._compositor = compositor; // a reference to the compositor
 
     this._target = null; // a register for holding the current

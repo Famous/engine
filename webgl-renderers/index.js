@@ -27,7 +27,7 @@
 module.exports = {
     Buffer: require('./Buffer'),
     BufferRegistry: require('./BufferRegistry'),
-    Checkerboard: require('./Checkerboard'),
+    createCheckerboard: require('./createCheckerboard'),
     Program: require('./Program'),
     WebGLRenderer: require('./WebGLRenderer'),
     Texture: require('./Texture')
