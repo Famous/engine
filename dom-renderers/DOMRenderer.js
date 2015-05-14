@@ -28,7 +28,6 @@ var ElementCache = require('./ElementCache');
 var math = require('./Math');
 var vendorPrefix = require('../utilities/vendorPrefix');
 var eventMap = require('./events/EventMap');
-var Pool = require('../utilities/Pool');
 
 var TRANSFORM = null;
 
@@ -81,8 +80,6 @@ function DOMRenderer (element, selector, compositor) {
     this._VPtransform = new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
 
     this._size = [null, null];
-    
-    this._eventPool = new Pool();
 }
 
 
@@ -153,13 +150,9 @@ DOMRenderer.prototype._triggerEvent = function _triggerEvent(ev) {
 
             var NormalizedEventConstructor = eventMap[ev.type][0];
 
-            // Proxy the native event properties onto the pooled, normalized
-            // event.
-            var normalizedEvent = this._eventPool.allocate(NormalizedEventConstructor, ev);
-
             // Finally send the event to the Worker Thread through the
             // compositor.
-            this._compositor.sendEvent(path, ev.type, normalizedEvent);
+            this._compositor.sendEvent(path, ev.type, new NormalizedEventConstructor(ev));
 
             break;
         }
@@ -223,7 +216,6 @@ DOMRenderer.prototype._getSize = DOMRenderer.prototype.getSize;
  * @return {type}             description
  */
 DOMRenderer.prototype.draw = function draw (renderState) {
-    this._eventPool.deallocateAll();
     if (renderState.perspectiveDirty) {
         this.perspectiveDirty = true;
 

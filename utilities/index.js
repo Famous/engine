@@ -34,7 +34,6 @@ module.exports = {
     keyValueToArrays: require('./keyValueToArrays'),
     loadURL: require('./loadURL'),
     ObjectManager: require('./ObjectManager'),
-    Pool: require('./Pool'),
     strip: require('./strip'),
     vendorPrefix: require('./vendorPrefix')
 };
