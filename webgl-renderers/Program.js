@@ -50,14 +50,14 @@ var inputTypes = {
     u_baseColor: 'vec4',
     u_normals: 'vert',
     u_glossiness: 'vec4',
-    u_metalness: 'float',
     u_positionOffset: 'vert'
 };
 
 var masks =  {
     vert: 1,
     vec3: 2,
-    float: 4
+    vec4: 4,
+    float: 8
 };
 
 /**

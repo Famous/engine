@@ -68,19 +68,31 @@ TextureManager.prototype.register = function register(input, slot) {
     var textureId = input.id;
     var options = input.options || {};
     var texture = this.registry[textureId];
-    var isLoaded = false;
+    var spec;
 
     if (!texture) {
 
         texture = new Texture(this.gl, options);
         texture.setImage(this._checkerboard);
 
+        // Add texture to registry
+
+        spec = this.registry[textureId] = {
+            resampleRate: options.resampleRate || null,
+            lastResample: null,
+            isLoaded: false,
+            texture: texture,
+            source: source,
+            id: textureId,
+            slot: slot
+        };
+
         // Handle array
 
         if (Array.isArray(source) || source instanceof Uint8Array || source instanceof Float32Array) {
             this.bindTexture(textureId);
             texture.setArray(source);
-            isLoaded = true;
+            spec.isLoaded = true;
         }
 
         // Handle video
@@ -90,10 +102,9 @@ TextureManager.prototype.register = function register(input, slot) {
                 this.bindTexture(textureId);
                 texture.setImage(source);
 
-                this.registry[textureId].isLoaded = true;
-                this.registry[textureId].source = source;
+                spec.isLoaded = true;
+                spec.source = source;
             }.bind(this));
-
         }
 
         // Handle image url
@@ -103,22 +114,10 @@ TextureManager.prototype.register = function register(input, slot) {
                 this.bindTexture(textureId);
                 texture.setImage(img);
 
-                this.registry[textureId].isLoaded = true;
-                this.registry[textureId].source = img;
+                spec.isLoaded = true;
+                spec.source = img;
             }.bind(this));
         }
-
-        // Add texture to registry
-
-        this.registry[textureId] = {
-            resampleRate: options.resampleRate || null,
-            lastResample: null,
-            isLoaded: isLoaded,
-            texture: texture,
-            source: source,
-            id: textureId,
-            slot: slot
-        };
     }
 
     return textureId;
