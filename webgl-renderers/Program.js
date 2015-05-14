@@ -47,11 +47,11 @@ var TYPES = {
 };
 
 var inputTypes = {
-    baseColor: 'vec4',
-    u_Normals: 'vert',
-    glossiness: 'vec4',
-    metalness: 'float',
-    positionOffset: 'vert'
+    u_baseColor: 'vec4',
+    u_normals: 'vert',
+    u_glossiness: 'vec4',
+    u_metalness: 'float',
+    u_positionOffset: 'vert'
 };
 
 var masks =  {
@@ -64,42 +64,42 @@ var masks =  {
  * Uniform keys and values
  */
 var uniforms = keyValueToArrays({
-    perspective: identityMatrix,
-    view: identityMatrix,
-    resolution: [0, 0, 0],
-    transform: identityMatrix,
-    size: [1, 1, 1],
-    time: [0],
-    opacity: [1],
-    metalness: [0],
-    glossiness: [0, 0, 0, 0],
-    baseColor: [1, 1, 1, 1],
-    u_Normals: [1, 1, 1],
-    positionOffset: [0, 0, 0],
-    u_LightPosition: identityMatrix,
-    u_LightColor: identityMatrix,
-    u_AmbientLight: [0, 0, 0],
-    u_FlatShading: [0],
-    u_NumLights: [0]
+    u_perspective: identityMatrix,
+    u_view: identityMatrix,
+    u_resolution: [0, 0, 0],
+    u_transform: identityMatrix,
+    u_size: [1, 1, 1],
+    u_time: [0],
+    u_opacity: [1],
+    u_metalness: [0],
+    u_glossiness: [0, 0, 0, 0],
+    u_baseColor: [1, 1, 1, 1],
+    u_normals: [1, 1, 1],
+    u_positionOffset: [0, 0, 0],
+    u_lightPosition: identityMatrix,
+    u_lightColor: identityMatrix,
+    u_ambientLight: [0, 0, 0],
+    u_flatShading: [0],
+    u_numLights: [0]
 });
 
 /**
  * Attributes keys and values
  */
 var attributes = keyValueToArrays({
-    pos: [0, 0, 0],
-    texCoord: [0, 0],
-    normals: [0, 0, 0]
+    a_pos: [0, 0, 0],
+    a_texCoord: [0, 0],
+    a_normals: [0, 0, 0]
 });
 
 /**
  * Varyings keys and values
  */
 var varyings = keyValueToArrays({
-    v_TextureCoordinate: [0, 0],
-    v_Normal: [0, 0, 0],
-    v_Position: [0, 0, 0],
-    v_EyeVector: [0, 0, 0]
+    v_textureCoordinate: [0, 0],
+    v_normal: [0, 0, 0],
+    v_position: [0, 0, 0],
+    v_eyeVector: [0, 0, 0]
 });
 
 /**
@@ -241,10 +241,10 @@ Program.prototype.resetProgram = function resetProgram() {
     this.flaggedUniforms = [];
     this.cachedUniforms = {};
 
-    fragmentHeader.push('uniform sampler2D u_Textures[7];\n');
+    fragmentHeader.push('uniform sampler2D u_textures[7];\n');
 
     if (this.applicationVert.length) {
-        vertexHeader.push('uniform sampler2D u_Textures[7];\n');
+        vertexHeader.push('uniform sampler2D u_textures[7];\n');
     }
 
     for(i = 0; i < this.uniformNames.length; i++) {
@@ -301,7 +301,7 @@ Program.prototype.resetProgram = function resetProgram() {
 
     this.setUniforms(this.uniformNames, this.uniformValues);
 
-    var textureLocation = this.gl.getUniformLocation(this.program, 'u_Textures[0]');
+    var textureLocation = this.gl.getUniformLocation(this.program, 'u_textures[0]');
     this.gl.uniform1iv(textureLocation, [0, 1, 2, 3, 4, 5, 6]);
 
     return this;

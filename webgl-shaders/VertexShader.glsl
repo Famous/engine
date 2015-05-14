@@ -44,7 +44,7 @@ vec4 applyTransform(vec4 pos) {
      * transform as state on the mesh object in WebGLRenderer. Multiplies the object's transformation from object space
      * to world space with its transformation from world space to eye space.
      */
-    mat4 MVMatrix = view * transform;
+    mat4 MVMatrix = u_view * u_transform;
 
     //TODO: move the origin, sizeScale and y axis inversion to application code in order to amortize redundant per-vertex calculations.
 
@@ -94,7 +94,7 @@ vec4 applyTransform(vec4 pos) {
      *
      * in the transform chain: projection * view * modelTransform * invertYAxis * sizeScale * origin * positionVector.
      */
-    pos.xyz *= size * 0.5;
+    pos.xyz *= u_size * 0.5;
 
     /**
      * Inverts the object space's y axis in order to match DOM space conventions. 
@@ -115,7 +115,7 @@ vec4 applyTransform(vec4 pos) {
      * since light position and direction is derived from the scene graph, calculated in DOM space.
      */
 
-    v_Position = (MVMatrix * pos).xyz;
+    v_position = (MVMatrix * pos).xyz;
 
     /**
     * Exporting the eye vector (a vector from the center of the screen) as a varying, to be used for lighting calculations.
@@ -125,7 +125,7 @@ vec4 applyTransform(vec4 pos) {
     * the position from the center of the screen, i.e. half the resolution of the canvas).
     */
 
-    v_EyeVector = (resolution * 0.5) - v_Position;
+    v_eyeVector = (u_resolution * 0.5) - v_position;
 
     /**
      * Transforming the position (currently represented in dom space) into view space (with our dom space view transform)
@@ -134,7 +134,7 @@ vec4 applyTransform(vec4 pos) {
      * projection transform).
      */
 
-    pos = perspective * MVMatrix * pos;
+    pos = u_perspective * MVMatrix * pos;
 
     return pos;
 }
@@ -165,11 +165,10 @@ vec3 calculateOffset(vec3 ID) {
  *
  */
 void main() {
-    gl_PointSize = 10.0;
-    v_TextureCoordinate = texCoord;
-    vec3 invertedNormals = normals + (u_Normals.x < 0.0 ? calculateOffset(u_Normals) * 2.0 - 1.0 : vec3(0.0));
+    v_textureCoordinate = a_texCoord;
+    vec3 invertedNormals = a_normals + (u_normals.x < 0.0 ? calculateOffset(u_normals) * 2.0 - 1.0 : vec3(0.0));
     invertedNormals.y *= -1.0;
-    v_Normal = transpose(mat3(inverse(transform))) * invertedNormals;
-    vec3 offsetPos = pos + calculateOffset(positionOffset);
+    v_normal = transpose(mat3(inverse(u_transform))) * invertedNormals;
+    vec3 offsetPos = a_pos + calculateOffset(u_positionOffset);
     gl_Position = applyTransform(vec4(offsetPos, 1.0));
 }

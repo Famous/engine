@@ -127,7 +127,7 @@ Context.prototype.receive = function receive(pathArr, path, commands, iterator) 
                 this.DOMRenderer.setMatrix(this._meshTransform);
 
                 if (this.WebGLRenderer)
-                    this.WebGLRenderer.setCutoutUniform(path, 'transform', this._meshTransform);
+                    this.WebGLRenderer.setCutoutUniform(path, 'u_transform', this._meshTransform);
 
                 break;
 
@@ -139,7 +139,7 @@ Context.prototype.receive = function receive(pathArr, path, commands, iterator) 
                 if (this.WebGLRenderer) {
                     this._meshSize[0] = width;
                     this._meshSize[1] = height;
-                    this.WebGLRenderer.setCutoutUniform(path, 'size', this._meshSize);
+                    this.WebGLRenderer.setCutoutUniform(path, 'u_size', this._meshSize);
                 }
                 break;
 

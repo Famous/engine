@@ -37,13 +37,13 @@ var compileMaterial = require('./compileMaterial');
 var identity = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
 
 var globalUniforms = keyValueToArrays({
-    'u_NumLights': 0,
-    'u_AmbientLight': new Array(3),
-    'u_LightPosition': new Array(3),
-    'u_LightColor': new Array(3),
-    'perspective': new Array(16),
-    'time': 0,
-    'view': new Array(16)
+    'u_numLights': 0,
+    'u_ambientLight': new Array(3),
+    'u_lightPosition': new Array(3),
+    'u_lightColor': new Array(3),
+    'u_perspective': new Array(16),
+    'u_time': 0,
+    'u_view': new Array(16)
 });
 
 /**
@@ -110,7 +110,7 @@ function WebGLRenderer(canvas, compositor) {
         enabledAttributesKeys: []
     };
 
-    this.resolutionName = ['resolution'];
+    this.resolutionName = ['u_resolution'];
     this.resolutionValues = [];
 
     this.cachedSize = [];
@@ -131,10 +131,12 @@ function WebGLRenderer(canvas, compositor) {
     
     this.projectionTransform = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, -0.000001, 0, -1, 1, 0, 1];
 
+    // TODO: remove this hack
+
     var cutout = this.cutoutGeometry = new Plane();
-    this.bufferRegistry.allocate(cutout.id, 'pos', cutout.spec.bufferValues[0], 3);
-    this.bufferRegistry.allocate(cutout.id, 'texCoord', cutout.spec.bufferValues[1], 2);
-    this.bufferRegistry.allocate(cutout.id, 'normals', cutout.spec.bufferValues[2], 3);
+    this.bufferRegistry.allocate(cutout.id, 'a_pos', cutout.spec.bufferValues[0], 3);
+    this.bufferRegistry.allocate(cutout.id, 'a_texCoord', cutout.spec.bufferValues[1], 2);
+    this.bufferRegistry.allocate(cutout.id, 'a_normals', cutout.spec.bufferValues[2], 3);
     this.bufferRegistry.allocate(cutout.id, 'indices', cutout.spec.bufferValues[3], 1);
 }
 
@@ -195,15 +197,16 @@ WebGLRenderer.prototype.createLight = function createLight(path) {
  */
 WebGLRenderer.prototype.createMesh = function createMesh(path) {
     this.meshRegistryKeys.push(path);
+
     var uniforms = keyValueToArrays({
-        opacity: 1,
-        transform: identity,
-        size: [0, 0, 0],
-        baseColor: [0.5, 0.5, 0.5, 1],
-        positionOffset: [0, 0, 0],
-        u_Normals: [0, 0, 0],
-        u_FlatShading: 0,
-        glossiness: [0, 0, 0, 0]
+        u_opacity: 1,
+        u_transform: identity,
+        u_size: [0, 0, 0],
+        u_baseColor: [0.5, 0.5, 0.5, 1],
+        u_positionOffset: [0, 0, 0],
+        u_normals: [0, 0, 0],
+        u_flatShading: 0,
+        u_glossiness: [0, 0, 0, 0]
     });
     return this.meshRegistry[path] = {
         depth: null,
@@ -240,11 +243,11 @@ WebGLRenderer.prototype.getOrSetCutout = function getOrSetCutout(path) {
     }
     else {
         var uniforms = keyValueToArrays({
-            opacity: 0,
-            transform: identity,
-            size: [0, 0, 0],
-            origin: [0, 0, 0],
-            baseColor: [0, 0, 0, 1]
+            u_opacity: 0,
+            u_transform: identity.slice(),
+            u_size: [0, 0, 0],
+            u_origin: [0, 0, 0],
+            u_baseColor: [0, 0, 0, 1]
         });
 
         this.cutoutRegistryKeys.push(path);
@@ -287,7 +290,14 @@ WebGLRenderer.prototype.setCutoutUniform = function setCutoutUniform(path, unifo
 
     var index = cutout.uniformKeys.indexOf(uniformName);
 
-    cutout.uniformValues[index] = uniformValue;
+    if (Array.isArray(uniformValue)) {
+        for (var i = 0, len = uniformValue.length; i < len; i++) {
+            cutout.uniformValues[index][i] = uniformValue[i];
+        }
+    }
+    else {
+        cutout.uniformValues[index] = uniformValue;
+    }
 };
 
 /**
@@ -433,6 +443,7 @@ WebGLRenderer.prototype.setMeshUniform = function setMeshUniform(path, uniformNa
     var mesh = this.meshRegistry[path] || this.createMesh(path);
 
     var index = mesh.uniformKeys.indexOf(uniformName);
+
     if (index === -1) {
         mesh.uniformKeys.push(uniformName);
         mesh.uniformValues.push(uniformValue);
@@ -576,7 +587,7 @@ WebGLRenderer.prototype.setGlobalUniforms = function setGlobalUniforms(renderSta
     this.projectionTransform[11] = renderState.perspectiveTransform[11];
 
     globalUniforms.values[4] = this.projectionTransform;
-    globalUniforms.values[5] = this.compositor.getTime() % 100000 / 1000;
+    globalUniforms.values[5] = this.compositor.getTime() * 0.001;
     globalUniforms.values[6] = renderState.viewTransform;
 
     this.program.setUniforms(globalUniforms.keys, globalUniforms.values);

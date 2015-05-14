@@ -63,9 +63,9 @@ function Icosahedron() {
 
     return new Geometry({
         buffers: [
-            { name: 'pos', data: vertices },
-            { name: 'texCoord', data: textureCoords, size: 2 },
-            { name: 'normals', data: normals },
+            { name: 'a_pos', data: vertices },
+            { name: 'a_texCoord', data: textureCoords, size: 2 },
+            { name: 'a_normals', data: normals },
             { name: 'indices', data: indices, size: 1 }
         ]
     });

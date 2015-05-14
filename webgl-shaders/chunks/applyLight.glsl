@@ -29,25 +29,25 @@
  * @private
  *
  */
-vec4 applyLight(in vec4 baseColor, in vec3 normal, in vec4 gloss) {
-    int numLights = int(u_NumLights);
-    vec3 ambientColor = u_AmbientLight * baseColor.rgb;
-    vec3 eyeVector = normalize(v_EyeVector);
+vec4 applyLight(in vec4 baseColor, in vec3 normal, in vec4 glossiness) {
+    int numLights = int(u_numLights);
+    vec3 ambientColor = u_ambientLight * baseColor.rgb;
+    vec3 eyeVector = normalize(v_eyeVector);
     vec3 diffuse = vec3(0.0);
-    bool hasGlossiness = gloss.a > 0.0;
-    bool hasSpecularColor = length(gloss.rgb) > 0.0;
+    bool hasGlossiness = glossiness.a > 0.0;
+    bool hasSpecularColor = length(glossiness.rgb) > 0.0;
 
     for(int i = 0; i < 4; i++) {
         if (i >= numLights) break;
-        vec3 lightDirection = normalize(u_LightPosition[i].xyz - v_Position);
+        vec3 lightDirection = normalize(u_lightPosition[i].xyz - v_position);
         float lambertian = max(dot(lightDirection, normal), 0.0);
 
         if (lambertian > 0.0) {
-            diffuse += u_LightColor[i].rgb * baseColor.rgb * lambertian;
+            diffuse += u_lightColor[i].rgb * baseColor.rgb * lambertian;
             if (hasGlossiness) {
                 vec3 halfVector = normalize(lightDirection + eyeVector);
-                float specularWeight = pow(max(dot(halfVector, normal), 0.0), gloss.a);
-                vec3 specularColor = hasSpecularColor ? gloss.rgb : u_LightColor[i].rgb;
+                float specularWeight = pow(max(dot(halfVector, normal), 0.0), glossiness.a);
+                vec3 specularColor = hasSpecularColor ? glossiness.rgb : u_lightColor[i].rgb;
                 diffuse += specularColor * specularWeight * lambertian;
             }
         }
