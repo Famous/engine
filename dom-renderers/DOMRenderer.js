@@ -463,18 +463,16 @@ DOMRenderer.prototype.setAttribute = function setAttribute (name, value) {
 DOMRenderer.prototype.setContent = function setContent (content) {
     this._assertTargetLoaded();
     this.findChildren();
-
-    var i;
-
-    // TODO Temporary solution
-    for (i = 0 ; i < this._children.length ; i++) {
-        this._target.element.removeChild(this._children[i].element);
+    
+    if (!this._target.content) {
+        this._target.content = document.createElement('div');
+        this._target.content.style.position = 'absolute';
+        this._target.element.insertBefore(
+            this._target.content,
+            this._target.element.firstChild
+        );
     }
-
-    this._target.element.innerHTML = content;
-
-    for (i = 0 ; i < this._children.length ; i++)
-        this._target.element.appendChild(this._children[i].element);
+    this._target.content.innerHTML = content;
 };
 
 

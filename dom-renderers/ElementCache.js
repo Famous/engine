@@ -49,6 +49,7 @@ var ident = [
 function ElementCache (element, path) {
     this.element = element;
     this.path = path;
+    this.content = null;
     this.worldTransform = new Float32Array(ident);
     this.invertedParent = new Float32Array(ident);
     this.finalTransform = new Float32Array(ident);
