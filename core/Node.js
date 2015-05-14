@@ -513,7 +513,28 @@ Node.prototype.addComponent = function addComponent (component) {
             component.onShow();
     }
 
+    var i = 0;
+    var list = this._children;
+    var len = list.length;
+    var item;
+    for (; i < len ; i++) {
+        item = list[i];
+        if (item.onParentComponentRemove) item.onParentComponentRemove();
+    }
+
     return index;
+};
+
+Node.prototype.hasComponent = function hasComponent(Constructor) {
+    var i = 0;
+    var list = this._components;
+    var len = list.length;
+    var item;
+    for (; i < len ; i++) {
+        item = list[i];
+        if (item && item.constructor === Constructor) return true;
+    }
+    return false;
 };
 
 /**
@@ -548,6 +569,16 @@ Node.prototype.removeComponent = function removeComponent (component) {
 
         this._components[index] = null;
     }
+    
+    var i = 0;
+    var list = this._children;
+    var len = list.length;
+    var item;
+    for (; i < len ; i++) {
+        item = list[i];
+        if (item.onParentComponentRemove) item.onParentComponentRemove();
+    }
+    
     return component;
 };
 
@@ -1215,6 +1246,10 @@ Node.prototype.dismount = function dismount () {
     return this;
 };
 
+Node.prototype.parentMount = function parentMount (parent, parentId, index) {
+    return this.mount(parent, parentId + '/' + index);
+};
+
 /**
  * Function to be invoked by the parent as soon as the parent is
  * being mounted.
@@ -1225,9 +1260,7 @@ Node.prototype.dismount = function dismount () {
  * @param  {String} parentId    The parent id (path to parent).
  * @param  {Number} index       Id the node should be mounted to.
  */
-Node.prototype.onParentMount = function onParentMount (parent, parentId, index) {
-    return this.mount(parent, parentId + '/' + index);
-};
+Node.prototype.onParentMount = Node.prototype.parentMount;
 
 /**
  * Function to be invoked by the parent as soon as the parent is being
@@ -1237,6 +1270,46 @@ Node.prototype.onParentMount = function onParentMount (parent, parentId, index) 
  */
 Node.prototype.onParentDismount = function onParentDismount () {
     return this.dismount();
+};
+
+Node.prototype.parentComponentAdd = function parentComponentAdd(component, node) {
+    var i = 0;
+    var list = this._components;
+    var len = list.length;
+    var item;
+
+    for (; i < len ; i++) {
+        item = list[i];
+        if (item.onParentComponentAdd) item.onParentComponentAdd(component, node);
+    }
+
+    i = 0;
+    list = this._children;
+    len = list.length;
+    for (; i < len ; i++) {
+        item = list[i];
+        if (item.onParentComponentAdd) item.onParentComponentAdd(component, node);
+    }
+};
+
+Node.prototype.parentComponentRemove = function parentComponentRemove(component, node) {
+    var i = 0;
+    var list = this._components;
+    var len = list.length;
+    var item;
+
+    for (; i < len ; i++) {
+        item = list[i];
+        if (item.onParentComponentRemove) item.onParentComponentRemove(component, node);
+    }
+
+    i = 0;
+    list = this._children;
+    len = list.length;
+    for (; i < len ; i++) {
+        item = list[i];
+        if (item.onParentComponentRemove) item.onParentComponentRemove(component, node);
+    }
 };
 
 /**
@@ -1265,15 +1338,23 @@ Node.prototype._requestUpdateWithoutArgs = function _requestUpdateWithoutArgs ()
     if (!this._requestingUpdate) this._requestUpdate();
 };
 
+Node.prototype.parentTransformChange = Node.prototype._requestUpdateWithoutArgs;
+
+Node.prototype.parentSizeChange = Node.prototype._requestUpdateWithoutArgs;
+
+Node.prototype.onParentComponentAdd = Node.prototype.parentComponentAdd;
+
+Node.prototype.onParentComponentRemove = Node.prototype.parentComponentRemove;
+
 Node.prototype.onUpdate = Node.prototype.update;
 
 Node.prototype.onParentShow = Node.prototype.show;
 
 Node.prototype.onParentHide = Node.prototype.hide;
 
-Node.prototype.onParentTransformChange = Node.prototype._requestUpdateWithoutArgs;
+Node.prototype.onParentTransformChange = Node.prototype.parentTransformChange;
 
-Node.prototype.onParentSizeChange = Node.prototype._requestUpdateWithoutArgs;
+Node.prototype.onParentSizeChange = Node.prototype.parentSizeChange;
 
 Node.prototype.onShow = Node.prototype.show;
 

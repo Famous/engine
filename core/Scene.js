@@ -70,8 +70,11 @@ function Scene (selector, updater) {
         .message('NEED_SIZE_FOR')  // size of the context so that
         .message(selector);        // the scene graph has a total size
 
-    this.show(); // the context begins shown (it's already present in the dom)
+    this._parent = this;
 
+    this.show(); // the context begins shown (it's already present in the dom)
+    
+    this.isScene = true;
 }
 
 // Scene inherits from node
