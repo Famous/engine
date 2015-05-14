@@ -24,7 +24,7 @@
 
 'use strict';
 var test = require('tape');
-var Checkerboard = require('../Checkerboard');
+var createCheckerboard = require('../createCheckerboard');
 var TestingContext = require('./helpers/ContextWebGL');
 
 var grey = 221;
@@ -32,12 +32,13 @@ var white = 255;
 var avg = (255 + 221) / 2;
 var size = 128;
 
-test('Checkerboard', function(t) {
+test('createCheckerboard', function(t) {
 
     //the average color in the loading screen should be 238
 
     t.test('data', function (t) {
-        var ctx = Checkerboard.getContext('2d');
+        var checkerboard = createCheckerboard();
+        var ctx = checkerboard.getContext('2d');
 
         var rgb = ctx.getImageData(0, 0, size, size);
         var average = 0;

@@ -24,10 +24,15 @@
 
 'use strict';
 
-// Generates a checkerboard pattern to be used as a placeholder texture
-// while an image loads over the network.
-
-module.exports = (function() {
+/**
+ * Generates a checkerboard pattern to be used as a placeholder texture while an
+ * image loads over the network.
+ *  
+ * @method  createCheckerBoard
+ *  
+ * @return {HTMLCanvasElement} 
+ */ 
+function createCheckerBoard() {
     var context = document.createElement('canvas').getContext('2d');
     context.canvas.width = context.canvas.height = 128;
     for (var y = 0; y < context.canvas.height; y += 16) {
@@ -38,4 +43,6 @@ module.exports = (function() {
     }
     
     return context.canvas;
-})();
+}
+
+module.exports = createCheckerBoard;
