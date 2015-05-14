@@ -193,7 +193,6 @@ Transitionable.prototype._interpolate = function _interpolate(output, from, to, 
             var x, y, z, w;
             var qx, qy, qz, qw;
             var omega, cosomega, sinomega, scaleFrom, scaleTo;
-            var resx, resy, resz, resw;
 
             x = from[0];
             y = from[1];

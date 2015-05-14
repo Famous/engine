@@ -115,7 +115,7 @@ Mesh.prototype.setGeometry = function setGeometry (geometry, options) {
         if (this._node) {
             var i = this.value.geometry.spec.invalidations.length;
             while (i--) {
-                var bufferIndex = this.value.geometry.spec.invalidations.pop();
+                this.value.geometry.spec.invalidations.pop();
                 this._changeQueue.push('GL_BUFFER_DATA');
                 this._changeQueue.push(this.value.geometry.id);
                 this._changeQueue.push(this.value.geometry.spec.bufferNames[i]);
@@ -278,8 +278,6 @@ Mesh.prototype.getNormals = function getNormals (materialExpression) {
  * @chainable
  */
 Mesh.prototype.setGlossiness = function setGlossiness(glossiness, strength) {
-    var glossiness;
-
     if (glossiness.__isAMaterial__) {
         this.value.glossiness = [null, null];
         this.value.expressions.glossiness = glossiness;
@@ -353,7 +351,7 @@ Mesh.prototype.setPositionOffset = function positionOffset(materialExpression) {
  * @method getPositionOffset
  * @returns {MaterialExpress|Number}
  */
-Mesh.prototype.getPositionOffset = function getPositionOffset (materialExpression) {
+Mesh.prototype.getPositionOffset = function getPositionOffset () {
     return this.value.expressions.positionOffset || this.value.positionOffset;
 };
 
@@ -502,7 +500,7 @@ Mesh.prototype.onOpacityChange = function onOpacityChange (opacity) {
     this._requestUpdate();
 };
 
-Mesh.prototype.onAddUIEvent = function onAddUIEvent (UIEvent, methods, properties) {
+Mesh.prototype.onAddUIEvent = function onAddUIEvent (UIEvent) {
     //TODO
 };
 
@@ -522,10 +520,6 @@ Mesh.prototype.init = function init () {
 };
 
 Mesh.prototype.draw = function draw () {
-    var key;
-    var i;
-    var len;
-
     this._inDraw = true;
 
     this.init();

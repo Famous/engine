@@ -182,7 +182,7 @@ test('Router', function (t) {
     });
 
     t.test('root option', function (t) {
-        window.history.replaceState(null, '', '/root')
+        window.history.replaceState(null, '', '/root');
         t.plan(3);
         var i = 0;
         var router = Router({

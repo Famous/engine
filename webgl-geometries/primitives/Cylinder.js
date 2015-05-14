@@ -41,7 +41,7 @@ var GeometryHelper = require('../GeometryHelper');
  * @return {Object} constructed geometry
  */
 function Cylinder (options) {
-    var options  = options || {};
+    options  = options || {};
     var radius   = options.radius || 1;
     var detail   = options.detail || 15;
     var buffers;
@@ -81,6 +81,6 @@ Cylinder.generator = function generator(r, u, v, pos) {
     pos[1] = r * Math.sin(v);
     pos[0] = r * Math.cos(v);
     pos[2] = r * (-1 + u / Math.PI * 2);
-}
+};
 
 module.exports = Cylinder;

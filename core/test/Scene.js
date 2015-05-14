@@ -28,7 +28,6 @@
 
 var test = require('tape');
 var Scene = require('../Scene');
-var Node = require('../Node');
 var Dispatch = require('../Dispatch');
 
 test('Scene', function(t) {

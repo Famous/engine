@@ -40,7 +40,7 @@ function Color(color, transition, cb) {
     this._g = new Transitionable(0);
     this._b = new Transitionable(0);
     if (color) this.set(color, transition, cb);
-};
+}
 
 /**
 * Returns the definition of the Class: 'Color'

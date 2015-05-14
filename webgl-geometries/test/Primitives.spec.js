@@ -38,7 +38,7 @@ var primitives = {
     Tetrahedron: require('../primitives/Tetrahedron'),
     Torus: require('../primitives/Torus'),
     Triangle: require('../primitives/Triangle'),
-}
+};
 
 test('Primitives', function(t) {
 

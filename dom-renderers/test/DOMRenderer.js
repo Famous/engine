@@ -40,7 +40,7 @@ var DOMRenderer = require('../DOMRenderer');
  */
 function createUnidirectionalCompositor(t) {
     return {
-        sendEvent: function (path, type, ev) {
+        sendEvent: function () {
             t.fail('DOMRenderer should not send delegated events for a static DOM tree');
         }
     };

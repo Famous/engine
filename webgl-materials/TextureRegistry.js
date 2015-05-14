@@ -73,6 +73,6 @@ TextureRegistry.get = function get(accessor) {
 	else {
 		return this.registry[accessor];
 	}
-}
+};
 
 module.exports = TextureRegistry;

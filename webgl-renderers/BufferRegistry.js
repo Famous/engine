@@ -132,7 +132,7 @@ BufferRegistry.prototype.allocate = function allocate(geometryId, name, value, s
     }
     
     var len = value.length;
-    for (var k = 0; k < len; k++) {
+    for (k = 0; k < len; k++) {
         vertexBuffers.values[j].data[offset + k] = value[k];
     }
     vertexBuffers.values[j].subData();

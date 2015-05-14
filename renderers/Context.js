@@ -83,7 +83,7 @@ Context.prototype.updateSize = function () {
     if (this.WebGLRenderer) this.WebGLRenderer.updateSize(this._size);
 
     return this;
-}
+};
 
 Context.prototype.draw = function draw() {
     this.DOMRenderer.draw(this._renderState);
@@ -105,10 +105,6 @@ Context.prototype.initWebGL = function initWebGL() {
 };
 
 Context.prototype.receive = function receive(pathArr, path, commands, iterator) {
-    var pointer;
-    var parentEl;
-    var element;
-    var id;
     var localIterator = iterator;
 
     var command = commands[++localIterator];

@@ -41,8 +41,8 @@ if (typeof window === 'object') {
     cAF = window.cancelAnimationFrame || window.cancelRequestAnimationFrame;
     for (var x = 0; x < vendors.length && !rAF; ++x) {
         rAF = window[vendors[x] + 'RequestAnimationFrame'];
-        cAF = window[vendors[x] + 'CancelRequestAnimationFrame']
-            || window[vendors[x] + 'CancelAnimationFrame'];
+        cAF = window[vendors[x] + 'CancelRequestAnimationFrame'] ||
+              window[vendors[x] + 'CancelAnimationFrame'];
     }
 
     if (rAF && !cAF) {

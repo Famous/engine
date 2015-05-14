@@ -40,7 +40,7 @@ function Light(node) {
     this.queue = [];
     this._color;
     this.commands = { color: 'GL_LIGHT_COLOR' };
-};
+}
 
 /**
 * Returns the definition of the Class: 'Light'

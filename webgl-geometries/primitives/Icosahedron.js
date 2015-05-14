@@ -42,8 +42,6 @@ var GeometryHelper = require('../GeometryHelper');
 function Icosahedron() {
     var t = ( 1 + Math.sqrt( 5 ) ) / 2;
 
-    var geometry;
-    var detail;
     var vertices = [
         - 1,   t,  0,    1,  t,  0,   - 1, - t,  0,    1, - t,  0,
           0, - 1, -t,    0,  1, -t,     0, - 1,  t,    0,   1,  t,

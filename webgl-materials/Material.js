@@ -152,8 +152,8 @@ expressions.registerExpression = function registerExpression(name, schema) {
     };
 };
 
-for (var name in snippets) {
-    expressions.registerExpression(name, snippets[name]);
+for (var snippetName in snippets) {
+    expressions.registerExpression(snippetName, snippets[snippetName]);
 }
 
 /**
@@ -207,8 +207,3 @@ expressions.Texture = function (source) {
 expressions.Custom = function (schema, inputs, uniforms) {
     return new Material('custom', {glsl: schema, output: 1, uniforms: uniforms || {}} , inputs);
 };
-
-function typeofConst(c) {
-    if (Array.isArray(c)) return 'vec' + c.length + ' ';
-    else return 'float ';
-}

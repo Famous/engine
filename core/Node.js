@@ -926,7 +926,7 @@ Node.prototype._resolveSizeMode = function _resolveSizeMode (vec, index, val) {
         }
     }
     else return this._vecOptionalSet(vec, index, val);
-}
+};
 
 /**
  * A proportional size defines the node's dimensions relative to its parents

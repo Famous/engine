@@ -22,6 +22,8 @@
  * THE SOFTWARE.
  */
 
+'use strict';
+
 /**
  * Mock WebGL rendering context for testing
  */
@@ -179,7 +181,7 @@ function ContextWebGL() {
     var i;
     var uniformLocations = 1;
 
-    for (var i = 0; i < methods.length; i++) {
+    for (i = 0; i < methods.length; i++) {
         this[methods[i].name] = function (i) {
             this[methods[i].name].callCount++;
             this[methods[i].name].history.push(

@@ -42,7 +42,6 @@ var GeometryHelper = require('../GeometryHelper');
 function Tetrahedron(options) {
     var textureCoords = [];
     var normals = [];
-    var geometry;
     var detail;
     var i;
     var t = Math.sqrt(3);

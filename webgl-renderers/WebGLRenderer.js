@@ -221,7 +221,7 @@ WebGLRenderer.prototype.setCutoutState = function setCutoutState(path, usesCutou
     var cutout = this.getOrSetCutout(path);
 
     cutout.visible = usesCutout;
-}
+};
 
 /**
  * Creates or retreives cutout
