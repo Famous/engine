@@ -57,16 +57,6 @@ var RENDER_SIZE = 2;
 function DOMElement (node, options) {
     if (!node) throw new Error('DOMElement must be instantiated on a node');
 
-    if (typeof options === 'string') {
-        console.warn(
-            'HTMLElement constructor signature changed!\n' +
-            'Pass in an options object with {tagName: ' + options + '} instead.'
-        );
-        options = {
-            tagName: options
-        };
-    }
-
     this._node = node;
     this._parent = null;
     this._children = [];
@@ -80,10 +70,9 @@ function DOMElement (node, options) {
     this._UIEvents = node.getUIEvents().slice(0);
     this._classes = [];
     this._requestingEventListeners = [];
-    this._styles = {
-        display: node.isShown(),
-        opacity: node.getOpacity()
-    };
+    this._styles = this.DEFAULT_PROPERTIES;
+    this._styles.display = node.isShown();
+    this._styles.opacity = node.getOpacity();
     this._attributes = {};
     this._content = '';
 
@@ -94,29 +83,23 @@ function DOMElement (node, options) {
 
     this._callbacks = new CallbackStore();
 
-    
-    var key;
-    
-    for (key in this.constructor.DEFAULT_STYLES) {
-        this.setProperty(key, this.constructor.DEFAULT_STYLES[key]);
-    }
 
     if (!options) return;
 
-    if (options.classes) {
-        for (var i = 0; i < options.classes.length; i++)
-            this.addClass(options.classes[i]);
-    }
+    var i;
+    var key;
 
-    if (options.attributes) {
+    if (options.classes)
+        for (i = 0; i < options.classes.length; i++)
+            this.addClass(options.classes[i]);
+
+    if (options.attributes)
         for (key in options.attributes)
             this.setAttribute(key, options.attributes[key]);
-    }
 
-    if (options.properties) {
+    if (options.properties)
         for (key in options.properties)
             this.setProperty(key, options.properties[key]);
-    }
 
     if (options.id) this.setId(options.id);
     if (options.content) this.setContent(options.content);
@@ -484,6 +467,17 @@ DOMElement.prototype.removeClass = function removeClass (value) {
     return this;
 };
 
+
+/**
+ * @method  hasClass
+ *  
+ * @param  {String} value description 
+ * @return {type}       description 
+ */ 
+DOMElement.prototype.hasClass = function hasClass (value) {
+    return this._classes.indexOf(value) !== -1;
+};
+
 /**
  * Sets an attribute of the DOMElement.
  *
@@ -611,7 +605,7 @@ DOMElement.prototype.draw = function draw () {
     this._inDraw = false;
 };
 
-DOMElement.DEFAULT_STYLES = {
+DOMElement.prototype.DEFAULT_PROPERTIES = {
     'position': 'absolute',
     '-webkit-transform-origin': '0% 0%',
     'transform-origin': '0% 0%',
@@ -624,7 +618,9 @@ DOMElement.DEFAULT_STYLES = {
     'z-index': '1',
     'box-sizing': 'border-box',
     '-moz-box-sizing': 'border-box',
-    '-webkit-box-sizing': 'border-box'
+    '-webkit-box-sizing': 'border-box',
+    'display': null,
+    'opacity': null
 };
 
 module.exports = DOMElement;

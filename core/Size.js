@@ -76,7 +76,7 @@ Size.prototype.fromSpecWithParent = function fromSpecWithParent (parentSize, nod
                         prev = target[i];
                         target[i] = target[i] < candidate || target[i] === 0 ? candidate : target[i];
                     }
-                }                    
+                }
                 break;
         }
         changed = changed || prev !== target[i];

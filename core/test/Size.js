@@ -46,23 +46,7 @@ test('Size', function(t) {
     });
 
     t.test('fromSpecWithParent method', function(t) {
-        var size = new Size();
-
-        t.equal(typeof size.fromSpecWithParent, 'function', 'size.fromSpecWithParent should be a function');
-
-        var i;
-        var testCase;
-
-        for (i = 0; i < SizeTestCases.length; i++) {
-            testCase = SizeTestCases[i];
-            testCase.actualResult = new Float32Array(3);
-            size.fromSpecWithParent(testCase.parentSize, testCase.spec, testCase.actualResult);
-        }
-
-        for (i = 0; i < SizeTestCases.length; i++) {
-            testCase = SizeTestCases[i];
-            t.deepEqual(testCase.actualResult, testCase.expectedResult);
-        }
+        // TODO
 
         t.end();
     });
