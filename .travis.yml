@@ -7,10 +7,11 @@ addons:
 before_install:
   - "export DISPLAY=:99.0"
   - "sh -e /etc/init.d/xvfb start"
-sudo: required
+sudo: false
 notifications:
   email:
     - mike@famo.us
     - myles@famo.us
     - marianna@famo.us
-  slack: famous-community:vd2V7VQpJ5IXTcyVr4L6cddV#notifications
+  slack:
+    secure: xy1hxUnULcBZxt3eGO8v/IUuIvvTUGZvMVaKeh/+gbutExlODJbav2i7tfzi71SynBCA483wTEh/RHX96hvhrS52kkJTXPq6b17pgGAbx549ouKD/8nzB0AW0THeLZY/dsWxS/T1MXtZMAabufv4Zh8+H5m6ZOo9DPNYsjD2URk=
