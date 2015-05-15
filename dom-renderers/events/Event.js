@@ -54,7 +54,6 @@ function Event(ev) {
 
     this.type = ev.type;
     this.defaultPrevented = ev.defaultPrevented;
-    this.isTrusted = ev.isTrusted;
     this.timeStamp = ev.timeStamp;
 }
 
