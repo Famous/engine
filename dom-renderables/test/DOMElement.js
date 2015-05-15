@@ -260,4 +260,53 @@ test('DOMElement', function(t) {
 
         domElement.onReceive('some event', actualEvent);
     });
+
+    t.test('setContent method', function(t) {
+        t.plan(4);
+
+        var node = new createMockNode(t);
+        var domElement = new DOMElement(node);
+        t.equal(
+            typeof domElement.setContent,
+            'function',
+            'domElement.setContent should be a function'
+        );
+
+        domElement.onMount(node, 0);
+        domElement.setContent('some content');
+        domElement.onUpdate(1);
+        t.deepEqual(
+            node.sentDrawCommands.slice(node.sentDrawCommands.length - 2),
+            ['CHANGE_CONTENT', 'some content' ],
+            'should issue CHANGE_CONTENT command'
+        );
+
+        node.sentDrawCommands.length = 0;
+    });
+
+    t.test('setProperty method', function (t) {
+        t.plan(4);
+
+        var node = new createMockNode(t);
+        var domElement = new DOMElement(node);
+        t.equal(
+            typeof domElement.setProperty,
+            'function',
+            'domElement.setProperty should be a function'
+        );
+
+        domElement.onMount(node, 0);
+        domElement.setProperty('background', 'red');
+        domElement.onUpdate(1);
+
+        // Properties are being read from an object. We can't make any
+        // assumptions about the order in which commands are being added to the
+        // command queue.
+
+        t.deepEqual(
+            node.sentDrawCommands,
+            [ 'WITH', 'body/0', 'DOM', 'INIT_DOM', 'div', 'CHANGE_TRANSFORM', 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 'WITH', 'body/0', 'DOM', 'CHANGE_SIZE', 0, 0, 'CHANGE_PROPERTY', 'position', 'absolute', 'CHANGE_PROPERTY', '-webkit-transform-origin', '0% 0%', 'CHANGE_PROPERTY', 'transform-origin', '0% 0%', 'CHANGE_PROPERTY', '-webkit-backface-visibility', 'visible', 'CHANGE_PROPERTY', 'backface-visibility', 'visible', 'CHANGE_PROPERTY', '-webkit-transform-style', 'preserve-3d', 'CHANGE_PROPERTY', 'transform-style', 'preserve-3d', 'CHANGE_PROPERTY', '-webkit-tap-highlight-color', 'transparent', 'CHANGE_PROPERTY', 'pointer-events', 'auto', 'CHANGE_PROPERTY', 'z-index', '1', 'CHANGE_PROPERTY', 'box-sizing', 'border-box', 'CHANGE_PROPERTY', '-moz-box-sizing', 'border-box', 'CHANGE_PROPERTY', '-webkit-box-sizing', 'border-box', 'CHANGE_PROPERTY', 'display', true, 'CHANGE_PROPERTY', 'opacity', 1, 'CHANGE_PROPERTY', 'background', 'red', 'CHANGE_PROPERTY', 'color', 'green', 'CHANGE_ATTRIBUTE', 'data-fa-path', 'body/0' ],
+            'should issue CHANGE_PROPERTY command'
+        );
+    });
 });

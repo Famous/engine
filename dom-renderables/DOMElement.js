@@ -1,18 +1,18 @@
 /**
  * The MIT License (MIT)
- * 
+ *
  * Copyright (c) 2015 Famous Industries Inc.
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -151,7 +151,7 @@ DOMElement.prototype.onUpdate = function onUpdate () {
             node.sendDrawCommand(node.getLocation());
             this._requestRenderSize = false;
         }
- 
+
     }
 
     this._requestingUpdate = false;
@@ -338,7 +338,7 @@ DOMElement.prototype.onOpacityChange = function onOpacityChange (opacity) {
 /**
  * Method to be invoked by the node as soon as a new UIEvent is being added.
  * This results into an `ADD_EVENT_LISTENER` command being send.
- * 
+ *
  * @param  {String} UIEvent     UIEvent to be subscribed to (e.g. `click`).
  */
 DOMElement.prototype.onAddUIEvent = function onAddUIEvent (UIEvent) {
@@ -469,11 +469,14 @@ DOMElement.prototype.removeClass = function removeClass (value) {
 
 
 /**
+ * Checks if the DOMElement has the passed in class.
+ *
  * @method  hasClass
- *  
- * @param  {String} value description 
- * @return {type}       description 
- */ 
+ *
+ * @param  {String} value   The class name.
+ * @return {Boolean}        Boolean value indicating whether the passed in class
+ *                          name is in the DOMElement's class list.
+ */
 DOMElement.prototype.hasClass = function hasClass (value) {
     return this._classes.indexOf(value) !== -1;
 };
@@ -624,4 +627,3 @@ DOMElement.prototype.DEFAULT_PROPERTIES = {
 };
 
 module.exports = DOMElement;
-
