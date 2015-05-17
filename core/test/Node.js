@@ -1,18 +1,18 @@
 /**
  * The MIT License (MIT)
- * 
+ *
  * Copyright (c) 2015 Famous Industries Inc.
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -50,15 +50,6 @@ test('Node', function(t) {
     t.test('Spec constructor', function(t) {
         t.equal(typeof Node.Spec, 'function', 'Node.Spec should be a constructor function');
         t.deepEqual(new Node.Spec(), DefaultNodeSpec, 'Node specs need to adhere to certain format');
-        t.end();
-    });
-
-    t.test('deprecated methods (for backwards compatibility)', function(t) {
-        var node = new Node();
-        var deprecatedMethods = ['getScene', 'getDispatch', 'getRenderProxy', 'getRenderPath', 'addRenderable'];
-        deprecatedMethods.forEach(function (deprecatedMethod) {
-            t.equal(typeof node[deprecatedMethod], 'function', 'node.' + deprecatedMethod + ' should be a function');
-        });
         t.end();
     });
 

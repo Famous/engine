@@ -33,14 +33,28 @@
  * @constructor
  */
 function Channel() {
-    this._workerMode = typeof self !== 'undefined' && self.window !== self;
-    if (this._workerMode) {
-        var _this = this;
-        self.addEventListener('message', function onmessage(ev) {
-            _this.onMessage(ev.data);
-        });
+    if (typeof self !== 'undefined' && self.window !== self) {
+        this._enterWorkerMode();
     }
 }
+
+
+/**
+ * Called during construction. Subscribes for `message` event and routes all
+ * future `sendMessage` messages to the Main Thread ("UI Thread").
+ * 
+ * Primarily used for testing.
+ * 
+ * @method  _enterWorkerMode
+ * @private
+ */ 
+Channel.prototype._enterWorkerMode = function _enterWorkerMode() {
+    this._workerMode = true;
+    var _this = this;
+    self.addEventListener('message', function onmessage(ev) {
+        _this.onMessage(ev.data);
+    });
+};
 
 /**
  * Meant to be overriden by `Famous`.

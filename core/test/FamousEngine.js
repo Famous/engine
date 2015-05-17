@@ -42,8 +42,17 @@ test('FamousEngine', function(t) {
     });
 
     t.test('requestUpdate method (basic)', function(t) {
-        t.plan(3);
+        t.plan(4);
         t.equal(typeof FamousEngine.requestUpdate, 'function', 'FamousEngine.requestUpdate should be a function');
+        
+        FamousEngine.getChannel().onmessage = function(commands) {
+            t.deepEqual(
+                commands,
+                ['TIME', 10],
+                'FamousEngine should send the [TIME, ...] commmand when ' +
+                'running .step on it'
+            );
+        };
 
         var executionOrder = [];
         FamousEngine.requestUpdate(onUpdateWrap(function(time) {
@@ -59,29 +68,39 @@ test('FamousEngine', function(t) {
         t.deepEqual(executionOrder, [ 0, 1 ]);
     });
 
+    t.test('setup onmessage mock', function(t) {
+        FamousEngine.getChannel().onmessage = function() {};
+        t.comment(
+            'The Channel#onmessage method is being shared across tests. It ' +
+            'is being set to a noop in this setup.'
+        );
+        t.end();
+    });
+
     t.test('requestUpdate method (nested)', function(t) {
         t.plan(1);
         var executionOrder = [];
+        
         FamousEngine.requestUpdate(onUpdateWrap(function() {
             executionOrder.push(0);
-
+    
             FamousEngine.requestUpdate(onUpdateWrap(function() {
                 executionOrder.push(2);
-
+    
                 FamousEngine.requestUpdate(onUpdateWrap(function() {
                     executionOrder.push(3);
                 }));
             }));
         }));
-
+    
         FamousEngine.requestUpdate(onUpdateWrap(function() {
             executionOrder.push(1);
         }));
-
+    
         FamousEngine.step(0);
         FamousEngine.step(1);
         FamousEngine.step(2);
-
+    
         t.deepEqual(executionOrder, [ 0, 1, 2, 3 ]);
     });
 
@@ -93,7 +112,7 @@ test('FamousEngine', function(t) {
             FamousEngine.step(10);
         }, 'FamousEngine.requestUpdate method should not throw an error when being invoked');
     });
-
+    
     t.test('requestUpdateOnNextTick method', function(t) {
         t.equal(typeof FamousEngine.requestUpdateOnNextTick, 'function', 'FamousEngine.requestUpdateOnNextTick should be a function');
         var executionOrder = [];
@@ -106,7 +125,7 @@ test('FamousEngine', function(t) {
         FamousEngine.requestUpdateOnNextTick(onUpdateWrap(function() {
             executionOrder.push(1);
         }));
-
+    
         t.deepEqual(executionOrder, []);
         FamousEngine.step(0);
         t.deepEqual(executionOrder,  [ 0, 1 ]);
@@ -125,31 +144,31 @@ test('FamousEngine', function(t) {
         t.equal(FamousEngine.getClock().now(), 125);
         FamousEngine.getChannel().postMessage(['FRAME', 126]);
         t.equal(FamousEngine.getClock().now(), 126);
-
+    
         t.end();
     });
-
+    
     t.test('createScene method', function(t) {
         t.equal(typeof FamousEngine.createScene, 'function', 'FamousEngine.createScene should be a function');
         var scene0 = FamousEngine.createScene('.div-0');
         var scene1 = FamousEngine.createScene('.div-1');
-
+    
         t.equal(scene0.constructor, Scene, 'FamousEngine.createScene should return Scene instances');
         t.equal(scene1.constructor, Scene, 'FamousEngine.createScene should return Scene instances');
         t.notEqual(scene0, scene1, 'FamousEngine.createScene being invoked on two different selectors should return different scene instances');
-
+    
         FamousEngine.getChannel().onmessage = function() {};
         FamousEngine.step(0);
         t.end();
     });
-
+    
     t.test('getClock method', function(t) {
         t.plan(3);
         t.equal(typeof FamousEngine.getClock, 'function', 'FamousEngine.getClock should be a function');
         t.equal(FamousEngine.getClock().constructor, Clock, 'FamousEngine.getClock should return clock instance');
         t.equal(FamousEngine.getClock(), FamousEngine.getClock(), 'FamousEngine.getClock should return clock singleton');
     });
-
+    
     t.test('step method', function(t) {
         t.plan(3);
         t.equal(typeof FamousEngine.step, 'function', 'FamousEngine.step should be a function');
@@ -164,14 +183,17 @@ test('FamousEngine', function(t) {
         t.equal(FamousEngine.getClock().getTime(), 3141, 'FamousEngine.step should update clock');
         FamousEngine.message(3142);
         FamousEngine.step(3143);
-
-        t.deepEqual(receivedMessages, [ [ 'm', 'and', 'ms' ], [ 3142 ] ]);
+    
+        t.deepEqual(
+            receivedMessages,
+            [ [ 'TIME', 3141, 'm', 'and', 'ms' ], [ 'TIME', 3143, 3142 ] ]
+        );
     });
-
+    
     t.test('handleFrame method', function(t) {
         t.plan(2);
         t.equal(typeof FamousEngine.handleFrame, 'function', 'FamousEngine.handleFrame should be a function');
-
+    
         // complete received command would be ['FRAME', 10]
         FamousEngine.handleFrame([10]);
         t.equal(FamousEngine.getClock().getTime(), 10, 'FamousEngine.handleFrame should update internal clock');
