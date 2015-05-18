@@ -135,6 +135,13 @@ Context.prototype.getRootSize = function getRootSize() {
     return this.DOMRenderer.getSize();
 };
 
+/**
+ * Handles initialization of WebGLRenderer when necessary, including creation
+ * of the canvas element and instantiation of the renderer.  Also updates size
+ * to pass size information to the renderer.
+ *
+ * @method initWebGL
+ */
 Context.prototype.initWebGL = function initWebGL() {
     this.canvas = document.createElement('canvas');
     this._rootEl.appendChild(this.canvas);
@@ -142,7 +149,18 @@ Context.prototype.initWebGL = function initWebGL() {
     this.updateSize();
 };
 
-Context.prototype.receive = function receive(pathArr, path, commands, iterator) {
+/**
+ * Handles initialization of WebGLRenderer when necessary, including creation
+ * of the canvas element and instantiation of the renderer.  Also updates size
+ * to pass size information to the renderer.
+ *
+ * @method receive
+ *
+ * @param {String} path String used as identifier of a given node in the
+ *
+ * @return {Number} iterator indicating progress through the command queue.
+ */
+Context.prototype.receive = function receive(path, commands, iterator) {
     var localIterator = iterator;
 
     var command = commands[++localIterator];
