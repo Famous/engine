@@ -840,10 +840,10 @@ WebGLRenderer.prototype.handleOptions = function handleOptions(options, mesh) {
     var gl = this.gl;
     if (!options) return;
 
-    if (options.side == 'double') {
-        this.cullFace(this.gl.FRONT);
+    if (options.side === 'double') {
+        this.gl.cullFace(this.gl.FRONT);
         this.drawBuffers(this.bufferRegistry.registry[mesh.geometry], mesh.drawType, mesh.geometry);
-        this.cullFace(this.gl.BACK);
+        this.gl.cullFace(this.gl.BACK);
     }
 
     if (options.blending) gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
