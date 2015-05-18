@@ -30,7 +30,7 @@ var DOMRenderer = require('../dom-renderers/DOMRenderer');
 
 /**
  * Context is a render layer with its own WebGLRenderer and DOMRenderer.
- * It is the interface between the Compositor, which receives commands,
+ * It is the interface between the Compositor which receives commands
  * and the renderers that interpret them.  It also relays information to
  * the renderers about resizing.
  *
