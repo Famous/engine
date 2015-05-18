@@ -52,11 +52,11 @@ if (typeof window === 'object') {
     }
 }
 
-var now = Date.now ? Date.now : function () {
-    return new Date().getTime();
-};
-
 if (!rAF) {
+    var now = Date.now ? Date.now : function () {
+        return new Date().getTime();
+    };
+
     rAF = function(callback) {
         var currTime = now();
         var timeToCall = Math.max(0, 16 - (currTime - lastTime));
