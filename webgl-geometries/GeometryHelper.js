@@ -125,12 +125,11 @@ GeometryHelper.computeNormals = function computeNormals(vertices, indices, out) 
     var y;
     var z;
     var length;
-
+    
     for (i = 0; i < len; i++) {
-        j = i * 3;
-        indexTwo = indices[j + 0] * 3;
-        indexOne = indices[j + 1] * 3;
-        indexThree = indices[j + 2] * 3;
+        indexTwo = indices[i*3 + 0] * 3;
+        indexOne = indices[i*3 + 1] * 3;
+        indexThree = indices[i*3 + 2] * 3;
 
         outputs[0].set(vertices[indexOne], vertices[indexOne + 1], vertices[indexOne + 2]);
         outputs[1].set(vertices[indexTwo], vertices[indexTwo + 1], vertices[indexTwo + 2]);
@@ -138,28 +137,29 @@ GeometryHelper.computeNormals = function computeNormals(vertices, indices, out) 
 
         normal = outputs[2].subtract(outputs[0]).cross(outputs[1].subtract(outputs[0])).normalize();
 
-        normals[indexOne + 0] += normal.x;
-        normals[indexOne + 1] += normal.y;
-        normals[indexOne + 2] += normal.z;
+        normals[indexOne + 0] = (normals[indexOne + 0] || 0) + normal.x;
+        normals[indexOne + 1] = (normals[indexOne + 1] || 0) + normal.y;
+        normals[indexOne + 2] = (normals[indexOne + 2] || 0) + normal.z;
+        
+        normals[indexTwo + 0] = (normals[indexTwo + 0] || 0) + normal.x;
+        normals[indexTwo + 1] = (normals[indexTwo + 1] || 0) + normal.y;
+        normals[indexTwo + 2] = (normals[indexTwo + 2] || 0) + normal.z;
 
-        normals[indexTwo + 0] += normal.x;
-        normals[indexTwo + 1] += normal.y;
-        normals[indexTwo + 2] += normal.z;
-
-        normals[indexThree + 0] += normal.x;
-        normals[indexThree + 1] += normal.y;
-        normals[indexThree + 2] += normal.z;
+        normals[indexThree + 0] = (normals[indexThree + 0] || 0) + normal.x;
+        normals[indexThree + 1] = (normals[indexThree + 1] || 0) + normal.y;
+        normals[indexThree + 2] = (normals[indexThree + 2] || 0) + normal.z;
     }
     
-    for (i = 0; i < normals.length; i++) {
-        x = normals[0];
-        y =normals[1];
-        z =normals[2];
+    for (i = 0; i < normals.length; i += 3) {
+        x = normals[i];
+        y = normals[i+1];
+        z = normals[i+2];
         length = Math.sqrt(x * x + y * y + z * z);
         for(j = 0; j< 3; j++) {
             normals[i+j] /= length;
         }
     }
+
     return normals;
 };
 

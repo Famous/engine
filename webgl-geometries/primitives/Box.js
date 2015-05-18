@@ -25,6 +25,7 @@
 'use strict';
 
 var Geometry = require('../Geometry');
+var GeometryHelper = require('../GeometryHelper');
 
 function pickOctant(i) {
     return [(i & 1) * 2 - 1, (i & 2) - 1, (i & 4) / 2 - 1];
@@ -76,6 +77,7 @@ function BoxGeometry(options) {
         }
         indices.push(v, v + 1, v + 2);
         indices.push(v + 2, v + 1, v + 3);
+        
     }
 
     return new Geometry({
