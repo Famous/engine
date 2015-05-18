@@ -191,7 +191,7 @@ WebGLRenderer.prototype.createLight = function createLight(path) {
  *
  * @method createMesh
  *
- * @param {String} Path used as id of new mesh in meshRegistry.
+ * @param {String} path Path used as id of new mesh in meshRegistry.
  *
  * @return {Object} Newly created mesh spec.
  */
@@ -220,6 +220,16 @@ WebGLRenderer.prototype.createMesh = function createMesh(path) {
     };
 };
 
+/**
+ * Sets flag on indicating whether to do skip draw phase for
+ * cutout mesh at given path. 
+ *
+ * @method setCutoutState
+ *
+ * @param {String} path Path used as id of target cutout mesh.
+ * @param {Boolean} usesCutout Indicates the presence of a 
+ * cutout mesh.
+ */
 WebGLRenderer.prototype.setCutoutState = function setCutoutState(path, usesCutout) {
     var cutout = this.getOrSetCutout(path);
 
@@ -231,7 +241,7 @@ WebGLRenderer.prototype.setCutoutState = function setCutoutState(path, usesCutou
  *
  * @method getOrSetCutout
  *
- * @param {String} Path used as id of new mesh in meshRegistry.
+ * @param {String} path Path used as id of target cutout mesh.
  *
  * @return {Object} Newly created cutout spec.
  */
@@ -262,13 +272,28 @@ WebGLRenderer.prototype.getOrSetCutout = function getOrSetCutout(path) {
     }
 };
 
-
+/**
+ * Sets flag on indicating whether to do skip draw phase for
+ * mesh at given path. 
+ *
+ * @method setMeshVisibility
+ *
+ * @param {String} path Path used as id of target mesh.
+ * @param {Boolean} visibility Indicates the visibility of target mesh.
+ */
 WebGLRenderer.prototype.setMeshVisibility = function setMeshVisibility(path, visibility) {
     var mesh = this.meshRegistry[path] || this.createMesh(path);
     
     mesh.visible = visibility;
 };
 
+/**
+ * Deletes a mesh from the meshRegistry.
+ *
+ * @method removeMesh
+ *
+ * @param {String} path Path used as id of target mesh.
+ */
 WebGLRenderer.prototype.removeMesh = function removeMesh(path) {
     var keyLocation = this.meshRegistryKeys.indexOf(path);
     this.meshRegistryKeys.splice(keyLocation, 1);
@@ -305,7 +330,7 @@ WebGLRenderer.prototype.setCutoutUniform = function setCutoutUniform(path, unifo
  *
  * @method setMeshOptions
  *
- * @param {String} Path used as id of cutout in cutout registry.
+ * @param {String} Path used as id of target mesh.
  * @param {Object} map of draw options for mesh
  *
 **/
