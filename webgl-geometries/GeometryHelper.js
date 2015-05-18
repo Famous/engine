@@ -120,8 +120,13 @@ GeometryHelper.computeNormals = function computeNormals(vertices, indices, out) 
     var normal;
     var j;
     var len = indices.length / 3;
+    var i;
+    var x;
+    var y;
+    var z;
+    var length;
 
-    for (var i = 0; i < len; i++) {
+    for (i = 0; i < len; i++) {
         j = i * 3;
         indexTwo = indices[j + 0] * 3;
         indexOne = indices[j + 1] * 3;
@@ -131,22 +136,30 @@ GeometryHelper.computeNormals = function computeNormals(vertices, indices, out) 
         outputs[1].set(vertices[indexTwo], vertices[indexTwo + 1], vertices[indexTwo + 2]);
         outputs[2].set(vertices[indexThree], vertices[indexThree + 1], vertices[indexThree + 2]);
 
-        normal = outputs[2].subtract(outputs[0]).cross(outputs[1].subtract(outputs[0]));
-        normal = normal.normalize().toArray();
+        normal = outputs[2].subtract(outputs[0]).cross(outputs[1].subtract(outputs[0])).normalize();
 
-        normals[indexOne + 0] += normal[0];
-        normals[indexOne + 1] += normal[1];
-        normals[indexOne + 2] += normal[2];
+        normals[indexOne + 0] += normal.x;
+        normals[indexOne + 1] += normal.y;
+        normals[indexOne + 2] += normal.z;
 
-        normals[indexTwo + 0] += normal[0];
-        normals[indexTwo + 1] += normal[1];
-        normals[indexTwo + 2] += normal[2];
+        normals[indexTwo + 0] += normal.x;
+        normals[indexTwo + 1] += normal.y;
+        normals[indexTwo + 2] += normal.z;
 
-        normals[indexThree + 0] += normal[0];
-        normals[indexThree + 1] += normal[1];
-        normals[indexThree + 2] += normal[2];
+        normals[indexThree + 0] += normal.x;
+        normals[indexThree + 1] += normal.y;
+        normals[indexThree + 2] += normal.z;
     }
-
+    
+    for (i = 0; i < normals.length; i++) {
+        x = normals[0];
+        y =normals[1];
+        z =normals[2];
+        length = Math.sqrt(x * x + y * y + z * z);
+        for(j = 0; j< 3; j++) {
+            normals[i+j] /= length;
+        }
+    }
     return normals;
 };
 
