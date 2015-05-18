@@ -24,10 +24,15 @@
  * THE SOFTWARE.
  */
 
-// Takes the original rendering contexts' compiler function
-// and augments it with added functionality for parsing and
-// displaying errors.
-
+/**
+ * Takes the original rendering contexts' compiler function
+ * and augments it with added functionality for parsing and
+ * displaying errors.
+ *
+ * @method debug
+ *
+ * @returns {Function}
+ */
 module.exports = function Debug() {
     return _augmentFunction(
         this.gl.compileShader,
