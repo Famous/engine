@@ -190,5 +190,4 @@ test('Program', function(t) {
 
         t.end();
     });
-    t.end();
 });

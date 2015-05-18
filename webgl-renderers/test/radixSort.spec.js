@@ -27,39 +27,21 @@ var test = require('tape');
 var sort = require('../radixSort');
 
 test('radixSort', function(t) {
-    var registry = {};
-    var meshList = [];
-    while (meshList.length < 1e3) {
-        var path = Math.random();
-        registry[path] = mockMesh();
-        meshList[meshList.length] = path;
+    var source = [];
+    while (source.length < 1e3) source.push((.5 - Math.random()) * 100)
+    var test = sort(source.slice());
+    var reference = source.slice().sort(function (a, b) { return a - b });
+
+    assert(checkSorted(test));;
+    assert(reference.join('') === reference.join(''));
+
+    function checkSorted (test){
+        for (var i= 0; i < test.length - 1; i++) {
+            if (test[i].x > test[i+1].x)  return false;
+        }
+        return true;
     }
 
-    t.test('sort', function(t) {
-        t.equals(checkSorted(test), true, 'should be sorted by depth');
-
-        t.end();
-    });
-
-    t.end();
 });
 
-function checkSorted (test){
-    for (var i= 0; i < test.length - 1; i++) {
-        if (test[i].depth > test[i+1].depth)  return false;
-    }
-    return true;
-}
 
-
-function mockMesh () {
-    return {
-        uniformValues: [0, fakeTransform()]
-    };
-}
-
-function fakeTransform() {
-    var x = new Array(14);
-    x[14] = Math.random() * 1000 + Math.random();
-    return x;
-}

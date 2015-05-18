@@ -43,6 +43,16 @@ function PointLight(node) {
 };
 
 /**
+* Returns the definition of the Class: 'PointLight'
+*
+* @method toString
+* @return {string} definition
+*/
+PointLight.prototype.toString = function toString() {
+    return 'PointLight';
+};
+
+/**
  * Extends Light constructor
  */
 PointLight.prototype = Object.create(Light.prototype);
