@@ -143,7 +143,6 @@ DOMElement.prototype.onUpdate = function onUpdate () {
     if (len && node) {
         node.sendDrawCommand('WITH');
         node.sendDrawCommand(node.getLocation());
-        node.sendDrawCommand('DOM');
 
         while (len--) node.sendDrawCommand(queue.shift());
         if (this._requestRenderSize) {
