@@ -134,17 +134,17 @@ GeometryHelper.computeNormals = function computeNormals(vertices, indices, out) 
         normal = outputs[2].subtract(outputs[0]).cross(outputs[1].subtract(outputs[0]));
         normal = normal.normalize().toArray();
 
-        normals[indexOne + 0] = normal[0];
-        normals[indexOne + 1] = normal[1];
-        normals[indexOne + 2] = normal[2];
+        normals[indexOne + 0] += normal[0];
+        normals[indexOne + 1] += normal[1];
+        normals[indexOne + 2] += normal[2];
 
-        normals[indexTwo + 0] = normal[0];
-        normals[indexTwo + 1] = normal[1];
-        normals[indexTwo + 2] = normal[2];
+        normals[indexTwo + 0] += normal[0];
+        normals[indexTwo + 1] += normal[1];
+        normals[indexTwo + 2] += normal[2];
 
-        normals[indexThree + 0] = normal[0];
-        normals[indexThree + 1] = normal[1];
-        normals[indexThree + 2] = normal[2];
+        normals[indexThree + 0] += normal[0];
+        normals[indexThree + 1] += normal[1];
+        normals[indexThree + 2] += normal[2];
     }
 
     return normals;
