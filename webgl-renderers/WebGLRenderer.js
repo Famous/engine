@@ -511,12 +511,20 @@ WebGLRenderer.prototype.draw = function draw(renderState) {
     this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
     this.textureManager.update(time);
     
-    this.setGlobalUniforms(renderState);
     this.meshRegistryKeys = sorter(this.meshRegistryKeys, this.meshRegistry);
+
+    this.setGlobalUniforms(renderState);
     this.drawCutouts();
     this.drawMeshes();
 };
 
+/**
+ * Iterates through and draws all registered meshes.  This includes
+ * binding textures, handling draw options, setting mesh uniforms
+ * and drawing mesh buffers.
+ *
+ * @method drawMeshes
+ */
 WebGLRenderer.prototype.drawMeshes = function drawMeshes() {
     var gl = this.gl;
     var buffers;
@@ -550,6 +558,12 @@ WebGLRenderer.prototype.drawMeshes = function drawMeshes() {
     }
 };
 
+/**
+ * Iterates through and draws all registered cutout meshes.  Blending 
+ * is disabled, cutout uniforms are set and finally buffers are drawn.
+ *
+ * @method drawCutouts
+ */
 WebGLRenderer.prototype.drawCutouts = function drawCutouts() {
     var cutout;
     var buffers;
@@ -570,6 +584,13 @@ WebGLRenderer.prototype.drawCutouts = function drawCutouts() {
     if (len) this.gl.disable(this.gl.BLEND);
 };
 
+/**
+ * Sets uniforms to be shared by all meshes.
+ *
+ * @method setGlobalUniforms
+ *
+ * @param {Object} renderState Draw state options passed down from compositor.
+ */
 WebGLRenderer.prototype.setGlobalUniforms = function setGlobalUniforms(renderState) {
     var light;
     var stride;
