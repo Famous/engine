@@ -134,10 +134,11 @@ function WebGLRenderer(canvas, compositor) {
     // TODO: remove this hack
 
     var cutout = this.cutoutGeometry = new Plane();
-    this.bufferRegistry.allocate(cutout.id, 'a_pos', cutout.spec.bufferValues[0], 3);
-    this.bufferRegistry.allocate(cutout.id, 'a_texCoord', cutout.spec.bufferValues[1], 2);
-    this.bufferRegistry.allocate(cutout.id, 'a_normals', cutout.spec.bufferValues[2], 3);
-    this.bufferRegistry.allocate(cutout.id, 'indices', cutout.spec.bufferValues[3], 1);
+
+    this.bufferRegistry.allocate(cutout.spec.id, 'a_pos', cutout.spec.bufferValues[0], 3);
+    this.bufferRegistry.allocate(cutout.spec.id, 'a_texCoord', cutout.spec.bufferValues[1], 2);
+    this.bufferRegistry.allocate(cutout.spec.id, 'a_normals', cutout.spec.bufferValues[2], 3);
+    this.bufferRegistry.allocate(cutout.spec.id, 'indices', cutout.spec.bufferValues[3], 1);
 }
 
 /**
@@ -265,8 +266,8 @@ WebGLRenderer.prototype.getOrSetCutout = function getOrSetCutout(path) {
         return this.cutoutRegistry[path] = {
             uniformKeys: uniforms.keys,
             uniformValues: uniforms.values,
-            geometry: this.cutoutGeometry.id,
-            drawType: 4,
+            geometry: this.cutoutGeometry.spec.id,
+            drawType: this.cutoutGeometry.spec.type,
             visible: true
         };
     }
