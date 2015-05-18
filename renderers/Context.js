@@ -84,6 +84,14 @@ function Context(selector, compositor) {
     this.updateSize();
 }
 
+/**
+ * Queries DOMRenderer size and updates canvas size.  Relays size information to 
+ * WebGLRenderer.
+ *
+ * @method drawBuffers
+ *
+ * @return {Object} Current context.
+ */
 Context.prototype.updateSize = function () {
     var newSize = this.DOMRenderer.getSize();
 
@@ -104,6 +112,12 @@ Context.prototype.updateSize = function () {
     return this;
 };
 
+/**
+ * Draw function called after all commands have been handled for current frame.
+ * Issues draw commands to all renderers with current renderState.
+ *
+ * @method draw
+ */
 Context.prototype.draw = function draw() {
     this.DOMRenderer.draw(this._renderState);
     if (this.WebGLRenderer) this.WebGLRenderer.draw(this._renderState);
@@ -112,6 +126,11 @@ Context.prototype.draw = function draw() {
     if (this._renderState.viewDirty) this._renderState.viewDirty = false;
 };
 
+/**
+ * Gets the size of the parent element of the DOMRenderer for this context.
+ *
+ * @method getRootSize
+ */
 Context.prototype.getRootSize = function getRootSize() {
     return this.DOMRenderer.getSize();
 };
