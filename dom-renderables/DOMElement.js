@@ -70,9 +70,15 @@ function DOMElement (node, options) {
     this._UIEvents = node.getUIEvents().slice(0);
     this._classes = [];
     this._requestingEventListeners = [];
-    this._styles = this.DEFAULT_PROPERTIES;
-    this._styles.display = node.isShown();
-    this._styles.opacity = node.getOpacity();
+    this._styles = {};
+
+    this.setProperty('display', node.isShown() ? 'none' : 'block');
+    this.onOpacityChange(node.getOpacity());
+
+    for (var property in this.DEFAULT_PROPERTIES) {
+        this.setProperty(property, this.DEFAULT_PROPERTIES[property]);
+    }
+
     this._attributes = {};
     this._content = '';
 
@@ -620,9 +626,7 @@ DOMElement.prototype.DEFAULT_PROPERTIES = {
     'z-index': '1',
     'box-sizing': 'border-box',
     '-moz-box-sizing': 'border-box',
-    '-webkit-box-sizing': 'border-box',
-    'display': null,
-    'opacity': null
+    '-webkit-box-sizing': 'border-box'
 };
 
 module.exports = DOMElement;
