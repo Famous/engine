@@ -319,6 +319,7 @@ Program.prototype.resetProgram = function resetProgram() {
  *
  * @param {String} targetName Key of uniform spec being evaluated.
  * @param {Number|Array} value Value of uniform spec being evaluated.
+ *
  * @return {Boolean} Value indicating whether the uniform being set
  * is cached.
  */

@@ -46,6 +46,14 @@ function TextureManager(gl) {
     this.gl = gl;
 }
 
+/**
+ * Update function used by WebGLRenderer to queue resamples on 
+ * registered textures.
+ *
+ * @method update
+ *
+ * @param {Number} time Time in milliseconds according to the compositor.
+ */
 TextureManager.prototype.update = function update(time) {
     var registryLength = this.registry.length;
 
@@ -63,6 +71,16 @@ TextureManager.prototype.update = function update(time) {
     }
 };
 
+/**
+ * Creates a spec and creates a texture based on given texture data.
+ * Handles loading assets if necessary.
+ *
+ * @method register
+ *
+ * @param {Object} input Object containing texture id, texture data
+ * and options used to draw texture.
+ * @param {Number} slot Texture slot to bind generated texture to.
+ */
 TextureManager.prototype.register = function register(input, slot) {
     var source = input.data;
     var textureId = input.id;
@@ -146,6 +164,14 @@ function loadImage (input, callback) {
     return image;
 }
 
+/**
+ * Sets active texture slot and binds target texture.  Also handles 
+ * resampling when necessary.
+ *
+ * @method bindTexture
+ *
+ * @param {Number} id Identifier used to retreive texture spec.
+ */
 TextureManager.prototype.bindTexture = function bindTexture(id) {
     var spec = this.registry[id];
 

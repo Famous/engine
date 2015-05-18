@@ -59,8 +59,6 @@ function Texture(gl, options) {
  * @method bind
  * @chainable
  *
- * @param {Number} unit The texture slot in which to upload the data.
- *
  * @return {Object} Current texture instance.
  */
 Texture.prototype.bind = function bind() {
@@ -74,8 +72,6 @@ Texture.prototype.bind = function bind() {
  * @method unbind
  * @chainable
  *
- * @param {Number} unit The texture slot in which to clean the data.
- * 
  * @return {Object} Current texture instance.
  */
 Texture.prototype.unbind = function unbind() {

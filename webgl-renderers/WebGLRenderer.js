@@ -191,7 +191,7 @@ WebGLRenderer.prototype.createLight = function createLight(path) {
  *
  * @method createMesh
  *
- * @param {String} Path used as id of new mesh in meshRegistry.
+ * @param {String} path Path used as id of new mesh in meshRegistry.
  *
  * @return {Object} Newly created mesh spec.
  */
@@ -220,6 +220,16 @@ WebGLRenderer.prototype.createMesh = function createMesh(path) {
     };
 };
 
+/**
+ * Sets flag on indicating whether to do skip draw phase for
+ * cutout mesh at given path. 
+ *
+ * @method setCutoutState
+ *
+ * @param {String} path Path used as id of target cutout mesh.
+ * @param {Boolean} usesCutout Indicates the presence of a 
+ * cutout mesh.
+ */
 WebGLRenderer.prototype.setCutoutState = function setCutoutState(path, usesCutout) {
     var cutout = this.getOrSetCutout(path);
 
@@ -231,7 +241,7 @@ WebGLRenderer.prototype.setCutoutState = function setCutoutState(path, usesCutou
  *
  * @method getOrSetCutout
  *
- * @param {String} Path used as id of new mesh in meshRegistry.
+ * @param {String} path Path used as id of target cutout mesh.
  *
  * @return {Object} Newly created cutout spec.
  */
@@ -262,13 +272,28 @@ WebGLRenderer.prototype.getOrSetCutout = function getOrSetCutout(path) {
     }
 };
 
-
+/**
+ * Sets flag on indicating whether to do skip draw phase for
+ * mesh at given path. 
+ *
+ * @method setMeshVisibility
+ *
+ * @param {String} path Path used as id of target mesh.
+ * @param {Boolean} visibility Indicates the visibility of target mesh.
+ */
 WebGLRenderer.prototype.setMeshVisibility = function setMeshVisibility(path, visibility) {
     var mesh = this.meshRegistry[path] || this.createMesh(path);
     
     mesh.visible = visibility;
 };
 
+/**
+ * Deletes a mesh from the meshRegistry.
+ *
+ * @method removeMesh
+ *
+ * @param {String} path Path used as id of target mesh.
+ */
 WebGLRenderer.prototype.removeMesh = function removeMesh(path) {
     var keyLocation = this.meshRegistryKeys.indexOf(path);
     this.meshRegistryKeys.splice(keyLocation, 1);
@@ -305,7 +330,7 @@ WebGLRenderer.prototype.setCutoutUniform = function setCutoutUniform(path, unifo
  *
  * @method setMeshOptions
  *
- * @param {String} Path used as id of cutout in cutout registry.
+ * @param {String} Path used as id of target mesh.
  * @param {Object} map of draw options for mesh
  *
 **/
@@ -486,12 +511,20 @@ WebGLRenderer.prototype.draw = function draw(renderState) {
     this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
     this.textureManager.update(time);
     
-    this.setGlobalUniforms(renderState);
     this.meshRegistryKeys = sorter(this.meshRegistryKeys, this.meshRegistry);
+
+    this.setGlobalUniforms(renderState);
     this.drawCutouts();
     this.drawMeshes();
 };
 
+/**
+ * Iterates through and draws all registered meshes.  This includes
+ * binding textures, handling draw options, setting mesh uniforms
+ * and drawing mesh buffers.
+ *
+ * @method drawMeshes
+ */
 WebGLRenderer.prototype.drawMeshes = function drawMeshes() {
     var gl = this.gl;
     var buffers;
@@ -525,6 +558,12 @@ WebGLRenderer.prototype.drawMeshes = function drawMeshes() {
     }
 };
 
+/**
+ * Iterates through and draws all registered cutout meshes.  Blending 
+ * is disabled, cutout uniforms are set and finally buffers are drawn.
+ *
+ * @method drawCutouts
+ */
 WebGLRenderer.prototype.drawCutouts = function drawCutouts() {
     var cutout;
     var buffers;
@@ -545,6 +584,13 @@ WebGLRenderer.prototype.drawCutouts = function drawCutouts() {
     if (len) this.gl.disable(this.gl.BLEND);
 };
 
+/**
+ * Sets uniforms to be shared by all meshes.
+ *
+ * @method setGlobalUniforms
+ *
+ * @param {Object} renderState Draw state options passed down from compositor.
+ */
 WebGLRenderer.prototype.setGlobalUniforms = function setGlobalUniforms(renderState) {
     var light;
     var stride;
@@ -794,10 +840,10 @@ WebGLRenderer.prototype.handleOptions = function handleOptions(options, mesh) {
     var gl = this.gl;
     if (!options) return;
 
-    if (options.side == 'double') {
-        this.cullFace(this.gl.FRONT);
+    if (options.side === 'double') {
+        this.gl.cullFace(this.gl.FRONT);
         this.drawBuffers(this.bufferRegistry.registry[mesh.geometry], mesh.drawType, mesh.geometry);
-        this.cullFace(this.gl.BACK);
+        this.gl.cullFace(this.gl.BACK);
     }
 
     if (options.blending) gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
