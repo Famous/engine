@@ -38,7 +38,7 @@ test('Texture', function(t) {
         t.equals(testingContext.texImage2D.history[0][8], null, 'should call texImage2D with a null value');
 
         t.equals(testingContext.pixelStorei.callCount, 2, 'should call pixelStorei');
-        t.equals(testingContext.bindTexture.callCount, 2, 'should bind the texture');
+        t.equals(testingContext.bindTexture.callCount, 1, 'should bind the texture');
 
         t.end();
     });
@@ -51,11 +51,7 @@ test('Texture', function(t) {
 
         texture.bind();
 
-        t.equals(testingContext.activeTexture.callCount, 3, 'should call the activeTexture method on the context');
-        t.equals(testingContext.bindTexture.callCount, 3, 'should call the bindTexture method on the context');
-
-        texture.bind(5);
-        t.equals(testingContext.activeTexture.history[3][0], 33989, 'should call activeTexture with correct texture slot');
+        t.equals(testingContext.bindTexture.callCount, 2, 'should call the bindTexture method on the context');
 
         t.end();
     });
@@ -68,11 +64,7 @@ test('Texture', function(t) {
 
         texture.unbind();
 
-        t.equals(testingContext.activeTexture.callCount, 3, 'should call the activeTexture method on the context');
-        t.equals(testingContext.bindTexture.callCount, 3, 'should call the bindTexture method on the context');
-
-        texture.unbind(5);
-        t.equal(testingContext.activeTexture.history[3][0], 33989, 'should call activeTexture with correct texture slot');
+        t.equals(testingContext.bindTexture.callCount, 2, 'should call the bindTexture method on the context');
 
         t.end();
     });
@@ -133,5 +125,5 @@ test('Texture', function(t) {
         t.end();
     });
 
-    t.end();
+   t.end();
 });

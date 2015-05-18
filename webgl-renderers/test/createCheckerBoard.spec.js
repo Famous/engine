@@ -40,21 +40,22 @@ test('createCheckerboard', function(t) {
         var checkerboard = createCheckerboard();
         var ctx = checkerboard.getContext('2d');
 
-        var rgb = ctx.getImageData(0, 0, size, size);
+        var rgb = ctx.getImageData(0, 0, size, size).data;
+
         var average = 0;
-        for (var idx = 0; idx < rgb.length; idx += 3)  {
-            avg += rgb[idx] + rgb[idx+1] + rgb[idx+2];
-
-            var wrongColor = rgb[idx] !== white || rgb !== grey;
-            var chooseColor = ((idx / 4) - 7 & 16) ? white: grey;
+        for (var idx = 0; idx < 8188; idx += 4)  {
+            average += rgb[idx] + rgb[idx+1] + rgb[idx+2];
+            var wrongColor = rgb[idx] !== white && rgb[idx] !== grey;
+            var chooseColor = ((idx / 4) & 16)  ? grey: white;
             var wrongLocation = rgb[idx] === chooseColor;
-
-            if (wrongColor) t.ok(false, 'the color is not white or grey');
-            if (wrongLocation) t.ok(false, 'the color is not alternating by 16');
+            var monochrome = rgb[idx] === rgb[idx + 1] === rgb[idx+2];
+            if (monochrome) return t.ok(false, 'the color is wrong');
+            if (wrongColor) return t.ok(false, 'the color is not white or grey');
+            if (wrongLocation) return t.ok(false, 'the color is not alternating by 16');
         }
-        
-        t.equals(average, avg, 'the average color will be exactly beteween white and grey');
+        t.ok(avg - (average / (8188 /4 ) / 3) < 1, 'the average color will be exactly beteween white and grey');
 
         t.end();
     });
+    t.end();
 });
