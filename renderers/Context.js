@@ -28,6 +28,25 @@ var WebGLRenderer = require('../webgl-renderers/WebGLRenderer');
 var Camera = require('../components/Camera');
 var DOMRenderer = require('../dom-renderers/DOMRenderer');
 
+/**
+ * Context is a render layer with its own WebGLRenderer and DOMRenderer.
+ * It is the interface between the Compositor, which receives commands,
+ * and the renderers that interpret them.  It also relays information to
+ * the renderers about resizing.
+ *
+ * The DOMElement at the given query selector is used as the root.  A
+ * new DOMElement is appended to this root element, and used as the
+ * parent element for all Famous DOM rendering at this context.  A 
+ * canvas is added and used for all WebGL rendering at this context.
+ *
+ * @class Context
+ * @constructor
+ *
+ * @param {String} selector Query selector used to locate root element of
+ * context layer.
+ * @param {Compositor} compositor Compositor reference to pass down to 
+ * WebGLRenderer.
+ */
 function Context(selector, compositor) {
     this._compositor = compositor;
     this._rootEl = document.querySelector(selector);
