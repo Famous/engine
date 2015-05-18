@@ -85,7 +85,9 @@ Mesh.prototype.getDrawOptions = function getDrawOptions () {
 };
 
 /**
- * Set the geometry of a mesh.
+ * Assigns a geometry to be used for this mesh.  Will create new Geometry
+ * from primtives if input is a string.  Queues the set command for this 
+ * geometry and looks for buffers to send to the renderer to update geometry.
  *
  * @method setGeometry
  * @chainable
@@ -130,7 +132,7 @@ Mesh.prototype.setGeometry = function setGeometry (geometry, options) {
 };
 
 /**
- * Get the geometry of a mesh.
+ * Gets the geometry of a mesh.
  *
  * @method getGeometry
  * @returns {Geometry} geometry Geometry of mesh
