@@ -150,13 +150,15 @@ Context.prototype.initWebGL = function initWebGL() {
 };
 
 /**
- * Handles initialization of WebGLRenderer when necessary, including creation
- * of the canvas element and instantiation of the renderer.  Also updates size
- * to pass size information to the renderer.
+ * Handles delegation of commands to renderers of this context.
  *
  * @method receive
  *
  * @param {String} path String used as identifier of a given node in the
+ * scene graph.
+ * @param {Array} commands List of all commands from this frame.
+ * @param {Number} iterator Number indicating progress through the command
+ * queue.
  *
  * @return {Number} iterator indicating progress through the command queue.
  */
