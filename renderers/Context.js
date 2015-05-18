@@ -51,20 +51,31 @@ function Context(selector, compositor) {
     this._compositor = compositor;
     this._rootEl = document.querySelector(selector);
 
+    // If root element is the body, update size on the context
+    // on window resize events.
+
     if (this._rootEl === document.body) {
         window.addEventListener('resize', this.updateSize.bind(this));
     }
+
+    // Create DOM element to be used as root for all famous DOM
+    // rendering and append element to the root element.
 
     var DOMLayerEl = document.createElement('div');
     DOMLayerEl.style.width = '100%';
     DOMLayerEl.style.height = '100%';
     DOMLayerEl.style.transformStyle = 'preserve-3d';
     DOMLayerEl.style.webkitTransformStyle = 'preserve-3d';
-    this._rootEl.appendChild(DOMLayerEl);
-    this.DOMRenderer = new DOMRenderer(DOMLayerEl, selector, compositor);
 
+    this._rootEl.appendChild(DOMLayerEl);
+
+    // Instantiate renderers
+
+    this.DOMRenderer = new DOMRenderer(DOMLayerEl, selector, compositor);
     this.WebGLRenderer = null;
     this.canvas = null;
+
+    // State holders
 
     this._renderState = {
         projectionType: Camera.ORTHOGRAPHIC_PROJECTION,
@@ -80,8 +91,6 @@ function Context(selector, compositor) {
 
     this._meshTransform = [];
     this._meshSize = [0, 0, 0];
-
-    this.updateSize();
 }
 
 /**
