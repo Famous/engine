@@ -102,16 +102,6 @@ test('AmbientLight', function(t) {
         t.end();
     });
 
-    t.test('AmbientLight.prototype.toString', function(t) {
-
-        t.equal(typeof AmbientLight.prototype.toString, 'function',
-            'should be a function');
-
-        t.equal(AmbientLight.prototype.toString(), 'AmbientLight');
-
-        t.end();
-    });
-
     t.test('AmbientLight.prototype.setColor', function(t) {
 
         ambientLight = createAmbientLight();

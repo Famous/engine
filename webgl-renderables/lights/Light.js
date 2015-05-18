@@ -43,16 +43,6 @@ function Light(node) {
 };
 
 /**
-* Returns the definition of the Class: 'Light'
-*
-* @method toString
-* @return {String} definition
-*/
-Light.prototype.toString = function toString() {
-    return 'Light';
-};
-
-/**
 * Changes the color of the light, using the 'Color' utility component.
 *
 * @method setColor
