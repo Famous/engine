@@ -662,7 +662,7 @@ WebGLRenderer.prototype.drawBuffers = function drawBuffers(vertexBuffers, mode, 
     // Disable any attributes that not currently being used.
 
     for(var i = 0, len = this.state.enabledAttributesKeys.length; i < len; i++) {
-        var key = this.state.enabledAttributes[this.state.enabledAttributesKeys[i]];
+        var key = this.state.enabledAttributesKeys[i];
         if (this.state.enabledAttributes[key] && vertexBuffers.keys.indexOf(key) === -1) {
             gl.disableVertexAttribArray(this.program.attributeLocations[key]);
             this.state.enabledAttributes[key] = false;
@@ -686,10 +686,10 @@ WebGLRenderer.prototype.drawBuffers = function drawBuffers(vertexBuffers, mode, 
                 this.state.boundElementBuffer = buffer;
             }
 
-            gl.drawElements(mode, length, gl.UNSIGNED_SHORT, 2 * offset);
+            gl.drawElements(gl[mode], length, gl.UNSIGNED_SHORT, 2 * offset);
         }
         else {
-            gl.drawArrays(mode, 0, length);
+            gl.drawArrays(gl[mode], 0, length);
         }
     }
 

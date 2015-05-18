@@ -493,9 +493,9 @@ GeometryHelper.trianglesToLines = function triangleToLines(indices, out) {
     var i;
 
     for (i = 0; i < numVectors; i++) {
-        out.push(indices[i + 0], indices[i + 1]);
-        out.push(indices[i + 1], indices[i + 2]);
-        out.push(indices[i + 2], indices[i + 0]);
+        out.push(indices[i * 3 + 0], indices[i * 3 + 1]);
+        out.push(indices[i * 3 + 1], indices[i * 3 + 2]);
+        out.push(indices[i * 3 + 2], indices[i * 3 + 0]);
     }
 
     return out;
