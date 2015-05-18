@@ -24,15 +24,10 @@
  * THE SOFTWARE.
  */
 
-/**
- * Takes the original rendering contexts' compiler function
- * and augments it with added functionality for parsing and
- * displaying errors.
- *
- * @method debug
- *
- * @returns {Function}
- */
+// Takes the original rendering contexts' compiler function
+// and augments it with added functionality for parsing and
+// displaying errors.
+
 module.exports = function Debug() {
     return _augmentFunction(
         this.gl.compileShader,
@@ -46,14 +41,9 @@ module.exports = function Debug() {
     );
 };
 
-/**
- * Takes a function, keeps the reference and replaces it by a closure that
- * executes the original function and the provided callback.
- *
- * @param {Function} Function
- * @param {Function} Callback
- * @return {Function}
- */
+// Takes a function, keeps the reference and replaces it by a closure that
+// executes the original function and the provided callback.
+
 function _augmentFunction(func, callback) {
     return function() {
         var res = func.apply(this, arguments);
@@ -62,14 +52,10 @@ function _augmentFunction(func, callback) {
     };
 }
 
-/**
- * Parses errors and failed source code from shaders in order
- * to build displayable error blocks.
- * Inspired by Jaume Sanchez Elias.
- *
- * @param {String} Errors
- * @param {String} Source
- */
+// Parses errors and failed source code from shaders in order
+// to build displayable error blocks.
+// Inspired by Jaume Sanchez Elias.
+
 function _processErrors(errors, source) {
 
     var css = 'body,html{background:#e3e3e3;font-family:monaco,monospace;font-size:14px;line-height:1.7em}' +
