@@ -43,16 +43,6 @@ function AmbientLight(node) {
 }
 
 /**
-* Returns the definition of the Class: 'AmbientLight'
-*
-* @method toString
-* @return {string} definition
-*/
-AmbientLight.prototype.toString = function toString() {
-    return 'AmbientLight';
-};
-
-/**
  * Extends Light constructor
  */
 AmbientLight.prototype = Object.create(Light.prototype);
