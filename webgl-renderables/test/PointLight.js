@@ -102,16 +102,6 @@ test('PointLight', function(t) {
         t.end();
     });
 
-    t.test('PointLight.prototype.toString', function(t) {
-
-        t.equal(typeof PointLight.prototype.toString, 'function',
-            'should be a function');
-
-        t.equal(PointLight.prototype.toString(), 'PointLight');
-
-        t.end();
-    });
-
     t.test('PointLight.prototype._receiveTransformChange', function(t) {
 
         pointLight = createPointLight();
