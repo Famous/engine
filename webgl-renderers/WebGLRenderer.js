@@ -686,10 +686,10 @@ WebGLRenderer.prototype.drawBuffers = function drawBuffers(vertexBuffers, mode, 
                 this.state.boundElementBuffer = buffer;
             }
 
-            gl.drawElements(mode, length, gl.UNSIGNED_SHORT, 2 * offset);
+            gl.drawElements(gl[mode], length, gl.UNSIGNED_SHORT, 2 * offset);
         }
         else {
-            gl.drawArrays(mode, 0, length);
+            gl.drawArrays(gl[mode], 0, length);
         }
     }
 

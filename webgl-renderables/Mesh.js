@@ -103,7 +103,7 @@ Mesh.prototype.setGeometry = function setGeometry (geometry, options) {
     if (this.value.geometry !== geometry || this._inDraw) {
         if (this._initialized) {
             this._changeQueue.push('GL_SET_GEOMETRY');
-            this._changeQueue.push(geometry.id);
+            this._changeQueue.push(geometry.spec.id);
             this._changeQueue.push(geometry.spec.type);
             this._changeQueue.push(geometry.spec.dynamic);
         }
@@ -117,7 +117,7 @@ Mesh.prototype.setGeometry = function setGeometry (geometry, options) {
             while (i--) {
                 this.value.geometry.spec.invalidations.pop();
                 this._changeQueue.push('GL_BUFFER_DATA');
-                this._changeQueue.push(this.value.geometry.id);
+                this._changeQueue.push(this.value.geometry.spec.id);
                 this._changeQueue.push(this.value.geometry.spec.bufferNames[i]);
                 this._changeQueue.push(this.value.geometry.spec.bufferValues[i]);
                 this._changeQueue.push(this.value.geometry.spec.bufferSpacings[i]);
