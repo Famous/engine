@@ -37,8 +37,8 @@ function Texture(gl, options) {
     this.width = options.width || 0;
     this.height = options.height || 0;
     this.mipmap = options.mipmap;
-    this.format = options.format || gl.RGBA;
-    this.type = options.type || gl.UNSIGNED_BYTE;
+    this.format = options.format || 'RGBA';
+    this.type = options.type || 'UNSIGNED_BYTE';
     this.gl = gl;
 
     this.bind();
@@ -51,8 +51,6 @@ function Texture(gl, options) {
 
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl[options.wrapS] || gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl[options.wrapT] || gl.CLAMP_TO_EDGE);
-
-    gl.texImage2D(gl.TEXTURE_2D, 0, this.format, this.width, this.height, 0, this.format, this.type, null);
 }
 
 /**
@@ -60,8 +58,6 @@ function Texture(gl, options) {
  *
  * @method bind
  * @chainable
- *
- * @param {Number} unit The texture slot in which to upload the data.
  *
  * @return {Object} Current texture instance.
  */
@@ -76,8 +72,6 @@ Texture.prototype.bind = function bind() {
  * @method unbind
  * @chainable
  *
- * @param {Number} unit The texture slot in which to clean the data.
- * 
  * @return {Object} Current texture instance.
  */
 Texture.prototype.unbind = function unbind() {
@@ -96,7 +90,7 @@ Texture.prototype.unbind = function unbind() {
  * @return {Object} Current texture instance.
  */
 Texture.prototype.setImage = function setImage(img) {
-    this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.format, this.format, this.type, img);
+    this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl[this.format], this.gl[this.format], this.gl[this.type], img);
     if (this.mipmap) this.gl.generateMipmap(this.gl.TEXTURE_2D);
     return this;
 };
@@ -112,9 +106,7 @@ Texture.prototype.setImage = function setImage(img) {
  * @return {Object} Current texture instance.
  */
 Texture.prototype.setArray = function setArray(input) {
-    // this.gl.bindTexture(this.gl.TEXTURE_2D, this.id);
-    this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.format, 1, 1, 0, this.format, this.type, new Uint8Array(input));
-    // this.gl.bindTexture(this.gl.TEXTURE_2D, null);
+    this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl[this.format], this.width, this.height, 0, this.gl[this.format], this.gl[this.type], input);
     return this;
 };
 

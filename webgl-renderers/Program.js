@@ -50,14 +50,14 @@ var inputTypes = {
     u_baseColor: 'vec4',
     u_normals: 'vert',
     u_glossiness: 'vec4',
-    u_metalness: 'float',
     u_positionOffset: 'vert'
 };
 
 var masks =  {
     vert: 1,
     vec3: 2,
-    float: 4
+    vec4: 4,
+    float: 8
 };
 
 /**
@@ -319,6 +319,7 @@ Program.prototype.resetProgram = function resetProgram() {
  *
  * @param {String} targetName Key of uniform spec being evaluated.
  * @param {Number|Array} value Value of uniform spec being evaluated.
+ *
  * @return {Boolean} Value indicating whether the uniform being set
  * is cached.
  */

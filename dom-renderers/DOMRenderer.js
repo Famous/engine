@@ -171,8 +171,8 @@ DOMRenderer.prototype._triggerEvent = function _triggerEvent(ev) {
 DOMRenderer.prototype.getSizeOf = function getSizeOf (path) {
     var element = this._elements[path];
     if (!element) return;
-    element = element.element;
-    var res = {val: [element.offsetWidth, element.offsetHeight, 0]};
+
+    var res = {val: element.size};
     this._compositor.sendEvent(path, 'resize', res);
     return res;
 };
@@ -436,20 +436,58 @@ DOMRenderer.prototype.setProperty = function setProperty (name, value) {
 
 /**
  * Sets the size of the currently loaded target.
- * Removes any explicit sizing constraints when passed in `true`
+ * Removes any explicit sizing constraints when passed in `false`
  * ("true-sizing").
  *
  * @method  setSize
  *
- * @param  {Number|true} width   Width to be set.
- * @param  {Number|true} height  Height to be set.
+ * @param  {Number|false} width   Width to be set.
+ * @param  {Number|false} height  Height to be set.
  */
 DOMRenderer.prototype.setSize = function setSize (width, height) {
     this._assertTargetLoaded();
-    this._target.element.style.width = (width === false) ? '' : width + 'px';
-    this._target.element.style.height = (height === false) ? '' : height + 'px';
+    
+    this.setWidth(width);
+    this.setHeight(height);
 };
 
+DOMRenderer.prototype.setWidth = function setWidth(width) {
+    this._assertTargetLoaded();
+    
+    var contentWrapper = this._target.content;
+    
+    if (width === false) {
+        this._target.explicitWidth = true;
+        if (contentWrapper) contentWrapper.style.width = '';
+        width = contentWrapper ? contentWrapper.offsetWidth : 0;
+        this._target.element.style.width = width + 'px';
+    } else {
+        this._target.explicitWidth = false;
+        if (contentWrapper) contentWrapper.style.width = width + 'px';
+        this._target.element.style.width = width + 'px';
+    }
+    
+    this._target.size[0] = width;
+};
+
+DOMRenderer.prototype.setHeight = function setHeight(height) {
+    this._assertTargetLoaded();
+    
+    var contentWrapper = this._target.content;
+    
+    if (height === false) {
+        this._target.explicitHeight = true;
+        if (contentWrapper) contentWrapper.style.height = '';
+        height = contentWrapper ? contentWrapper.offsetHeight : 0;
+        this._target.element.style.height = height + 'px';
+    } else {
+        this._target.explicitHeight = false;
+        if (contentWrapper) contentWrapper.style.height = height + 'px';
+        this._target.element.style.height = height + 'px';
+    }
+    
+    this._target.size[1] = height;
+};
 
 /**
  * Sets an attribute on the currently loaded target.
@@ -464,7 +502,6 @@ DOMRenderer.prototype.setAttribute = function setAttribute (name, value) {
     this._target.element.setAttribute(name, value);
 };
 
-
 /**
  * Sets the `innerHTML` content of the currently loaded target.
  *
@@ -475,18 +512,21 @@ DOMRenderer.prototype.setAttribute = function setAttribute (name, value) {
 DOMRenderer.prototype.setContent = function setContent (content) {
     this._assertTargetLoaded();
     this.findChildren();
-
-    var i;
-
-    // TODO Temporary solution
-    for (i = 0 ; i < this._children.length ; i++) {
-        this._target.element.removeChild(this._children[i].element);
+    
+    if (!this._target.content) {
+        this._target.content = document.createElement('div');
+        this._target.content.style.position = 'absolute';
+        this._target.element.insertBefore(
+            this._target.content,
+            this._target.element.firstChild
+        );
     }
-
-    this._target.element.innerHTML = content;
-
-    for (i = 0 ; i < this._children.length ; i++)
-        this._target.element.appendChild(this._children[i].element);
+    this._target.content.innerHTML = content;
+    
+    this.setSize(
+        this._target.explicitWidth ? false : this._target.size[0],
+        this._target.explicitHeight ? false : this._target.size[1]
+    );
 };
 
 

@@ -85,7 +85,9 @@ Mesh.prototype.getDrawOptions = function getDrawOptions () {
 };
 
 /**
- * Set the geometry of a mesh.
+ * Assigns a geometry to be used for this mesh.  Will create new Geometry
+ * from primtives if input is a string.  Queues the set command for this 
+ * geometry and looks for buffers to send to the renderer to update geometry.
  *
  * @method setGeometry
  * @chainable
@@ -103,7 +105,7 @@ Mesh.prototype.setGeometry = function setGeometry (geometry, options) {
     if (this.value.geometry !== geometry || this._inDraw) {
         if (this._initialized) {
             this._changeQueue.push('GL_SET_GEOMETRY');
-            this._changeQueue.push(geometry.id);
+            this._changeQueue.push(geometry.spec.id);
             this._changeQueue.push(geometry.spec.type);
             this._changeQueue.push(geometry.spec.dynamic);
         }
@@ -117,7 +119,7 @@ Mesh.prototype.setGeometry = function setGeometry (geometry, options) {
             while (i--) {
                 this.value.geometry.spec.invalidations.pop();
                 this._changeQueue.push('GL_BUFFER_DATA');
-                this._changeQueue.push(this.value.geometry.id);
+                this._changeQueue.push(this.value.geometry.spec.id);
                 this._changeQueue.push(this.value.geometry.spec.bufferNames[i]);
                 this._changeQueue.push(this.value.geometry.spec.bufferValues[i]);
                 this._changeQueue.push(this.value.geometry.spec.bufferSpacings[i]);
@@ -130,7 +132,7 @@ Mesh.prototype.setGeometry = function setGeometry (geometry, options) {
 };
 
 /**
- * Get the geometry of a mesh.
+ * Gets the geometry of a mesh.
  *
  * @method getGeometry
  * @returns {Geometry} geometry Geometry of mesh

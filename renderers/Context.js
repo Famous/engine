@@ -28,24 +28,54 @@ var WebGLRenderer = require('../webgl-renderers/WebGLRenderer');
 var Camera = require('../components/Camera');
 var DOMRenderer = require('../dom-renderers/DOMRenderer');
 
+/**
+ * Context is a render layer with its own WebGLRenderer and DOMRenderer.
+ * It is the interface between the Compositor which receives commands
+ * and the renderers that interpret them.  It also relays information to
+ * the renderers about resizing.
+ *
+ * The DOMElement at the given query selector is used as the root.  A
+ * new DOMElement is appended to this root element, and used as the
+ * parent element for all Famous DOM rendering at this context.  A 
+ * canvas is added and used for all WebGL rendering at this context.
+ *
+ * @class Context
+ * @constructor
+ *
+ * @param {String} selector Query selector used to locate root element of
+ * context layer.
+ * @param {Compositor} compositor Compositor reference to pass down to 
+ * WebGLRenderer.
+ */
 function Context(selector, compositor) {
     this._compositor = compositor;
     this._rootEl = document.querySelector(selector);
 
+    // If root element is the body, update size on the context
+    // on window resize events.
+
     if (this._rootEl === document.body) {
         window.addEventListener('resize', this.updateSize.bind(this));
     }
+
+    // Create DOM element to be used as root for all famous DOM
+    // rendering and append element to the root element.
 
     var DOMLayerEl = document.createElement('div');
     DOMLayerEl.style.width = '100%';
     DOMLayerEl.style.height = '100%';
     DOMLayerEl.style.transformStyle = 'preserve-3d';
     DOMLayerEl.style.webkitTransformStyle = 'preserve-3d';
-    this._rootEl.appendChild(DOMLayerEl);
-    this.DOMRenderer = new DOMRenderer(DOMLayerEl, selector, compositor);
 
+    this._rootEl.appendChild(DOMLayerEl);
+
+    // Instantiate renderers
+
+    this.DOMRenderer = new DOMRenderer(DOMLayerEl, selector, compositor);
     this.WebGLRenderer = null;
     this.canvas = null;
+
+    // State holders
 
     this._renderState = {
         projectionType: Camera.ORTHOGRAPHIC_PROJECTION,
@@ -61,10 +91,16 @@ function Context(selector, compositor) {
 
     this._meshTransform = [];
     this._meshSize = [0, 0, 0];
-
-    this.updateSize();
 }
 
+/**
+ * Queries DOMRenderer size and updates canvas size.  Relays size information to 
+ * WebGLRenderer.
+ *
+ * @method drawBuffers
+ *
+ * @return {Object} Current context.
+ */
 Context.prototype.updateSize = function () {
     var newSize = this.DOMRenderer.getSize();
 
@@ -85,6 +121,12 @@ Context.prototype.updateSize = function () {
     return this;
 };
 
+/**
+ * Draw function called after all commands have been handled for current frame.
+ * Issues draw commands to all renderers with current renderState.
+ *
+ * @method draw
+ */
 Context.prototype.draw = function draw() {
     this.DOMRenderer.draw(this._renderState);
     if (this.WebGLRenderer) this.WebGLRenderer.draw(this._renderState);
@@ -93,10 +135,22 @@ Context.prototype.draw = function draw() {
     if (this._renderState.viewDirty) this._renderState.viewDirty = false;
 };
 
+/**
+ * Gets the size of the parent element of the DOMRenderer for this context.
+ *
+ * @method getRootSize
+ */
 Context.prototype.getRootSize = function getRootSize() {
     return this.DOMRenderer.getSize();
 };
 
+/**
+ * Handles initialization of WebGLRenderer when necessary, including creation
+ * of the canvas element and instantiation of the renderer.  Also updates size
+ * to pass size information to the renderer.
+ *
+ * @method initWebGL
+ */
 Context.prototype.initWebGL = function initWebGL() {
     this.canvas = document.createElement('canvas');
     this._rootEl.appendChild(this.canvas);
@@ -104,7 +158,20 @@ Context.prototype.initWebGL = function initWebGL() {
     this.updateSize();
 };
 
-Context.prototype.receive = function receive(pathArr, path, commands, iterator) {
+/**
+ * Handles delegation of commands to renderers of this context.
+ *
+ * @method receive
+ *
+ * @param {String} path String used as identifier of a given node in the
+ * scene graph.
+ * @param {Array} commands List of all commands from this frame.
+ * @param {Number} iterator Number indicating progress through the command
+ * queue.
+ *
+ * @return {Number} iterator indicating progress through the command queue.
+ */
+Context.prototype.receive = function receive(path, commands, iterator) {
     var localIterator = iterator;
 
     var command = commands[++localIterator];

@@ -1,18 +1,18 @@
 /**
  * The MIT License (MIT)
- * 
+ *
  * Copyright (c) 2015 Famous Industries Inc.
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -57,16 +57,6 @@ var RENDER_SIZE = 2;
 function DOMElement (node, options) {
     if (!node) throw new Error('DOMElement must be instantiated on a node');
 
-    if (typeof options === 'string') {
-        console.warn(
-            'HTMLElement constructor signature changed!\n' +
-            'Pass in an options object with {tagName: ' + options + '} instead.'
-        );
-        options = {
-            tagName: options
-        };
-    }
-
     this._node = node;
     this._parent = null;
     this._children = [];
@@ -80,10 +70,15 @@ function DOMElement (node, options) {
     this._UIEvents = node.getUIEvents().slice(0);
     this._classes = [];
     this._requestingEventListeners = [];
-    this._styles = {
-        display: node.isShown(),
-        opacity: node.getOpacity()
-    };
+    this._styles = {};
+
+    this.setProperty('display', node.isShown() ? 'none' : 'block');
+    this.onOpacityChange(node.getOpacity());
+
+    for (var property in this.DEFAULT_PROPERTIES) {
+        this.setProperty(property, this.DEFAULT_PROPERTIES[property]);
+    }
+
     this._attributes = {};
     this._content = '';
 
@@ -94,29 +89,23 @@ function DOMElement (node, options) {
 
     this._callbacks = new CallbackStore();
 
-    
-    var key;
-    
-    for (key in this.constructor.DEFAULT_STYLES) {
-        this.setProperty(key, this.constructor.DEFAULT_STYLES[key]);
-    }
 
     if (!options) return;
 
-    if (options.classes) {
-        for (var i = 0; i < options.classes.length; i++)
-            this.addClass(options.classes[i]);
-    }
+    var i;
+    var key;
 
-    if (options.attributes) {
+    if (options.classes)
+        for (i = 0; i < options.classes.length; i++)
+            this.addClass(options.classes[i]);
+
+    if (options.attributes)
         for (key in options.attributes)
             this.setAttribute(key, options.attributes[key]);
-    }
 
-    if (options.properties) {
+    if (options.properties)
         for (key in options.properties)
             this.setProperty(key, options.properties[key]);
-    }
 
     if (options.id) this.setId(options.id);
     if (options.content) this.setContent(options.content);
@@ -160,7 +149,6 @@ DOMElement.prototype.onUpdate = function onUpdate () {
     if (len && node) {
         node.sendDrawCommand('WITH');
         node.sendDrawCommand(node.getLocation());
-        node.sendDrawCommand('DOM');
 
         while (len--) node.sendDrawCommand(queue.shift());
         if (this._requestRenderSize) {
@@ -168,7 +156,7 @@ DOMElement.prototype.onUpdate = function onUpdate () {
             node.sendDrawCommand(node.getLocation());
             this._requestRenderSize = false;
         }
- 
+
     }
 
     this._requestingUpdate = false;
@@ -355,7 +343,7 @@ DOMElement.prototype.onOpacityChange = function onOpacityChange (opacity) {
 /**
  * Method to be invoked by the node as soon as a new UIEvent is being added.
  * This results into an `ADD_EVENT_LISTENER` command being send.
- * 
+ *
  * @param  {String} UIEvent     UIEvent to be subscribed to (e.g. `click`).
  */
 DOMElement.prototype.onAddUIEvent = function onAddUIEvent (UIEvent) {
@@ -482,6 +470,20 @@ DOMElement.prototype.removeClass = function removeClass (value) {
 
     if (!this._requestingUpdate) this._requestUpdate();
     return this;
+};
+
+
+/**
+ * Checks if the DOMElement has the passed in class.
+ *
+ * @method  hasClass
+ *
+ * @param  {String} value   The class name.
+ * @return {Boolean}        Boolean value indicating whether the passed in class
+ *                          name is in the DOMElement's class list.
+ */
+DOMElement.prototype.hasClass = function hasClass (value) {
+    return this._classes.indexOf(value) !== -1;
 };
 
 /**
@@ -611,18 +613,20 @@ DOMElement.prototype.draw = function draw () {
     this._inDraw = false;
 };
 
-DOMElement.DEFAULT_STYLES = {
+DOMElement.prototype.DEFAULT_PROPERTIES = {
     'position': 'absolute',
     '-webkit-transform-origin': '0% 0%',
     'transform-origin': '0% 0%',
     '-webkit-backface-visibility': 'visible',
     'backface-visibility': 'visible',
     '-webkit-transform-style': 'preserve-3d',
-    'transform-style': 'preserve-3d; /* performance *',
+    'transform-style': 'preserve-3d',
     '-webkit-tap-highlight-color': 'transparent',
     'pointer-events': 'auto',
-    'z-index': '1'
+    'z-index': '1',
+    'box-sizing': 'border-box',
+    '-moz-box-sizing': 'border-box',
+    '-webkit-box-sizing': 'border-box'
 };
 
 module.exports = DOMElement;
-

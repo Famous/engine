@@ -482,6 +482,7 @@ GeometryHelper.getAltitude = function altitude(v) {
  * @method trianglesToLines
  *
  * @param {Array} indices Indices of all faces on the geometry
+ * @param {Array} out Indices of all faces on the geometry
  * 
  * @return {Array} new list of line-formatted indices
  */
@@ -493,14 +494,24 @@ GeometryHelper.trianglesToLines = function triangleToLines(indices, out) {
     var i;
 
     for (i = 0; i < numVectors; i++) {
-        out.push(indices[i + 0], indices[i + 1]);
-        out.push(indices[i + 1], indices[i + 2]);
-        out.push(indices[i + 2], indices[i + 0]);
+        out.push(indices[i * 3 + 0], indices[i * 3 + 1]);
+        out.push(indices[i * 3 + 1], indices[i * 3 + 2]);
+        out.push(indices[i * 3 + 2], indices[i * 3 + 0]);
     }
 
     return out;
 };
 
+/**
+ * Adds a reverse order triangle for every triangle in the mesh.  Adds extra vertices
+ * and indices to input arrays.
+ *
+ * @static
+ * @method addBackfaceTriangles
+ *
+ * @param {Array} vertices X, Y, Z positions of all vertices in the geometry
+ * @param {Array} indices Indices of all faces on the geometry
+ */
 GeometryHelper.addBackfaceTriangles = function addBackfaceTriangles(vertices, indices) {
     var nFaces = indices.length / 3;
     

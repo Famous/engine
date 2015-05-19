@@ -1,18 +1,18 @@
 /**
  * The MIT License (MIT)
- * 
+ *
  * Copyright (c) 2015 Famous Industries Inc.
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -39,7 +39,7 @@ test('Vec2', function(t) {
 
         vec = new Vec2(1, 2);
         t.deepEqual(vec.toArray(), [1, 2], 'Vec2 constructor should set initial state');
-        
+
         vec = new Vec2();
         t.deepEqual(vec.toArray(), [0, 0], 'Vec2 constructor should default to [0, 0]');
 
@@ -63,7 +63,7 @@ test('Vec2', function(t) {
         t.deepEqual(vec.toArray(), [4, 5]);
         t.end();
     });
-    
+
     t.test('add method', function(t) {
         var vector = new Vec2();
         t.equal(typeof vector.add, 'function', 'vector.add should be a function');
@@ -110,7 +110,7 @@ test('Vec2', function(t) {
 
         t.end();
     });
-    
+
     t.test('invert method', function(t) {
         var vector = new Vec2();
         t.equal(typeof vector.invert, 'function', 'vector.invert should be a function');
@@ -129,7 +129,7 @@ test('Vec2', function(t) {
 
     t.test('map method', function(t) {
         var vector = new Vec2();
-    
+
         t.equal(typeof vector.map, 'function', 'vector.map should be a function');
 
         var inverse = function(value) {
@@ -145,7 +145,7 @@ test('Vec2', function(t) {
 
     t.test('length method', function(t) {
         var vector = new Vec2();
-    
+
         t.equal(typeof vector.length, 'function', 'vector.length should be a function');
 
         t.equal((new Vec2(1, 1)).length(), Math.sqrt(2));
@@ -198,16 +198,6 @@ test('Vec2', function(t) {
         t.equal(new Vec2(1, 0).isZero(), false);
         t.equal(new Vec2(0, 1).isZero(), false);
         t.equal(new Vec2(0, 0).isZero(), true);
-
-        t.end();
-    });
-
-    t.test('identity method', function(t) {
-        var vector = new Vec2();
-        t.equal(typeof vector.isZero, 'function', 'vector.isZero should be a function');
-
-        t.equal(vector.identity(new Vec2(0, 0)), true);
-        t.equal(vector.identity(new Vec2(0, 1)), false);
 
         t.end();
     });
@@ -278,33 +268,15 @@ test('Vec2', function(t) {
 
         t.end();
     });
-    
+
     t.test('clone method', function(t) {
         var sourceVec2 = new Vec2();
         t.equal(typeof Vec2.clone, 'function', 'Vec2.clone should be a function');
-
 
         var clonedVec2 = Vec2.clone(sourceVec2);
 
         t.notEqual(sourceVec2, clonedVec2);
         t.deepEqual(sourceVec2, clonedVec2);
-        t.end();
-    });
-
-    t.test('dotProduct method', function(t) {
-        t.equal(typeof Vec2.dotProduct, 'function',' Vec2.dotProduct should be a function');
-
-        t.equal(Vec2.dotProduct(new Vec2(1, 2), new Vec2(3, 9)), 21);
-
-        t.end();
-    });
-
-    t.test('equals method', function(t) {
-        t.equal(typeof Vec2.equals, 'function',' Vec2.equals should be a function');
-
-        t.equal(Vec2.equals(new Vec2(1, 2), new Vec2(3, 9)), false);
-        t.equal(Vec2.equals(new Vec2(1, 2), new Vec2(1, 2)), true);
-
         t.end();
     });
 });

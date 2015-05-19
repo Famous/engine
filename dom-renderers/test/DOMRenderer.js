@@ -1,18 +1,18 @@
 /**
  * The MIT License (MIT)
- * 
+ *
  * Copyright (c) 2015 Famous Industries Inc.
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -34,7 +34,7 @@ var DOMRenderer = require('../DOMRenderer');
  *
  * @method createUnidirectionalCompositor
  * @private
- * 
+ *
  * @param  {tape} t tape-test object
  * @return {Object} mock compostior
  */
@@ -110,20 +110,20 @@ test('DOMRenderer', function(t) {
         domRenderer.insertEl('div');
 
         domRenderer.setProperty('background', 'red');
-        t.equal(element.children[0].style.background, 'red', 'domRenderer.setProperty should set the background color to red');
-        
+        t.equal(element.children[0].style.backgroundColor, 'red', 'domRenderer.setProperty should set the background color to red');
+
         domRenderer.setProperty('background', 'yellow');
-        t.equal(element.children[0].style.background, 'yellow', 'domRenderer.setProperty should set the background color to yellow');
+        t.equal(element.children[0].style.backgroundColor, 'yellow', 'domRenderer.setProperty should set the background color to yellow');
 
         domRenderer.loadPath(selector + '/' + 1);
         domRenderer.findTarget();
         domRenderer.insertEl('div');
 
         domRenderer.setProperty('background', 'green');
-        t.equal(element.children[0].style.background, 'green', 'domRenderer.setProperty should set the background color to green');        
+        t.equal(element.children[0].style.backgroundColor, 'green', 'domRenderer.setProperty should set the background color to green');
 
         domRenderer.setProperty('background', 'yellow');
-        t.equal(element.children[0].children[0].style.background, 'yellow', 'domRenderer.setProperty should set the background color to yellow');        
+        t.equal(element.children[0].children[0].style.backgroundColor, 'yellow', 'domRenderer.setProperty should set the background color to yellow');
 
         t.end();
     });
@@ -181,16 +181,17 @@ test('DOMRenderer', function(t) {
         domRenderer.insertEl('div');
 
         domRenderer.setContent('only text');
-        t.equal(element.children[0].innerHTML, 'only text');
+        t.equal(element.children[0].children[0].constructor, HTMLDivElement, 'DOMRenderer should wrap content into content div');
+        t.equal(element.children[0].children[0].innerHTML, 'only text');
 
         domRenderer.setContent('also <strong>HTML</strong> should work');
-        t.equal(element.children[0].innerHTML, 'also <strong>HTML</strong> should work');
+        t.equal(element.children[0].children[0].innerHTML, 'also <strong>HTML</strong> should work');
 
-        domRenderer.setContent('combined <strong>HTML</strong> and nodes');
+        domRenderer.setContent('combined <strong>HTML</strong> and nodes <section></section>');
         domRenderer.loadPath(selector + '/' + 0 + '/' + 1);
         domRenderer.findTarget();
         domRenderer.insertEl('section');
-        t.equal(element.children[0].innerHTML, 'combined <strong>HTML</strong> and nodes<section></section>');
+        t.equal(element.children[0].children[0].innerHTML, 'combined <strong>HTML</strong> and nodes <section></section>');
 
         t.end();
     });

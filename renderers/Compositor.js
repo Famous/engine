@@ -104,7 +104,7 @@ Compositor.prototype.handleWith = function handleWith (iterator, commands) {
     var path = commands[iterator];
     var pathArr = path.split('/');
     var context = this.getOrSetContext(pathArr.shift());
-    return context.receive(pathArr, path, commands, iterator);
+    return context.receive(path, commands, iterator);
 };
 
 /**

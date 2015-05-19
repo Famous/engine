@@ -31,10 +31,14 @@ var types = {
 };
 
 /**
- * Converts material graph into chunk
+ * Traverses material to create a string of glsl code to be applied in
+ * the vertex or fragment shader.
  *
  * @method _compile
  * @protected
+ *
+ * @param {Object} material Material to be compiled.
+ * @param {Number} textureSlot Next available texture slot for Mesh.
  *
  */
 function compileMaterial(material, textureSlot) {
@@ -48,7 +52,7 @@ function compileMaterial(material, textureSlot) {
     _traverse(material, function (node, depth) {
         if (! node.chunk) return;
         
-        var type = types[_getOutputType(node)];
+        var type = types[_getOutputLength(node)];
         var label = _makeLabel(node);
         var output = _processGLSL(node.chunk.glsl, node.inputs, textures.length + textureSlot);
 
@@ -72,14 +76,9 @@ function compileMaterial(material, textureSlot) {
     };
 }
 
-/**
- * Iterates over material graph
- *
- * @method traverse
- * @chainable
- *
- * @param {Function} invoked upon every expression in the graph
- */
+// Recursively iterates over a material's inputs, invoking a given callback
+// with the current material
+
 function _traverse(material, callback) {
 	var inputs = material.inputs;
     var len = inputs && inputs.length;
@@ -93,7 +92,10 @@ function _traverse(material, callback) {
     return material;
 }
 
-function _getOutputType(node) {
+// Helper function used to infer length of the output
+// from a given material node.
+
+function _getOutputLength(node) {
 
     // Handle constant values
 
@@ -107,9 +109,12 @@ function _getOutputType(node) {
 
     // Handle polymorphic output
 
-    var key = node.inputs.map(function recurse(node) { return _getOutputType(node); }).join(',');
+    var key = node.inputs.map(function recurse(node) { return _getOutputLength(node); }).join(',');
     return output[key];
 }
+
+// Helper function to run replace inputs and texture tags with
+// correct glsl.
 
 function _processGLSL(str, inputs, textureSlot) {
     return str
@@ -119,15 +124,22 @@ function _processGLSL(str, inputs, textureSlot) {
         .replace(/\$TEXTURE/, 'u_textures[' + textureSlot + ']');
 }
 
+// Helper function used to create glsl definition of the 
+// input material node.
+
 function _makeLabel (n) {
     if (Array.isArray(n)) return arrayToVec(n);
     if (typeof n == 'object') return 'fa_' + (n._id);
     else return n.toFixed(6);
 }
 
+// Helper to copy the properties of an object onto another object.
+
 function _extend (a, b) {
 	for (var k in b) a[k] = b[k];
 }
+
+// Helper to create glsl vector representation of a javascript array.
 
 function _arrayToVec(array) {
     var len = array.length;

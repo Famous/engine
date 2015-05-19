@@ -1,18 +1,18 @@
 /**
  * The MIT License (MIT)
- * 
+ *
  * Copyright (c) 2015 Famous Industries Inc.
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -28,6 +28,14 @@
 
 var MouseEvent = require('./MouseEvent');
 
+/**
+ * See [UI Events (formerly DOM Level 3 Events)](http://www.w3.org/TR/2015/WD-uievents-20150428/#events-wheelevents).
+ *
+ * @class       WheelEvent
+ * @augments    UIEvent
+ *
+ * @param  {Event} ev   The native DOM event.
+ */
 function WheelEvent(ev) {
     // [Constructor(DOMString typeArg, optional WheelEventInit wheelEventInitDict)]
     // interface WheelEvent : MouseEvent {
@@ -42,12 +50,47 @@ function WheelEvent(ev) {
     // };
 
     MouseEvent.call(this, ev);
+
+    /**
+     * @name WheelEvent#DOM_DELTA_PIXEL
+     * @type Number
+     */
     this.DOM_DELTA_PIXEL = 0x00;
+
+    /**
+     * @name WheelEvent#DOM_DELTA_LINE
+     * @type Number
+     */
     this.DOM_DELTA_LINE = 0x01;
+
+    /**
+     * @name WheelEvent#DOM_DELTA_PAGE
+     * @type Number
+     */
     this.DOM_DELTA_PAGE = 0x02;
+
+    /**
+     * @name WheelEvent#deltaX
+     * @type Number
+     */
     this.deltaX = ev.deltaX;
+
+    /**
+     * @name WheelEvent#deltaY
+     * @type Number
+     */
     this.deltaY = ev.deltaY;
+
+    /**
+     * @name WheelEvent#deltaZ
+     * @type Number
+     */
     this.deltaZ = ev.deltaZ;
+
+    /**
+     * @name WheelEvent#deltaMode
+     * @type Number
+     */
     this.deltaMode = ev.deltaMode;
 }
 
