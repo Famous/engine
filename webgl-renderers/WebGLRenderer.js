@@ -1,18 +1,18 @@
 /**
  * The MIT License (MIT)
- * 
+ *
  * Copyright (c) 2015 Famous Industries Inc.
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -61,9 +61,11 @@ var globalUniforms = keyValueToArrays({
  *
  */
 function WebGLRenderer(canvas, compositor) {
+    canvas.classList.add('famous-webgl-renderer');
+
     this.canvas = canvas;
     this.compositor = compositor;
-    
+
     for (var key in this.constructor.DEFAULT_STYLES) {
         this.canvas.style[key] = this.constructor.DEFAULT_STYLES[key];
     }
@@ -84,7 +86,7 @@ function WebGLRenderer(canvas, compositor) {
     this.meshRegistryKeys = [];
 
     this.cutoutRegistry = {};
-    
+
     this.cutoutRegistryKeys = [];
 
     /**
@@ -128,7 +130,7 @@ function WebGLRenderer(canvas, compositor) {
     The final component (this.projectionTransform[15]) is initialized as 1 because certain projection models,
     e.g. the WC3 specified model, keep the XY plane as the projection hyperplane.
     */
-    
+
     this.projectionTransform = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, -0.000001, 0, -1, 1, 0, 1];
 
     // TODO: remove this hack
@@ -223,12 +225,12 @@ WebGLRenderer.prototype.createMesh = function createMesh(path) {
 
 /**
  * Sets flag on indicating whether to do skip draw phase for
- * cutout mesh at given path. 
+ * cutout mesh at given path.
  *
  * @method setCutoutState
  *
  * @param {String} path Path used as id of target cutout mesh.
- * @param {Boolean} usesCutout Indicates the presence of a 
+ * @param {Boolean} usesCutout Indicates the presence of a
  * cutout mesh.
  */
 WebGLRenderer.prototype.setCutoutState = function setCutoutState(path, usesCutout) {
@@ -275,7 +277,7 @@ WebGLRenderer.prototype.getOrSetCutout = function getOrSetCutout(path) {
 
 /**
  * Sets flag on indicating whether to do skip draw phase for
- * mesh at given path. 
+ * mesh at given path.
  *
  * @method setMeshVisibility
  *
@@ -284,7 +286,7 @@ WebGLRenderer.prototype.getOrSetCutout = function getOrSetCutout(path) {
  */
 WebGLRenderer.prototype.setMeshVisibility = function setMeshVisibility(path, visibility) {
     var mesh = this.meshRegistry[path] || this.createMesh(path);
-    
+
     mesh.visible = visibility;
 };
 
@@ -508,10 +510,10 @@ WebGLRenderer.prototype.bufferData = function bufferData(path, geometryId, buffe
  */
 WebGLRenderer.prototype.draw = function draw(renderState) {
     var time = this.compositor.getTime();
-    
+
     this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
     this.textureManager.update(time);
-    
+
     this.meshRegistryKeys = sorter(this.meshRegistryKeys, this.meshRegistry);
 
     this.setGlobalUniforms(renderState);
@@ -549,9 +551,9 @@ WebGLRenderer.prototype.drawMeshes = function drawMeshes() {
 
         var j = mesh.textures.length;
         while (j--) this.textureManager.bindTexture(mesh.textures[j]);
-        
+
         if (mesh.options) this.handleOptions(mesh.options, mesh);
-        
+
         this.program.setUniforms(mesh.uniformKeys, mesh.uniformValues);
         this.drawBuffers(buffers, mesh.drawType, mesh.geometry);
 
@@ -560,7 +562,7 @@ WebGLRenderer.prototype.drawMeshes = function drawMeshes() {
 };
 
 /**
- * Iterates through and draws all registered cutout meshes.  Blending 
+ * Iterates through and draws all registered cutout meshes.  Blending
  * is disabled, cutout uniforms are set and finally buffers are drawn.
  *
  * @method drawCutouts

@@ -68,16 +68,12 @@ function DOMElement (node, options) {
     this._changeQueue = [];
 
     this._UIEvents = node.getUIEvents().slice(0);
-    this._classes = [];
+    this._classes = ['famous-dom-element'];
     this._requestingEventListeners = [];
     this._styles = {};
 
     this.setProperty('display', node.isShown() ? 'none' : 'block');
     this.onOpacityChange(node.getOpacity());
-
-    for (var property in this.DEFAULT_PROPERTIES) {
-        this.setProperty(property, this.DEFAULT_PROPERTIES[property]);
-    }
 
     this._attributes = {};
     this._content = '';
@@ -611,22 +607,6 @@ DOMElement.prototype.draw = function draw () {
         this.onAddUIEvent(this._UIEvents[i]);
 
     this._inDraw = false;
-};
-
-DOMElement.prototype.DEFAULT_PROPERTIES = {
-    'position': 'absolute',
-    '-webkit-transform-origin': '0% 0%',
-    'transform-origin': '0% 0%',
-    '-webkit-backface-visibility': 'visible',
-    'backface-visibility': 'visible',
-    '-webkit-transform-style': 'preserve-3d',
-    'transform-style': 'preserve-3d',
-    '-webkit-tap-highlight-color': 'transparent',
-    'pointer-events': 'auto',
-    'z-index': '1',
-    'box-sizing': 'border-box',
-    '-moz-box-sizing': 'border-box',
-    '-webkit-box-sizing': 'border-box'
 };
 
 module.exports = DOMElement;

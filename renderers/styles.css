@@ -22,10 +22,37 @@
  * THE SOFTWARE.
  */
 
-'use strict';
+ .famous-dom-renderer {
+     width: 100%;
+     height: 100%;
+     transform-style: preserve-3d;
+     webkit-transform-style: preserve-3d;
+ }
 
-module.exports = {
-    Compositor: require('./Compositor'),
-    Context: require('./Context'),
-    UIManager: require('./UIManager')
-};
+ .famous-dom-element {
+     -webkit-transform-origin: 0% 0%;
+     transform-origin: 0% 0%;
+     -webkit-backface-visibility: visible;
+     backface-visibility: visible;
+     -webkit-transform-style: preserve-3d;
+     transform-style: preserve-3d;
+     -webkit-tap-highlight-color: transparent;
+     pointer-events: auto;
+     z-index: 1;
+ }
+
+ .famous-dom-element-content,
+ .famous-dom-element {
+     position: absolute;
+     box-sizing: border-box;
+     -moz-box-sizing: border-box;
+     -webkit-box-sizing: border-box;
+ }
+
+ .famous-webgl-renderer {
+     pointer-events: none;
+     position: absolute;
+     z-index: 1;
+     top: 0;
+     left: 0;
+ }
