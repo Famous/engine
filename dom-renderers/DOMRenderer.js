@@ -45,6 +45,8 @@ var TRANSFORM = null;
  * @param {Compositor}
  */
 function DOMRenderer (element, selector, compositor) {
+    element.classList.add('famous-dom-renderer');
+
     TRANSFORM = TRANSFORM || vendorPrefix('transform');
     this._compositor = compositor; // a reference to the compositor
 
@@ -98,14 +100,14 @@ function DOMRenderer (element, selector, compositor) {
  * @param  {String} type            DOM event type (e.g. click, mouseover).
  * @param  {Boolean} preventDefault Whether or not the default browser action
  *                                  should be prevented.
- */ 
+ */
 DOMRenderer.prototype.subscribe = function subscribe(type, preventDefault) {
     // TODO preventDefault should be a separate command
     this._assertTargetLoaded();
-    
+
     this._target.preventDefault[type] = preventDefault;
     this._target.subscribe[type] = true;
-    
+
     if (
         !this._target.listeners[type] && !this._root.listeners[type]
     ) {
@@ -135,7 +137,7 @@ DOMRenderer.prototype._triggerEvent = function _triggerEvent(ev) {
         if (!evPath[i].dataset) continue;
         var path = evPath[i].dataset.faPath;
         if (!path) continue;
-        
+
         // Stop further event propogation and path traversal as soon as the
         // first ElementCache subscribing for the emitted event has been found.
         if (this._elements[path].subscribe[ev.type]) {
@@ -446,16 +448,16 @@ DOMRenderer.prototype.setProperty = function setProperty (name, value) {
  */
 DOMRenderer.prototype.setSize = function setSize (width, height) {
     this._assertTargetLoaded();
-    
+
     this.setWidth(width);
     this.setHeight(height);
 };
 
 DOMRenderer.prototype.setWidth = function setWidth(width) {
     this._assertTargetLoaded();
-    
+
     var contentWrapper = this._target.content;
-    
+
     if (width === false) {
         this._target.explicitWidth = true;
         if (contentWrapper) contentWrapper.style.width = '';
@@ -466,15 +468,15 @@ DOMRenderer.prototype.setWidth = function setWidth(width) {
         if (contentWrapper) contentWrapper.style.width = width + 'px';
         this._target.element.style.width = width + 'px';
     }
-    
+
     this._target.size[0] = width;
 };
 
 DOMRenderer.prototype.setHeight = function setHeight(height) {
     this._assertTargetLoaded();
-    
+
     var contentWrapper = this._target.content;
-    
+
     if (height === false) {
         this._target.explicitHeight = true;
         if (contentWrapper) contentWrapper.style.height = '';
@@ -485,7 +487,7 @@ DOMRenderer.prototype.setHeight = function setHeight(height) {
         if (contentWrapper) contentWrapper.style.height = height + 'px';
         this._target.element.style.height = height + 'px';
     }
-    
+
     this._target.size[1] = height;
 };
 
@@ -512,17 +514,17 @@ DOMRenderer.prototype.setAttribute = function setAttribute (name, value) {
 DOMRenderer.prototype.setContent = function setContent (content) {
     this._assertTargetLoaded();
     this.findChildren();
-    
+
     if (!this._target.content) {
         this._target.content = document.createElement('div');
-        this._target.content.style.position = 'absolute';
+        this._target.content.classList.add('famous-dom-element-content');
         this._target.element.insertBefore(
             this._target.content,
             this._target.element.firstChild
         );
     }
     this._target.content.innerHTML = content;
-    
+
     this.setSize(
         this._target.explicitWidth ? false : this._target.size[0],
         this._target.explicitHeight ? false : this._target.size[1]
