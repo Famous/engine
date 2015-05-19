@@ -28,7 +28,7 @@ var Context = require('./Context');
 
 /**
  * Instantiates a new Compositor, used for routing commands received from the
- * application or WebWorker to the WebGL and DOM renderer.
+ * the global FamousEngine core singleton or WebWorker to the WebGL and DOM renderer.
  *
  * @class Compositor
  * @constructor
