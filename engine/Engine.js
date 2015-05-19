@@ -1,18 +1,18 @@
 /**
  * The MIT License (MIT)
- * 
+ *
  * Copyright (c) 2015 Famous Industries Inc.
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -56,7 +56,7 @@ if (typeof document !== 'undefined') {
  * `update` method invocations to the refresh rate of the screen. Manages
  * the `requestAnimationFrame`-loop by normalizing the passed in timestamp
  * when switching tabs.
- * 
+ *
  * @class Engine
  * @constructor
  */
@@ -94,7 +94,7 @@ function Engine() {
  *
  * @method start
  * @chainable
- * 
+ *
  * @return {Engine} this
  */
 Engine.prototype.start = function start() {
@@ -112,7 +112,7 @@ Engine.prototype.start = function start() {
  *
  * @method stop
  * @chainable
- * 
+ *
  * @return {Engine} this
  */
 Engine.prototype.stop = function stop() {
@@ -129,7 +129,7 @@ Engine.prototype.stop = function stop() {
  * Determines whether the Engine is currently running or not.
  *
  * @method isRunning
- * 
+ *
  * @return {Boolean}    boolean value indicating whether the Engine is
  *                      currently running or not
  */
@@ -142,8 +142,8 @@ Engine.prototype.isRunning = function isRunning() {
  *
  * @method step
  * @chainable
- * 
- * @param  {Number} time high resolution timstamp used for invoking the
+ *
+ * @param  {Number} time high resolution timestamp used for invoking the
  *                       `update` method on all registered objects
  * @return {Engine}      this
  */
@@ -160,8 +160,8 @@ Engine.prototype.step = function step (time) {
  *
  * @method loop
  * @chainable
- * 
- * @param  {Number} time high resolution timstamp used for invoking the
+ *
+ * @param  {Number} time high resolution timestamp used for invoking the
  *                       `update` method on all registered objects
  * @return {Engine}      this
  */
@@ -172,12 +172,12 @@ Engine.prototype.loop = function loop(time) {
 };
 
 /**
- * Registeres an updateable object which `update` method should be invoked on
+ * Registers an updateable object which `update` method should be invoked on
  * every paint, starting on the next paint (assuming the Engine is running).
  *
  * @method update
  * @chainable
- * 
+ *
  * @param  {Object} updateable          object to be updated
  * @param  {Function} updateable.update update function to be called on the
  *                                      registered object
@@ -196,7 +196,7 @@ Engine.prototype.update = function update(updateable) {
  *
  * @method noLongerUpdate
  * @chainable
- * 
+ *
  * @param  {Object} updateable          updateable object previously
  *                                      registered using `update`
  * @return {Engine}                     this
