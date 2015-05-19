@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "tape": "tap-closer | smokestack -b firefox | tap-spec",
+    "tape": "tap-closer | smokestack | tap-spec",
     "test-components": "browserify components/test/*.js | npm run tape",
     "test-core": "browserify core/test/*.js | npm run tape",
     "test-dom-renderables": "browserify dom-renderables/test/*.js | npm run tape",
