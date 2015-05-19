@@ -1,18 +1,18 @@
 /**
  * The MIT License (MIT)
- * 
+ *
  * Copyright (c) 2015 Famous Industries Inc.
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -107,6 +107,9 @@ Transitionable.Clock = FamousEngine.getClock();
  *                                                          to be called after
  *                                                          the transition is
  *                                                          complete
+ * @param  {String}                 [method]                method used for
+ *                                                          interpolation
+ *                                                          (e.g. slerp)
  * @return {Transitionable}         this
  */
 Transitionable.prototype.to = function to(finalState, curve, duration, callback, method) {
@@ -187,6 +190,24 @@ Transitionable.prototype.override = function override(finalState, curve, duratio
     return this;
 };
 
+
+/**
+ * Used for interpolating between the start and end state of the currently
+ * running transition
+ *
+ * @method  _interpolate
+ * @private
+ *
+ * @param  {Object|Array|Number} output     Where to write to (in order to avoid
+ *                                          object allocation and therefore GC).
+ * @param  {Object|Array|Number} from       Start state of current transition.
+ * @param  {Object|Array|Number} to         End state of current transition.
+ * @param  {Number} progress                Progress of the current transition,
+ *                                          in [0, 1]
+ * @param  {String} method                  Method used for interpolation (e.g.
+ *                                          slerp)
+ * @return {Object|Array|Number}            output
+ */
 Transitionable.prototype._interpolate = function _interpolate(output, from, to, progress, method) {
     if (to instanceof Object) {
         if (method === 'slerp') {
@@ -237,6 +258,21 @@ Transitionable.prototype._interpolate = function _interpolate(output, from, to, 
     return output;
 };
 
+
+/**
+ * Internal helper method used for synchronizing the current, absolute state of
+ * a transition to a given output array, object literal or number. Supports
+ * nested state objects by through recursion.
+ *
+ * @method  _sync
+ * @private
+ *
+ * @param  {Number|Array|Object} output     Where to write to (in order to avoid
+ *                                          object allocation and therefore GC).
+ * @param  {Number|Array|Object} input      Input state to proxy onto the
+ *                                          output.
+ * @return {Number|Array|Object} output     Passed in output object.
+ */
 Transitionable.prototype._sync = function _sync(output, input) {
     if (typeof input === 'number') output = input;
     else if (input instanceof Array) {
@@ -260,10 +296,11 @@ Transitionable.prototype._sync = function _sync(output, input) {
  *
  * @method get
  *
- * @param {Number=} timestamp Evaluate the curve at a normalized version of this
- *    time. If omitted, use current time. (Unix epoch time)
- * @return {Number|Array.Number} beginning state
- *    interpolated to this point in time.
+ * @param {Number=} timestamp       Evaluate the curve at a normalized version
+ *                                  of this time. If omitted, use current time
+ *                                  (Unix epoch time retrieved from Clock).
+ * @return {Number|Array.Number}    Beginning state interpolated to this point
+ *                                  in time.
  */
 Transitionable.prototype.get = function get(t) {
     if (this._queue.length === 0) return this._state;
@@ -272,7 +309,13 @@ Transitionable.prototype.get = function get(t) {
     t = t ? t : this.constructor.Clock.now();
 
     var progress = (t - this._startedAt) / this._queue[2];
-    this._state = this._interpolate(this._state, this._from, this._queue[0], this._queue[1](progress > 1 ? 1 : progress), this._queue[4]);
+    this._state = this._interpolate(
+        this._state,
+        this._from,
+        this._queue[0],
+        this._queue[1](progress > 1 ? 1 : progress),
+        this._queue[4]
+    );
     var state = this._state;
     if (progress >= 1) {
         this._startedAt = this._startedAt + this._queue[2];
@@ -336,7 +379,7 @@ Transitionable.prototype.isPaused = function isPaused() {
 };
 
 /**
- * Resume transition.
+ * Resume a previously paused transition.
  *
  * @method resume
  * @chainable
