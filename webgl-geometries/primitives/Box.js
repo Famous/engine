@@ -76,6 +76,7 @@ function BoxGeometry(options) {
         }
         indices.push(v, v + 1, v + 2);
         indices.push(v + 2, v + 1, v + 3);
+        
     }
 
     return new Geometry({

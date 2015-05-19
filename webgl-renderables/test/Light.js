@@ -102,16 +102,6 @@ test('Light', function(t) {
         t.end();
     });
 
-    t.test('Light.prototype.toString', function(t) {
-
-        t.equal(typeof Light.prototype.toString, 'function',
-            'should be a function');
-
-        t.equal(Light.prototype.toString(), 'Light');
-
-        t.end();
-    });
-
     t.test('Light.prototype.setColor', function(t) {
 
         light = createLight();

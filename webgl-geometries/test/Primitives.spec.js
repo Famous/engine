@@ -54,7 +54,7 @@ test('Primitives', function(t) {
         if (name !== 'Circle') {
             t.notEquals(primitive.spec.bufferNames.indexOf('indices'), -1, 'should contain an index buffer');
         }
-   }
+    }
 
     t.end();
 });
