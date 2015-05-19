@@ -1,18 +1,18 @@
 /**
  * The MIT License (MIT)
- * 
+ *
  * Copyright (c) 2015 Famous Industries Inc.
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -519,12 +519,12 @@ Node.prototype.addComponent = function addComponent (component) {
 
 /**
  * @method  getComponent
- *  
+ *
  * @param  {Number} index   Index at which the component has been regsitered
  *                          (using `Node#addComponent`).
  * @return {*}              The component registered at the passed in index (if
  *                          any).
- */ 
+ */
 Node.prototype.getComponent = function getComponent (index) {
     return this._components[index];
 };
@@ -755,7 +755,7 @@ Node.prototype.setRotation = function setRotation (x, y, z, w) {
             else {
                 var sp = -2 * (quat[1] * quat[2] - quat[3] * quat[0]);
 
-                if (Math.abs(sp) > (1 - Number.MIN_VALUE)) {
+                if (Math.abs(sp) > 0.99999) {
                     y = y == null ? Math.PI * 0.5 * sp : y;
                     x = x == null ? Math.atan2(-quat[0] * quat[2] + quat[3] * quat[1], 0.5 - quat[1] * quat[1] - quat[2] * quat[2]) : x;
                     z = z == null ? 0 : z;
@@ -884,7 +884,7 @@ Node.prototype.setOpacity = function setOpacity (val) {
 Node.prototype.setSizeMode = function setSizeMode (x, y, z) {
     var vec3 = this.value.size.sizeMode;
     var propogate = false;
-    
+
     if (x != null) propogate = this._resolveSizeMode(vec3, 0, x) || propogate;
     if (y != null) propogate = this._resolveSizeMode(vec3, 1, y) || propogate;
     if (z != null) propogate = this._resolveSizeMode(vec3, 2, z) || propogate;
