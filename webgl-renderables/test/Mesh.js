@@ -207,7 +207,8 @@ test('Mesh', function(t) {
             mesh.setGeometry('Sphere');
         }, 'accepts string references for geometries');
 
-        var geometry = mesh._geometry;
+        var geometry = mesh.value.geometry;
+
         t.true(contains(['GL_SET_GEOMETRY', geometry.id, geometry.spec.type, geometry.spec.dynamic], mesh._changeQueue),
             'sends the appropriate commands for geometry');
 
@@ -244,22 +245,6 @@ test('Mesh', function(t) {
         mesh = createMesh().mesh;
         t.equal(typeof mesh._pushActiveCommands, 'function',
             'should be a function');
-
-        t.end();
-    });
-
-    t.test('Mesh.prototype.clean', function(t) {
-
-        mesh = createMesh().mesh;
-        t.equal(typeof mesh.clean, 'function',
-            'should be a function');
-
-        t.true(mesh._changeQueue,
-            'should have a populated queue');
-
-        mesh.clean();
-        t.equal(mesh._changeQueue.length, 0,
-            'should have an empty (cleaned) queue');
 
         t.end();
     });
