@@ -26,5 +26,6 @@
 
 module.exports = {
     Compositor: require('./Compositor'),
+    Context: require('./Context'),
     UIManager: require('./UIManager')
 };
