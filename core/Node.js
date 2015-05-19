@@ -1,18 +1,18 @@
 /**
  * The MIT License (MIT)
- * 
+ *
  * Copyright (c) 2015 Famous Industries Inc.
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -202,7 +202,7 @@ Node.prototype.emit = function emit (event, payload) {
     return this;
 };
 
-// THIS WILL BE DEPRICATED
+// THIS WILL BE DEPRECATED
 Node.prototype.sendDrawCommand = function sendDrawCommand (message) {
     this._globalUpdater.message(message);
     return this;
@@ -341,7 +341,7 @@ Node.prototype.getUpdater = function getUpdater () {
  *
  * @method isMounted
  *
- * @return {Boolean}    Boolean indicating weather the node is mounted or not.
+ * @return {Boolean}    Boolean indicating whether the node is mounted or not.
  */
 Node.prototype.isMounted = function isMounted () {
     return this.value.showState.mounted;
@@ -352,7 +352,7 @@ Node.prototype.isMounted = function isMounted () {
  *
  * @method isShown
  *
- * @return {Boolean}    Boolean indicating weather the node is visible
+ * @return {Boolean}    Boolean indicating whether the node is visible
  *                      ("shown") or not.
  */
 Node.prototype.isShown = function isShown () {
@@ -495,7 +495,7 @@ Node.prototype.removeChild = function removeChild (child) {
  *
  * @method addComponent
  *
- * @param {Object} component    An component to be added.
+ * @param {Object} component    A component to be added.
  * @return {Number} index       The index at which the component has been
  *                              registered. Indices aren't necessarily
  *                              consecutive.
@@ -518,12 +518,12 @@ Node.prototype.addComponent = function addComponent (component) {
 
 /**
  * @method  getComponent
- *  
- * @param  {Number} index   Index at which the component has been regsitered
+ *
+ * @param  {Number} index   Index at which the component has been registered
  *                          (using `Node#addComponent`).
  * @return {*}              The component registered at the passed in index (if
  *                          any).
- */ 
+ */
 Node.prototype.getComponent = function getComponent (index) {
     return this._components[index];
 };
@@ -533,7 +533,7 @@ Node.prototype.getComponent = function getComponent (index) {
  *
  * @method removeComponent
  *
- * @param  {Object} component   An component that has previously been added
+ * @param  {Object} component   A component that has previously been added
  *                              using @{@link addComponent}.
  */
 Node.prototype.removeComponent = function removeComponent (component) {
@@ -858,7 +858,7 @@ Node.prototype.setOpacity = function setOpacity (val) {
 };
 
 /**
- * Sets the size mode being used for determining the nodes final width, height
+ * Sets the size mode being used for determining the node's final width, height
  * and depth.
  * Size modes are a way to define the way the node's size is being calculated.
  * Size modes are enums set on the @{@link Size} constructor (and aliased on
@@ -866,7 +866,7 @@ Node.prototype.setOpacity = function setOpacity (val) {
  *
  * @example
  * node.setSizeMode(Node.RELATIVE_SIZE, Node.ABSOLUTE_SIZE, Node.ABSOLUTE_SIZE);
- * // Instead of null, any proporional height or depth can be passed in, since
+ * // Instead of null, any proportional height or depth can be passed in, since
  * // it would be ignored in any case.
  * node.setProportionalSize(0.5, null, null);
  * node.setAbsoluteSize(null, 100, 200);
@@ -883,7 +883,7 @@ Node.prototype.setOpacity = function setOpacity (val) {
 Node.prototype.setSizeMode = function setSizeMode (x, y, z) {
     var vec3 = this.value.size.sizeMode;
     var propogate = false;
-    
+
     if (x != null) propogate = this._resolveSizeMode(vec3, 0, x) || propogate;
     if (y != null) propogate = this._resolveSizeMode(vec3, 1, y) || propogate;
     if (z != null) propogate = this._resolveSizeMode(vec3, 2, z) || propogate;
@@ -964,7 +964,7 @@ Node.prototype.setProportionalSize = function setProportionalSize (x, y, z) {
 };
 
 /**
- * Differential sizing can be used to add or subtract an absolute size from a
+ * Differential sizing can be used to add or subtract an absolute size from an
  * otherwise proportionally sized node.
  * E.g. a differential width of `-10` and a proportional width of `0.5` is
  * being interpreted as setting the node's size to 50% of its parent's width
@@ -1004,7 +1004,7 @@ Node.prototype.setDifferentialSize = function setDifferentialSize (x, y, z) {
 };
 
 /**
- * Sets the nodes size in pixels, independent of its parent.
+ * Sets the node's size in pixels, independent of its parent.
  *
  * @method setAbsoluteSize
  *
@@ -1078,7 +1078,7 @@ Node.prototype._sizeChanged = function _sizeChanged (size) {
     }
 };
 
-// DEPRICATE
+// DEPRECATE
 Node.prototype.getFrame = function getFrame () {
     return this._globalUpdater.getFrame();
 };

@@ -1,18 +1,18 @@
 /**
  * The MIT License (MIT)
- * 
+ *
  * Copyright (c) 2015 Famous Industries Inc.
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -31,7 +31,7 @@ var now = require('./now');
  * `update` method invocations to the refresh rate of the screen.
  * Does not normalize the high resolution timestamp when being consecutively
  * started and stopped.
- * 
+ *
  * @class ContainerEngine
  * @constructor
  */
@@ -63,7 +63,7 @@ ContainerEngine.prototype._onWindowMessage = function _onWindowMessage(ev) {
  *
  * @method start
  * @chainable
- * 
+ *
  * @return {ContainerEngine} this
  */
 ContainerEngine.prototype.start = function start() {
@@ -77,7 +77,7 @@ ContainerEngine.prototype.start = function start() {
  *
  * @method stop
  * @chainable
- * 
+ *
  * @return {ContainerEngine} this
  */
 ContainerEngine.prototype.stop = function stop() {
@@ -90,7 +90,7 @@ ContainerEngine.prototype.stop = function stop() {
  * Determines whether the ContainerEngine is currently running or not.
  *
  * @method isRunning
- * 
+ *
  * @return {Boolean}    boolean value indicating whether the ContainerEngine is
  *                      currently running or not
  */
@@ -103,8 +103,8 @@ ContainerEngine.prototype.isRunning = function isRunning() {
  *
  * @method step
  * @chainable
- * 
- * @param  {Number} time high resolution timstamp used for invoking the
+ *
+ * @param  {Number} time high resolution timestamp used for invoking the
  *                       `update` method on all registered objects
  * @return {ContainerEngine}      this
  */
@@ -116,12 +116,12 @@ ContainerEngine.prototype.step = function step (time) {
 };
 
 /**
- * Registeres an updateable object which `update` method should be invoked on
+ * Registers an updateable object which `update` method should be invoked on
  * every paint, starting on the next paint (assuming the ContainerEngine is running).
  *
  * @method update
  * @chainable
- * 
+ *
  * @param  {Object} updateable          object to be updated
  * @param  {Function} updateable.update update function to be called on the
  *                                      registered object
@@ -140,7 +140,7 @@ ContainerEngine.prototype.update = function update(updateable) {
  *
  * @method noLongerUpdate
  * @chainable
- * 
+ *
  * @param  {Object} updateable          updateable object previously
  *                                      registered using `update`
  * @return {ContainerEngine}                     this
