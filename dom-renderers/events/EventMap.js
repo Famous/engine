@@ -37,6 +37,9 @@ var UIEvent = require('./UIEvent');
 var WheelEvent = require('./WheelEvent');
 
 var EventMap = {
+    change                         : [Event, true],
+    submit                         : [Event, true],
+
     // UI Events (http://www.w3.org/TR/uievents/)
     abort                          : [Event, false],
     beforeinput                    : [InputEvent, true],

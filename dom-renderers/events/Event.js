@@ -72,7 +72,6 @@ function Event(ev) {
      * @name Event#type
      * @type String
      */
-
     this.type = ev.type;
 
     /**
@@ -86,6 +85,23 @@ function Event(ev) {
      * @type Number
      */
     this.timeStamp = ev.timeStamp;
+
+
+    /**
+     * Used for exposing the current target's value.
+     *
+     * @name Event#value
+     * @type String
+     */
+    var targetConstructor = ev.target.constructor;
+    // TODO Support HTMLKeygenElement
+    if (
+        targetConstructor === HTMLInputElement ||
+        targetConstructor === HTMLTextAreaElement ||
+        targetConstructor === HTMLSelectElement
+    ) {
+        this.value = ev.target.value;
+    }
 }
 
 Event.prototype.toString = function toString () {
