@@ -119,94 +119,76 @@ test('Mesh', function(t) {
             'mesh should be instantiated without errors');
 
         mesh = createMesh('randomOption').mesh;
-        t.true(contains(['GL_SET_DRAW_OPTIONS', 'randomOption'], mesh.queue),
+        t.true(contains(['GL_SET_DRAW_OPTIONS', 'randomOption'], mesh._changeQueue),
             'should take options');
 
         t.end();
     });
 
-    t.test('Mesh.prototype.toString', function(t) {
-
-        t.equal(typeof Mesh.prototype.toString, 'function',
-            'should be a function');
-
-        t.equal(Mesh.prototype.toString(), 'Mesh');
-
-        t.end();
-    });
-
-    t.test('Mesh.prototype.setOptions', function(t) {
+    t.test('Mesh.prototype.setDrawOptions', function(t) {
         mesh = createMesh().mesh;
 
-        t.equal(typeof mesh.setOptions, 'function',
+        t.equal(typeof mesh.setDrawOptions, 'function',
             'should be a function');
 
-        t.false(~mesh.queue.indexOf('notPassedIn'),
+        t.false(~mesh._changeQueue.indexOf('notPassedIn'),
             'should not contain false options');
 
-        mesh.setOptions('randomOption');
-        t.true(contains(['GL_SET_DRAW_OPTIONS', 'randomOption'], mesh.queue),
+        mesh.setDrawOptions('randomOption');
+        t.true(contains(['GL_SET_DRAW_OPTIONS', 'randomOption'], mesh._changeQueue),
             'should take options');
 
-        t.false(contains(['GL_SET_DRAW_OPTIONS', 'notIncluded'], mesh.queue),
+        t.false(contains(['GL_SET_DRAW_OPTIONS', 'notIncluded'], mesh._changeQueue),
             'should not pass fake options');
 
         t.end();
     });
 
-    t.test('Mesh.prototype._receiveTransformChange', function(t) {
+    t.test('Mesh.prototype.onTransformChange', function(t) {
 
         node = createMesh();
         mesh = node.mesh;
         dispatch = node.dispatch;
-        t.equal(typeof mesh._receiveTransformChange, 'function',
+        t.equal(typeof mesh.onTransformChange, 'function',
             'should be a function');
 
-        t.doesNotThrow(function() {
-            mesh._receiveTransformChange(dispatch.getContext()._transform);
-        }, 'should not throw an error given an appropriate input');
+        var transform = new Array(16);
 
-        t.throws(function() {
-            mesh._receiveTransformChange();
-        }, 'should throw an error without a dispatch');
+        mesh.onSizeChange(transform);
+
+        t.ok(contains(mesh._changeQueue, ['GL_UNIFORMS', 'u_transform', transform]),
+             'should enqueue transform changes');
+        t.end();
+    });
+
+    t.test('Mesh.prototype.onSizeChange', function(t) {
+
+        node = createMesh();
+        mesh = node.mesh;
+        dispatch = node.dispatch;
+        t.equal(typeof mesh.onSizeChange, 'function',
+            'should be a function');
+
+        mesh.onSizeChange('none');
+
+        t.ok(contains(mesh._changeQueue, ['GL_UNIFORMS', 'u_size', 'none']),
+             'should enqueue size changes');
 
         t.end();
     });
 
-    t.test('Mesh.prototype._receiveSizeChange', function(t) {
+    t.test('Mesh.prototype.onOpacityChange', function(t) {
 
         node = createMesh();
         mesh = node.mesh;
         dispatch = node.dispatch;
-        t.equal(typeof mesh._receiveSizeChange, 'function',
+        t.equal(typeof mesh.onOpacityChange, 'function',
             'should be a function');
 
-        t.doesNotThrow(function() {
-            mesh._receiveSizeChange(dispatch.getContext()._size);
-        }, 'should not throw an error given the appropriate input');
+        mesh.onOpacityChange(5);
 
-        t.throws(function() {
-            mesh._receiveSizeChange();
-        }, 'should throw an error without a dispatch');
-
-        t.end();
-    });
-
-    t.test('Mesh.prototype._receiveOpacityChange', function(t) {
-
-        node = createMesh();
-        mesh = node.mesh;
-        dispatch = node.dispatch;
-        t.equal(typeof mesh._receiveOpacityChange, 'function',
-            'should be a function');
-
-        t.doesNotThrow(function() {
-            mesh._receiveOpacityChange(dispatch.getContext()._opacity);
-        }, 'should not throw an error given the appropriate input');
-
-        t.throws(function() {
-            mesh._receiveOpacityChange();
-        }, 'should throw an error without a dispatch');
+        t.ok(contains(mesh._changeQueue, ['GL_UNIFORMS', 'u_opacity', 5]),
+             'should enqueue opacity changes');
 
         t.end();
     });
@@ -238,7 +220,7 @@ test('Mesh', function(t) {
         }, 'accepts string references for geometries');
 
         var geometry = mesh._geometry;
-        t.true(contains(['GL_SET_GEOMETRY', geometry.id, geometry.spec.type, geometry.spec.dynamic], mesh.queue),
+        t.true(contains(['GL_SET_GEOMETRY', geometry.id, geometry.spec.type, geometry.spec.dynamic], mesh._changeQueue),
             'sends the appropriate commands for geometry');
 
         t.end();
@@ -284,11 +266,11 @@ test('Mesh', function(t) {
         t.equal(typeof mesh.clean, 'function',
             'should be a function');
 
-        t.true(mesh.queue,
+        t.true(mesh._changeQueue,
             'should have a populated queue');
 
         mesh.clean();
-        t.equal(mesh.queue.length, 0,
+        t.equal(mesh._changeQueue.length, 0,
             'should have an empty (cleaned) queue');
 
         t.end();
@@ -304,14 +286,14 @@ test('Mesh', function(t) {
             'should not have a material expression by default');
 
         mesh.setBaseColor(materialExpression);
-        t.true(contains(['sampleExpression'], mesh.queue),
+        t.true(contains(['sampleExpression'], mesh._changeQueue),
             'should be able to take a material expression');
 
         t.false(mesh._color,
             'should not have a color by default');
 
         mesh.setBaseColor(new MockColor());
-        t.true(contains(['1,1,1'], mesh.queue),
+        t.true(contains(['1,1,1'], mesh._changeQueue),
             'should be able to take a Color instance');
 
         t.end();
@@ -382,7 +364,7 @@ test('Mesh', function(t) {
 
 
         mesh.setNormals(materialExpression);
-        t.true(contains(['MATERIAL_INPUT', 'normal', 'sampleExpression'], mesh.queue),
+        t.true(contains(['MATERIAL_INPUT', 'normal', 'sampleExpression'], mesh._changeQueue),
             'should be able to take a normal material expression');
 
         t.end();
@@ -409,7 +391,7 @@ test('Mesh', function(t) {
             'should be a function');
 
         mesh.setGlossiness(materialExpression);
-        t.true(contains(['MATERIAL_INPUT', 'glossiness', 'sampleExpression'], mesh.queue),
+        t.true(contains(['MATERIAL_INPUT', 'glossiness', 'sampleExpression'], mesh._changeQueue),
             'should take a material expression for glossiness');
 
         mesh.setGlossiness(10, { duration: 1000 }, function() {
@@ -451,7 +433,7 @@ test('Mesh', function(t) {
             'should be a function');
 
         mesh.setPositionOffset(materialExpression);
-        t.true(contains(['MATERIAL_INPUT', 'positionOffset', 'sampleExpression'], mesh.queue),
+        t.true(contains(['MATERIAL_INPUT', 'positionOffset', 'sampleExpression'], mesh._changeQueue),
             'should take a material expression for positionOffset');
 
         mesh.setPositionOffset(10, { duration: 1000 }, function() {
