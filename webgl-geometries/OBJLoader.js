@@ -1,18 +1,18 @@
 /**
  * The MIT License (MIT)
- * 
+ *
  * Copyright (c) 2015 Famous Industries Inc.
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -35,7 +35,6 @@ var GeometryHelper = require('./GeometryHelper');
  * @static
  * @class OBJLoader
  */
-
 var OBJLoader = {
     cached: {},
     requests: {},
@@ -49,14 +48,14 @@ var OBJLoader = {
  *
  * @method load
  *
- * @param {String} url URL of desired obj
- * @param {Function} cb Function to be fired upon successful formatting of obj
- * @param {Object} options Options hash to that can affect the output of the OBJ
- * vertices.
+ * @param {String}      url     URL of desired obj
+ * @param {Function}    cb      Function to be fired upon successful formatting of obj
+ * @param {Object}      options Options hash to that can affect the output of the OBJ
+ *                              vertices.
  */
 OBJLoader.load = function load(url, cb, options) {
-    if (! this.cached[url]) {
-        if(! this.requests[url]) {
+    if (!this.cached[url]) {
+        if (!this.requests[url]) {
             this.requests[url] = [cb];
             loadURL(
                 url,
@@ -66,25 +65,27 @@ OBJLoader.load = function load(url, cb, options) {
                     options
                 )
             );
-        } else {
+        }
+        else {
             this.requests[url].push(cb);
         }
-    } else {
+    }
+    else {
         cb(this.cached[url]);
     }
 };
 
 /*
- * Fired on response from server for OBJ asset.  Formats the
+ * Fired on response from server for OBJ asset. Formats the
  * returned string and stores the buffer data in cache.
  * Invokes all queued callbacks before clearing them.
  *
  * @method _onsuccess
  * @private
  *
- * @param {String} URL of requested obj
- * @param {Boolean} value determining whether or not to manually calculate normals
- * @param {String} content of the server response
+ * @param {String}  URL of requested obj
+ * @param {Object}  Options for formatting the OBJ
+ * @param {String}  Content of the server response
  */
 OBJLoader._onsuccess = function _onsuccess(url, options, text) {
     var buffers = format.call(this, text, options || {});
@@ -104,8 +105,8 @@ OBJLoader._onsuccess = function _onsuccess(url, options, text) {
  * @method format
  * @private
  *
- * @param {String} raw obj data in text format
- * @param {Boolean} value determining whether or not to manually calculate normals
+ * @param {String}  raw obj data in text format
+ * @param {Object}  Options for formatting the OBJ
  *
  * @return {Object} vertex buffer data
  */
@@ -333,7 +334,7 @@ function format(text, options) {
  *
  * @param {String} text String to be sanitized.
  *
- * @return {String} sanitized string.
+ * @return {String}     Sanitized string.
  */
 function sanitize(text) {
     return text.replace(/ +(?= )/g,'').replace(/\s+$/g, '');
@@ -346,15 +347,15 @@ function sanitize(text) {
  * @method cacheVertices
  * @private
  *
- * @param {Array} v Pool of vertices used in face declarations.
- * @param {Array} n Pool of normals used in face declarations.
- * @param {Array} t Pool of textureCoords used in face declarations.
- * @param {Array} fv Vertex positions at each face in the OBJ.
- * @param {Array} fn Normals at each face in the OBJ.
- * @param {Array} ft Texture coordinates at each face in the OBJ.
+ * @param {Array} v     Pool of vertices used in face declarations.
+ * @param {Array} n     Pool of normals used in face declarations.
+ * @param {Array} t     Pool of textureCoords used in face declarations.
+ * @param {Array} fv    Vertex positions at each face in the OBJ.
+ * @param {Array} fn    Normals at each face in the OBJ.
+ * @param {Array} ft    Texture coordinates at each face in the OBJ.
  *
- * @return {Object} Object containing the vertices, textureCoordinates and
- * normals of the OBJ.
+ * @return {Object}     Object containing the vertices, textureCoordinates and
+ *                      normals of the OBJ.
  */
 function cacheVertices(v, n, t, fv, fn, ft) {
     var outNormals = [];
