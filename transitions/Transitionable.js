@@ -225,6 +225,14 @@ Transitionable.prototype._interpolate = function _interpolate(output, from, to, 
             qz = to[2];
             qw = to[3];
 
+            if (progress === 1) {
+                output[0] = qx;
+                output[1] = qy;
+                output[2] = qz;
+                output[3] = qw;
+                return output;
+            }
+
             cosomega = w * qw + x * qx + y * qy + z * qz;
             if ((1.0 - cosomega) > 1e-5) {
                 omega = Math.acos(cosomega);
