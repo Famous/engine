@@ -20,8 +20,9 @@
     "test-webgl-renderables": "browserify webgl-renderables/test/*.js | tap-closer | smokestack -b firefox | tap-spec",
     "test-webgl-renderers": "browserify webgl-renderers/test/*.js | tap-closer | smokestack -b firefox | tap-spec",
     "test": "npm run test-components && npm run test-core && npm run test-dom-renderables && npm run test-dom-renderers && npm run test-engine && npm run test-math && npm run test-physics && npm run test-polyfills && npm run test-utilities && npm run test-webgl-geometries && npm run test-webgl-materials && npm run test-webgl-renderables && npm run test-webgl-renderers",
-    "check": "jscs core dom-renderers physics renderers stylesheets utilities webgl-materials webgl-renderers components dom-renderables engine math polyfills router transitions webgl-geometries webgl-renderables webgl-shaders",
-    "lint": "jshint --reporter node_modules/jshint-stylish/stylish.js .",
+    "check": "jscs core dom-renderers physics renderers utilities webgl-materials webgl-renderers components dom-renderables engine math polyfills router transitions webgl-geometries webgl-renderables webgl-shaders",
+    "check-jsdoc": "eslint --reset --no-eslintrc --rule 'valid-jsdoc: 2' --ignore-path .gitignore .",
+    "lint": "eslint --ignore-path .gitignore .",
     "build": "mkdir dist; browserify index.js --standalone famous | uglifyjs --screw-ie8 -m -c dead_code,sequences,conditionals,booleans,unused,if_return,join_vars,drop_debugger > dist/famous.min.js"
   },
   "repository": {
@@ -32,9 +33,8 @@
   "license": "All rights reserved",
   "devDependencies": {
     "browserify": "^9.0.3",
+    "eslint": "^0.21.2",
     "jscs": "^1.13.1",
-    "jshint": "^2.7.0",
-    "jshint-stylish": "^1.0.2",
     "smokestack": "^3.2.2",
     "tap-closer": "^1.0.0",
     "tap-spec": "^3.0.0",
