@@ -39,7 +39,6 @@ var PREFIXES = ['', '-ms-', '-webkit-', '-moz-', '-o-'];
  * 5. `-o-`
  *
  * @method vendorPrefix
- * @private
  *
  * @param {String} property     CSS property (no camelCase), e.g.
  *                              `border-radius`.
