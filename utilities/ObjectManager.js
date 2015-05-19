@@ -65,7 +65,8 @@ function _free(pool) {
 }
 
 /**
- * Untrack all object of the given type. Used to allow allocated objects to be garbage collected.
+ * Untrack all object of the given type. Used to allow allocated objects to be
+ * garbage collected.
  *
  * @method disposeOf
  *
