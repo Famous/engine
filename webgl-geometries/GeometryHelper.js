@@ -1,18 +1,18 @@
 /**
  * The MIT License (MIT)
- * 
+ *
  * Copyright (c) 2015 Famous Industries Inc.
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -52,11 +52,12 @@ var GeometryHelper = {};
  * @static
  * @method generateParametric
  *
- * @param {Number} detailX Amount of slices to iterate through.
- * @param {Number} detailY Amount of stacks to iterate through.
- * @param {Function} func Function used to generate vertex positions at each point.
- * 
- * @return {Object} Object containing generated vertices and indices.
+ * @param  {Number}     detailX     Amount of slices to iterate through.
+ * @param  {Number}     detailY     Amount of stacks to iterate through.
+ * @param  {Function}   func        Function used to generate vertex positions at each point.
+ * @param  {Boolean}    boolean     Optional parameter (default: Pi) for setting a custom wrap range
+ *
+ * @return {Object}     Object      containing generated vertices and indices.
  */
 GeometryHelper.generateParametric = function generateParametric(detailX, detailY, func, wrap) {
     var vertices = [],
@@ -95,17 +96,17 @@ GeometryHelper.generateParametric = function generateParametric(detailX, detailY
 }
 
 /**
- * Calculates normals belonging to each face of a geometry.  
+ * Calculates normals belonging to each face of a geometry.
  * Assumes clockwise declaration of vertices.
  *
  * @static
  * @method computeNormals
  *
- * @param {Array} vertices Vertices of all points on the geometry.
- * @param {Array} indices Indices declaring faces of geometry.
- * @param {Array} out Array to be filled and returned.
- * 
- * @return {Array} Calculated face normals.
+ * @param {Array} vertices  Vertices of all points on the geometry.
+ * @param {Array} indices   Indices declaring faces of geometry.
+ * @param {Array} out       Array to be filled and returned.
+ *
+ * @return {Array}          Calculated face normals.
  */
 GeometryHelper.computeNormals = function computeNormals(vertices, indices, out) {
     var normals = out || [];
@@ -125,7 +126,7 @@ GeometryHelper.computeNormals = function computeNormals(vertices, indices, out) 
     var y;
     var z;
     var length;
-    
+
     for (i = 0; i < len; i++) {
         indexTwo = indices[i*3 + 0] * 3;
         indexOne = indices[i*3 + 1] * 3;
@@ -140,7 +141,7 @@ GeometryHelper.computeNormals = function computeNormals(vertices, indices, out) 
         normals[indexOne + 0] = (normals[indexOne + 0] || 0) + normal.x;
         normals[indexOne + 1] = (normals[indexOne + 1] || 0) + normal.y;
         normals[indexOne + 2] = (normals[indexOne + 2] || 0) + normal.z;
-        
+
         normals[indexTwo + 0] = (normals[indexTwo + 0] || 0) + normal.x;
         normals[indexTwo + 1] = (normals[indexTwo + 1] || 0) + normal.y;
         normals[indexTwo + 2] = (normals[indexTwo + 2] || 0) + normal.z;
@@ -149,7 +150,7 @@ GeometryHelper.computeNormals = function computeNormals(vertices, indices, out) 
         normals[indexThree + 1] = (normals[indexThree + 1] || 0) + normal.y;
         normals[indexThree + 2] = (normals[indexThree + 2] || 0) + normal.z;
     }
-    
+
     for (i = 0; i < normals.length; i += 3) {
         x = normals[i];
         y = normals[i+1];
@@ -170,10 +171,10 @@ GeometryHelper.computeNormals = function computeNormals(vertices, indices, out) 
  * @static
  * @method subdivide
  *
- * @param {Array} indices Indices declaring faces of geometry
- * @param {Array} vertices Vertices of all points on the geometry
- * @param {Array} texutureCoords Texture coordinates of all points on the geometry
- * 
+ * @param {Array} indices           Indices declaring faces of geometry
+ * @param {Array} vertices          Vertices of all points on the geometry
+ * @param {Array} texutureCoords    Texture coordinates of all points on the geometry
+ *
  */
 GeometryHelper.subdivide = function subdivide(indices, vertices, textureCoords) {
     var triangleIndex = indices.length / 3,
@@ -217,9 +218,9 @@ GeometryHelper.subdivide = function subdivide(indices, vertices, textureCoords) 
  * @static
  * @method getUniqueFaces
  *
- * @param {Array} vertices Vertices of all points on the geometry
- * @param {Array} indices Indices declaring faces of geometry
- * 
+ * @param {Array} vertices  Vertices of all points on the geometry
+ * @param {Array} indices   Indices declaring faces of geometry
+ *
  */
 GeometryHelper.getUniqueFaces = function getUniqueFaces(vertices, indices) {
     var triangleIndex = indices.length / 3,
@@ -248,9 +249,9 @@ GeometryHelper.getUniqueFaces = function getUniqueFaces(vertices, indices) {
  * @static
  * @method subdivide
  *
- * @param {Array} vertices Vertices of all points on the geometry
- * @param {Array} indices Indices declaring faces of geometry
- * 
+ * @param {Array} vertices  Vertices of all points on the geometry
+ * @param {Array} indices   Indices declaring faces of geometry
+ *
  */
 GeometryHelper.subdivideSpheroid = function subdivideSpheroid(vertices, indices) {
     var triangleIndex = indices.length / 3,
@@ -286,10 +287,10 @@ GeometryHelper.subdivideSpheroid = function subdivideSpheroid(vertices, indices)
  * @static
  * @method getSpheroidNormals
  *
- * @param {Array} vertices Vertices of all points on the geometry
- * @param {Array} out Optional array to be filled with resulting normals.
- * 
- * @return {Array} new list of calculated normals.
+ * @param {Array} vertices  Vertices of all points on the geometry
+ * @param {Array} out       Optional array to be filled with resulting normals.
+ *
+ * @return {Array}          New list of calculated normals.
  */
 GeometryHelper.getSpheroidNormals = function getSpheroidNormals(vertices, out) {
     var out = out || [];
@@ -318,10 +319,10 @@ GeometryHelper.getSpheroidNormals = function getSpheroidNormals(vertices, out) {
  * @static
  * @method getSpheroidUV
  *
- * @param {Array} vertices Vertices of all points on the geometry
- * @param {Array} out Optional array to be filled with resulting texture coordinates.
- * 
- * @return {Array} new list of calculated texture coordinates
+ * @param {Array} vertices  Vertices of all points on the geometry
+ * @param {Array} out       Optional array to be filled with resulting texture coordinates.
+ *
+ * @return {Array}          New list of calculated texture coordinates
  */
 GeometryHelper.getSpheroidUV = function getSpheroidUV(vertices, out) {
     var out = out || [];
@@ -354,10 +355,10 @@ GeometryHelper.getSpheroidUV = function getSpheroidUV(vertices, out) {
  * @static
  * @method normalizeAll
  *
- * @param {Array} vertices Vertices of all points on the geometry
- * @param {Array} out Optional array to be filled with resulting normalized vectors.
- * 
- * @return {Array} new list of normalized vertices
+ * @param {Array} vertices  Vertices of all points on the geometry
+ * @param {Array} out       Optional array to be filled with resulting normalized vectors.
+ *
+ * @return {Array}          New list of normalized vertices
  */
 GeometryHelper.normalizeAll = function normalizeAll(vertices, out) {
     var out = out || [];
@@ -377,10 +378,10 @@ GeometryHelper.normalizeAll = function normalizeAll(vertices, out) {
  * @static
  * @method normalizeVertices
  *
- * @param {Array} vertices Vertices of all points on the geometry
- * @param {Array} out Optional array to be filled with model space position vectors.
- * 
- * @return {Array} Output vertices.
+ * @param {Array} vertices  Vertices of all points on the geometry
+ * @param {Array} out       Optional array to be filled with model space position vectors.
+ *
+ * @return {Array}          Output vertices.
  */
 GeometryHelper.normalizeVertices = function normalizeVertices(vertices, out) {
     var out = out || [];
@@ -436,10 +437,10 @@ GeometryHelper.normalizeVertices = function normalizeVertices(vertices, out) {
  * @method getTranslationFactor
  * @private
  *
- * @param {Number} max Maximum position value of given axis on the model.
- * @param {Number} min Minimum position value of given axis on the model.
+ * @param {Number} max  Maximum position value of given axis on the model.
+ * @param {Number} min  Minimum position value of given axis on the model.
  *
- * @return {Number} Number by which the given axis should be translated for all vertices.
+ * @return {Number}     Number by which the given axis should be translated for all vertices.
  */
 function getTranslationFactor(max, min) {
     return -(min + (max - min) / 2);
@@ -451,10 +452,10 @@ function getTranslationFactor(max, min) {
  * @method getScaleFactor
  * @private
  *
- * @param {Number} max Maximum scale value of given axis on the model.
- * @param {Number} min Minimum scale value of given axis on the model.
+ * @param {Number} max  Maximum scale value of given axis on the model.
+ * @param {Number} min  Minimum scale value of given axis on the model.
  *
- * @return {Number} Number by which the given axis should be scaled for all vertices.
+ * @return {Number}     Number by which the given axis should be scaled for all vertices.
  */
 function getScaleFactor(max, min) {
     return 1 / ((max - min) / 2);
@@ -466,9 +467,9 @@ function getScaleFactor(max, min) {
  * @static
  * @method getAzimuth
  *
- * @param {Array} v Vertex to retreive azimuth from.
- * 
- * @return {Number} Azimuth value in radians. 
+ * @param {Array} v     Vertex to retreive azimuth from.
+ *
+ * @return {Number}     Azimuth value in radians.
  */
 GeometryHelper.getAzimuth = function azimuth(v) {
     return Math.atan2(v[2], -v[0]);
@@ -481,8 +482,8 @@ GeometryHelper.getAzimuth = function azimuth(v) {
  * @method getAltitude
  *
  * @param {Array} v Vertex to retreive altitude from.
- * 
- * @return {Number} Altitude value in radians. 
+ *
+ * @return {Number} Altitude value in radians.
  */
 GeometryHelper.getAltitude = function altitude(v) {
     return Math.atan2(-v[1], Math.sqrt((v[0] * v[0]) + (v[2] * v[2])));
@@ -494,10 +495,10 @@ GeometryHelper.getAltitude = function altitude(v) {
  * @static
  * @method trianglesToLines
  *
- * @param {Array} indices Indices of all faces on the geometry
- * @param {Array} out Indices of all faces on the geometry
- * 
- * @return {Array} new list of line-formatted indices
+ * @param {Array}   Indices Indices of all faces on the geometry
+ * @param {Array}   Out Indices of all faces on the geometry
+ *
+ * @return {Array}  New list of line-formatted indices
  */
 GeometryHelper.trianglesToLines = function triangleToLines(indices, out) {
     var numVectors = indices.length / 3;
@@ -516,18 +517,18 @@ GeometryHelper.trianglesToLines = function triangleToLines(indices, out) {
 };
 
 /**
- * Adds a reverse order triangle for every triangle in the mesh.  Adds extra vertices
+ * Adds a reverse order triangle for every triangle in the mesh. Adds extra vertices
  * and indices to input arrays.
  *
  * @static
  * @method addBackfaceTriangles
  *
- * @param {Array} vertices X, Y, Z positions of all vertices in the geometry
- * @param {Array} indices Indices of all faces on the geometry
+ * @param {Array} vertices  X, Y, Z positions of all vertices in the geometry
+ * @param {Array} indices   Indices of all faces on the geometry
  */
 GeometryHelper.addBackfaceTriangles = function addBackfaceTriangles(vertices, indices) {
     var nFaces = indices.length / 3;
-    
+
     var maxIndex = 0;
     var i = indices.length;
     while (i--) if (indices[i] > maxIndex) maxIndex = indices[i];
