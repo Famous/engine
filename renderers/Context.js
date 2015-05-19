@@ -1,18 +1,18 @@
 /**
  * The MIT License (MIT)
- * 
+ *
  * Copyright (c) 2015 Famous Industries Inc.
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -31,21 +31,21 @@ var DOMRenderer = require('../dom-renderers/DOMRenderer');
 /**
  * Context is a render layer with its own WebGLRenderer and DOMRenderer.
  * It is the interface between the Compositor which receives commands
- * and the renderers that interpret them.  It also relays information to
+ * and the renderers that interpret them. It also relays information to
  * the renderers about resizing.
  *
- * The DOMElement at the given query selector is used as the root.  A
+ * The DOMElement at the given query selector is used as the root. A
  * new DOMElement is appended to this root element, and used as the
- * parent element for all Famous DOM rendering at this context.  A 
+ * parent element for all Famous DOM rendering at this context. A
  * canvas is added and used for all WebGL rendering at this context.
  *
  * @class Context
  * @constructor
  *
- * @param {String} selector Query selector used to locate root element of
- * context layer.
- * @param {Compositor} compositor Compositor reference to pass down to 
- * WebGLRenderer.
+ * @param {String}      selector    Query selector used to locate root element of
+ *                                  context layer.
+ * @param {Compositor}  compositor  Compositor reference to pass down to
+ *                                  WebGLRenderer.
  */
 function Context(selector, compositor) {
     this._compositor = compositor;
@@ -94,12 +94,11 @@ function Context(selector, compositor) {
 }
 
 /**
- * Queries DOMRenderer size and updates canvas size.  Relays size information to 
+ * Queries DOMRenderer size and updates canvas size. Relays size information to
  * WebGLRenderer.
  *
- * @method drawBuffers
- *
- * @return {Object} Current context.
+ * @chainable
+ * @return {Context} this
  */
 Context.prototype.updateSize = function () {
     var newSize = this.DOMRenderer.getSize();
@@ -146,7 +145,7 @@ Context.prototype.getRootSize = function getRootSize() {
 
 /**
  * Handles initialization of WebGLRenderer when necessary, including creation
- * of the canvas element and instantiation of the renderer.  Also updates size
+ * of the canvas element and instantiation of the renderer. Also updates size
  * to pass size information to the renderer.
  *
  * @method initWebGL
@@ -163,13 +162,12 @@ Context.prototype.initWebGL = function initWebGL() {
  *
  * @method receive
  *
- * @param {String} path String used as identifier of a given node in the
- * scene graph.
- * @param {Array} commands List of all commands from this frame.
- * @param {Number} iterator Number indicating progress through the command
- * queue.
- *
- * @return {Number} iterator indicating progress through the command queue.
+ * @param {String}  path        String used as identifier of a given node in the
+ *                              scene graph.
+ * @param {Array}   commands    List of all commands from this frame.
+ * @param {Number}  iterator    Number indicating progress through the command
+ *                              queue.
+ * @return {Number} iterator    indicating progress through the command queue.
  */
 Context.prototype.receive = function receive(path, commands, iterator) {
     var localIterator = iterator;
@@ -234,7 +232,7 @@ Context.prototype.receive = function receive(path, commands, iterator) {
                 if (this.WebGLRenderer) this.WebGLRenderer.getOrSetCutout(path);
                 this.DOMRenderer.removeClass(commands[++localIterator]);
                 break;
-                
+
             case 'SUBSCRIBE':
                 if (this.WebGLRenderer) this.WebGLRenderer.getOrSetCutout(path);
                 this.DOMRenderer.subscribe(commands[++localIterator], commands[++localIterator]);
