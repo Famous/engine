@@ -3,6 +3,11 @@ node_js:
   - '0.10'
   - 'iojs'
 sudo: false
+env:
+  global:
+    - SAUCE=true
+    - SAUCE_USERNAME=famous
+    - secure: "NMp8S8wz82K9gwN16zPOhXd4gfiPd553AIonBfm/DietMuhCkm/t+YUYg5QKyZ+9j11dnFe0/ZXaQIuqXUdPfWQFBIRdWT7UOrXaSB4mJ0vrz/Q8/+b4V59BaEAWPG+iKPP4T1/N3Pa+nEywMMwy16CcdnBN/9piyowYZHBdJDA="
 notifications:
   email:
     - mike@famo.us
