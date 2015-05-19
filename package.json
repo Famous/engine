@@ -34,7 +34,6 @@
   "devDependencies": {
     "browserify": "^9.0.3",
     "eslint": "^0.21.2",
-    "cssify": "^0.7.0",
     "jscs": "^1.13.1",
     "smokestack": "^3.2.2",
     "tap-closer": "^1.0.0",
@@ -47,8 +46,7 @@
   },
   "browserify": {
     "transform": [
-      "glslify",
-      "cssify"
+      "glslify"
     ]
   }
 }

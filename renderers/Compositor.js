@@ -25,8 +25,7 @@
 'use strict';
 
 var Context = require('./Context');
-
-require('./styles.css');
+var injectCSS = require('./inject-css');
 
 /**
  * Instantiates a new Compositor, used for routing commands received from the
@@ -36,6 +35,8 @@ require('./styles.css');
  * @constructor
  */
 function Compositor() {
+    injectCSS();
+
     this._contexts = {};
     this._outCommands = [];
     this._inCommands = [];
