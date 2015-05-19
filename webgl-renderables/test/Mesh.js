@@ -193,18 +193,6 @@ test('Mesh', function(t) {
         t.end();
     });
 
-    t.test('Mesh.prototype.getSize', function(t) {
-
-        mesh = createMesh().mesh;
-        t.equal(typeof mesh.getSize, 'function',
-            'should be a function');
-
-        t.deepEqual(mesh.getSize(), [100, 100, 100],
-            'should return size of renderable');
-
-        t.end();
-    });
-
     t.test('Mesh.prototype.setGeometry', function(t) {
 
         mesh = createMesh().mesh;
