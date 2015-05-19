@@ -1,18 +1,18 @@
 /**
  * The MIT License (MIT)
- * 
+ *
  * Copyright (c) 2015 Famous Industries Inc.
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -47,7 +47,11 @@ Vec3Transitionable.prototype.get = function get() {
 };
 
 Vec3Transitionable.prototype.set = function set(x, y, z, options, callback) {
-    this.dirty();
+    if (!this._transform._dirty) {
+        this._transform._node.requestUpdate(this._transform._id);
+        this._transform._dirty = true;
+    }
+    this._dirty = true;
 
     var cbX = null;
     var cbY = null;
@@ -89,44 +93,16 @@ Vec3Transitionable.prototype.halt = function halt() {
     return this;
 };
 
-Vec3Transitionable.prototype.dirty = function dirty() {
-    if (!this._transform._dirty) {
-        this._transform._node.requestUpdate(this._transform._id);
-        this._transform._dirty = true;
-    }
-    this._dirty = true;
-    return this;
-};
-
 function QuatTransitionable(x, y, z, w, transform) {
     this._transform = transform;
-    this._queue = [];
-    this._front = 0;
-    this._end = 0;
     this._dirty = false;
-    this._t = new Transitionable(0);
-    this._fromQ = new Quaternion(w, x, y, z);
-    this._toQ = new Quaternion();
-    this._q = new Quaternion(w, x, y, z);
+    this._t = new Transitionable([x,y,z,w]);
 }
 
 QuatTransitionable.prototype.get = function get() {
-    var t = this._t.get();
-    var w, x, y, z;
-    var queue = this._queue;
-    while (t >= this._front + 1) {
-        this._front++;
-        w = queue.shift();
-        x = queue.shift();
-        y = queue.shift();
-        z = queue.shift();
-        this._q.set(w, x, y, z);
-        this._fromQ.set(w, x, y, z);
-        if (this._queue.length !== 0) this._toQ.set(queue[0], queue[1], queue[2], queue[3]);
-    }
-    if (this._queue.length !== 0) this._fromQ.slerp(this._toQ, t - this._front, this._q);
-    return this._q;
+    return this._t.get();
 };
+
 
 QuatTransitionable.prototype.set = function set(x, y, z, w, options, callback) {
     if (!this._transform._dirty) {
@@ -134,12 +110,11 @@ QuatTransitionable.prototype.set = function set(x, y, z, w, options, callback) {
         this._transform._dirty = true;
     }
     this._dirty = true;
-    if (this._queue.length === 0) this._toQ.set(w, x, y, z);
-    this._queue.push(w, x, y, z);
-    this._end++;
-    this._t.set(this._end, options, callback);
-    return this;
+
+    options.method = 'slerp';
+    this._t.set([x,y,z,w], options, callback);
 };
+
 
 QuatTransitionable.prototype.isActive = function isActive() {
     return this._t.isActive();
@@ -157,10 +132,7 @@ QuatTransitionable.prototype.resume = function resume() {
 
 QuatTransitionable.prototype.halt = function halt() {
     this._dirty = false;
-    this._t.reset(0);
-    this._queue.length = 0;
-    this._front = 0;
-    this._end = 0;
+    this._t.halt();
     return this;
 };
 
@@ -260,9 +232,9 @@ Transform.prototype.translate = function translate(x, y, z, options, callback) {
     var xq = p.x._queue;
     var yq = p.y._queue;
     var zq = p.z._queue;
-    var xEnd = x == null ? null : x + (xq.length > 0 ? xq[xq.length - 4] : p.x._end);
-    var yEnd = y == null ? null : y + (yq.length > 0 ? yq[yq.length - 4] : p.y._end);
-    var zEnd = z == null ? null : z + (zq.length > 0 ? zq[zq.length - 4] : p.z._end);
+    var xEnd = x == null ? null : x + (xq.length > 0 ? xq[xq.length - 5] : p.x._state);
+    var yEnd = y == null ? null : y + (yq.length > 0 ? yq[yq.length - 5] : p.y._state);
+    var zEnd = z == null ? null : z + (zq.length > 0 ? zq[zq.length - 5] : p.z._state);
     this.position.set(xEnd, yEnd, zEnd, options, callback);
     return this;
 };
@@ -290,13 +262,13 @@ Transform.prototype.rotate = function rotate(x, y, z, w, options, callback) {
         var v = this._node.getRotation();
         this.rotation = new QuatTransitionable(v[0], v[1], v[2], v[3], this);
     }
-    var queue = this.rotation._queue;
-    var len = this.rotation._queue.length;
+    var queue = this.rotation._t._queue;
+    var len = queue.length;
     var referenceQ;
-    if (len !== 0) {
-        referenceQ = Q2_REGISTER.set(queue[len - 4], queue[len - 3], queue[len - 2], queue[len - 1]);
-    }
-    else referenceQ = Q2_REGISTER.copy(this.rotation._q);
+    var arr;
+    if (len !== 0) arr = queue[len - 5];
+    else arr = this.rotation._t._state;
+    referenceQ = Q2_REGISTER.set(arr[3], arr[0], arr[1], arr[2]);
 
     var rotQ = Q_REGISTER;
     if (typeof w === 'number') {
@@ -343,8 +315,8 @@ Transform.prototype.clean = function clean() {
         isDirty = isDirty || c._dirty;
     }
     if ((c = this.rotation) && c._dirty) {
-        c.get();
-        node.setRotation(c._q.x, c._q.y, c._q.z, c._q.w);
+        var q = c.get();
+        node.setRotation(q[0], q[1], q[2], q[3]);
         c._dirty = c.isActive();
         isDirty = isDirty || c._dirty;
     }
