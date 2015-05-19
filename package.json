@@ -20,7 +20,7 @@
     "test-webgl-materials": "browserify webgl-materials/test/*.js | npm run tape",
     "test-webgl-renderables": "browserify webgl-renderables/test/*.js | npm run tape",
     "test-webgl-renderers": "browserify webgl-renderers/test/*.js | npm run tape",
-    "test": "EXIT_STATUS=0; npm run lint -s || EXIT_STATUS=$?; npm run test-components -s || EXIT_STATUS=$?; npm run test-core -s || EXIT_STATUS=$?; npm run test-dom-renderables -s || EXIT_STATUS=$?; npm run test-dom-renderers -s || EXIT_STATUS=$?; npm run test-engine -s || EXIT_STATUS=$?; npm run test-math -s || EXIT_STATUS=$?; npm run test-physics -s || EXIT_STATUS=$?; npm run test-polyfills -s || EXIT_STATUS=$?; npm run test-utilities -s || EXIT_STATUS=$?; npm run test-webgl-geometries -s || EXIT_STATUS=$?; npm run test-webgl-materials -s || EXIT_STATUS=$?; npm run test-webgl-renderables -s || EXIT_STATUS=$?; npm run test-webgl-renderers -s || EXIT_STATUS=$?; exit $EXIT_STATUS",
+    "test": "echo $SAUCE; echo $SAUCE_USERNAME",
     "lint-jscs": "jscs core dom-renderers physics renderers utilities webgl-materials webgl-renderers components dom-renderables engine math polyfills transitions webgl-geometries webgl-renderables webgl-shaders",
     "lint-eslint-jsdoc": "eslint --reset --no-eslintrc --rule 'valid-jsdoc: 2' --ignore-path .gitignore .",
     "lint-eslint": "eslint --ignore-path .gitignore .",
