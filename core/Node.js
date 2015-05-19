@@ -1178,7 +1178,7 @@ Node.prototype.mount = function mount (parent, myId) {
         if (item && item.onParentMount) item.onParentMount(this, myId, i);
     }
 
-    if (this._requestingUpdate) this._requestUpdate(true);
+    if (!this._requestingUpdate) this._requestUpdate(true);
     return this;
 };
 
