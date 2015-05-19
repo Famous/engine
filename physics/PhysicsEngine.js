@@ -35,6 +35,8 @@ var VEC_REGISTER = new Vec3();
 var QUAT_REGISTER = new Quaternion();
 var DELTA_REGISTER = new Vec3();
 
+var singleton = null;
+
 /**
  * Singleton PhysicsEngine object.
  * Manages bodies, forces, constraints.
@@ -43,6 +45,9 @@ var DELTA_REGISTER = new Vec3();
  * @param {Object} options A hash of configurable options.
  */
 function PhysicsEngine(options) {
+    if (!singleton) singleton = this;
+    else return singleton;
+    
     options = options || {};
     /** @prop bodies The bodies currently active in the engine. */
     this.bodies = [];
