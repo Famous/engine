@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * The MIT License (MIT)
  *
@@ -24,32 +22,47 @@
  * THE SOFTWARE.
  */
 
-/**
- * Takes an object containing keys and values and returns an object
- * comprising two "associate" arrays, one with the keys and the other
- * with the values.
- *
- * @method keyValuesToArrays
- *
- * @param {Object} object                   Objects where to extract keys and values
- *                                          from.
- * @return {Object}         result
- *         {Array.<String>} result.keys     Keys of `result`, as returned by
- *                                          `Object.keys()`
- *         {Array}          result.values   Values of passed in object.
- */
-module.exports = function keyValuesToArrays(obj) {
-    var keysArray = [], valuesArray = [];
-    var i = 0;
-    for(var key in obj) {
-        if (obj.hasOwnProperty(key)) {
-            keysArray[i] = key;
-            valuesArray[i] = obj[key];
-            i++;
-        }
-    }
-    return {
-        keys: keysArray,
-        values: valuesArray
-    };
-};
+'use strict';
+
+var test = require('tape');
+var ObjectManager = require('../ObjectManager');
+
+test('ObjectManager', function(t) {
+    t.equal(
+        typeof ObjectManager,
+        'object',
+        'ObjectManager should be a singleton'
+    );
+
+    function A() {}
+    function B() {}
+
+    t.equal(
+        typeof ObjectManager.register,
+        'function',
+        'ObjectManager.register should be a function'
+    );
+    ObjectManager.register('A', A);
+    ObjectManager.register('B', B);
+
+    var a0 = ObjectManager.requestA();
+    var a1 = ObjectManager.requestA();
+
+    t.notEqual(
+        a0,
+        a1,
+        'Objects should not be allocated to multiple requesters'
+    );
+
+    ObjectManager.freeA(a0);
+
+    var a0Rebirth = ObjectManager.requestA();
+
+    t.equal(
+        a0,
+        a0Rebirth,
+        'Objects should be reused'
+    );
+
+    t.end();
+});
