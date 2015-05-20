@@ -27,10 +27,13 @@
 var Position = require('./Position');
 
 /**
+ * Origin is a component designed to allow for smooth tweening
+ * of where on the Node should be considered the origin for rotations and scales.
+ *
  * @class Origin
- * @constructor
- * @component
- * @param {LocalDispatch} dispatch LocalDispatch to be retrieved from corresponding Render Node of the Origin component
+ * @augments Position
+ *
+ * @param {Node} node Node that the Origin component will be attached to
  */
 function Origin(node) {
     Position.call(this, node);
@@ -42,6 +45,13 @@ function Origin(node) {
     this._z.set(initial[2]);
 }
 
+/**
+ * Return the name of the Origin component
+ *
+ * @method
+ *
+ * @return {String} Name of the component
+ */
 Origin.prototype.toString = function toString() {
     return 'Origin';
 };
@@ -49,6 +59,14 @@ Origin.prototype.toString = function toString() {
 Origin.prototype = Object.create(Position.prototype);
 Origin.prototype.constructor = Origin;
 
+/**
+ * When the node this component is attached to updates, update the value
+ * of the Node's origin
+ *
+ * @method
+ *
+ * @return {undefined} undefined
+ */
 Origin.prototype.update = function update() {
     this._node.setOrigin(this._x.get(), this._y.get(), this._z.get());
     this._checkUpdate();

@@ -25,10 +25,13 @@
 'use strict';
 
 /**
+ * Camera is a component that is responsible for sending information to the renderer about where
+ * the camera is in the scene.  This allows the user to set the type of projection, the focal depth,
+ * and other properties to adjust the way the scenes are rendered.
+ *
  * @class Camera
- * @constructor
- * @component
- * @param {RenderNode} RenderNode to which the instance of Camera will be a component of
+ *
+ * @param {Node} node to which the instance of Camera will be a component of
  */
 function Camera(node) {
     this._node = node;
@@ -48,10 +51,22 @@ Camera.FRUSTUM_PROJECTION = 0;
 Camera.PINHOLE_PROJECTION = 1;
 Camera.ORTHOGRAPHIC_PROJECTION = 2;
 
+/**
+ * @method
+ *
+ * @return {String} Name of the component
+ */
 Camera.prototype.toString = function toString() {
     return 'Camera';
 };
 
+/**
+ * Gets object containing serialized data for the component
+ *
+ * @method
+ *
+ * @return {Object} the state of the component
+ */
 Camera.prototype.getValue = function getValue() {
     return {
         component: this.toString(),
@@ -62,6 +77,15 @@ Camera.prototype.getValue = function getValue() {
     };
 };
 
+/**
+ * Set the components state based on some serialized data
+ *
+ * @method
+ *
+ * @param {Object} state an object defining what the state of the component should be
+ *
+ * @return {Boolean} status of the set
+ */
 Camera.prototype.setValue = function setValue(state) {
     if (this.toString() === state.component) {
         this.set(state.projectionType, state.focalDepth, state.near, state.far);
@@ -70,6 +94,18 @@ Camera.prototype.setValue = function setValue(state) {
     return false;
 };
 
+/**
+ * Set the internals of the component
+ *
+ * @method
+ *
+ * @param {Number} type an id corresponding to the type of projection to use
+ * @param {Number} depth the depth for the pinhole projection model
+ * @param {Number} near the distance of the near clipping plane for a frustum projection
+ * @param {Number} far the distanct of the far clipping plane for a frustum projection
+ * 
+ * @return {Boolean} status of the set
+ */
 Camera.prototype.set = function set(type, depth, near, far) {
     if (!this._requestingUpdate) {
         this._node.requestUpdate(this._id);
@@ -81,6 +117,15 @@ Camera.prototype.set = function set(type, depth, near, far) {
     this._far = far;
 };
 
+/**
+ * Set the camera depth for a pinhole projection model
+ *
+ * @method
+ *
+ * @param {Number} depth the distance between the Camera and the origin
+ *
+ * @return {Camera} this
+ */
 Camera.prototype.setDepth = function setDepth(depth) {
     if (!this._requestingUpdate) {
         this._node.requestUpdate(this._id);
@@ -95,11 +140,22 @@ Camera.prototype.setDepth = function setDepth(depth) {
     return this;
 };
 
+/**
+ * Gets object containing serialized data for the component
+ *
+ * @method
+ *
+ * @param {Number} near distance from the near clipping plane to the camera
+ * @param {Number} far distance from the far clipping plane to the camera
+ * 
+ * @return {Camera} this
+ */
 Camera.prototype.setFrustum = function setFrustum(near, far) {
     if (!this._requestingUpdate) {
         this._node.requestUpdate(this._id);
         this._requestingUpdate = true;
     }
+
     this._perspectiveDirty = true;
     this._projectionType = Camera.FRUSTUM_PROJECTION;
     this._focalDepth = 0;
@@ -109,11 +165,19 @@ Camera.prototype.setFrustum = function setFrustum(near, far) {
     return this;
 };
 
+/**
+ * Set the Camera to have orthographic projection
+ *
+ * @method
+ *
+ * @return {Camera} this
+ */
 Camera.prototype.setFlat = function setFlat() {
     if (!this._requestingUpdate) {
         this._node.requestUpdate(this._id);
         this._requestingUpdate = true;
     }
+
     this._perspectiveDirty = true;
     this._projectionType = Camera.ORTHOGRAPHIC_PROJECTION;
     this._focalDepth = 0;
@@ -123,6 +187,15 @@ Camera.prototype.setFlat = function setFlat() {
     return this;
 };
 
+/**
+ * When the node this component is attached to updates, the Camera will
+ * send new camera information to the Compositor to update the rendering
+ * of the scene.
+ *
+ * @method
+ *
+ * @return {undefined} undefined
+ */
 Camera.prototype.onUpdate = function onUpdate() {
     this._requestingUpdate = false;
 
@@ -177,7 +250,17 @@ Camera.prototype.onUpdate = function onUpdate() {
     }
 };
 
-
+/**
+ * When the transform of the node this component is attached to
+ * changes, have the Camera update its projection matrix and
+ * if needed, flag to node to update.
+ *
+ * @method
+ *
+ * @param {Array} transform an array denoting the transform matrix of the node
+ *
+ * @return {Camera} this
+ */
 Camera.prototype.onTransformChange = function onTransformChange(transform) {
     var a = transform;
     this._viewDirty = true;

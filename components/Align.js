@@ -27,12 +27,14 @@
 var Position = require('./Position');
 
 /**
+ * Align is a component designed to allow for smooth tweening
+ * of the alignment of a node relative to its parent.
+ *
  * @class Align
- * @constructor
- * @component
- * @param {LocalDispatch} node LocalDispatch to be retrieved from corresponding Render Node of the Align component
+ * @augments Position
+ *
+ * @param {Node} node Node that the Align component will be attached to
  */
-
 function Align(node) {
     Position.call(this, node);
 
@@ -43,6 +45,13 @@ function Align(node) {
     this._z.set(initial[2]);
 }
 
+/**
+ * Return the name of the Align component
+ *
+ * @method
+ *
+ * @return {String} Name of the component
+ */
 Align.prototype.toString = function toString() {
     return 'Align';
 };
@@ -50,6 +59,14 @@ Align.prototype.toString = function toString() {
 Align.prototype = Object.create(Position.prototype);
 Align.prototype.constructor = Align;
 
+/**
+ * When the node this component is attached to updates, update the value
+ * of the Node's align.
+ *
+ * @method
+ *
+ * @return {undefined} undefined
+ */
 Align.prototype.update = function update() {
     this._node.setAlign(this._x.get(), this._y.get(), this._z.get());
     this._checkUpdate();

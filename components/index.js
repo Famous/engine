@@ -35,6 +35,5 @@ module.exports = {
     Rotation: require('./Rotation'),
     Scale: require('./Scale'),
     Size: require('./Size'),
-    Transform: require('./Transform'),
-    UIEventHandler: require('./UIEventHandler')
+    Transform: require('./Transform')
 };
