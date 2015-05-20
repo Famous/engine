@@ -27,10 +27,13 @@
 var Position = require('./Position');
 
 /**
+ * Rotation is a component that allows the tweening of a Node's rotation. Rotation
+ * happens about a Node's origin which is by default [0, 0, .5].
+ *
  * @class Rotation
- * @constructor
- * @component
- * @param {LocalDispatch} dispatch LocalDispatch to be retrieved from corresponding Render Node of the Rotation component
+ * @augments Position
+ *
+ * @param {Node} node Node that the Rotation component will be attached to
  */
 function Rotation(node) {
     Position.call(this, node);
@@ -58,6 +61,13 @@ function Rotation(node) {
     this._z.set(rz);
 }
 
+/**
+ * Return the name of the Rotation component
+ *
+ * @method
+ *
+ * @return {String} Name of the component
+ */
 Rotation.prototype.toString = function toString() {
     return 'Rotation';
 };
@@ -65,6 +75,14 @@ Rotation.prototype.toString = function toString() {
 Rotation.prototype = Object.create(Position.prototype);
 Rotation.prototype.constructor = Rotation;
 
+/**
+ * When the node this component is attached to updates, update the value
+ * of the Node's rotation
+ *
+ * @method
+ *
+ * @return {undefined} undefined
+ */
 Rotation.prototype.update = function update() {
     this._node.setRotation(this._x.get(), this._y.get(), this._z.get());
     this._checkUpdate();

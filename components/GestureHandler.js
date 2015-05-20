@@ -115,12 +115,15 @@ function GestureHandler(node, events) {
 
 
 /**
-* onReceive fires when the node this component is attached to gets an event.
-*
-* @method onReceive
-* @param {String} ev name of the event
-* @param {Object} payload data associated with the event 
-*/
+ * onReceive fires when the node this component is attached to gets an event.
+ *
+ * @method
+ *
+ * @param {String} ev name of the event
+ * @param {Object} payload data associated with the event 
+ *
+ * @return {undefined} undefined
+ */
 GestureHandler.prototype.onReceive = function onReceive (ev, payload) {
     switch(ev) {
         case 'touchstart':
@@ -144,11 +147,12 @@ GestureHandler.prototype.onReceive = function onReceive (ev, payload) {
 };
 
 /**
-* Return the name of the GestureHandler component
-*
-* @method toString
-* @return {String} Name of the component
-*/
+ * Return the name of the GestureHandler component
+ *
+ * @method
+ *
+ * @return {String} Name of the component
+ */
 GestureHandler.prototype.toString = function toString() {
     return 'GestureHandler';
 };
@@ -156,9 +160,12 @@ GestureHandler.prototype.toString = function toString() {
 /**
  * Register a callback to be invoked on an event.
  *
- * @method on
+ * @method
+ *
  * @param {Object|String} ev The event object or event name.
- * @param {Function} cb The callback.
+ * @param {Function} cb The callback
+ *
+ * @return {undefined} undefined
  */
 GestureHandler.prototype.on = function on(ev, cb) {
     var gesture = ev.event || ev;
@@ -173,7 +180,9 @@ GestureHandler.prototype.on = function on(ev, cb) {
 /**
  * Trigger gestures in the order they were requested, if they occured.
  *
- * @method triggerGestures
+ * @method
+ *
+ * @return {undefined} undefined
  */
 GestureHandler.prototype.triggerGestures = function() {
     var payload = this.event;
@@ -204,8 +213,11 @@ GestureHandler.prototype.triggerGestures = function() {
  * Trigger the callback associated with an event, passing in a payload.
  *
  * @method trigger
- * @param {String} ev The event name.
- * @param {Object} payload The event payload.
+ *
+ * @param {String} ev The event name
+ * @param {Object} payload The event payload
+ *
+ * @return {undefined} undefined
  */
 GestureHandler.prototype.trigger = function trigger (ev, payload) {
     this._events.trigger(ev, payload);
@@ -216,7 +228,10 @@ GestureHandler.prototype.trigger = function trigger (ev, payload) {
  *
  * @method _processPointerStart
  * @private
- * @param {Object} e The event object.
+ *
+ * @param {Object} e The event object
+ *
+ * @return {undefined} undefined
  */
 function _processPointerStart(e) {
     var t;
@@ -312,7 +327,10 @@ function _processPointerStart(e) {
  *
  * @method _processPointerMove
  * @private
+ *
  * @param {Object} e The event object.
+ *
+ * @return {undefined} undefined
  */
 function _processPointerMove(e) {
     var t;
@@ -400,7 +418,10 @@ function _processPointerMove(e) {
  *
  * @method _processPointerEnd
  * @private
- * @param {Object} e The event object.
+ *
+ * @param {Object} e The event object
+ *
+ * @return {undefined} undefined
  */
 function _processPointerEnd(e) {
     var t;
@@ -467,6 +488,8 @@ function _processPointerEnd(e) {
  *
  * @method _processMouseLeave
  * @private
+ *
+ * @return {undefined} undefined
  */
 function _processMouseLeave() {
     if (this.event.current) {

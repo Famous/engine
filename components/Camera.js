@@ -30,7 +30,6 @@
  * and other properties to adjust the way the scenes are rendered.
  *
  * @class Camera
- * @constructor
  *
  * @param {Node} node to which the instance of Camera will be a component of
  */
@@ -53,21 +52,21 @@ Camera.PINHOLE_PROJECTION = 1;
 Camera.ORTHOGRAPHIC_PROJECTION = 2;
 
 /**
-* Return the name of the Camera component
-*
-* @method toString
-* @return {String} Name of the component
-*/
+ * @method
+ *
+ * @return {String} Name of the component
+ */
 Camera.prototype.toString = function toString() {
     return 'Camera';
 };
 
 /**
-* Gets object containing serialized data for the component
-*
-* @method getValue
-* @return {Object} the state of the component
-*/
+ * Gets object containing serialized data for the component
+ *
+ * @method
+ *
+ * @return {Object} the state of the component
+ */
 Camera.prototype.getValue = function getValue() {
     return {
         component: this.toString(),
@@ -79,13 +78,14 @@ Camera.prototype.getValue = function getValue() {
 };
 
 /**
-* Set the components state based on some serialized data
-*
-* @method setValue
-* @param {Object} state an object defining what the state of the component should be
-*
-* @return {Boolean} status of the set
-*/
+ * Set the components state based on some serialized data
+ *
+ * @method
+ *
+ * @param {Object} state an object defining what the state of the component should be
+ *
+ * @return {Boolean} status of the set
+ */
 Camera.prototype.setValue = function setValue(state) {
     if (this.toString() === state.component) {
         this.set(state.projectionType, state.focalDepth, state.near, state.far);
@@ -95,16 +95,17 @@ Camera.prototype.setValue = function setValue(state) {
 };
 
 /**
-* Set the internals of the component
-*
-* @method set
-* @param {Number} type an id corresponding to the type of projection to use
-* @param {Number} depth the depth for the pinhole projection model
-* @param {Number} near the distance of the near clipping plane for a frustum projection
-* @param {Number} far the distanct of the far clipping plane for a frustum projection
-* 
-* @return {Boolean} status of the set
-*/
+ * Set the internals of the component
+ *
+ * @method
+ *
+ * @param {Number} type an id corresponding to the type of projection to use
+ * @param {Number} depth the depth for the pinhole projection model
+ * @param {Number} near the distance of the near clipping plane for a frustum projection
+ * @param {Number} far the distanct of the far clipping plane for a frustum projection
+ * 
+ * @return {Boolean} status of the set
+ */
 Camera.prototype.set = function set(type, depth, near, far) {
     if (!this._requestingUpdate) {
         this._node.requestUpdate(this._id);
@@ -117,13 +118,14 @@ Camera.prototype.set = function set(type, depth, near, far) {
 };
 
 /**
-* Set the camera depth for a pinholeprojection model
-*
-* @method setDepth
-* @param {Number} depth the distance between the Camera and the origin
-*
-* @return {Camera} this
-*/
+ * Set the camera depth for a pinhole projection model
+ *
+ * @method
+ *
+ * @param {Number} depth the distance between the Camera and the origin
+ *
+ * @return {Camera} this
+ */
 Camera.prototype.setDepth = function setDepth(depth) {
     if (!this._requestingUpdate) {
         this._node.requestUpdate(this._id);
@@ -139,19 +141,21 @@ Camera.prototype.setDepth = function setDepth(depth) {
 };
 
 /**
-* Gets object containing serialized data for the component
-*
-* @method getValue
-* @param {Number} near distance from the near clipping plane to the camera
-* @param {Number} far distance from the far clipping plane to the camera
-* 
-* @return {Camera} this
-*/
+ * Gets object containing serialized data for the component
+ *
+ * @method
+ *
+ * @param {Number} near distance from the near clipping plane to the camera
+ * @param {Number} far distance from the far clipping plane to the camera
+ * 
+ * @return {Camera} this
+ */
 Camera.prototype.setFrustum = function setFrustum(near, far) {
     if (!this._requestingUpdate) {
         this._node.requestUpdate(this._id);
         this._requestingUpdate = true;
     }
+
     this._perspectiveDirty = true;
     this._projectionType = Camera.FRUSTUM_PROJECTION;
     this._focalDepth = 0;
@@ -162,17 +166,18 @@ Camera.prototype.setFrustum = function setFrustum(near, far) {
 };
 
 /**
-* Set the Camera to have orthographic projection
-*
-* @method setFlat
-*
-* @return {Camera} this
-*/
+ * Set the Camera to have orthographic projection
+ *
+ * @method
+ *
+ * @return {Camera} this
+ */
 Camera.prototype.setFlat = function setFlat() {
     if (!this._requestingUpdate) {
         this._node.requestUpdate(this._id);
         this._requestingUpdate = true;
     }
+
     this._perspectiveDirty = true;
     this._projectionType = Camera.ORTHOGRAPHIC_PROJECTION;
     this._focalDepth = 0;
@@ -183,12 +188,14 @@ Camera.prototype.setFlat = function setFlat() {
 };
 
 /**
-* When the node this component is attached to updates, the Camera will
-* send new camera information to the Compositor to update the rendering
-* of the scene.
-*
-* @method onUpdate
-*/
+ * When the node this component is attached to updates, the Camera will
+ * send new camera information to the Compositor to update the rendering
+ * of the scene.
+ *
+ * @method
+ *
+ * @return {undefined} undefined
+ */
 Camera.prototype.onUpdate = function onUpdate() {
     this._requestingUpdate = false;
 
@@ -244,13 +251,16 @@ Camera.prototype.onUpdate = function onUpdate() {
 };
 
 /**
-* When the transform of the node this component is attached to
-* changes, have the Camera update its projection matrix and
-* if needed, flag to node to update.
-*
-* @method onTransformChange
-* @param {Array} transform an array denoting the transform matrix of the node
-*/
+ * When the transform of the node this component is attached to
+ * changes, have the Camera update its projection matrix and
+ * if needed, flag to node to update.
+ *
+ * @method
+ *
+ * @param {Array} transform an array denoting the transform matrix of the node
+ *
+ * @return {Camera} this
+ */
 Camera.prototype.onTransformChange = function onTransformChange(transform) {
     var a = transform;
     this._viewDirty = true;

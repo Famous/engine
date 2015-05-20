@@ -28,10 +28,12 @@ var Transitionable = require('../transitions/Transitionable');
 
 
 /**
+ * Opacity is a component designed to allow for smooth tweening
+ * of the Node's opacity
+ *
  * @class Opacity
- * @constructor
- * @component
- * @param {LocalDispatch} dispatch LocalDispatch to be retrieved from corresponding Render Node of the Opacity component
+ *
+ * @param {Node} node Node that the Opacity component is attached to
  */
 function Opacity(node) {
     this._node = node;
@@ -46,13 +48,13 @@ Opacity.prototype.toString = function toString() {
 };
 
 /**
-*
-* Retrieves state of Opacity
-*
-* @method
-* @return {Object} contains component key which holds the stringified constructor 
-* and value key which contains the numeric value
-*/
+ * Retrieves internal state of Opacity component
+ *
+ * @method
+ *
+ * @return {Object} contains component key which holds the stringified constructor 
+ * and value key which contains the numeric value
+ */
 Opacity.prototype.getValue = function getValue() {
     return {
         component: this.toString(),
@@ -61,13 +63,14 @@ Opacity.prototype.getValue = function getValue() {
 };
 
 /**
-*
-* Setter for Opacity state
-*
-* @method
-* @param {Object} state contains component key, which holds stringified constructor, and a value key, which contains a numeric value used to set opacity if the constructor value matches
-* @return {Boolean} true if set is successful, false otherwise
-*/
+ * Set the internal state of the Opacity component
+ *
+ * @method
+ *
+ * @param {Object} value Object containing the component key, which holds stringified constructor, and a value key, which contains a numeric value used to set opacity if the constructor value matches
+ *
+ * @return {Boolean} true if set is successful, false otherwise
+ */
 Opacity.prototype.setValue = function setValue(value) {
     if (this.toString() === value.component) {
         this.set(value.value);
@@ -77,57 +80,75 @@ Opacity.prototype.setValue = function setValue(value) {
 };
 
 /**
-*
-* Setter for Opacity with callback
-*
-* @method
-* @param {Number} value value used to set Opacity
-* @param {Object} options options hash
-* @param {Function} callback to be called following Opacity set
-* @chainable
-*/
-Opacity.prototype.set = function set(value, options, callback) {
+ * Set the opacity of the Node
+ *
+ * @method
+ *
+ * @param {Number} value value used to set Opacity
+ * @param {Object} transition options for the transition
+ * @param {Function} callback to be called following Opacity set completion
+ *
+ * @return {Opacity} this
+ */
+Opacity.prototype.set = function set(value, transition, callback) {
     if (!this._requestingUpdate) {
         this._node.requestUpdate(this._id);
         this._requestingUpdate = true;
     }
 
-    this._value.set(value, options, callback);
+    this._value.set(value, transition, callback);
     return this;
 };
 
 /**
-*
-* Getter for Opacity
-*
-* @method
-* @return {Number}
-*/
+ * Get the current opacity for the component
+ *
+ * @method
+ *
+ * @return {Number} opacity as known by the component
+ */
 Opacity.prototype.get = function get() {
     return this._value.get();
 };
 
 /**
-*
-* Stops Opacity transition
-*
-* @method
-* @chainable
-*/
+ * Stops Opacity transition
+ *
+ * @method
+ *
+ * @return {Opacity} this
+ */
 Opacity.prototype.halt = function halt() {
     this._value.halt();
     return this;
 };
 
+/**
+ * Tells whether or not the opacity is in a transition
+ *
+ * @method
+ *
+ * @return {Boolean} whether or not the opacity is transitioning
+ */
 Opacity.prototype.isActive = function isActive(){
     return this._value.isActive();
 };
 
+/**
+ * When the node this component is attached to updates, update the value
+ * of the Node's opacity.
+ *
+ * @method
+ *
+ * @return {undefined} undefined
+ */
 Opacity.prototype.update = function update () {
     this._node.setOpacity(this._value.get());
+    
     if (this._value.isActive()) {
       this._node.requestUpdateOnNextTick(this._id);
-    } else {
+    }
+    else {
       this._requestingUpdate = false;
     }
 };
