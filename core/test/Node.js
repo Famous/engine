@@ -32,6 +32,40 @@ var Size = require('../Size');
 var Scene = require('../Scene');
 var DefaultNodeSpec = require('./expected/DefaultNodeSpec');
 
+var IDENT = [
+    1, 0, 0, 0,
+    0, 1, 0, 0,
+    0, 0, 1, 0,
+    0, 0, 0, 1
+];
+
+function createMockNode() {
+    return {
+        sentDrawCommands: [],
+        sendDrawCommand: function(command) {},
+        shown: true,
+        isShown: function() { return this.shown; },
+        addComponent: function() {},
+        location: 'body/0',
+        getLocation: function() { return this.location; } ,
+        transform: IDENT,
+        getTransform: function() { return this.transform; },
+        requestUpdate: function() {},
+        size: [0, 0, 0],
+        getSize: function() { return this.size; },
+        sizeMode: [0, 0, 0],
+        getSizeMode: function() { return this.sizeMode; },
+        uiEvents: [],
+        getUIEvents: function() { return this.uiEvents; },
+        opacity: 1,
+        getOpacity: function() { return this.opacity; },
+        updater: {
+            requestUpdate: function() {}
+        },
+        getUpdater: function() { return this.updater; }
+    };
+}
+
 test('Node', function(t) {
     t.test('constructor', function(t) {
         t.equal(typeof Node, 'function', 'Node should be a constructor function');
@@ -57,7 +91,7 @@ test('Node', function(t) {
         t.plan(2);
         var node = new Node();
         t.equal(typeof node.getLocation, 'function', 'node.getLocation should be a function');
-        node.mount(node, 'body/1/2/3');
+        node.mount(createMockNode(), 'body/1/2/3');
         t.equal(node.getLocation(), 'body/1/2/3', 'node.getLocation() should return path');
     });
 
@@ -76,6 +110,9 @@ test('Node', function(t) {
             return {
                 message: function(message) {
                     receivedMessages.push(message);
+                },
+                requestUpdate: function() {
+                    t.pass('should requestUpdate after being mounted to the context');
                 }
             };
         };
@@ -137,19 +174,33 @@ test('Node', function(t) {
 
         node011.setPosition(11, 93, 21);
 
-        t.equal(requesters[0], node0);
-        t.equal(requesters[1], node1);
-        t.equal(requesters[2], node00);
-        t.equal(requesters[3], node01);
-        t.equal(requesters[4], node010);
-        t.equal(requesters[5], node011);
-        t.equal(requesters.length, 6);
+        t.deepEqual(requesters.map(function (requester) {
+            return requester.getLocation();
+        }), [root, node0, node1, node00, node01, node010, node011].map(function (requester) {
+            return requester.getLocation();
+        }), 'Initial requests should be issued in predefined order');
+
+        // TODO Compare to static JSON file
 
         t.end();
     });
 
     t.test('getComputedValue method', function(t) {
         var root = new Node();
+        root.mount({
+            getUpdater: function() {
+                return {
+                    requestUpdate: function() {
+                    }
+                };
+            },
+            getSize: function() {
+                return [19000, 19000, 19000];
+            },
+            getTransform: function() {
+                return IDENT;
+            }
+        }, 0);
         t.equal(typeof root.getComputedValue, 'function', 'root.getComputedValue should be a function');
 
         var node0 = root.addChild();
@@ -158,14 +209,23 @@ test('Node', function(t) {
         root.setSizeMode(Node.ABSOLUTE_SIZE, Node.ABSOLUTE_SIZE, Node.ABSOLUTE_SIZE);
         root.setAbsoluteSize(100, 200, 300);
 
-        root.mount(root, 0);
         node0.mount(root, 0);
         node1.mount(root, 1);
 
-        root.update();
+        root.update(1);
+        node0.update(0);
 
-        // TODO
-        // @dan This is broken.
+        t.deepEqual(
+            node0.getComputedValue(),
+            {
+                children: [],
+                computedValues: {
+                    size: [100, 200, 300],
+                    transform: IDENT
+                },
+                location: '0/0'
+            }
+        );
 
         t.end();
     });
@@ -191,6 +251,7 @@ test('Node', function(t) {
 
     t.test('getParent method', function(t) {
         var parent = new Node();
+        parent.mount(createMockNode(), 0);
         t.equal(typeof parent.getParent, 'function', 'parent.getParent should be a function');
         var child = parent.addChild();
 
@@ -200,30 +261,50 @@ test('Node', function(t) {
     });
 
     t.test('requestUpdate method', function(t) {
+        t.plan(5);
         var context = {};
         var requesters = [];
-        context.getUpdater = function getUpdater () {
-            return {
-                requestUpdate: function requestUpdate (requester) {
-                    requesters.push(requester);
-                }
-            };
-        };
 
         var root = new Node();
-        root.mount(context, 'body');
+        root.mount({
+            getUpdater: function () {
+                return {
+                    requestUpdate: function (requester) {
+                        requesters.push(requester);
+                    }
+                };
+            }
+        }, 'body');
         t.equal(typeof root.requestUpdate, 'function', 'root.requestUpdate should be a function');
         var node0 = root.addChild();
 
-        var node00 = node0.addChild();
+        // mount is requesting an update. We need to reset _requestingUpdate.
+        node0.update(0);
 
-        node00.requestUpdate(node00);
-        t.deepEqual(requesters, [node00]);
+        requesters.length = 0;
 
-        node0.requestUpdate(node0);
-        t.deepEqual(requesters, [node00, node0]);
+        var componentId = node0.addComponent({
+            onUpdate: function(actualTime) {
+                t.pass('should update a component when requesting an update');
+                t.equal(actualTime, time);
+            }
+        });
 
-        t.end();
+        node0.requestUpdate(componentId);
+
+        t.equal(
+            requesters.length,
+            1,
+            'requestUpdate on a single component should only enqueue a single target node'
+        );
+        t.equal(
+            requesters[0],
+            node0,
+            'requestUpdate should for specific component id should result into node being enqueued for next scene graph update'
+        );
+
+        var time = 123;
+        node0.update(time);
     });
 
     t.test('requestUpdateOnNextTick method', function(t) {
@@ -233,7 +314,9 @@ test('Node', function(t) {
     });
 
     t.test('getUpdater method', function(t) {
-        var globalUpdater = {};
+        var globalUpdater = {
+            requestUpdate: function() {}
+        };
         var context = {
             getUpdater: function() {
                 return globalUpdater;
@@ -256,8 +339,13 @@ test('Node', function(t) {
         t.equal(typeof child.isMounted, 'function', 'child.isMounted should be a function');
         t.equal(child.isMounted(), false, 'nodes should not be mounted when being initialized');
 
-        var parent = new Node();
-        child.mount(parent, 'body/0');
+        child.mount({
+            getUpdater: function() {
+                return {
+                    requestUpdate: function() {}
+                };
+            }
+        }, 'body/0');
 
         t.equal(child.isMounted(), true, 'node.isMounted should indicate mounted state after node has been mounted');
 
@@ -265,14 +353,13 @@ test('Node', function(t) {
     });
 
     t.test('isShown method', function(t) {
-        var parent = new Node();
-        t.equal(typeof parent.isShown, 'function', 'parent.isShown should be a function');
         var child = new Node();
-        child.mount(parent, '0');
+        t.equal(typeof child.isShown, 'function', 'child.isShown should be a function');
+        t.equal(child.isShown(), false, 'nodes should not be shown when being initialized');
 
-        t.equal(child.isShown(), false);
         child.show();
-        t.equal(child.isShown(), true);
+
+        t.equal(child.isShown(), true, 'node.isShown should indicate shown state after node has been mounted');
 
         t.end();
     });
@@ -280,7 +367,19 @@ test('Node', function(t) {
     t.test('getOpacity method', function(t) {
         var parent = new Node();
         parent.show();
-        parent.onMount(parent, 'body');
+        parent.onMount({
+            getUpdater: function() {
+                return {
+                    requestUpdate: function() {}
+                };
+            },
+            getSize: function() {
+                return [19000, 19000, 19000];
+            },
+            getTransform: function() {
+                return IDENT;
+            }
+        }, 'body');
 
         t.equal(typeof parent.getOpacity, 'function', 'parent.getOpacity should be a function');
         var child = new Node();
@@ -316,7 +415,13 @@ test('Node', function(t) {
         var root = new Node();
         t.equal(typeof root.addChild, 'function', 'root.addChild should be a function');
         t.equal(typeof root.removeChild, 'function', 'root.removeChild should be a function');
-        root.mount(root, 'root');
+        root.mount({
+            getUpdater: function() {
+                return {
+                    requestUpdate: function() {}
+                };
+            },    
+        }, 'root');
         var node = root.addChild();
         t.equal(root.getChildren()[0], node);
         t.equal(root.getChildren().length, 1);
@@ -328,21 +433,22 @@ test('Node', function(t) {
 
     t.test('addComponent method', function(t) {
         var root = new Node();
-
-        var events = [];
-
         t.equal(typeof root.addComponent, 'function', 'root.addComponent should be a function');
 
-        root.addComponent({
+        var component = {
             onMount: function() {
                 events.push('onMount');
-            },
-        });
+            }
+        };
+        var componentId = root.addComponent(component);
 
-        root.onMount(root, 'root');
-        root.onUpdate(1);
-        t.deepEqual(events, ['onMount']);
-        events.length = 0;
+        t.equal(typeof componentId, 'number', 'componentId returned by Node#addComponent should be a number');
+
+        t.equal(
+            root.getComponent(componentId),
+            component,
+            'root.addComponent should return componentId that can be used to retrieve the component later on using Node#getComponent'
+        );
 
         t.end();
     });
@@ -351,6 +457,8 @@ test('Node', function(t) {
         var updater = {
             message: function() {
                 return updater;
+            },
+            requestUpdate:function() {
             }
         };
         var root = new Scene('body', updater);
@@ -425,7 +533,13 @@ test('Node', function(t) {
             );
 
             var root = new Node();
-            root.onMount(root);
+            root.onMount({
+                getUpdater: function() {
+                    return {
+                        requestUpdate: function() {}
+                    };
+                }
+            });
             node.onMount(root, 'body');
 
             node.addComponent({
@@ -458,7 +572,13 @@ test('Node', function(t) {
             var node = new Node();
 
             var root = new Node();
-            root.onMount(root);
+            root.onMount({
+                getUpdater: function() {
+                    return {
+                        requestUpdate: function() {}
+                    };
+                }
+            });
             node.onMount(root, 'body');
 
             node.addComponent({
