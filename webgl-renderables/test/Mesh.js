@@ -275,7 +275,7 @@ test('Mesh', function(t) {
             'should be a function');
 
         mesh.setBaseColor(materialExpression);
-        console.log(mesh.getBaseColor());
+
         t.true(mesh.getBaseColor().__isAMaterial__,
             'should be able to take a material expression');
 
@@ -296,11 +296,11 @@ test('Mesh', function(t) {
             'should be false by default');
 
         mesh.setFlatShading(true);
-        t.true(mesh.value._flatShading,
+        t.true(mesh.value.flatShading,
             'should be true when set to true');
 
         mesh.setFlatShading(false);
-        t.false(mesh.value._flatShading,
+        t.false(mesh.value.flatShading,
             'should be false when set to false');
 
         t.end();
@@ -329,12 +329,15 @@ test('Mesh', function(t) {
     t.test('Mesh.prototype.setNormals', function(t) {
 
         mesh = createMesh().mesh;
+        mesh._initialized = true;
         t.equal(typeof mesh.setNormals, 'function',
             'should be a function');
 
 
         mesh.setNormals(materialExpression);
-        t.true(contains(['MATERIAL_INPUT', 'normal', materialExpression], mesh._changeQueue),
+
+        t.true(contains(['MATERIAL_INPUT', 'u_normals', materialExpression], mesh._changeQueue),
+               
             'should be able to take a normal material expression');
 
         t.end();
@@ -357,23 +360,20 @@ test('Mesh', function(t) {
         time = 0;
 
         mesh = createMesh().mesh;
+
+        mesh._initialized = true;
+
         t.equal(typeof mesh.setGlossiness, 'function',
             'should be a function');
 
         mesh.setGlossiness(materialExpression);
-        t.true(contains(['MATERIAL_INPUT', 'glossiness', materialExpression], mesh._changeQueue),
+        t.true(contains(['MATERIAL_INPUT', 'u_glossiness', materialExpression], mesh._changeQueue),
             'should take a material expression for glossiness');
 
-        mesh.setGlossiness(10, { duration: 1000 }, function() {
-            t.pass('should accept and invoke a callback function')
-        });
+        mesh.setGlossiness(new MockColor(), 10);
 
-        t.equal(typeof mesh._glossiness, 'object',
-            'should take an integer for setting glossiness');
-
-        time = 1000;
-        t.equal(mesh.getGlossiness(), 10,
-            'should accept and tween a transition argument');
+        t.equal(typeof mesh.value.glossiness, 'object',
+            'should take constants  for setting glossiness');
 
         t.end();
     });
@@ -388,8 +388,9 @@ test('Mesh', function(t) {
         t.true(mesh.getGlossiness().__isAMaterial__,
             'should be able to return the glossiness expression');
 
-        mesh.setGlossiness(10);
-        t.equal(mesh.getGlossiness(), 10,
+        var x = new MockColor()
+        mesh.setGlossiness(x, 10);
+        t.equal(mesh.getGlossiness()[0], x,
             'should be able to return the glossiness value');
 
         t.end();
@@ -399,23 +400,17 @@ test('Mesh', function(t) {
         time = 0;
 
         mesh = createMesh().mesh;
+        mesh._initialized = true;
         t.equal(typeof mesh.setPositionOffset, 'function',
             'should be a function');
 
         mesh.setPositionOffset(materialExpression);
-        t.true(contains(['MATERIAL_INPUT', 'positionOffset', materialExpression], mesh._changeQueue),
+        t.true(contains(['MATERIAL_INPUT', 'u_positionOffset', materialExpression], mesh._changeQueue),
             'should take a material expression for positionOffset');
 
-        mesh.setPositionOffset(10, { duration: 1000 }, function() {
-            t.pass('should accept and invoke a callback function')
-        });
-
-        t.equal(typeof mesh._positionOffset, 'object',
-            'should take an integer for setting positionOffset');
-
-        time = 1000;
-        t.equal(mesh.getPositionOffset(), 10,
-            'should accept and tween a transition argument');
+        mesh.setPositionOffset([.5, .2, .1]);
+        t.equal(typeof mesh.value.positionOffset, 'object',
+            'should take a constant for setting positionOffset');
 
         t.end();
     });

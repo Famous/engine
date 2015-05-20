@@ -62,5 +62,8 @@ MockDispatch.prototype.onOpacityChange = function onOpacityChange() {};
 MockDispatch.prototype.onOriginChange = function onOriginChange() {};
 
 MockDispatch.prototype.requestUpdate = function() {};
+MockDispatch.prototype.getTransform = function() {
+    return [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
+};
 
 module.exports = MockDispatch;
