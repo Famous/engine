@@ -26,7 +26,7 @@
 
 /**
  * The Size class is responsible for processing Size from a node
- * @constructor {Size}
+ * @constructor Size
  */
 function Size () {
     this._size = new Float32Array(3);

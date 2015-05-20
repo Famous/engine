@@ -57,6 +57,8 @@ function Clock () {
  * @chainable
  * 
  * @param {Number} scale    The scale at which the clock time is passing.
+ *
+ * @return {Clock} this
  */
 Clock.prototype.setScale = function setScale (scale) {
     this._scale = scale;
@@ -101,7 +103,7 @@ Clock.prototype.step = function step (time) {
  *
  * @method  now
  * 
- * @param  {Number} time high resolution timstamp used for invoking the
+ * @return  {Number} time high resolution timstamp used for invoking the
  *                       `update` method on all registered objects
  */
 Clock.prototype.now = function now () {
@@ -114,7 +116,7 @@ Clock.prototype.now = function now () {
  * @method  getTime
  * @deprecated Use #now instead
  * 
- * @param  {Number} time high resolution timstamp used for invoking the
+ * @return  {Number} time high resolution timstamp used for invoking the
  *                       `update` method on all registered objects
  */
 Clock.prototype.getTime = Clock.prototype.now;
@@ -165,7 +167,7 @@ Clock.prototype.setTimeout = function (callback, delay) {
  * @method setInterval
  *
  * @param {Function} callback function to be run after a specified duration
- * @param {Number} duration interval to execute function in milliseconds
+ * @param {Number} delay interval to execute function in milliseconds
  *
  * @return {Function} timer function used for Clock#clearTimer
  */
@@ -190,7 +192,7 @@ Clock.prototype.setInterval = function setInterval(callback, delay) {
  * @method clearTimer
  * @chainable
  * 
- * @param  {Function} callback  previously by `Clock#setTimeout` or
+ * @param  {Function} timer  previously by `Clock#setTimeout` or
  *                              `Clock#setInterval` returned callback function
  * @return {Clock}              this
  */
