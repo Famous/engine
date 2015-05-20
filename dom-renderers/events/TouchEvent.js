@@ -31,10 +31,10 @@ var EMPTY_ARRAY = [];
 /**
  * See [Touch Interface](http://www.w3.org/TR/2013/REC-touch-events-20131010/#touch-interface).
  *
- * @class       Touch
+ * @class Touch
  * @private
  *
- * @param  {Touch} touch   The native Touch object.
+ * @param {Touch} touch The native Touch object.
  */
 function Touch(touch) {
     // interface Touch {
@@ -119,10 +119,10 @@ function cloneTouchList(touchList) {
 /**
  * See [Touch Event Interface](http://www.w3.org/TR/2013/REC-touch-events-20131010/#touchevent-interface).
  *
- * @class       TouchEvent
- * @augments    UIEvent
+ * @class TouchEvent
+ * @augments UIEvent
  *
- * @param  {Event} ev   The native DOM event.
+ * @param {Event} ev The native DOM event.
  */
 function TouchEvent(ev) {
     // interface TouchEvent : UIEvent {
@@ -182,6 +182,13 @@ function TouchEvent(ev) {
 TouchEvent.prototype = Object.create(UIEvent.prototype);
 TouchEvent.prototype.constructor = TouchEvent;
 
+/**
+ * Return the name of the event type
+ *
+ * @method
+ *
+ * @return {String} Name of the event type
+ */
 TouchEvent.prototype.toString = function toString () {
     return 'TouchEvent';
 };

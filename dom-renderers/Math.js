@@ -24,6 +24,16 @@
 
 'use strict';
 
+/**
+ * A method for inverting a transform matrix
+ *
+ * @method
+ *
+ * @param {Array} output array to store the return of the inversion
+ * @param {Array} a transform matrix to inverse
+ *
+ * @return {Array} output array that is storing the transform matrix
+ */
 function invert (out, a) {
     var a00 = a[0], a01 = a[1], a02 = a[2], a03 = a[3],
         a10 = a[4], a11 = a[5], a12 = a[6], a13 = a[7],
@@ -71,6 +81,17 @@ function invert (out, a) {
     return out;
 }
 
+/**
+ * A method for multiplying two matricies
+ *
+ * @method
+ *
+ * @param {Array} output array to store the return of the multiplication
+ * @param {Array} a transform matrix to multiply
+ * @param {Array} b transform matrix to multiple
+ *
+ * @return {Array} output array that is storing the transform matrix
+ */
 function multiply (out, a, b) {
     var a00 = a[0], a01 = a[1], a02 = a[2], a03 = a[3],
         a10 = a[4], a11 = a[5], a12 = a[6], a13 = a[7],

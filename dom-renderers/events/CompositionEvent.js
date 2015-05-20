@@ -29,10 +29,10 @@ var UIEvent = require('./UIEvent');
 /**
  * See [UI Events (formerly DOM Level 3 Events)](http://www.w3.org/TR/2015/WD-uievents-20150428/#events-compositionevents).
  *
- * @class       CompositionEvent
- * @augments    UIEvent
+ * @class CompositionEvent
+ * @augments UIEvent
  *
- * @param  {Event} ev   The native DOM event.
+ * @param {Event} ev The native DOM event.
  */
 function CompositionEvent(ev) {
     // [Constructor(DOMString typeArg, optional CompositionEventInit compositionEventInitDict)]
@@ -52,6 +52,13 @@ function CompositionEvent(ev) {
 CompositionEvent.prototype = Object.create(UIEvent.prototype);
 CompositionEvent.prototype.constructor = CompositionEvent;
 
+/**
+ * Return the name of the event type
+ *
+ * @method
+ *
+ * @return {String} Name of the event type
+ */
 CompositionEvent.prototype.toString = function toString () {
     return 'CompositionEvent';
 };

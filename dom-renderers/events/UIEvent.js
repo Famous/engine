@@ -22,8 +22,6 @@
  * THE SOFTWARE.
  */
 
-/*jshint -W079 */
-
 'use strict';
 
 var Event = require('./Event');
@@ -31,8 +29,8 @@ var Event = require('./Event');
 /**
  * See [UI Events (formerly DOM Level 3 Events)](http://www.w3.org/TR/2015/WD-uievents-20150428).
  *
- * @class               UIEvent
- * @augments            Event
+ * @class UIEvent
+ * @augments Event
  *
  * @param  {Event} ev   The native DOM event.
  */
@@ -54,6 +52,13 @@ function UIEvent(ev) {
 UIEvent.prototype = Object.create(Event.prototype);
 UIEvent.prototype.constructor = UIEvent;
 
+/**
+ * Return the name of the event type
+ *
+ * @method
+ *
+ * @return {String} Name of the event type
+ */
 UIEvent.prototype.toString = function toString () {
     return 'UIEvent';
 };

@@ -29,10 +29,10 @@ var UIEvent = require('./UIEvent');
 /**
  * See [Input Events](http://w3c.github.io/editing-explainer/input-events.html#idl-def-InputEvent).
  *
- * @class       InputEvent
- * @augments    UIEvent
+ * @class InputEvent
+ * @augments UIEvent
  *
- * @param  {Event} ev   The native DOM event.
+ * @param {Event} ev The native DOM event.
  */
 function InputEvent(ev) {
     // [Constructor(DOMString typeArg, optional InputEventInit inputEventInitDict)]
@@ -75,6 +75,13 @@ function InputEvent(ev) {
 InputEvent.prototype = Object.create(UIEvent.prototype);
 InputEvent.prototype.constructor = InputEvent;
 
+/**
+ * Return the name of the event type
+ *
+ * @method
+ *
+ * @return {String} Name of the event type
+ */
 InputEvent.prototype.toString = function toString () {
     return 'InputEvent';
 };

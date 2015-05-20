@@ -22,8 +22,6 @@
  * THE SOFTWARE.
  */
 
- /*jshint -W079 */
-
 'use strict';
 
 var CompositionEvent = require('./CompositionEvent');
@@ -36,6 +34,12 @@ var TouchEvent = require('./TouchEvent');
 var UIEvent = require('./UIEvent');
 var WheelEvent = require('./WheelEvent');
 
+/**
+ * A mapping of DOM events to the corresponding handlers
+ *
+ * @name EventMap
+ * @type Object
+ */
 var EventMap = {
     change                         : [Event, true],
     submit                         : [Event, true],

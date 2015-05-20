@@ -29,10 +29,10 @@ var UIEvent = require('./UIEvent');
 /**
  * See [UI Events (formerly DOM Level 3 Events)](http://www.w3.org/TR/2015/WD-uievents-20150428/#events-focusevent).
  *
- * @class    FocusEvent
+ * @class FocusEvent
  * @augments UIEvent
  *
- * @param  {Event} ev   The native DOM event.
+ * @param {Event} ev The native DOM event.
  */
 function FocusEvent(ev) {
     // [Constructor(DOMString typeArg, optional FocusEventInit focusEventInitDict)]
@@ -46,6 +46,13 @@ function FocusEvent(ev) {
 FocusEvent.prototype = Object.create(UIEvent.prototype);
 FocusEvent.prototype.constructor = FocusEvent;
 
+/**
+ * Return the name of the event type
+ *
+ * @method
+ *
+ * @return {String} Name of the event type
+ */
 FocusEvent.prototype.toString = function toString () {
     return 'FocusEvent';
 };
