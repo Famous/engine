@@ -1,18 +1,18 @@
 /**
  * The MIT License (MIT)
- * 
+ *
  * Copyright (c) 2015 Famous Industries Inc.
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -33,8 +33,8 @@ var Geometry = require('../webgl-geometries');
  * @class Mesh
  * @constructor
  * @renderable
- * @param {LocalDispatch} dispatch LocalDispatch to be retrieved
- * @param {object} Options Optional params for configuring Mesh
+ * @param {LocalDispatch}   Dispatch    LocalDispatch to be retrieved
+ * @param {object}          Options     Optional params for configuring Mesh
  */
 function Mesh (node, options) {
     this._node = node;
@@ -67,6 +67,7 @@ function Mesh (node, options) {
  *
  * @param {Object} Options
  * @chainable
+ * @return {Mesh} this
  */
 Mesh.prototype.setDrawOptions = function setOptions (options) {
     this._changeQueue.push('GL_SET_DRAW_OPTIONS');
@@ -85,16 +86,17 @@ Mesh.prototype.getDrawOptions = function getDrawOptions () {
 };
 
 /**
- * Assigns a geometry to be used for this mesh.  Will create new Geometry
- * from primtives if input is a string.  Queues the set command for this 
+ * Assigns a geometry to be used for this mesh. Sets the geometry from either
+ * a 'Geometry' or a valid primitive (string) name. Queues the set command for this
  * geometry and looks for buffers to send to the renderer to update geometry.
  *
  * @method setGeometry
  * @chainable
  *
- * @param {Geometry} geometry instance to be associated with the mesh
- * @param {Object} Options Various configurations for geometries.
+ * @param {Geometry|String}     Geometry    Geometry to be associated with the mesh.
+ * @param {Object}              Options     Various configurations for geometries.
  * @chainable
+ * @return {Mesh} this
  */
 Mesh.prototype.setGeometry = function setGeometry (geometry, options) {
     if (typeof geometry === 'string') {
@@ -148,6 +150,7 @@ Mesh.prototype.getGeometry = function getGeometry () {
 * @method setBaseColor
 * @param {Object|Color} Material, image, vec3, or Color instance
 * @chainable
+* @return {Mesh} this
 */
 Mesh.prototype.setBaseColor = function setBaseColor (color) {
     var uniformValue;
@@ -207,6 +210,7 @@ Mesh.prototype.getBaseColor = function getBaseColor () {
  * @method setFlatShading
  * @param {boolean} Boolean
  * @chainable
+ * @return {Mesh} this
  */
 Mesh.prototype.setFlatShading = function setFlatShading (bool) {
     if (this._inDraw || this.value.flatShading !== bool) {
@@ -242,7 +246,7 @@ Mesh.prototype.getFlatShading = function getFlatShading () {
  * @chainable
  *
  * @param {Object|Array} Material, Image or vec3
- * @return {Element} current Mesh
+ * @return {Mesh} this
  */
 Mesh.prototype.setNormals = function setNormals (materialExpression) {
     if (materialExpression.__isAMaterial__) {
@@ -275,9 +279,10 @@ Mesh.prototype.getNormals = function getNormals (materialExpression) {
  * scalar value
  *
  * @method setGlossiness
- * @param {MaterialExpression|Color} Accepts either a material expression or Color instance
- * @param {Number} Optional value for changing the strength of the glossiness
+ * @param {MaterialExpression|Color}    glossiness     Accepts either a material expression or Color instance
+ * @param {Number}                      strength       Optional value for changing the strength of the glossiness
  * @chainable
+ * @return {Mesh} this
  */
 Mesh.prototype.setGlossiness = function setGlossiness(glossiness, strength) {
     if (glossiness.__isAMaterial__) {
@@ -319,9 +324,8 @@ Mesh.prototype.getGlossiness = function getGlossiness() {
  * @chainable
  *
  * @param {MaterialExpression|Array}
- * @param {Object} Optional tweening parameter
- * @param {Function} Callback
  * @chainable
+ * @return {Mesh} this
  */
 Mesh.prototype.setPositionOffset = function positionOffset(materialExpression) {
     var uniformValue;
@@ -358,20 +362,32 @@ Mesh.prototype.getPositionOffset = function getPositionOffset () {
 };
 
 /**
- * Get the mesh's custom options.
+ * Get the mesh's expressions
  *
- * @method getDrawOptions
+ * @method getMaterialExpressions
  * @returns {Object} Options
  */
 Mesh.prototype.getMaterialExpressions = function getMaterialExpressions () {
     return this.value.expressions;
 };
 
+/**
+ * Get the mesh's value
+ *
+ * @method getValue
+ * @returns {Number} Value
+ */
 Mesh.prototype.getValue = function getValue () {
     return this.value;
 };
 
-Mesh.prototype._pushInvalidations = function pushInvalidations (expressionName) {
+/**
+ * Queues the invalidations for Mesh
+ *
+ * @param  {String} expressionName
+ * @return {Mesh} this
+ */
+Mesh.prototype._pushInvalidations = function _pushInvalidations (expressionName) {
     var uniformKey;
     var expression = this.value.expressions[expressionName];
     if (expression) {
@@ -383,6 +399,7 @@ Mesh.prototype._pushInvalidations = function pushInvalidations (expressionName) 
             this._node.sendDrawCommand(expression.uniforms[uniformKey]);
         }
     }
+    return this;
 };
 
 /**
@@ -428,9 +445,15 @@ Mesh.prototype.onUpdate = function onUpdate() {
 
         queue.length = 0;
     }
-
 };
 
+/**
+ * Save reference to node, set its ID and call draw on Mesh.
+ *
+ * @method onMount
+ * @param  {LocalDispatch} node
+ * @param  {Number} id      Identifier for Mesh
+ */
 Mesh.prototype.onMount = function onMount (node, id) {
     this._node = node;
     this._id = id;
@@ -438,6 +461,11 @@ Mesh.prototype.onMount = function onMount (node, id) {
     this.draw();
 };
 
+/**
+ * Queues the command for dismounting Mesh
+ *
+ * @method onDismount
+ */
 Mesh.prototype.onDismount = function onDismount () {
     this._initialized = false;
     this._changeQueue.push('GL_REMOVE_MESH');
@@ -445,12 +473,22 @@ Mesh.prototype.onDismount = function onDismount () {
     this._requestUpdate();
 };
 
+/**
+ * Makes Mesh visible
+ *
+ * @method onShow
+ */
 Mesh.prototype.onShow = function onShow () {
     this._changeQueue.push('GL_MESH_VISIBILITY', true);
 
     this._requestUpdate();
 };
 
+/**
+ * Makes Mesh hidden
+ *
+ * @method onHide
+ */
 Mesh.prototype.onHide = function onHide () {
     this._changeQueue.push('GL_MESH_VISIBILITY', false);
 
@@ -460,6 +498,7 @@ Mesh.prototype.onHide = function onHide () {
 /**
  * Receives transform change updates from the scene graph.
  *
+ * @method onTransformChange
  * @private
  */
 Mesh.prototype.onTransformChange = function onTransformChange (transform) {
@@ -475,6 +514,7 @@ Mesh.prototype.onTransformChange = function onTransformChange (transform) {
 /**
  * Receives size change updates from the scene graph.
  *
+ * @method  onSizeChange
  * @private
  */
 Mesh.prototype.onSizeChange = function onSizeChange (size) {
@@ -490,6 +530,7 @@ Mesh.prototype.onSizeChange = function onSizeChange (size) {
 /**
  * Receives opacity change updates from the scene graph.
  *
+ * @method onOpacityChange
  * @private
  */
 Mesh.prototype.onOpacityChange = function onOpacityChange (opacity) {
@@ -502,10 +543,20 @@ Mesh.prototype.onOpacityChange = function onOpacityChange (opacity) {
     this._requestUpdate();
 };
 
+/**
+ * Adds functionality for UI events (TODO)
+ *
+ * @method onAddUIEvent
+ */
 Mesh.prototype.onAddUIEvent = function onAddUIEvent (UIEvent) {
     //TODO
 };
 
+/**
+ * Queues instance to be updated.
+ *
+ * @method _requestUpdate
+ */
 Mesh.prototype._requestUpdate = function _requestUpdate () {
     if (!this._requestingUpdate) {
         this._node.requestUpdate(this._id);
@@ -513,6 +564,11 @@ Mesh.prototype._requestUpdate = function _requestUpdate () {
     }
 };
 
+/**
+ * Initializes the mesh with appropriate listeners.
+ *
+ * @method  init
+ */
 Mesh.prototype.init = function init () {
     this._initialized = true;
     this.onTransformChange(this._node.getTransform());
@@ -521,6 +577,11 @@ Mesh.prototype.init = function init () {
     this._requestUpdate();
 };
 
+/**
+ * Draws given Mesh's current state.
+ *
+ * @method  draw
+ */
 Mesh.prototype.draw = function draw () {
     this._inDraw = true;
 
