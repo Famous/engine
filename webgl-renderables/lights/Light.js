@@ -1,18 +1,18 @@
 /**
  * The MIT License (MIT)
- * 
+ *
  * Copyright (c) 2015 Famous Industries Inc.
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -25,13 +25,13 @@
 'use strict';
 
 /**
- * The blueprint for all light components for inheriting common functionality.
+ * The blueprint for all light components.
  *
  * @class Light
  * @constructor
  * @component
  * @param {Node} node The controlling node
- * from the corresponding Render Node
+ *                    from the corresponding Render Node
  */
 function Light(node) {
     this._node = node;
@@ -48,6 +48,7 @@ function Light(node) {
 * @method setColor
 * @param {Color} Color instance
 * @chainable
+* @return {Light} this
 */
 Light.prototype.setColor = function setColor(color) {
     if (!color.getNormalizedRGB) return false;
@@ -68,7 +69,7 @@ Light.prototype.setColor = function setColor(color) {
 * Returns the current color.
 
 * @method getColor
-* @returns {Color} Color.
+* @returns {Color} Color
 */
 Light.prototype.getColor = function getColor() {
     return this._color;
@@ -99,7 +100,8 @@ Light.prototype.onUpdate = function onUpdate() {
         this._node.sendDrawCommand(rgb[1]);
         this._node.sendDrawCommand(rgb[2]);
         this._node.requestUpdateOnNextTick(this._id);
-    } else {
+    }
+    else {
         this._requestingUpdate = false;
     }
 };
