@@ -36,9 +36,9 @@
  *
  * See [UI Events (formerly DOM Level 3 Events)](http://www.w3.org/TR/2015/WD-uievents-20150428/#interface-Event).
  *
- * @class   Event
+ * @class Event
  *
- * @param  {Event} ev   The native DOM event.
+ * @param {Event} ev The native DOM event.
  */
 function Event(ev) {
     // [Constructor(DOMString type, optional EventInit eventInitDict),
@@ -104,6 +104,13 @@ function Event(ev) {
     }
 }
 
+/**
+ * Return the name of the event type
+ *
+ * @method
+ *
+ * @return {String} Name of the event type
+ */
 Event.prototype.toString = function toString () {
     return 'Event';
 };

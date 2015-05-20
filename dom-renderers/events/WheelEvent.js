@@ -22,8 +22,6 @@
  * THE SOFTWARE.
  */
 
-/*jshint -W079 */
-
 'use strict';
 
 var MouseEvent = require('./MouseEvent');
@@ -31,10 +29,10 @@ var MouseEvent = require('./MouseEvent');
 /**
  * See [UI Events (formerly DOM Level 3 Events)](http://www.w3.org/TR/2015/WD-uievents-20150428/#events-wheelevents).
  *
- * @class       WheelEvent
- * @augments    UIEvent
+ * @class WheelEvent
+ * @augments UIEvent
  *
- * @param  {Event} ev   The native DOM event.
+ * @param {Event} ev The native DOM event.
  */
 function WheelEvent(ev) {
     // [Constructor(DOMString typeArg, optional WheelEventInit wheelEventInitDict)]
@@ -97,6 +95,13 @@ function WheelEvent(ev) {
 WheelEvent.prototype = Object.create(MouseEvent.prototype);
 WheelEvent.prototype.constructor = WheelEvent;
 
+/**
+ * Return the name of the event type
+ *
+ * @method
+ *
+ * @return {String} Name of the event type
+ */
 WheelEvent.prototype.toString = function toString () {
     return 'WheelEvent';
 };

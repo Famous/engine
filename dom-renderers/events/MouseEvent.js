@@ -22,8 +22,6 @@
  * THE SOFTWARE.
  */
 
-/*jshint -W079 */
-
 'use strict';
 
 var UIEvent = require('./UIEvent');
@@ -31,10 +29,10 @@ var UIEvent = require('./UIEvent');
 /**
  * See [UI Events (formerly DOM Level 3 Events)](http://www.w3.org/TR/2015/WD-uievents-20150428/#events-mouseevents).
  *
- * @class       KeyboardEvent
- * @augments    UIEvent
+ * @class KeyboardEvent
+ * @augments UIEvent
  *
- * @param  {Event} ev   The native DOM event.
+ * @param {Event} ev The native DOM event.
  */
 function MouseEvent(ev) {
     // [Constructor(DOMString typeArg, optional MouseEventInit mouseEventInitDict)]
@@ -156,6 +154,13 @@ function MouseEvent(ev) {
 MouseEvent.prototype = Object.create(UIEvent.prototype);
 MouseEvent.prototype.constructor = MouseEvent;
 
+/**
+ * Return the name of the event type
+ *
+ * @method
+ *
+ * @return {String} Name of the event type
+ */
 MouseEvent.prototype.toString = function toString () {
     return 'MouseEvent';
 };

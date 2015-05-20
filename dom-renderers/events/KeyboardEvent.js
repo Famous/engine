@@ -29,10 +29,10 @@ var UIEvent = require('./UIEvent');
 /**
  * See [UI Events (formerly DOM Level 3 Events)](http://www.w3.org/TR/2015/WD-uievents-20150428/#events-keyboardevents).
  *
- * @class       KeyboardEvent
- * @augments    UIEvent
+ * @class KeyboardEvent
+ * @augments UIEvent
  *
- * @param  {Event} ev   The native DOM event.
+ * @param {Event} ev The native DOM event.
  */
 function KeyboardEvent(ev) {
     // [Constructor(DOMString typeArg, optional KeyboardEventInit keyboardEventInitDict)]
@@ -138,6 +138,13 @@ function KeyboardEvent(ev) {
 KeyboardEvent.prototype = Object.create(UIEvent.prototype);
 KeyboardEvent.prototype.constructor = KeyboardEvent;
 
+/**
+ * Return the name of the event type
+ *
+ * @method
+ *
+ * @return {String} Name of the event type
+ */
 KeyboardEvent.prototype.toString = function toString () {
     return 'KeyboardEvent';
 };
