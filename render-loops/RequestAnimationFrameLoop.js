@@ -29,9 +29,9 @@ var rAF = polyfills.requestAnimationFrame;
 var cAF = polyfills.cancelAnimationFrame;
 
 /**
- * Boolean constant indicating whether the Engine has access to the document.
+ * Boolean constant indicating whether the RequestAnimationFrameLoop has access to the document.
  * The document is being used in order to subscribe for visibilitychange events
- * used for normalizing the Engine time when e.g. when switching tabs.
+ * used for normalizing the RequestAnimationFrameLoop time when e.g. when switching tabs.
  * 
  * @constant
  * @type {Boolean}
@@ -61,14 +61,14 @@ if (DOCUMENT_ACCESS) {
 }
 
 /**
- * Engine class used for updating objects on a frame-by-frame. Synchronizes the
+ * RequestAnimationFrameLoop class used for updating objects on a frame-by-frame. Synchronizes the
  * `update` method invocations to the refresh rate of the screen. Manages
  * the `requestAnimationFrame`-loop by normalizing the passed in timestamp
  * when switching tabs.
  * 
- * @class Engine
+ * @class RequestAnimationFrameLoop
  */
-function Engine() {
+function RequestAnimationFrameLoop() {
     var _this = this;
     
     // References to objects to be updated on next frame.
@@ -94,7 +94,7 @@ function Engine() {
     // TODO(alexanderGugel)
     this.start();
 
-    // The Engine supports running in a non-browser environment (e.g. Worker).
+    // The RequestAnimationFrameLoop supports running in a non-browser environment (e.g. Worker).
     if (DOCUMENT_ACCESS) {
         document.addEventListener(VENDOR_VISIBILITY_CHANGE, function() {
             _this._onVisibilityChange();
@@ -110,7 +110,7 @@ function Engine() {
  * 
  * @return {undefined} undefined
  */
-Engine.prototype._onVisibilityChange = function _onVisibilityChange() {
+RequestAnimationFrameLoop.prototype._onVisibilityChange = function _onVisibilityChange() {
     if (document[VENDOR_HIDDEN]) {
         this._onUnfocus();
     }
@@ -128,7 +128,7 @@ Engine.prototype._onVisibilityChange = function _onVisibilityChange() {
  *
  * @return {undefined} undefined
  */ 
-Engine.prototype._onFocus = function _onFocus() {
+RequestAnimationFrameLoop.prototype._onFocus = function _onFocus() {
     if (this._startOnVisibilityChange) {
         this._start();
     }
@@ -143,20 +143,20 @@ Engine.prototype._onFocus = function _onFocus() {
  *
  * @return {undefined} undefined
  */ 
-Engine.prototype._onUnfocus = function _onUnfocus() {
+RequestAnimationFrameLoop.prototype._onUnfocus = function _onUnfocus() {
     this._stop();
 };
 
 /**
- * Starts the Engine. When switching to a differnt tab/ window (changing the
+ * Starts the RequestAnimationFrameLoop. When switching to a differnt tab/ window (changing the
  * visibiltiy), the engine will be retarted when switching back to a visible
  * state.
  *
  * @method
  * 
- * @return {Engine} this
+ * @return {RequestAnimationFrameLoop} this
  */
-Engine.prototype.start = function start() {
+RequestAnimationFrameLoop.prototype.start = function start() {
     if (!this._running) {
         this._startOnVisibilityChange = true;
         this._start();
@@ -165,7 +165,7 @@ Engine.prototype.start = function start() {
 };
 
 /**
- * Internal version of Engine's start function, not affecting behavior on visibilty
+ * Internal version of RequestAnimationFrameLoop's start function, not affecting behavior on visibilty
  * change.
  * 
  * @method
@@ -173,20 +173,20 @@ Engine.prototype.start = function start() {
 *
  * @return {undefined} undefined
  */ 
-Engine.prototype._start = function _start() {
+RequestAnimationFrameLoop.prototype._start = function _start() {
     this._running = true;
     this._sleepDiff = true;
     this._rAF = rAF(this._looper);
 };
 
 /**
- * Stops the Engine.
+ * Stops the RequestAnimationFrameLoop.
  *
  * @method
  * 
- * @return {Engine} this
+ * @return {RequestAnimationFrameLoop} this
  */
-Engine.prototype.stop = function stop() {
+RequestAnimationFrameLoop.prototype.stop = function stop() {
     if (this._running) {
         this._startOnVisibilityChange = false;
         this._stop();
@@ -195,7 +195,7 @@ Engine.prototype.stop = function stop() {
 };
 
 /**
- * Internal version of Engine's stop function, not affecting behavior on visibilty
+ * Internal version of RequestAnimationFrameLoop's stop function, not affecting behavior on visibilty
  * change.
  * 
  * @method
@@ -203,7 +203,7 @@ Engine.prototype.stop = function stop() {
  *
  * @return {undefined} undefined
  */ 
-Engine.prototype._stop = function _stop() {
+RequestAnimationFrameLoop.prototype._stop = function _stop() {
     this._running = false;
     this._stoppedAt = this._time;
 
@@ -212,13 +212,13 @@ Engine.prototype._stop = function _stop() {
 };
 
 /**
- * Determines whether the Engine is currently running or not.
+ * Determines whether the RequestAnimationFrameLoop is currently running or not.
  *
  * @method
  * 
- * @return {Boolean} boolean value indicating whether the Engine is currently running or not
+ * @return {Boolean} boolean value indicating whether the RequestAnimationFrameLoop is currently running or not
  */
-Engine.prototype.isRunning = function isRunning() {
+RequestAnimationFrameLoop.prototype.isRunning = function isRunning() {
     return this._running;
 };
 
@@ -229,9 +229,9 @@ Engine.prototype.isRunning = function isRunning() {
  * 
  * @param {Number} time high resolution timstamp used for invoking the `update` method on all registered objects
  *
- * @return {Engine} this
+ * @return {RequestAnimationFrameLoop} this
  */
-Engine.prototype.step = function step (time) {
+RequestAnimationFrameLoop.prototype.step = function step (time) {
     this._time = time;
     if (this._sleepDiff) {
         this._sleep += time - this._stoppedAt;
@@ -254,9 +254,9 @@ Engine.prototype.step = function step (time) {
  * @method
  * 
  * @param {Number} time high resolution timstamp used for invoking the `update` method on all registered objects
- * @return {Engine} this
+ * @return {RequestAnimationFrameLoop} this
  */
-Engine.prototype.loop = function loop(time) {
+RequestAnimationFrameLoop.prototype.loop = function loop(time) {
     this.step(time);
     this._rAF = rAF(this._looper);
     return this;
@@ -264,16 +264,16 @@ Engine.prototype.loop = function loop(time) {
 
 /**
  * Registeres an updateable object which `update` method should be invoked on
- * every paint, starting on the next paint (assuming the Engine is running).
+ * every paint, starting on the next paint (assuming the RequestAnimationFrameLoop is running).
  *
  * @method
  * 
  * @param {Object} updateable object to be updated
  * @param {Function} updateable.update update function to be called on the registered object
  *
- * @return {Engine} this
+ * @return {RequestAnimationFrameLoop} this
  */
-Engine.prototype.update = function update(updateable) {
+RequestAnimationFrameLoop.prototype.update = function update(updateable) {
     if (this._updates.indexOf(updateable) === -1) {
         this._updates.push(updateable);
     }
@@ -288,9 +288,9 @@ Engine.prototype.update = function update(updateable) {
  * 
  * @param {Object} updateable updateable object previously registered using `update`
  *
- * @return {Engine} this
+ * @return {RequestAnimationFrameLoop} this
  */
-Engine.prototype.noLongerUpdate = function noLongerUpdate(updateable) {
+RequestAnimationFrameLoop.prototype.noLongerUpdate = function noLongerUpdate(updateable) {
     var index = this._updates.indexOf(updateable);
     if (index > -1) {
         this._updates.splice(index, 1);
@@ -298,4 +298,4 @@ Engine.prototype.noLongerUpdate = function noLongerUpdate(updateable) {
     return this;
 };
 
-module.exports = Engine;
+module.exports = RequestAnimationFrameLoop;
