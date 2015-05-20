@@ -1,18 +1,18 @@
 /**
  * The MIT License (MIT)
- * 
+ *
  * Copyright (c) 2015 Famous Industries Inc.
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -111,7 +111,8 @@ var varyings = keyValueToArrays({
  * @class Program
  * @constructor
  *
- * @param {WebGL_Context} gl Context to be used to create the shader program.
+ * @param {WebGL_Context}   gl  Context to be used to create the shader program.
+ * @return {undefined}          undefined
  */
 function Program(gl, options) {
     this.gl = gl;
@@ -139,12 +140,12 @@ function Program(gl, options) {
  * Determines whether a material has already been registered to
  * the shader program.
  *
- * @method registerMaterial
+ * @method
  *
- * @param {String} name Name of target input of material.
- * @param {Object} material Compiled material object being verified.
+ * @param {String}  name        Name of target input of material.
+ * @param {Object}  material    Compiled material object being verified.
  *
- * @return {Object} Current program.
+ * @return {Object}             Current program.
  */
 Program.prototype.registerMaterial = function registerMaterial(name, material) {
     var compiled = material;
@@ -212,8 +213,7 @@ Program.prototype.registerMaterial = function registerMaterial(name, material) {
  * shader program and upon success links program to the WebGL
  * context.
  *
- * @method resetProgram
- *
+ * @method
  * @return {Program} Current program.
  */
 Program.prototype.resetProgram = function resetProgram() {
@@ -315,13 +315,11 @@ Program.prototype.resetProgram = function resetProgram() {
  * the cached value stored on the Program class.  Updates and
  * creates new entries in the cache when necessary.
  *
- * @method uniformIsCached
- *
- * @param {String} targetName Key of uniform spec being evaluated.
- * @param {Number|Array} value Value of uniform spec being evaluated.
- *
- * @return {Boolean} Value indicating whether the uniform being set
- * is cached.
+ * @method
+ * @param {String}          targetName  Key of uniform spec being evaluated.
+ * @param {Number|Array}    value       Value of uniform spec being evaluated.
+ * @return {Boolean}        boolean     Indicating whether the uniform being set
+ *                                      is cached.
  */
 Program.prototype.uniformIsCached = function(targetName, value) {
     if(this.cachedUniforms[targetName] == null) {
@@ -360,12 +358,10 @@ Program.prototype.uniformIsCached = function(targetName, value) {
  * setUniforms will iterate through the passed in shaderChunks (if any)
  * and set the appropriate uniforms to specify which chunks to use.
  *
- * @method setUniforms
- *
- * @param {Array} uniformNames Array containing the keys of all uniforms to be set.
- * @param {Array} uniformValue Array containing the values of all uniforms to be set.
- *
- * @return {Program} Current program.
+ * @method
+ * @param {Array} uniformNames  Array containing the keys of all uniforms to be set.
+ * @param {Array} uniformValue  Array containing the values of all uniforms to be set.
+ * @return {Program}            Current program.
  */
 Program.prototype.setUniforms = function (uniformNames, uniformValue) {
     var gl = this.gl;
@@ -423,11 +419,10 @@ Program.prototype.setUniforms = function (uniformNames, uniformValue) {
  * Infers uniform setter function to be called on the WebGL context, based
  * on an input value.
  *
- * @method getUniformTypeFromValue
+ * @method
  *
- * @param {Number | Array} value Value from which uniform type is inferred.
- *
- * @return {String} Name of uniform function for given value.
+ * @param {Number|Array} value  Value from which uniform type is inferred.
+ * @return {String}             Name of uniform function for given value.
  */
 Program.prototype.getUniformTypeFromValue = function getUniformTypeFromValue(value) {
     if (Array.isArray(value) || value instanceof Float32Array) {
@@ -443,7 +438,7 @@ Program.prototype.getUniformTypeFromValue = function getUniformTypeFromValue(val
     else if (!isNaN(parseFloat(value)) && isFinite(value)) {
         return 'uniform1f';
     }
-    
+
     throw 'cant load uniform "' + name + '" with value:' + JSON.stringify(value);
 };
 
@@ -451,12 +446,11 @@ Program.prototype.getUniformTypeFromValue = function getUniformTypeFromValue(val
  * Adds shader source to shader and compiles the input shader.  Checks
  * compile status and logs error if necessary.
  *
- * @method compileShader
+ * @method
  *
- * @param {Object} shader Program to be compiled.
- * @param {String} source Source to be used in the shader.
- *
- * @return {Object} Compiled shader.
+ * @param {Object}  shader  Program to be compiled.
+ * @param {String}  source  Source to be used in the shader.
+ * @return {Object}         Compiled shader.
  */
 Program.prototype.compileShader = function compileShader(shader, source) {
     var i = 1;

@@ -1,18 +1,18 @@
 /**
  * The MIT License (MIT)
- * 
+ *
  * Copyright (c) 2015 Famous Industries Inc.
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -30,6 +30,7 @@
  *
  * @class Texture
  * @constructor
+ * @return {undefined} undefined
  */
 function Texture(gl, options) {
     options = options || {};
@@ -56,9 +57,7 @@ function Texture(gl, options) {
 /**
  * Binds this texture as the selected target.
  *
- * @method bind
- * @chainable
- *
+ * @method
  * @return {Object} Current texture instance.
  */
 Texture.prototype.bind = function bind() {
@@ -69,9 +68,7 @@ Texture.prototype.bind = function bind() {
 /**
  * Erases the texture data in the given texture slot.
  *
- * @method unbind
- * @chainable
- *
+ * @method
  * @return {Object} Current texture instance.
  */
 Texture.prototype.unbind = function unbind() {
@@ -82,12 +79,10 @@ Texture.prototype.unbind = function unbind() {
 /**
  * Replaces the image data in the texture with the given image.
  *
- * @method setImage
- * @chainable
+ * @method
  *
- * @param {Image} img The image object to upload pixel data from.
- *
- * @return {Object} Current texture instance.
+ * @param {Image}   img     The image object to upload pixel data from.
+ * @return {Object}         Current texture instance.
  */
 Texture.prototype.setImage = function setImage(img) {
     this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl[this.format], this.gl[this.format], this.gl[this.type], img);
@@ -98,12 +93,10 @@ Texture.prototype.setImage = function setImage(img) {
 /**
  * Replaces the image data in the texture with an array of arbitrary data.
  *
- * @method setArray
- * @chainable
+ * @method
  *
- * @param {Array} input Array to be set as data to texture. 
- *
- * @return {Object} Current texture instance.
+ * @param {Array}   input   Array to be set as data to texture.
+ * @return {Object}         Current texture instance.
  */
 Texture.prototype.setArray = function setArray(input) {
     this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl[this.format], this.width, this.height, 0, this.gl[this.format], this.gl[this.type], input);
@@ -113,15 +106,14 @@ Texture.prototype.setArray = function setArray(input) {
 /**
  * Dumps the rgb-pixel contents of a texture into an array for debugging purposes
  *
- * @method readBack
- * @chainable
+ * @method
  *
- * @param {Number} x-offset between texture coordinates and snapshot
- * @param {Number} y-offset between texture coordinates and snapshot
- * @param {Number} x-depth of the snapshot
- * @param {Number} y-depth of the snapshot
- * 
- * @return {Array} An array of the pixels contained in the snapshot.
+ * @param {Number} x        x-offset between texture coordinates and snapshot
+ * @param {Number} y        y-offset between texture coordinates and snapshot
+ * @param {Number} width    x-depth of the snapshot
+ * @param {Number} height   y-depth of the snapshot
+ *
+ * @return {Array}          An array of the pixels contained in the snapshot.
  */
 Texture.prototype.readBack = function readBack(x, y, width, height) {
     var gl = this.gl;
@@ -143,17 +135,17 @@ Texture.prototype.readBack = function readBack(x, y, width, height) {
 /*
  * Determines whether both input values are power-of-two numbers.
  *
- * @method isPowerOfTwo
+ * @method
  * @private
  *
- * @param {Number} width Number representing texture width.
- * @param {Number} height Number representing texture height.
+ * @param {Number} width    Number representing texture width.
+ * @param {Number} height   Number representing texture height.
  *
- * @return {Boolean} Boolean denoting whether the input dimensions
- * are both power-of-two values.
+ * @return {Boolean}        Boolean denoting whether the input dimensions
+ *                          are both power-of-two values.
  */
 function isPowerOfTwo(width, height) {
-    return (width & width - 1) === 0 
+    return (width & width - 1) === 0
         && (height & height - 1) === 0;
 };
 
