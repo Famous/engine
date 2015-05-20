@@ -39,6 +39,9 @@ var TIME_UPDATE = ['TIME', null];
  * Famous has two responsibilities, one to act as the highest level
  * updater and another to send messages over to the renderers. It is
  * a singleton.
+ *
+ * @class FamousEngine
+ * @constructor
  */
 function FamousEngine() {
     this._updateQueue = []; // The updateQueue is a place where nodes
@@ -70,8 +73,14 @@ function FamousEngine() {
 
 
 /**
- * @method init
- * @chainable
+ * An init script that initializes the FamousEngine with options
+ * or default parameters.
+ *
+ * @method
+ *
+ * @param {Object} options a set of options containing a compositor and a render loop
+ *
+ * @return {FamousEngine} this
  */
 FamousEngine.prototype.init = function init(options) {
     this.compositor = options && options.compositor || new Compositor();
@@ -81,11 +90,15 @@ FamousEngine.prototype.init = function init(options) {
 };
 
 /**
- * @method setChannel
- * @chainable
+ * Sets the channel that the engine will use to communicate to
+ * the renderers.
+ *
+ * @method
  *
  * @param {Channel} channel     The channel to be used for communicating with
  *                              the `UIManager`/ `Compositor`.
+ *
+ * @return {FamousEngine} this
  */
 FamousEngine.prototype.setChannel = function setChannel(channel) {
     this._channel = channel;
@@ -93,7 +106,10 @@ FamousEngine.prototype.setChannel = function setChannel(channel) {
 };
 
 /**
- * @method getChannel
+ * Returns the channel that the engine is currently using
+ * to communicate with the renderers.
+ *
+ * @method
  *
  * @return {Channel} channel    The channel to be used for communicating with
  *                              the `UIManager`/ `Compositor`.
@@ -109,6 +125,10 @@ FamousEngine.prototype.getChannel = function getChannel () {
  * time on all nodes. While _update is called _inUpdate is set to true and
  * all requests to be placed in the update queue will be forwarded to the
  * nextUpdateQueue.
+ *
+ * @method
+ *
+ * @return {undefined} undefined
  */
 FamousEngine.prototype._update = function _update () {
     this._inUpdate = true;
@@ -135,7 +155,11 @@ FamousEngine.prototype._update = function _update () {
  * If FamousEngine is currently in an update, requestUpdate
  * passes its argument to requestUpdateOnNextTick.
  *
- * @param {Object} an object with an onUpdate method
+ * @method
+ *
+ * @param {Object} requester an object with an onUpdate method
+ *
+ * @return {undefined} undefined
  */
 FamousEngine.prototype.requestUpdate = function requestUpdate (requester) {
     if (!requester)
@@ -153,7 +177,11 @@ FamousEngine.prototype.requestUpdate = function requestUpdate (requester) {
  * to requestUpdate. This method should be used to prevent infinite loops where
  * a class is updated on the frame but needs to be updated again next frame.
  *
- * @param {Object} an object with an onUpdate method
+ * @method
+ *
+ * @param {Object} requester an object with an onUpdate method
+ *
+ * @return {undefined} undefined
  */
 FamousEngine.prototype.requestUpdateOnNextTick = function requestUpdateOnNextTick (requester) {
     this._nextUpdateQueue.push(requester);
@@ -164,8 +192,9 @@ FamousEngine.prototype.requestUpdateOnNextTick = function requestUpdateOnNextTic
  * These messages will be interpreted and sent into the scene graph
  * as events if necessary.
  *
- * @param {Array} an array of commands.
- * @chainable
+ * @method
+ *
+ * @param {Array} messages an array of commands.
  *
  * @return {FamousEngine} this
  */
@@ -198,8 +227,9 @@ FamousEngine.prototype.handleMessage = function handleMessage (messages) {
  * WITH command. It'll then issue the next commands to the path specified
  * by the WITH command.
  *
- * @param {Array} array of messages.
- * @chainable
+ * @method
+ *
+ * @param {Array} messages array of messages.
  *
  * @return {FamousEngine} this
  */
@@ -224,8 +254,9 @@ FamousEngine.prototype.handleWith = function handleWith (messages) {
  * handleFrame is called when the renderers issue a FRAME command to
  * FamousEngine. FamousEngine will then step updating the scene graph to the current time.
  *
- * @param {Array} array of messages.
- * @chainable
+ * @method
+ *
+ * @param {Array} messages array of messages.
  *
  * @return {FamousEngine} this
  */
@@ -241,8 +272,9 @@ FamousEngine.prototype.handleFrame = function handleFrame (messages) {
  * step updates the clock and the scene graph and then sends the draw commands
  * that accumulated in the update to the renderers.
  *
- * @param {Number} current engine time
- * @chainable
+ * @method
+ *
+ * @param {Number} time current engine time
  *
  * @return {FamousEngine} this
  */
@@ -265,7 +297,9 @@ FamousEngine.prototype.step = function step (time) {
  * portion of the path and is listed from the start of the string to the first
  * '/'.
  *
- * @param {String} the path to look up the context for.
+ * @method
+ *
+ * @param {String} selector the path to look up the context for.
  *
  * @return {Context | Undefined} the context if found, else undefined.
  */
@@ -281,6 +315,8 @@ FamousEngine.prototype.getContext = function getContext (selector) {
 /**
  * returns the instance of clock within famous.
  *
+ * @method
+ *
  * @return {Clock} FamousEngine's clock
  */
 FamousEngine.prototype.getClock = function getClock () {
@@ -290,8 +326,9 @@ FamousEngine.prototype.getClock = function getClock () {
 /**
  * queues a message to be transfered to the renderers.
  *
- * @param {Any} Draw Command
- * @chainable
+ * @method
+ *
+ * @param {Any} command Draw Command
  *
  * @return {FamousEngine} this
  */
@@ -303,7 +340,9 @@ FamousEngine.prototype.message = function message (command) {
 /**
  * Creates a scene under which a scene graph could be built.
  *
- * @param {String} a dom selector for where the scene should be placed
+ * @method
+ *
+ * @param {String} selector a dom selector for where the scene should be placed
  *
  * @return {Scene} a new instance of Scene.
  */
@@ -319,7 +358,9 @@ FamousEngine.prototype.createScene = function createScene (selector) {
  * Starts the engine running in the Main-Thread.
  * This effects **every** updateable managed by the Engine.
  *
- * @chainable
+ * @method
+ *
+ * @return {FamousEngine} this
  */
 FamousEngine.prototype.startEngine = function startEngine () {
     this._channel.sendMessage(ENGINE_START);
@@ -330,7 +371,9 @@ FamousEngine.prototype.startEngine = function startEngine () {
  * Stops the engine running in the Main-Thread.
  * This effects **every** updateable managed by the Engine.
  *
- * @chainable
+ * @method
+ *
+ * @return {FamousEngine} this
  */
 FamousEngine.prototype.stopEngine = function stopEngine () {
     this._channel.sendMessage(ENGINE_STOP);
