@@ -1265,7 +1265,15 @@ Node.prototype.setAbsoluteSize = function setAbsoluteSize (x, y, z) {
 };
 
 /**
- * Private method for alerting all components that 
+ * Private method for alerting all components and children that
+ * this node's transform has changed.
+ *
+ * @method
+ *
+ * @param {Float32Array} transform The transform that has changed
+ *
+ * @return {undefined}
+ */
 Node.prototype._transformChanged = function _transformChanged (transform) {
     var i = 0;
     var items = this._components;
@@ -1287,6 +1295,16 @@ Node.prototype._transformChanged = function _transformChanged (transform) {
     }
 };
 
+/**
+ * Private method for alerting all components and children that
+ * this node's size has changed.
+ *
+ * @method
+ *
+ * @param {Float32Array} size the size that has changed
+ *
+ * @return {undefined}
+ */
 Node.prototype._sizeChanged = function _sizeChanged (size) {
     var i = 0;
     var items = this._components;
@@ -1308,7 +1326,13 @@ Node.prototype._sizeChanged = function _sizeChanged (size) {
     }
 };
 
-// DEPRICATE
+/**
+ * Method for getting the current frame. Will be depricated.
+ *
+ * @method
+ *
+ * @return {Number} current frame
+ */
 Node.prototype.getFrame = function getFrame () {
     return this._globalUpdater.getFrame();
 };
@@ -1477,6 +1501,8 @@ Node.prototype.onParentDismount = function onParentDismount () {
  *
  * @param  {String} type   The event type (e.g. "click").
  * @param  {Object} ev     The event payload object to be dispatched.
+ *
+ * @return {Node} this
  */
 Node.prototype.receive = function receive (type, ev) {
     var i = 0;
@@ -1491,28 +1517,121 @@ Node.prototype.receive = function receive (type, ev) {
 };
 
 
+/**
+ * Private method to avoid accidentally passing arguments
+ * to update events.
+ *
+ * @method
+ *
+ * @return {undefined}
+ */
 Node.prototype._requestUpdateWithoutArgs = function _requestUpdateWithoutArgs () {
     if (!this._requestingUpdate) this._requestUpdate();
 };
 
+/**
+ * A method to execute logic on update. Defaults to the
+ * node's .update method.
+ *
+ * @method
+ *
+ * @param {Number} current time
+ *
+ * @return {undefined}
+ */
 Node.prototype.onUpdate = Node.prototype.update;
 
+/**
+ * A method to execute logic when a parent node is shown. Delegates
+ * to Node.show.
+ *
+ * @method
+ *
+ * @return {Node} this
+ */
 Node.prototype.onParentShow = Node.prototype.show;
 
+/**
+ * A method to execute logic when the parent is hidden. Delegates
+ * to Node.hide.
+ *
+ * @method
+ *
+ * @return {Node} this
+ */
 Node.prototype.onParentHide = Node.prototype.hide;
 
+/**
+ * A method to execute logic when the parent transform changes.
+ * Delegates to Node._requestUpdateWithoutArgs.
+ *
+ * @method
+ *
+ * @return {undefined}
+ */
 Node.prototype.onParentTransformChange = Node.prototype._requestUpdateWithoutArgs;
 
+/**
+ * A method to execute logic when the parent size changes.
+ * Delegates to Node._requestUpdateWIthoutArgs.
+ *
+ * @method
+ *
+ * @return {undefined}
+ */
 Node.prototype.onParentSizeChange = Node.prototype._requestUpdateWithoutArgs;
 
+/**
+ * A method to execute logic when the node something wants
+ * to show the node. Delegates to Node.show.
+ *
+ * @method
+ *
+ * @return {Node} this
+ */
 Node.prototype.onShow = Node.prototype.show;
 
+/**
+ * A method to execute logic when something wants to hide this
+ * node. Delegates to Node.hide.
+ *
+ * @method
+ *
+ * @return {Node} this
+ */
 Node.prototype.onHide = Node.prototype.hide;
 
+/**
+ * A method which can execute logic when this node is added to
+ * to the scene graph. Delegates to mount.
+ *
+ * @method
+ *
+ * @return {Node} this
+ */
 Node.prototype.onMount = Node.prototype.mount;
 
+/**
+ * A method which can execute logic when this node is removed from
+ * the scene graph. Delegates to Node.dismount.
+ *
+ * @method
+ *
+ * @return {Node} this
+ */
 Node.prototype.onDismount = Node.prototype.dismount;
 
+/**
+ * A method which can execute logic when this node receives
+ * an event from the scene graph. Delegates to Node.receive.
+ *
+ * @method
+ *
+ * @param {String} event name
+ * @param {Object} payload
+ *
+ * @return {undefined}
+ */
 Node.prototype.onReceive = Node.prototype.receive;
 
 module.exports = Node;
