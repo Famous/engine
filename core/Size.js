@@ -44,9 +44,9 @@ Size.DEFAULT = Size.RELATIVE;
  * a final size for the node from the node's spec. Returns whether or not
  * the final size has changed from its last value.
  *
- * @param {Array} parent node's calculated size
- * @param {Node.Spec} the target node's spec
- * @param {Array} an array to write the result to
+ * @param {Array} parentSize parent node's calculated size
+ * @param {Node.Spec} node the target node's spec
+ * @param {Array} target an array to write the result to
  *
  * @return {Boolean} true if the size of the node has changed.
  */
