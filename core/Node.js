@@ -117,6 +117,9 @@ Node.DEFAULT_SIZE = Size.DEFAULT;
 /**
  * A Node spec holds the "data" associated with a Node.
  *
+ * @class Spec
+ * @constructor
+ *
  * @property {String} location path to the node (e.g. "body/0/1")
  * @property {Object} showState
  * @property {Boolean} showState.mounted
@@ -182,6 +185,8 @@ Node.prototype.getLocation = function getLocation () {
 
 /**
  * @alias getId
+ *
+ * @return {String} the path of the Node
  */
 Node.prototype.getId = Node.prototype.getLocation;
 
@@ -193,6 +198,8 @@ Node.prototype.getId = Node.prototype.getLocation;
  *
  * @param  {String} event   Event type.
  * @param  {Object} payload Event object to be dispatched.
+ *
+ * @return {Node} this
  */
 Node.prototype.emit = function emit (event, payload) {
     var p = this.getParent();
@@ -299,6 +306,8 @@ Node.prototype.getParent = function getParent () {
  * @param  {Object} requester   If the requester has an `onUpdate` method, it
  *                              will be invoked during the next update phase of
  *                              the node.
+ *
+ * @return {Node} this
  */
 Node.prototype.requestUpdate = function requestUpdate (requester) {
     if (this._inUpdate || !this.isMounted())
@@ -318,6 +327,8 @@ Node.prototype.requestUpdate = function requestUpdate (requester) {
  * @param  {Object} requester   If the requester has an `onUpdate` method, it
  *                              will be invoked during the next update phase of
  *                              the node.
+ *
+ * @return {Node} this
  */
 Node.prototype.requestUpdateOnNextTick = function requestUpdateOnNextTick (requester) {
     this._nextUpdateQueue.push(requester);
@@ -325,10 +336,9 @@ Node.prototype.requestUpdateOnNextTick = function requestUpdateOnNextTick (reque
 };
 
 /**
- * If the context has been created using @{@link Famous.createContext}, the
- * @{@link Famous} singleton will be the global updater.
+ * Get the object responsible for updating this node.
  *
- * @method getUpdater
+ * @method 
  *
  * @return {Object} The global updater.
  */
@@ -418,46 +428,129 @@ Node.prototype.getPosition = function getPosition () {
     return this.value.vectors.position;
 };
 
+/**
+ * Returns the node's current rotation
+ *
+ * @method getRotation
+ *
+ * @return {Float32Array} an array of four values, showing the rotation as a quaternion
+ */
 Node.prototype.getRotation = function getRotation () {
     return this.value.vectors.rotation;
 };
 
+/**
+ * Returns the scale of the node
+ *
+ * @method
+ *
+ * @return {Float32Array} an array showing the current scale vector
+ */
 Node.prototype.getScale = function getScale () {
     return this.value.vectors.scale;
 };
 
+/**
+ * Returns the current size mode of the node
+ *
+ * @method
+ *
+ * @return {Float32Array} an array of numbers showing the current size mode
+ */
 Node.prototype.getSizeMode = function getSizeMode () {
     return this.value.size.sizeMode;
 };
 
+/**
+ * Returns the current proportional size
+ *
+ * @method
+ *
+ * @return {Float32Array} a vector 3 showing the current proportional size
+ */
 Node.prototype.getProportionalSize = function getProportionalSize () {
     return this.value.size.proportional;
 };
 
+/**
+ * Returns the differential size of the node
+ *
+ * @method
+ *
+ * @return {Float32Array} a vector 3 showing the current differential size
+ */
 Node.prototype.getDifferentialSize = function getDifferentialSize () {
     return this.value.size.differential;
 };
 
+/**
+ * Returns the absolute size of the node
+ *
+ * @method
+ *
+ * @return {Float32Array} a vector 3 showing the current absolute size of the node
+ */
 Node.prototype.getAbsoluteSize = function getAbsoluteSize () {
     return this.value.size.absolute;
 };
 
+/**
+ * Returns the current Render Size of the node. Note that the render size
+ * is asynchronous (will always be one frame behind) and needs to be explicitely
+ * calculated by setting the proper size mode.
+ *
+ * @method
+ *
+ * @return {Float32Array} a vector 3 showing the current render size
+ */
 Node.prototype.getRenderSize = function getRenderSize () {
     return this.value.size.render;
 };
 
+/**
+ * Returns the external size of the node
+ *
+ * @method
+ *
+ * @return {Float32Array} a vector 3 of the final calculated side of the node
+ */
 Node.prototype.getSize = function getSize () {
     return this._calculatedValues.size;
 };
 
+/**
+ * Returns the current world transform of the node
+ *
+ * @method
+ *
+ * @return {Float32Array} a 16 value transform
+ */
 Node.prototype.getTransform = function getTransform () {
     return this._calculatedValues.transform;
 };
 
+/**
+ * Get the list of the UI Events that are currently associated with this node
+ *
+ * @method
+ *
+ * @return {Array} an array of strings representing the current subscribed UI event of this node
+ */
 Node.prototype.getUIEvents = function getUIEvents () {
     return this.value.UIEvents;
 };
 
+/**
+ * Adds a new child to this node. If this method is called with no argument it will
+ * create a new node, however it can also be called with an existing node which it will
+ * append to the node that this method is being called on. Returns the new or passed in node.
+ *
+ * @method
+ * 
+ * @param {Node | void} child the node to appended or no node to create a new node.
+ *
+ * @return {Node} the appended node.
+ */
 Node.prototype.addChild = function addChild (child) {
     var index = child ? this._children.indexOf(child) : -1;
     child = child ? child : new Node();
@@ -477,6 +570,16 @@ Node.prototype.addChild = function addChild (child) {
     return child;
 };
 
+/**
+ * Removes a child node from another node. The passed in node must be
+ * a child of the node that this method is called upon. 
+ *
+ * @method
+ * 
+ * @param {Node} child node to be removed
+ *
+ * @return {Boolean} whether or not the node was successfully removed
+ */
 Node.prototype.removeChild = function removeChild (child) {
     var index = this._children.indexOf(child);
     var added = index !== -1;
@@ -536,6 +639,8 @@ Node.prototype.getComponent = function getComponent (index) {
  *
  * @param  {Object} component   An component that has previously been added
  *                              using @{@link addComponent}.
+ *
+ * @return {Node} this
  */
 Node.prototype.removeComponent = function removeComponent (component) {
     var index = this._components.indexOf(component);
@@ -552,6 +657,17 @@ Node.prototype.removeComponent = function removeComponent (component) {
     return component;
 };
 
+/**
+ * Subscribes a node to a UI Event. All components on the node
+ * will have the opportunity to begin listening to that event
+ * and alerting the scene graph.
+ *
+ * @method
+ *
+ * @param {String} eventName the name of the event
+ *
+ * @return {undefined} undefined
+ */
 Node.prototype.addUIEvent = function addUIEvent (eventName) {
     var UIEvents = this.getUIEvents();
     var components = this._components;
@@ -565,9 +681,18 @@ Node.prototype.addUIEvent = function addUIEvent (eventName) {
             if (component && component.onAddUIEvent) component.onAddUIEvent(eventName);
         }
     }
-    return added;
 };
 
+/**
+ * Private method for the Node to request an update for itself.
+ *
+ * @method
+ * @private
+ *
+ * @param {Boolean} force whether or not to force the update
+ *
+ * @return {undefined} undefined
+ */
 Node.prototype._requestUpdate = function _requestUpdate (force) {
     if (force || (!this._requestingUpdate && this._globalUpdater)) {
         this._globalUpdater.requestUpdate(this);
@@ -575,6 +700,18 @@ Node.prototype._requestUpdate = function _requestUpdate (force) {
     }
 };
 
+/**
+ * Private method to set an optional value in an array, and 
+ * request an update if this changes the value of the array.
+ *
+ * @method
+ *
+ * @param {Array} vec the array to insert the value into
+ * @param {Number} index the index at which to insert the value
+ * @param {Any} val the value to potentially insert (if not null or undefined)
+ *
+ * @return {Boolean} whether or not a new value was inserted.
+ */
 Node.prototype._vecOptionalSet = function _vecOptionalSet (vec, index, val) {
     if (val != null && vec[index] !== val) {
         vec[index] = val;
@@ -584,6 +721,15 @@ Node.prototype._vecOptionalSet = function _vecOptionalSet (vec, index, val) {
     return false;
 };
 
+/**
+ * Shows the node, which is to say, calls onShow on all of the
+ * node's components. Renderable components can then issue the
+ * draw commands necessary to be shown.
+ *
+ * @method
+ *
+ * @return {Node} this
+ */
 Node.prototype.show = function show () {
     var i = 0;
     var items = this._components;
@@ -608,6 +754,15 @@ Node.prototype.show = function show () {
     return this;
 };
 
+/**
+ * Hides the node, which is to say, calls onHide on all of the
+ * node's components. Renderable components can then issue
+ * the draw commands necessary to be hidden
+ *
+ * @method
+ *
+ * @return {Node} this
+ */
 Node.prototype.hide = function hide () {
     var i = 0;
     var items = this._components;
@@ -632,6 +787,18 @@ Node.prototype.hide = function hide () {
     return this;
 };
 
+/**
+ * Sets the align value of the node. Will call onAlignChange 
+ * on all of the Node's components.
+ *
+ * @method
+ *
+ * @param {Number} x Align value in the x dimension.
+ * @param {Number} y Align value in the y dimension.
+ * @param {Number} z Align value in the z dimension.
+ *
+ * @return {Node} this
+ */
 Node.prototype.setAlign = function setAlign (x, y, z) {
     var vec3 = this.value.offsets.align;
     var propogate = false;
@@ -656,6 +823,18 @@ Node.prototype.setAlign = function setAlign (x, y, z) {
     return this;
 };
 
+/**
+ * Sets the mount point value of the node. Will call onMountPointChange
+ * on all of the node's components.
+ *
+ * @method
+ *
+ * @param {Number} x MountPoint value in x dimension
+ * @param {Number} y MountPoint value in y dimension
+ * @param {Number} z MountPoint value in z dimension
+ *
+ * @return {Node} this
+ */
 Node.prototype.setMountPoint = function setMountPoint (x, y, z) {
     var vec3 = this.value.offsets.mountPoint;
     var propogate = false;
@@ -680,6 +859,18 @@ Node.prototype.setMountPoint = function setMountPoint (x, y, z) {
     return this;
 };
 
+/**
+ * Sets the origin value of the node. Will call onOriginChange
+ * on all of the node's components.
+ *
+ * @method
+ *
+ * @param {Number} x Origin value in x dimension
+ * @param {Number} y Origin value in y dimension
+ * @param {Number} z Origin value in z dimension
+ *
+ * @return {Node} this
+ */
 Node.prototype.setOrigin = function setOrigin (x, y, z) {
     var vec3 = this.value.offsets.origin;
     var propogate = false;
@@ -704,7 +895,18 @@ Node.prototype.setOrigin = function setOrigin (x, y, z) {
     return this;
 };
 
-
+/**
+ * Sets the position of the node. Will call onPositionChange
+ * on all of the node's components.
+ *
+ * @method
+ *
+ * @param {Number} x Position in x
+ * @param {Number} y Position in y
+ * @param {Number} z Position in z
+ *
+ * @return {Node} this
+ */
 Node.prototype.setPosition = function setPosition (x, y, z) {
     var vec3 = this.value.vectors.position;
     var propogate = false;
@@ -730,6 +932,21 @@ Node.prototype.setPosition = function setPosition (x, y, z) {
     return this;
 };
 
+/**
+ * Sets the rotation of the node. Will call onRotationChange
+ * on all of the node's components. This method takes either
+ * Euler angles or a quaternion. If the fourth argument is undefined
+ * Euler angles are assumed.
+ *
+ * @method
+ *
+ * @param {Number} x Either the rotation around the x axis or the magnitude in x of the axis of rotation.
+ * @param {Number} y Either the rotation around the y axis or the magnitude in y of the axis of rotation.
+ * @param {Number} z Either the rotation around the z axis or the magnitude in z of the axis of rotation.
+ * @param {Number|undefined} w the amount of rotation around the axis of rotation, if a quaternion is specified.
+ *
+ * @return {undefined} undefined
+ */
 Node.prototype.setRotation = function setRotation (x, y, z, w) {
     var quat = this.value.vectors.rotation;
     var propogate = false;
@@ -817,6 +1034,18 @@ Node.prototype.setRotation = function setRotation (x, y, z, w) {
     return this;
 };
 
+/**
+ * Sets the scale of the node. The default value is 1 in all dimensions.
+ * The node's components will have onScaleChanged called on them.
+ *
+ * @method
+ *
+ * @param {Number} x Scale value in x
+ * @param {Number} y Scale value in y
+ * @param {Number} z Scale value in z
+ *
+ * @return {Node} this
+ */
 Node.prototype.setScale = function setScale (x, y, z) {
     var vec3 = this.value.vectors.scale;
     var propogate = false;
@@ -841,6 +1070,16 @@ Node.prototype.setScale = function setScale (x, y, z) {
     return this;
 };
 
+/**
+ * Sets the value of the opacity of this node. All of the node's
+ * components will have onOpacityChange called on them/
+ *
+ * @method
+ *
+ * @param {Number} val Value of the opacity. 1 is the default.
+ *
+ * @return {Node} this
+ */
 Node.prototype.setOpacity = function setOpacity (val) {
     if (val !== this.value.showState.opacity) {
         this.value.showState.opacity = val;
@@ -880,6 +1119,8 @@ Node.prototype.setOpacity = function setOpacity (val) {
  *                        y direction ("height").
  * @param {SizeMode} z    The size mode being used for determining the size in
  *                        z direction ("depth").
+ *
+ * @return {Node} this
  */
 Node.prototype.setSizeMode = function setSizeMode (x, y, z) {
     var vec3 = this.value.size.sizeMode;
@@ -909,7 +1150,11 @@ Node.prototype.setSizeMode = function setSizeMode (x, y, z) {
  * A protected method that resolves string representations of size mode
  * to numeric values and applies them.
  *
- * @method _resolveSizeMode
+ * @method
+ *
+ * @param {Array} vec the array to write size mode to
+ * @param {Number} index the index to write to in the array
+ * @param {String|Number} val the value to write
  *
  * @return {Bool} whether or not the sizemode has been changed for this index.
  */
@@ -939,6 +1184,8 @@ Node.prototype._resolveSizeMode = function _resolveSizeMode (vec, index, val) {
  * @param {Number} x    x-Size in pixels ("width").
  * @param {Number} y    y-Size in pixels ("height").
  * @param {Number} z    z-Size in pixels ("depth").
+ *
+ * @return {Node} this
  */
 Node.prototype.setProportionalSize = function setProportionalSize (x, y, z) {
     var vec3 = this.value.size.proportional;
@@ -979,6 +1226,8 @@ Node.prototype.setProportionalSize = function setProportionalSize (x, y, z) {
  *                      pixels ("height").
  * @param {Number} z    z-Size to be added to the relatively sized node in
  *                      pixels ("depth").
+ *
+ * @return {Node} this
  */
 Node.prototype.setDifferentialSize = function setDifferentialSize (x, y, z) {
     var vec3 = this.value.size.differential;
@@ -1012,6 +1261,8 @@ Node.prototype.setDifferentialSize = function setDifferentialSize (x, y, z) {
  * @param {Number} x    x-Size in pixels ("width").
  * @param {Number} y    y-Size in pixels ("height").
  * @param {Number} z    z-Size in pixels ("depth").
+ * 
+ * @return {Node} this
  */
 Node.prototype.setAbsoluteSize = function setAbsoluteSize (x, y, z) {
     var vec3 = this.value.size.absolute;
@@ -1037,6 +1288,16 @@ Node.prototype.setAbsoluteSize = function setAbsoluteSize (x, y, z) {
     return this;
 };
 
+/**
+ * Private method for alerting all components and children that
+ * this node's transform has changed.
+ *
+ * @method
+ *
+ * @param {Float32Array} transform The transform that has changed
+ *
+ * @return {undefined} undefined
+ */
 Node.prototype._transformChanged = function _transformChanged (transform) {
     var i = 0;
     var items = this._components;
@@ -1058,6 +1319,16 @@ Node.prototype._transformChanged = function _transformChanged (transform) {
     }
 };
 
+/**
+ * Private method for alerting all components and children that
+ * this node's size has changed.
+ *
+ * @method
+ *
+ * @param {Float32Array} size the size that has changed
+ *
+ * @return {undefined} undefined
+ */
 Node.prototype._sizeChanged = function _sizeChanged (size) {
     var i = 0;
     var items = this._components;
@@ -1079,7 +1350,13 @@ Node.prototype._sizeChanged = function _sizeChanged (size) {
     }
 };
 
-// DEPRICATE
+/**
+ * Method for getting the current frame. Will be depricated.
+ *
+ * @method
+ *
+ * @return {Number} current frame
+ */
 Node.prototype.getFrame = function getFrame () {
     return this._globalUpdater.getFrame();
 };
@@ -1103,6 +1380,8 @@ Node.prototype.getComponents = function getComponents () {
  *
  * @param  {Number} time    high-resolution timstamp, usually retrieved using
  *                          requestAnimationFrame
+ *
+ * @return {Node} this
  */
 Node.prototype.update = function update (time){
     this._inUpdate = true;
@@ -1152,6 +1431,8 @@ Node.prototype.update = function update (time){
  *
  * @param  {Node} parent    parent node
  * @param  {String} myId    path to node (e.g. `body/0/1`)
+ *
+ * @return {Node} this
  */
 Node.prototype.mount = function mount (parent, myId) {
     if (this.isMounted()) return;
@@ -1186,7 +1467,9 @@ Node.prototype.mount = function mount (parent, myId) {
  * Dismounts (detaches) the node from the scene graph by removing it as a
  * child of its parent.
  *
- * @method dismount
+ * @method
+ *
+ * @return {Node} this
  */
 Node.prototype.dismount = function dismount () {
     if (!this.isMounted()) return;
@@ -1225,6 +1508,8 @@ Node.prototype.dismount = function dismount () {
  * @param  {Node} parent        The parent node.
  * @param  {String} parentId    The parent id (path to parent).
  * @param  {Number} index       Id the node should be mounted to.
+ *
+ * @return {Node} this
  */
 Node.prototype.onParentMount = function onParentMount (parent, parentId, index) {
     return this.mount(parent, parentId + '/' + index);
@@ -1235,6 +1520,8 @@ Node.prototype.onParentMount = function onParentMount (parent, parentId, index) 
  * unmounted.
  *
  * @method onParentDismount
+ *
+ * @return {Node} this
  */
 Node.prototype.onParentDismount = function onParentDismount () {
     return this.dismount();
@@ -1248,6 +1535,8 @@ Node.prototype.onParentDismount = function onParentDismount () {
  *
  * @param  {String} type   The event type (e.g. "click").
  * @param  {Object} ev     The event payload object to be dispatched.
+ *
+ * @return {Node} this
  */
 Node.prototype.receive = function receive (type, ev) {
     var i = 0;
@@ -1262,28 +1551,121 @@ Node.prototype.receive = function receive (type, ev) {
 };
 
 
+/**
+ * Private method to avoid accidentally passing arguments
+ * to update events.
+ *
+ * @method
+ *
+ * @return {undefined} undefined
+ */
 Node.prototype._requestUpdateWithoutArgs = function _requestUpdateWithoutArgs () {
     if (!this._requestingUpdate) this._requestUpdate();
 };
 
+/**
+ * A method to execute logic on update. Defaults to the
+ * node's .update method.
+ *
+ * @method
+ *
+ * @param {Number} current time
+ *
+ * @return {undefined} undefined
+ */
 Node.prototype.onUpdate = Node.prototype.update;
 
+/**
+ * A method to execute logic when a parent node is shown. Delegates
+ * to Node.show.
+ *
+ * @method
+ *
+ * @return {Node} this
+ */
 Node.prototype.onParentShow = Node.prototype.show;
 
+/**
+ * A method to execute logic when the parent is hidden. Delegates
+ * to Node.hide.
+ *
+ * @method
+ *
+ * @return {Node} this
+ */
 Node.prototype.onParentHide = Node.prototype.hide;
 
+/**
+ * A method to execute logic when the parent transform changes.
+ * Delegates to Node._requestUpdateWithoutArgs.
+ *
+ * @method
+ *
+ * @return {undefined} undefined
+ */
 Node.prototype.onParentTransformChange = Node.prototype._requestUpdateWithoutArgs;
 
+/**
+ * A method to execute logic when the parent size changes.
+ * Delegates to Node._requestUpdateWIthoutArgs.
+ *
+ * @method
+ *
+ * @return {undefined} undefined
+ */
 Node.prototype.onParentSizeChange = Node.prototype._requestUpdateWithoutArgs;
 
+/**
+ * A method to execute logic when the node something wants
+ * to show the node. Delegates to Node.show.
+ *
+ * @method
+ *
+ * @return {Node} this
+ */
 Node.prototype.onShow = Node.prototype.show;
 
+/**
+ * A method to execute logic when something wants to hide this
+ * node. Delegates to Node.hide.
+ *
+ * @method
+ *
+ * @return {Node} this
+ */
 Node.prototype.onHide = Node.prototype.hide;
 
+/**
+ * A method which can execute logic when this node is added to
+ * to the scene graph. Delegates to mount.
+ *
+ * @method
+ *
+ * @return {Node} this
+ */
 Node.prototype.onMount = Node.prototype.mount;
 
+/**
+ * A method which can execute logic when this node is removed from
+ * the scene graph. Delegates to Node.dismount.
+ *
+ * @method
+ *
+ * @return {Node} this
+ */
 Node.prototype.onDismount = Node.prototype.dismount;
 
+/**
+ * A method which can execute logic when this node receives
+ * an event from the scene graph. Delegates to Node.receive.
+ *
+ * @method
+ *
+ * @param {String} event name
+ * @param {Object} payload
+ *
+ * @return {undefined} undefined
+ */
 Node.prototype.onReceive = Node.prototype.receive;
 
 module.exports = Node;

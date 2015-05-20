@@ -40,6 +40,8 @@ function Event () {
  * scene graph.
  *
  * @method stopPropagation
+ *
+ * @return {undefined} undefined
  */
 function stopPropagation () {
     this.propagationStopped = true;

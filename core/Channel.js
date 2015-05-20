@@ -45,8 +45,9 @@ function Channel() {
  *
  * Primarily used for testing.
  *
- * @method  _enterWorkerMode
- * @private
+ * @method 
+ *
+ * @return {undefined} undefined
  */
 Channel.prototype._enterWorkerMode = function _enterWorkerMode() {
     this._workerMode = true;
@@ -62,6 +63,8 @@ Channel.prototype._enterWorkerMode = function _enterWorkerMode() {
  *
  * @type {Function}
  * @override
+ * 
+ * @return {undefined} undefined
  */
 Channel.prototype.onMessage = null;
 
@@ -69,6 +72,8 @@ Channel.prototype.onMessage = null;
  * Sends a message to the ThreadManager.
  *
  * @param  {Any}    message Arbitrary message object.
+ *
+ * @return {undefined} undefined
  */
 Channel.prototype.sendMessage = function sendMessage (message) {
     if (this._workerMode) {
@@ -97,6 +102,10 @@ Channel.prototype.onmessage = null;
  *
  * @private
  * @alias onMessage
+ *
+ * @param {Any} message a message to send over the channel
+ *
+ * @return {undefined} undefined
  */
 Channel.prototype.postMessage = function postMessage(message) {
     return this.onMessage(message);
