@@ -29,16 +29,13 @@ var CallbackStore = require('../utilities/CallbackStore');
 var RENDER_SIZE = 2;
 
 /**
- * A DOMElement is a renderable that can be added just like a "normal"
- * component to a node using `addComponent`.
- * Renderables send draw commands to the node they are attached to.
- * Those commands then get interpreted by the `DOMRenderer` in the Main thread
- * to build the actual DOM representation.
+ * A DOMElement is a component that can be added to a Node with the
+ * purpose of sending draw commands to the renderer. Renderables send draw commands 
+ * to through their Nodes to the Compositor where they are acted upon.
  *
  * @class DOMElement
- * @constructor
  *
- * @param {Node} node                   The entity to which the `DOMElement`
+ * @param {Node} node                   The Node to which the `DOMElement`
  *                                      renderable should be attached to.
  * @param {Object} options              Initial options used for instantiating
  *                                      the Node.
@@ -54,7 +51,7 @@ var RENDER_SIZE = 2;
  *                                      WebGL canvas over this element which allows
  *                                      for DOM and WebGL layering.  On by default.
  */
-function DOMElement (node, options) {
+function DOMElement(node, options) {
     if (!node) throw new Error('DOMElement must be instantiated on a node');
 
     this._node = node;
@@ -109,15 +106,13 @@ function DOMElement (node, options) {
 }
 
 /**
- * Serializes the state of the DOMElement. This method will be invoked by
- * @{@link Node#getValue} in order to serialize the node and possibly entire
- * scene graph hierarchies.
+ * Serializes the state of the DOMElement.
  *
- * @method getValue
+ * @method
  *
- * @return {Object}     serialized component.
+ * @return {Object} serialized interal state
  */
-DOMElement.prototype.getValue = function getValue () {
+DOMElement.prototype.getValue = function getValue() {
     return {
         classes: this._classes,
         styles: this._styles,
@@ -135,9 +130,11 @@ DOMElement.prototype.getValue = function getValue () {
  * This flushes the internal draw command queue by sending individual commands
  * to the node using `sendDrawCommand`.
  *
- * @method onUpdate
+ * @method
+ *
+ * @return {undefined} undefined
  */
-DOMElement.prototype.onUpdate = function onUpdate () {
+DOMElement.prototype.onUpdate = function onUpdate() {
     var node = this._node;
     var queue = this._changeQueue;
     var len = queue.length;
@@ -163,11 +160,13 @@ DOMElement.prototype.onUpdate = function onUpdate () {
  * hierarchy.
  *
  * @method _setParent
- * @protected
+ * @private
  *
  * @param {String} path of the parent
+ *
+ * @return {undefined} undefined
  */
-DOMElement.prototype._setParent = function _setParent (path) {
+DOMElement.prototype._setParent = function _setParent(path) {
     if (this._node) {
         var location = this._node.getLocation();
         if (location === path || location.indexOf(path) === -1)
@@ -180,12 +179,14 @@ DOMElement.prototype._setParent = function _setParent (path) {
  * Private method which adds a child of the element in the DOM
  * hierarchy.
  *
- * @method _addChild
- * @protected
+ * @method
+ * @private
  *
  * @param {String} path of the child
+ *
+ * @return {undefined} undefined
  */
-DOMElement.prototype._addChild = function _addChild (path) {
+DOMElement.prototype._addChild = function _addChild(path) {
     if (this._node) {
         var location = this._node.getLocation();
         if (path === location || path.indexOf(location) === -1)
@@ -198,10 +199,12 @@ DOMElement.prototype._addChild = function _addChild (path) {
 /**
  * Private method which returns the path of the parent of this element
  *
- * @method _getParent
- * @protected
+ * @method
+ * @private
+ *
+ * @return {String} path of the parent element
  */
-DOMElement.prototype._getParent = function _getParent () {
+DOMElement.prototype._getParent = function _getParent() {
     return this._parent;
 };
 
@@ -209,10 +212,12 @@ DOMElement.prototype._getParent = function _getParent () {
  * Private method which returns an array of paths of the children elements
  * of this element
  *
- * @method _getChildren
- * @protected
+ * @method
+ * @private
+ *
+ * @return {Array} an array of the paths of the child element
  */
-DOMElement.prototype._getChildren = function _getChildren () {
+DOMElement.prototype._getChildren = function _getChildren() {
     return this._children;
 };
 
@@ -222,12 +227,14 @@ DOMElement.prototype._getChildren = function _getChildren () {
  *
  * @method onMount
  *
- * @param  {Node} node      Parent node to which the component should be added.
- * @param  {String} id      Path at which the component (or node) is being
+ * @param {Node} node      Parent node to which the component should be added.
+ * @param {String} id      Path at which the component (or node) is being
  *                          attached. The path is being set on the actual
  *                          DOMElement as a `data-fa-path`-attribute.
+ *
+ * @return {undefined} undefined
  */
-DOMElement.prototype.onMount = function onMount (node, id) {
+DOMElement.prototype.onMount = function onMount(node, id) {
     this._node = node;
     this._id = id;
     this._UIEvents = node.getUIEvents().slice(0);
@@ -237,11 +244,13 @@ DOMElement.prototype.onMount = function onMount (node, id) {
 
 /**
  * Method to be invoked by the Node as soon as the node is being dismounted
- * either directly or by dismounting one of its ancestors).
+ * either directly or by dismounting one of its ancestors.
  *
- * @method onDismount
+ * @method
+ *
+ * @return {undefined} undefined
  */
-DOMElement.prototype.onDismount = function onDismount () {
+DOMElement.prototype.onDismount = function onDismount() {
     this.setProperty('display', 'none');
     this.setAttribute('data-fa-path', '');
     this._initialized = false;
@@ -252,9 +261,11 @@ DOMElement.prototype.onDismount = function onDismount () {
  * This results into the DOMElement setting the `display` property to `block`
  * and therefore visually showing the corresponding DOMElement (again).
  *
- * @method onShow
+ * @method
+ *
+ * @return {undefined} undefined
  */
-DOMElement.prototype.onShow = function onShow () {
+DOMElement.prototype.onShow = function onShow() {
     this.setProperty('display', 'block');
 };
 
@@ -263,21 +274,26 @@ DOMElement.prototype.onShow = function onShow () {
  * This results into the DOMElement setting the `display` property to `none`
  * and therefore visually hiding the corresponding DOMElement (again).
  *
- * @method onHide
+ * @method
+ *
+ * @return {undefined} undefined
  */
-DOMElement.prototype.onHide = function onHide () {
+DOMElement.prototype.onHide = function onHide() {
     this.setProperty('display', 'none');
 };
 
 /**
  * Enables or disables WebGL 'cutout' for this element, which affects
- * how the element is layered with WebGL objects in the scene.
+ * how the element is layered with WebGL objects in the scene.  This is designed
+ * mainly as a way to acheive 
  *
- * @method setCutoutState
+ * @method
  *
  * @param {Boolean} usesCutout  The presence of a WebGL 'cutout' for this element.
+ *
+ * @return {undefined} undefined
  */
-DOMElement.prototype.setCutoutState = function setCutoutState (usesCutout) {
+DOMElement.prototype.setCutoutState = function setCutoutState(usesCutout) {
     this._changeQueue.push('GL_CUTOUT_STATE', usesCutout);
 
     if (this._initialized) this._requestUpdate();
@@ -285,13 +301,14 @@ DOMElement.prototype.setCutoutState = function setCutoutState (usesCutout) {
 
 /**
  * Method to be invoked by the node as soon as the transform matrix associated
- * with the node changes.
- * The DOMElement will react to transform changes by sending `CHANGE_TRANSFORM`
- * commands to the `DOMRenderer`.
+ * with the node changes. The DOMElement will react to transform changes by sending
+ * `CHANGE_TRANSFORM` commands to the `DOMRenderer`.
  *
- * @method onTransformChange
+ * @method
  *
- * @param  {Float32Array} transform     The final transform matrix.
+ * @param {Float32Array} transform The final transform matrix
+ *
+ * @return {undefined} undefined
  */
 DOMElement.prototype.onTransformChange = function onTransformChange (transform) {
     this._changeQueue.push('CHANGE_TRANSFORM');
@@ -304,13 +321,13 @@ DOMElement.prototype.onTransformChange = function onTransformChange (transform) 
 /**
  * Method to be invoked by the node as soon as its computed size changes.
  *
- * @method onSizeChange
- * @chainable
+ * @method
  *
- * @param  {Float32Array} size      Absolute, pixel size.
+ * @param {Float32Array} size Size of the Node in pixels
+ *
  * @return {DOMElement} this
  */
-DOMElement.prototype.onSizeChange = function onSizeChange (size) {
+DOMElement.prototype.onSizeChange = function onSizeChange(size) {
     var sizeMode = this._node.getSizeMode();
     var sizedX = sizeMode[0] !== RENDER_SIZE;
     var sizedY = sizeMode[1] !== RENDER_SIZE;
@@ -324,15 +341,15 @@ DOMElement.prototype.onSizeChange = function onSizeChange (size) {
 };
 
 /**
- * Method to be invoked by the node as soon as its opacity changes.
+ * Method to be invoked by the node as soon as its opacity changes
  *
- * @method onOpacityChange
- * @chainable
+ * @method
  *
- * @param  {Number} opacity      The new opacity, as a scalar from 0 to 1.
+ * @param {Number} opacity The new opacity, as a scalar from 0 to 1
+ *
  * @return {DOMElement} this
  */
-DOMElement.prototype.onOpacityChange = function onOpacityChange (opacity) {
+DOMElement.prototype.onOpacityChange = function onOpacityChange(opacity) {
     return this.setProperty('opacity', opacity);
 };
 
@@ -340,9 +357,11 @@ DOMElement.prototype.onOpacityChange = function onOpacityChange (opacity) {
  * Method to be invoked by the node as soon as a new UIEvent is being added.
  * This results into an `ADD_EVENT_LISTENER` command being send.
  *
- * @param  {String} UIEvent     UIEvent to be subscribed to (e.g. `click`).
+ * @param {String} UIEvent UIEvent to be subscribed to (e.g. `click`)
+ *
+ * @return {undefined} undefined
  */
-DOMElement.prototype.onAddUIEvent = function onAddUIEvent (UIEvent) {
+DOMElement.prototype.onAddUIEvent = function onAddUIEvent(UIEvent) {
     if (this._UIEvents.indexOf(UIEvent) === -1) {
         this._subscribe(UIEvent);
         this._UIEvents.push(UIEvent);
@@ -355,7 +374,12 @@ DOMElement.prototype.onAddUIEvent = function onAddUIEvent (UIEvent) {
 /**
  * Appends an `ADD_EVENT_LISTENER` command to the command queue.
  *
- * @param  {String} UIEvent Event type (e.g. `click`)
+ * @method
+ * @private
+ *
+ * @param {String} UIEvent Event type (e.g. `click`)
+ *
+ * @return {undefined} undefined
  */
 DOMElement.prototype._subscribe = function _subscribe (UIEvent) {
     if (this._initialized) {
@@ -372,9 +396,15 @@ DOMElement.prototype._subscribe = function _subscribe (UIEvent) {
  * changes. This results into the size being fetched from the node in
  * order to update the actual, rendered size.
  *
- * @method onSizeModeChange
+ * @method
+ *
+ * @param {Number} x the sizing mode in use for determining size in the x direction
+ * @param {Number} y the sizing mode in use for determining size in the y direction
+ * @param {Number} z the sizing mode in use for determining size in the z direction
+ *
+ * @return {undefined} undefined
  */
-DOMElement.prototype.onSizeModeChange = function onSizeModeChange (x, y, z) {
+DOMElement.prototype.onSizeModeChange = function onSizeModeChange(x, y, z) {
     if (x === RENDER_SIZE || y === RENDER_SIZE || z === RENDER_SIZE) {
         this._renderSized = true;
         this._requestRenderSize = true;
@@ -382,12 +412,27 @@ DOMElement.prototype.onSizeModeChange = function onSizeModeChange (x, y, z) {
     this.onSizeChange(this._node.getSize());
 };
 
-
-DOMElement.prototype.getRenderSize = function getRenderSize () {
+/**
+ * Method to be retrieve the rendered size of the DOM element that is
+ * drawn for this node.
+ *
+ * @method
+ *
+ * @return {Array} size of the rendered DOM element in pixels
+ */
+DOMElement.prototype.getRenderSize = function getRenderSize() {
     return this._renderSize;
 };
 
-DOMElement.prototype._requestUpdate = function _requestUpdate () {
+/**
+ * Method to have the component request an update from its Node
+ *
+ * @method
+ * @private
+ *
+ * @return {undefined} undefined
+ */
+DOMElement.prototype._requestUpdate = function _requestUpdate() {
     if (!this._requestingUpdate) {
         this._node.requestUpdate(this._id);
         this._requestingUpdate = true;
@@ -398,9 +443,11 @@ DOMElement.prototype._requestUpdate = function _requestUpdate () {
  * Initializes the DOMElement by sending the `INIT_DOM` command. This creates
  * or reallocates a new Element in the actual DOM hierarchy.
  *
- * @method init
+ * @method
+ *
+ * @return {undefined} undefined
  */
-DOMElement.prototype.init = function init () {
+DOMElement.prototype.init = function init() {
     this._changeQueue.push('INIT_DOM', this._tagName);
     this._initialized = true;
     this.onTransformChange(this._node.getTransform());
@@ -411,10 +458,11 @@ DOMElement.prototype.init = function init () {
 /**
  * Sets the id attribute of the DOMElement.
  *
- * @method setId
- * @chainable
+ * @method
  *
- * @param {String} id   New id to be set.
+ * @param {String} id New id to be set
+ *
+ * @return {DOMElement} this
  */
 DOMElement.prototype.setId = function setId (id) {
     this.setAttribute('id', id);
@@ -425,10 +473,10 @@ DOMElement.prototype.setId = function setId (id) {
  * Adds a new class to the internal class list of the underlying Element in the
  * DOM.
  *
- * @method addClass
- * @chainable
+ * @method
  *
- * @param {String} value    New class name to be added.
+ * @param {String} value New class name to be added
+ *
  * @return {DOMElement} this
  */
 DOMElement.prototype.addClass = function addClass (value) {
@@ -450,9 +498,10 @@ DOMElement.prototype.addClass = function addClass (value) {
 /**
  * Removes a class from the DOMElement's classList.
  *
- * @method removeClass
+ * @method
  *
- * @param  {String} value       Class name to be removed.
+ * @param {String} value Class name to be removed
+ *
  * @return {DOMElement} this
  */
 DOMElement.prototype.removeClass = function removeClass (value) {
@@ -472,11 +521,11 @@ DOMElement.prototype.removeClass = function removeClass (value) {
 /**
  * Checks if the DOMElement has the passed in class.
  *
- * @method  hasClass
+ * @method
  *
- * @param  {String} value   The class name.
- * @return {Boolean}        Boolean value indicating whether the passed in class
- *                          name is in the DOMElement's class list.
+ * @param {String} value The class name
+ *
+ * @return {Boolean} Boolean value indicating whether the passed in class name is in the DOMElement's class list.
  */
 DOMElement.prototype.hasClass = function hasClass (value) {
     return this._classes.indexOf(value) !== -1;
@@ -485,10 +534,12 @@ DOMElement.prototype.hasClass = function hasClass (value) {
 /**
  * Sets an attribute of the DOMElement.
  *
- * @method setAttribute
+ * @method
  *
- * @param {String} name     Attribute key (e.g. `src`)
- * @param {String} value    Attribute value (e.g. `http://famo.us`)
+ * @param {String} name Attribute key (e.g. `src`)
+ * @param {String} value Attribute value (e.g. `http://famo.us`)
+ *
+ * @return {DOMElement} this
  */
 DOMElement.prototype.setAttribute = function setAttribute (name, value) {
     if (this._attributes[name] !== value || this._inDraw) {
@@ -496,17 +547,18 @@ DOMElement.prototype.setAttribute = function setAttribute (name, value) {
         if (this._initialized) this._changeQueue.push('CHANGE_ATTRIBUTE', name, value);
         if (!this._requestUpdate) this._requestUpdate();
     }
+
     return this;
 };
 
 /**
- * Sets a CSS property.
+ * Sets a CSS property
  *
- * @method setProperty
  * @chainable
  *
- * @param {String} name  Name of the CSS rule (e.g. `background-color`).
- * @param {String} value Value of CSS property (e.g. `red`).
+ * @param {String} name  Name of the CSS rule (e.g. `background-color`)
+ * @param {String} value Value of CSS property (e.g. `red`)
+ *
  * @return {DOMElement} this
  */
 DOMElement.prototype.setProperty = function setProperty (name, value) {
@@ -516,6 +568,7 @@ DOMElement.prototype.setProperty = function setProperty (name, value) {
         if (!this._requestingUpdate) this._requestUpdate();
         if (this._renderSized) this._requestRenderSize = true;
     }
+
     return this;
 };
 
@@ -523,9 +576,11 @@ DOMElement.prototype.setProperty = function setProperty (name, value) {
  * Sets the content of the DOMElement. This is using `innerHTML`, escaping user
  * generated content is therefore essential for security purposes.
  *
- * @method setContent
+ * @method
  *
- * @param {String} content     Content to be set using `.innerHTML = ...`
+ * @param {String} content Content to be set using `.innerHTML = ...`
+ *
+ * @return {DOMElement} this
  */
 DOMElement.prototype.setContent = function setContent (content) {
     if (this._content !== content || this._inDraw) {
@@ -534,6 +589,7 @@ DOMElement.prototype.setContent = function setContent (content) {
         if (!this._requestingUpdate) this._requestUpdate();
         if (this._renderSized) this._requestRenderSize = true;
     }
+
     return this;
 };
 
@@ -542,28 +598,31 @@ DOMElement.prototype.setContent = function setContent (content) {
  *
  * @method on
  *
- * @param  {String} event       The event type (e.g. `click`).
- * @param  {Function} listener  Handler function for the specified event type
+ * @param {String} event       The event type (e.g. `click`).
+ * @param {Function} listener  Handler function for the specified event type
  *                              in which the payload event object will be
  *                              passed into.
+ *
+ * @return {Function} A function to call if you want to remove the callback
  */
 DOMElement.prototype.on = function on (event, listener) {
     return this._callbacks.on(event, listener);
 };
 
 /**
- * Function to be invoked by the Node whenever an UIEvent is being received.
+ * Function to be invoked by the Node whenever an event is being received.
  * There are two different ways to subscribe for those events:
  *
  * 1. By overriding the onReceive method (and possibly using `switch` in order
  *     to differentiate between the different event types).
- * 2. By using @{@link DOMElement#on} and using the built-in
- *     @{@linkCallbackStore}.
+ * 2. By using DOMElement and using the built-in CallbackStore.
  *
- * @method onReceive
+ * @method
  *
- * @param  {String} event   Event type (e.g. `click`).
- * @param  {Object} payload Event object.
+ * @param {String} event Event type (e.g. `click`)
+ * @param {Object} payload Event object.
+ *
+ * @return {undefined} undefined
  */
 DOMElement.prototype.onReceive = function onReceive (event, payload) {
     if (event === 'resize') {
@@ -578,10 +637,12 @@ DOMElement.prototype.onReceive = function onReceive (event, payload) {
  * The draw function is being used in order to allow mutating the DOMElement
  * before actually mounting the corresponding node.
  *
- * @method draw
+ * @method
  * @private
+ *
+ * @return {undefined} undefined
  */
-DOMElement.prototype.draw = function draw () {
+DOMElement.prototype.draw = function draw() {
     var key;
     var i;
     var len;
