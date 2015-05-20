@@ -38,6 +38,7 @@ var sqrt = Math.sqrt;
  * and z = sin(theta/2)*z'.
  *
  * @class Quaternion
+ *
  * @param {Number} w The w component.
  * @param {Number} x The x component.
  * @param {Number} y The y component.
@@ -54,8 +55,11 @@ function Quaternion(w, x, y, z) {
  * Multiply the current Quaternion by input Quaternion q.
  * Left-handed multiplication.
  *
- * @method multiply
+ * @method
+ *
  * @param {Quaternion} q The Quaternion to multiply by on the right.
+ *
+ * @return {Quaternion} this
  */
 Quaternion.prototype.multiply = function multiply(q) {
     var x1 = this.x;
@@ -78,8 +82,11 @@ Quaternion.prototype.multiply = function multiply(q) {
  * Multiply the current Quaternion by input Quaternion q on the left, i.e. q * this.
  * Left-handed multiplication.
  *
- * @method leftMultiply
+ * @method
+ *
  * @param {Quaternion} q The Quaternion to multiply by on the left.
+ *
+ * @return {Quaternion} this
  */
 Quaternion.prototype.leftMultiply = function leftMultiply(q) {
     var x1 = q.x;
@@ -102,9 +109,11 @@ Quaternion.prototype.leftMultiply = function leftMultiply(q) {
  * Apply the current Quaternion to input Vec3 v, according to
  * v' = ~q * v * q.
  *
- * @method rotateVector
+ * @method
+ *
  * @param {Vec3} v The reference Vec3.
  * @param {Vec3} output Vec3 in which to place the result.
+ *
  * @return {Vec3} The rotated version of the Vec3.
  */
 Quaternion.prototype.rotateVector = function rotateVector(v, output) {
@@ -136,8 +145,9 @@ Quaternion.prototype.rotateVector = function rotateVector(v, output) {
 /**
  * Invert the current Quaternion.
  *
- * @method invert
- * @chainable
+ * @method
+ *
+ * @return {Quaternion} this
  */
 Quaternion.prototype.invert = function invert() {
     this.w = -this.w;
@@ -150,8 +160,9 @@ Quaternion.prototype.invert = function invert() {
 /**
  * Conjugate the current Quaternion.
  *
- * @method conjugate
- * @chainable
+ * @method
+ *
+ * @return {Quaternion} this
  */
 Quaternion.prototype.conjugate = function conjugate() {
     this.x = -this.x;
@@ -163,8 +174,9 @@ Quaternion.prototype.conjugate = function conjugate() {
 /**
  * Compute the length (norm) of the current Quaternion.
  *
- * @method length
- * @return {Number}
+ * @method
+ *
+ * @return {Number} length of the Quaternion
  */
 Quaternion.prototype.length = function length() {
     var w = this.w;
@@ -177,8 +189,9 @@ Quaternion.prototype.length = function length() {
 /**
  * Alter the current Quaternion to be of unit length;
  *
- * @method normalize
- * @chainable
+ * @method
+ *
+ * @return {Quaternion} this
  */
 Quaternion.prototype.normalize = function normalize() {
     var w = this.w;
@@ -198,12 +211,14 @@ Quaternion.prototype.normalize = function normalize() {
 /**
  * Set the w, x, y, z components of the current Quaternion.
  *
- * @method set
+ * @method
+ *
  * @param {Number} w The w component.
  * @param {Number} x The x component.
  * @param {Number} y The y component.
  * @param {Number} z The z component.
- * @chainable
+ *
+ * @return {Quaternion} this
  */
 Quaternion.prototype.set = function set(w, x ,y, z) {
     if (w != null) this.w = w;
@@ -216,9 +231,11 @@ Quaternion.prototype.set = function set(w, x ,y, z) {
 /**
  * Copy input Quaternion q onto the current Quaternion.
  *
- * @method copy
+ * @method
+ *
  * @param {Quaternion} q The reference Quaternion.
- * @chainable
+ *
+ * @return {Quaternion} this
  */
 Quaternion.prototype.copy = function copy(q) {
     this.w = q.w;
@@ -231,8 +248,9 @@ Quaternion.prototype.copy = function copy(q) {
 /**
  * Reset the current Quaternion.
  *
- * @method clear
- * @chainable
+ * @method
+ *
+ * @return {Quaternion} this
  */
 Quaternion.prototype.clear = function clear() {
     this.w = 1;
@@ -246,9 +264,11 @@ Quaternion.prototype.clear = function clear() {
  * The dot product. Can be used to determine the cosine of the angle between
  * the two rotations, assuming both Quaternions are of unit length.
  *
- * @method dot
+ * @method
+ *
  * @param {Quaternion} q The other Quaternion.
- * @return {Number}
+ *
+ * @return {Number} the resulting dot product
  */
 Quaternion.prototype.dot = function dot(q) {
     return this.w * q.w + this.x * q.x + this.y * q.y + this.z * q.z;
@@ -257,11 +277,13 @@ Quaternion.prototype.dot = function dot(q) {
 /**
  * Spherical linear interpolation.
  *
- * @method slerp
+ * @method
+ *
  * @param {Quaternion} q The final orientation.
  * @param {Number} t The tween parameter.
  * @param {Vec3} output Vec3 in which to put the result.
- * @return {Quaternion}
+ *
+ * @return {Quaternion} The quaternion the slerp results were saved to
  */
 Quaternion.prototype.slerp = function slerp(q, t, output) {
     var w = this.w;
@@ -303,8 +325,11 @@ Quaternion.prototype.slerp = function slerp(q, t, output) {
 /**
  * Get the Mat33 matrix corresponding to the current Quaternion.
  *
- * @method toMatrix
- * @return {Transform}
+ * @method
+ *
+ * @param {Object} output Object to process the Transform matrix
+ *
+ * @return {Array} the Quaternion as a Transform matrix
  */
 Quaternion.prototype.toMatrix = function toMatrix(output) {
     var w = this.w;
@@ -330,11 +355,12 @@ Quaternion.prototype.toMatrix = function toMatrix(output) {
  * The rotation angles about the x, y, and z axes corresponding to the
  * current Quaternion, when applied in the ZYX order.
  *
- * @method toEuler
+ * @method
+ *
  * @param {Vec3} output Vec3 in which to put the result.
- * @return {Vec3}
+ *
+ * @return {Vec3} the Vec3 the result was stored in
  */
-
 Quaternion.prototype.toEuler = function toEuler(output) {
     var w = this.w;
     var x = this.x;
@@ -359,11 +385,13 @@ Quaternion.prototype.toEuler = function toEuler(output) {
  * The Quaternion corresponding to the Euler angles x, y, and z,
  * applied in the ZYX order.
  *
- * @method fromEuler
+ * @method
+ *
  * @param {Number} x The angle of rotation about the x axis.
  * @param {Number} y The angle of rotation about the y axis.
  * @param {Number} z The angle of rotation about the z axis.
  * @param {Quaternion} output Quaternion in which to put the result.
+ *
  * @return {Quaternion} The equivalent Quaternion.
  */
 Quaternion.prototype.fromEuler = function fromEuler(x, y, z) {
@@ -388,12 +416,16 @@ Quaternion.prototype.fromEuler = function fromEuler(x, y, z) {
 
 /**
  * Alter the current Quaternion to reflect a rotation of input angle about
- * input axis v.
+ * input axis x, y, and z.
  *
- * @method makeFromAngleAndAxis
+ * @method
+ *
  * @param {Number} angle The angle of rotation.
- * @param {Vec3} v The axis of rotation.
- * @chainable
+ * @param {Vec3} x The axis of rotation.
+ * @param {Vec3} y The axis of rotation.
+ * @param {Vec3} z The axis of rotation.
+ *
+ * @return {Quaternion} this
  */
 Quaternion.prototype.fromAngleAxis = function fromAngleAxis(angle, x, y, z) {
     var len = sqrt(x * x + y * y + z * z);
@@ -417,10 +449,12 @@ Quaternion.prototype.fromAngleAxis = function fromAngleAxis(angle, x, y, z) {
  * Multiply the input Quaternions.
  * Left-handed coordinate system multiplication.
  *
- * @method multiply
+ * @method
+ *
  * @param {Quaternion} q1 The left Quaternion.
  * @param {Quaternion} q2 The right Quaternion.
  * @param {Quaternion} output Quaternion in which to place the result.
+ *
  * @return {Quaternion} The product of multiplication.
  */
 Quaternion.multiply = function multiply(q1, q2, output) {
@@ -444,7 +478,11 @@ Quaternion.multiply = function multiply(q1, q2, output) {
 /**
  * Normalize the input quaternion.
  *
- * @method normalize
+ * @method
+ *
+ * @param {Quaternion} q The reference Quaternion.
+ * @param {Quaternion} output Quaternion in which to place the result.
+ *
  * @return {Quaternion} The normalized quaternion.
  */
 Quaternion.normalize = function normalize(q, output) {
@@ -465,9 +503,11 @@ Quaternion.normalize = function normalize(q, output) {
 /**
  * The conjugate of the input Quaternion.
  *
- * @method conjugate
+ * @method
+ *
  * @param {Quaternion} q The reference Quaternion.
  * @param {Quaternion} output Quaternion in which to place the result.
+ *
  * @return {Quaternion} The conjugate Quaternion.
  */
 Quaternion.conjugate = function conjugate(q, output) {
@@ -481,8 +521,10 @@ Quaternion.conjugate = function conjugate(q, output) {
 /**
  * Clone the input Quaternion.
  *
- * @method clone
+ * @method
+ *
  * @param {Quaternion} q the reference Quaternion.
+ *
  * @return {Quaternion} The cloned Quaternion.
  */
 Quaternion.clone = function clone(q) {
@@ -492,9 +534,11 @@ Quaternion.clone = function clone(q) {
 /**
  * The dot product of the two input Quaternions.
  *
- * @method dotProduct
+ * @method
+ *
  * @param {Quaternion} q1 The left Quaternion.
  * @param {Quaternion} q2 The right Quaternion.
+ *
  * @return {Number} The dot product of the two Quaternions.
  */
 Quaternion.dot = function dot(q1, q2) {

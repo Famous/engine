@@ -28,9 +28,8 @@
  * A 3x3 numerical matrix, represented as an array.
  *
  * @class Mat33
- * @constructor
  *
- * @param {Number[]} values
+ * @param {Array} values a 3x3 matrix flattened
  */
 function Mat33(values) {
     this.values = values || [1,0,0,0,1,0,0,0,1];
@@ -39,8 +38,9 @@ function Mat33(values) {
 /**
  * Return the values in the Mat33 as an array.
  *
- * @method get
- * @return {Number[]} matrix values as array of rows.
+ * @method
+ *
+ * @return {Array} matrix values as array of rows.
  */
 Mat33.prototype.get = function get() {
     return this.values;
@@ -49,9 +49,11 @@ Mat33.prototype.get = function get() {
 /**
  * Set the values of the current Mat33.
  *
- * @method set
- * @param {Number[]} values Array of nine numbers to set in the Mat33.
- * @chainable
+ * @method
+ *
+ * @param {Array} values Array of nine numbers to set in the Mat33.
+ *
+ * @return {Mat33} this
  */
 Mat33.prototype.set = function set(values) {
     this.values = values;
@@ -61,9 +63,11 @@ Mat33.prototype.set = function set(values) {
 /**
  * Copy the values of the input Mat33.
  *
- * @method copy
+ * @method
+ *
  * @param {Mat33} matrix The Mat33 to copy.
- * @chainable
+ * 
+ * @return {Mat33} this
  */
 Mat33.prototype.copy = function copy(matrix) {
     var A = this.values;
@@ -85,9 +89,11 @@ Mat33.prototype.copy = function copy(matrix) {
 /**
  * Take this Mat33 as A, input vector V as a column vector, and return Mat33 product (A)(V).
  *
- * @method vectorMultiply
+ * @method
+ *
  * @param {Vec3} v Vector to rotate.
  * @param {Vec3} output Vec3 in which to place the result.
+ *
  * @return {Vec3} The input vector after multiplication.
  */
 Mat33.prototype.vectorMultiply = function vectorMultiply(v, output) {
@@ -106,9 +112,11 @@ Mat33.prototype.vectorMultiply = function vectorMultiply(v, output) {
 /**
  * Multiply the provided Mat33 with the current Mat33.  Result is (this) * (matrix).
  *
- * @method multiply
+ * @method
+ *
  * @param {Mat33} matrix Input Mat33 to multiply on the right.
- * @chainable
+ *
+ * @return {Mat33} this
  */
 Mat33.prototype.multiply = function multiply(matrix) {
     var A = this.values;
@@ -150,8 +158,9 @@ Mat33.prototype.multiply = function multiply(matrix) {
 /**
  * Transposes the Mat33.
  *
- * @method transpose
- * @chainable
+ * @method
+ *
+ * @return {Mat33} this
  */
 Mat33.prototype.transpose = function transpose() {
     var M = this.values;
@@ -176,7 +185,8 @@ Mat33.prototype.transpose = function transpose() {
 /**
  * The determinant of the Mat33.
  *
- * @method getDeterminant
+ * @method
+ *
  * @return {Number} The determinant.
  */
 Mat33.prototype.getDeterminant = function getDeterminant() {
@@ -199,8 +209,9 @@ Mat33.prototype.getDeterminant = function getDeterminant() {
 /**
  * The inverse of the Mat33.
  *
- * @method inverse
- * @chainable
+ * @method
+ *
+ * @return {Mat33} this
  */
 Mat33.prototype.inverse = function inverse() {
     var M = this.values;
@@ -239,8 +250,10 @@ Mat33.prototype.inverse = function inverse() {
 /**
  * Clones the input Mat33.
  *
- * @method clone
+ * @method
+ *
  * @param {Mat33} m Mat33 to clone.
+ *
  * @return {Mat33} New copy of the original Mat33.
  */
 Mat33.clone = function clone(m) {
@@ -250,9 +263,11 @@ Mat33.clone = function clone(m) {
 /**
  * The inverse of the Mat33.
  *
- * @method inverse
+ * @method
+ *
  * @param {Mat33} matrix Mat33 to invert.
  * @param {Mat33} output Mat33 in which to place the result.
+ *
  * @return {Mat33} The Mat33 after the invert.
  */
 Mat33.inverse = function inverse(matrix, output) {
@@ -293,9 +308,11 @@ Mat33.inverse = function inverse(matrix, output) {
 /**
  * Transposes the Mat33.
  *
- * @method transpose
+ * @method
+ *
  * @param {Mat33} matrix Mat33 to transpose.
  * @param {Mat33} output Mat33 in which to place the result.
+ *
  * @return {Mat33} The Mat33 after the transpose.
  */
 Mat33.transpose = function transpose(matrix, output) {
@@ -328,10 +345,12 @@ Mat33.transpose = function transpose(matrix, output) {
 /**
  * Add the provided Mat33's.
  *
- * @method add
+ * @method
+ *
  * @param {Mat33} matrix1 The left Mat33.
  * @param {Mat33} matrix2 The right Mat33.
  * @param {Mat33} output Mat33 in which to place the result.
+ *
  * @return {Mat33} The result of the addition.
  */
 Mat33.add = function add(matrix1, matrix2, output) {
@@ -375,10 +394,12 @@ Mat33.add = function add(matrix1, matrix2, output) {
 /**
  * Subtract the provided Mat33's.
  *
- * @method subtract
+ * @method
+ *
  * @param {Mat33} matrix1 The left Mat33.
  * @param {Mat33} matrix2 The right Mat33.
  * @param {Mat33} output Mat33 in which to place the result.
+ *
  * @return {Mat33} The result of the subtraction.
  */
 Mat33.subtract = function subtract(matrix1, matrix2, output) {
@@ -421,10 +442,11 @@ Mat33.subtract = function subtract(matrix1, matrix2, output) {
 /**
  * Multiply the provided Mat33 M2 with this Mat33.  Result is (this) * (M2).
  *
- * @method multiply
+ * @method
  * @param {Mat33} matrix1 The left Mat33.
  * @param {Mat33} matrix2 The right Mat33.
  * @param {Mat33} output Mat33 in which to place the result.
+ *
  * @return {Mat33} the result of the multiplication.
  */
 Mat33.multiply = function multiply(matrix1, matrix2, output) {

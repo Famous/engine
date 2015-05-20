@@ -32,10 +32,11 @@ var sqrt = Math.sqrt;
  * A two-dimensional vector.
  *
  * @class Vec2
+ *
  * @param {Number} x The x component.
  * @param {Number} y The y component.
  */
-var Vec2 = function(x, y){
+var Vec2 = function(x, y) {
     if (x instanceof Array || x instanceof Float32Array) {
         this.x = x[0] || 0;
         this.y = x[1] || 0;
@@ -49,10 +50,12 @@ var Vec2 = function(x, y){
 /**
  * Set the components of the current Vec2.
  *
- * @method set
+ * @method
+ *
  * @param {Number} x The x component.
  * @param {Number} y The y component.
- * @chainable
+ *
+ * @return {Vec2} this
  */
 Vec2.prototype.set = function set(x, y) {
     if (x != null) this.x = x;
@@ -63,9 +66,11 @@ Vec2.prototype.set = function set(x, y) {
 /**
  * Add the input v to the current Vec2.
  *
- * @method add
+ * @method
+ *
  * @param {Vec2} v The Vec2 to add.
- * @chainable
+ *
+ * @return {Vec2} this
  */
 Vec2.prototype.add = function add(v) {
     this.x += v.x;
@@ -76,9 +81,11 @@ Vec2.prototype.add = function add(v) {
 /**
  * Subtract the input v from the current Vec2.
  *
- * @method subtract
+ * @method
+ *
  * @param {Vec2} v The Vec2 to subtract.
- * @chainable
+ *
+ * @return {Vec2} this
  */
 Vec2.prototype.subtract = function subtract(v) {
     this.x -= v.x;
@@ -89,9 +96,11 @@ Vec2.prototype.subtract = function subtract(v) {
 /**
  * Scale the current Vec2 by a scalar or Vec2.
  *
- * @method scale
+ * @method
+ *
  * @param {Number|Vec2} s The Number or vec2 by which to scale.
- * @chainable
+ *
+ * @return {Vec2} this
  */
 Vec2.prototype.scale = function scale(s) {
     if (s instanceof Vec2) {
@@ -107,9 +116,11 @@ Vec2.prototype.scale = function scale(s) {
 /**
  * Rotate the Vec2 counter-clockwise by theta about the z-axis.
  *
- * @method rotate
+ * @method
+ *
  * @param {Number} theta Angle by which to rotate.
- * @chainable
+ *
+ * @return {Vec2} this
  */
 Vec2.prototype.rotate = function(theta) {
     var x = this.x;
@@ -127,9 +138,11 @@ Vec2.prototype.rotate = function(theta) {
 /**
  * The dot product of of the current Vec2 with the input Vec2.
  *
- * @method dot
+ * @method
+ *
  * @param {Number} v The other Vec2.
- * @chainable
+ *
+ * @return {Vec2} this
  */
 Vec2.prototype.dot = function(v) {
     return this.x * v.x + this.y * v.y;
@@ -138,9 +151,11 @@ Vec2.prototype.dot = function(v) {
 /**
  * The cross product of of the current Vec2 with the input Vec2.
  *
- * @method cross
+ * @method
+ *
  * @param {Number} v The other Vec2.
- * @chainable
+ *
+ * @return {Vec2} this
  */
 Vec2.prototype.cross = function(v) {
     return this.x * v.y - this.y * v.x;
@@ -149,8 +164,9 @@ Vec2.prototype.cross = function(v) {
 /**
  * Preserve the magnitude but invert the orientation of the current Vec2.
  *
- * @method invert
- * @chainable
+ * @method
+ *
+ * @return {Vec2} this
  */
 Vec2.prototype.invert = function invert() {
     this.x *= -1;
@@ -161,9 +177,11 @@ Vec2.prototype.invert = function invert() {
 /**
  * Apply a function component-wise to the current Vec2.
  *
- * @method map
+ * @method
+ *
  * @param {Function} fn Function to apply.
- * @chainable
+ *
+ * @return {Vec2} this
  */
 Vec2.prototype.map = function map(fn) {
     this.x = fn(this.x);
@@ -172,10 +190,11 @@ Vec2.prototype.map = function map(fn) {
 };
 
 /**
- * The magnitude of the current Vec2.
+ * Get the magnitude of the current Vec2.
  *
- * @method length
- * @return {Number}
+ * @method
+ *
+ * @return {Number} the length of the vector
  */
 Vec2.prototype.length = function length() {
     var x = this.x;
@@ -187,9 +206,11 @@ Vec2.prototype.length = function length() {
 /**
  * Copy the input onto the current Vec2.
  *
- * @method copy
- * @param {Vec2} v Vec2 to copy.
- * @chainable
+ * @method
+ *
+ * @param {Vec2} v Vec2 to copy
+ *
+ * @return {Vec2} this
  */
 Vec2.prototype.copy = function copy(v) {
     this.x = v.x;
@@ -200,8 +221,9 @@ Vec2.prototype.copy = function copy(v) {
 /**
  * Reset the current Vec2.
  *
- * @method clear
- * @chainable
+ * @method
+ *
+ * @return {Vec2} this
  */
 Vec2.prototype.clear = function clear() {
     this.x = 0;
@@ -212,8 +234,9 @@ Vec2.prototype.clear = function clear() {
 /**
  * Check whether the magnitude of the current Vec2 is exactly 0.
  *
- * @method isZero
- * @return {Boolean}
+ * @method
+ *
+ * @return {Boolean} whether or not the length is 0
  */
 Vec2.prototype.isZero = function isZero() {
     if (this.x !== 0 || this.y !== 0) return false;
@@ -223,8 +246,9 @@ Vec2.prototype.isZero = function isZero() {
 /**
  * The array form of the current Vec2.
  *
- * @method toArray
- * @return {Number[]}
+ * @method
+ *
+ * @return {Array} the Vec to as an array
  */
 Vec2.prototype.toArray = function toArray() {
     return [this.x, this.y];
@@ -233,10 +257,12 @@ Vec2.prototype.toArray = function toArray() {
 /**
  * Normalize the input Vec2.
  *
- * @method normalize
+ * @method
+ *
  * @param {Vec2} v The reference Vec2.
  * @param {Vec2} output Vec2 in which to place the result.
- * @return {Vec2} The normalize Vec2.
+ *
+ * @return {Vec2} The normalized Vec2.
  */
 Vec2.normalize = function normalize(v, output) {
     var x = v.x;
@@ -253,8 +279,10 @@ Vec2.normalize = function normalize(v, output) {
 /**
  * Clone the input Vec2.
  *
- * @method clone
+ * @method
+ *
  * @param {Vec2} v The Vec2 to clone.
+ *
  * @return {Vec2} The cloned Vec2.
  */
 Vec2.clone = function clone(v) {
@@ -264,10 +292,12 @@ Vec2.clone = function clone(v) {
 /**
  * Add the input Vec2's.
  *
- * @method add
+ * @method
+ *
  * @param {Vec2} v1 The left Vec2.
  * @param {Vec2} v2 The right Vec2.
  * @param {Vec2} output Vec2 in which to place the result.
+ *
  * @return {Vec2} The result of the addition.
  */
 Vec2.add = function add(v1, v2, output) {
@@ -280,10 +310,12 @@ Vec2.add = function add(v1, v2, output) {
 /**
  * Subtract the second Vec2 from the first.
  *
- * @method subtract
+ * @method
+ *
  * @param {Vec2} v1 The left Vec2.
  * @param {Vec2} v2 The right Vec2.
  * @param {Vec2} output Vec2 in which to place the result.
+ *
  * @return {Vec2} The result of the subtraction.
  */
 Vec2.subtract = function subtract(v1, v2, output) {
@@ -295,10 +327,12 @@ Vec2.subtract = function subtract(v1, v2, output) {
 /**
  * Scale the input Vec2.
  *
- * @method scale
+ * @method
+ *
  * @param {Vec2} v The reference Vec2.
  * @param {Number} s Number to scale by.
  * @param {Vec2} output Vec2 in which to place the result.
+ *
  * @return {Vec2} The result of the scaling.
  */
 Vec2.scale = function scale(v, s, output) {
@@ -310,9 +344,11 @@ Vec2.scale = function scale(v, s, output) {
 /**
  * The dot product of the input Vec2's.
  *
- * @method dot
+ * @method
+ *
  * @param {Vec2} v1 The left Vec2.
  * @param {Vec2} v2 The right Vec2.
+ *
  * @return {Number} The dot product.
  */
 Vec2.dot = function dot(v1, v2) {
@@ -322,9 +358,11 @@ Vec2.dot = function dot(v1, v2) {
 /**
  * The cross product of the input Vec2's.
  *
- * @method cross
- * @param {Number} v The left Vec2.
- * @param {Number} v The right Vec2.
+ * @method
+ *
+ * @param {Number} v1 The left Vec2.
+ * @param {Number} v2 The right Vec2.
+ *
  * @return {Number} The z-component of the cross product.
  */
 Vec2.cross = function(v1,v2) {
