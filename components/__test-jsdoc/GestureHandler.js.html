@@ -1,4 +1,32 @@
-/**
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: GestureHandler.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: GestureHandler.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
  * The MIT License (MIT)
  * 
  * Copyright (c) 2015 Famous Industries Inc.
@@ -99,7 +127,7 @@ function GestureHandler(node, events) {
     var len;
 
     if (events) {
-        for (i = 0, len = events.length; i < len; i++) {
+        for (i = 0, len = events.length; i &lt; len; i++) {
             this.on(events[i], events[i].callback);
         }
     }
@@ -177,7 +205,7 @@ GestureHandler.prototype.on = function on(ev, cb) {
  */
 GestureHandler.prototype.triggerGestures = function() {
     var payload = this.event;
-    for (var i = 0, len = this.gestures.length; i < len; i++) {
+    for (var i = 0, len = this.gestures.length; i &lt; len; i++) {
         var gesture = this.gestures[i];
         switch (gesture) {
             case 'rotate':
@@ -188,7 +216,7 @@ GestureHandler.prototype.triggerGestures = function() {
                 if (payload.status === 'start') {
                     if (this.options.tap) {
                         var pts = this.options.tap.points || 1;
-                        if(this.multiTap >= pts && payload.points >= pts) this.trigger(gesture, payload);
+                        if(this.multiTap >= pts &amp;&amp; payload.points >= pts) this.trigger(gesture, payload);
                     }
                     else this.trigger(gesture, payload);
                 }
@@ -227,7 +255,7 @@ function _processPointerStart(e) {
     }
     else t = e.targetTouches;
 
-    if (t[0] && t[1] && this.trackedPointerIDs[0] === t[0].identifier && this.trackedPointerIDs[1] === t[1].identifier) {
+    if (t[0] &amp;&amp; t[1] &amp;&amp; this.trackedPointerIDs[0] === t[0].identifier &amp;&amp; this.trackedPointerIDs[1] === t[1].identifier) {
         return;
     }
 
@@ -238,8 +266,8 @@ function _processPointerStart(e) {
 
     if (this.trackedPointerIDs[0] !== t[0].identifier) {
         if (this.trackedGestures.tap) {
-            threshold = (this.options.tap && this.options.tap.threshold) || 250;
-            if (this.event.time - this.timeOfPointer < threshold) this.event.taps++;
+            threshold = (this.options.tap &amp;&amp; this.options.tap.threshold) || 250;
+            if (this.event.time - this.timeOfPointer &lt; threshold) this.event.taps++;
             else this.event.taps = 1;
             this.timeOfPointer = this.event.time;
             this.multiTap = 1;
@@ -254,10 +282,10 @@ function _processPointerStart(e) {
         this.delta1.clear();
         this.event.pointers.push(this.pointer1);
     }
-    if (t[1] && this.trackedPointerIDs[1] !== t[1].identifier) {
+    if (t[1] &amp;&amp; this.trackedPointerIDs[1] !== t[1].identifier) {
         if (this.trackedGestures.tap) {
-            threshold = (this.options.tap && this.options.tap.threshold) || 250;
-            if (this.event.time - this.timeOfPointer < threshold) this.multiTap = 2;
+            threshold = (this.options.tap &amp;&amp; this.options.tap.threshold) || 250;
+            if (this.event.time - this.timeOfPointer &lt; threshold) this.multiTap = 2;
         }
         this.event.current = 2;
         this.event.points = 2;
@@ -411,7 +439,7 @@ function _processPointerEnd(e) {
     }
     else t = e.targetTouches;
 
-    if (t[0] && t[1] && this.trackedPointerIDs[0] === t[0].identifier && this.trackedPointerIDs[1] === t[1].identifier) {
+    if (t[0] &amp;&amp; t[1] &amp;&amp; this.trackedPointerIDs[0] === t[0].identifier &amp;&amp; this.trackedPointerIDs[1] === t[1].identifier) {
             return;
     }
 
@@ -479,3 +507,26 @@ function _processMouseLeave() {
 }
 
 module.exports = GestureHandler;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Align.html">Align</a></li><li><a href="Camera.html">Camera</a></li><li><a href="GestureHandler.html">GestureHandler</a></li><li><a href="MountPoint.html">MountPoint</a></li><li><a href="Opacity.html">Opacity</a></li><li><a href="Origin.html">Origin</a></li><li><a href="Position.html">Position</a></li><li><a href="Rotation.html">Rotation</a></li><li><a href="Scale.html">Scale</a></li><li><a href="Size.html">Size</a></li></ul><h3>Global</h3><ul><li><a href="global.html#get">get</a></li><li><a href="global.html#getValue">getValue</a></li><li><a href="global.html#halt">halt</a></li><li><a href="global.html#on">on</a></li><li><a href="global.html#onReceive">onReceive</a></li><li><a href="global.html#onTransformChange">onTransformChange</a></li><li><a href="global.html#onUpdate">onUpdate</a></li><li><a href="global.html#set">set</a></li><li><a href="global.html#setAbsolute">setAbsolute</a></li><li><a href="global.html#setDepth">setDepth</a></li><li><a href="global.html#setDifferential">setDifferential</a></li><li><a href="global.html#setFlat">setFlat</a></li><li><a href="global.html#setProportional">setProportional</a></li><li><a href="global.html#setValue">setValue</a></li><li><a href="global.html#toString">toString</a></li><li><a href="global.html#trigger">trigger</a></li><li><a href="global.html#triggerGestures">triggerGestures</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0-dev</a> on Tue May 19 2015 17:51:36 GMT-0700 (PDT)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

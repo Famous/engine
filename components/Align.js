@@ -29,10 +29,10 @@ var Position = require('./Position');
 /**
  * @class Align
  * @constructor
+ * @augments Position
  * @component
  * @param {LocalDispatch} node LocalDispatch to be retrieved from corresponding Render Node of the Align component
  */
-
 function Align(node) {
     Position.call(this, node);
 

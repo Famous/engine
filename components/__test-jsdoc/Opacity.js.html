@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: Opacity.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: Opacity.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) 2015 Famous Industries Inc.
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
+'use strict';
+
+var Transitionable = require('../transitions/Transitionable');
+
+
+/**
+ * @class Opacity
+ * @constructor
+ * @component
+ * @param {LocalDispatch} dispatch LocalDispatch to be retrieved from corresponding Render Node of the Opacity component
+ */
+function Opacity(node) {
+    this._node = node;
+    this._id = node.addComponent(this);
+    this._value = new Transitionable(1);
+
+    this._requestingUpdate = false;
+}
+
+Opacity.prototype.toString = function toString() {
+    return 'Opacity';
+};
+
+/**
+*
+* Retrieves state of Opacity
+*
+* @method
+* @return {Object} contains component key which holds the stringified constructor 
+* and value key which contains the numeric value
+*/
+Opacity.prototype.getValue = function getValue() {
+    return {
+        component: this.toString(),
+        value: this._value.get()
+    };
+};
+
+/**
+*
+* Setter for Opacity state
+*
+* @method
+* @param {Object} state contains component key, which holds stringified constructor, and a value key, which contains a numeric value used to set opacity if the constructor value matches
+* @return {Boolean} true if set is successful, false otherwise
+*/
+Opacity.prototype.setValue = function setValue(value) {
+    if (this.toString() === value.component) {
+        this.set(value.value);
+        return true;
+    }
+    return false;
+};
+
+/**
+*
+* Setter for Opacity with callback
+*
+* @method
+* @param {Number} value value used to set Opacity
+* @param {Object} options options hash
+* @param {Function} callback to be called following Opacity set
+* @chainable
+*/
+Opacity.prototype.set = function set(value, options, callback) {
+    if (!this._requestingUpdate) {
+        this._node.requestUpdate(this._id);
+        this._requestingUpdate = true;
+    }
+
+    this._value.set(value, options, callback);
+    return this;
+};
+
+/**
+*
+* Getter for Opacity
+*
+* @method
+* @return {Number}
+*/
+Opacity.prototype.get = function get() {
+    return this._value.get();
+};
+
+/**
+*
+* Stops Opacity transition
+*
+* @method
+* @chainable
+*/
+Opacity.prototype.halt = function halt() {
+    this._value.halt();
+    return this;
+};
+
+Opacity.prototype.isActive = function isActive(){
+    return this._value.isActive();
+};
+
+Opacity.prototype.update = function update () {
+    this._node.setOpacity(this._value.get());
+    if (this._value.isActive()) {
+      this._node.requestUpdateOnNextTick(this._id);
+    } else {
+      this._requestingUpdate = false;
+    }
+};
+
+Opacity.prototype.onUpdate = Opacity.prototype.update;
+
+module.exports = Opacity;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Align.html">Align</a></li><li><a href="Camera.html">Camera</a></li><li><a href="GestureHandler.html">GestureHandler</a></li><li><a href="MountPoint.html">MountPoint</a></li><li><a href="Opacity.html">Opacity</a></li><li><a href="Origin.html">Origin</a></li><li><a href="Position.html">Position</a></li><li><a href="Rotation.html">Rotation</a></li><li><a href="Scale.html">Scale</a></li><li><a href="Size.html">Size</a></li></ul><h3>Global</h3><ul><li><a href="global.html#get">get</a></li><li><a href="global.html#getValue">getValue</a></li><li><a href="global.html#halt">halt</a></li><li><a href="global.html#on">on</a></li><li><a href="global.html#onReceive">onReceive</a></li><li><a href="global.html#onTransformChange">onTransformChange</a></li><li><a href="global.html#onUpdate">onUpdate</a></li><li><a href="global.html#set">set</a></li><li><a href="global.html#setAbsolute">setAbsolute</a></li><li><a href="global.html#setDepth">setDepth</a></li><li><a href="global.html#setDifferential">setDifferential</a></li><li><a href="global.html#setFlat">setFlat</a></li><li><a href="global.html#setProportional">setProportional</a></li><li><a href="global.html#setValue">setValue</a></li><li><a href="global.html#toString">toString</a></li><li><a href="global.html#trigger">trigger</a></li><li><a href="global.html#triggerGestures">triggerGestures</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0-dev</a> on Tue May 19 2015 17:51:36 GMT-0700 (PDT)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
