@@ -35,7 +35,9 @@ var Event = require('./Event');
  * The Dispatch class is used to propogate events down the
  * scene graph.
  *
- * @param {Context} Context on which it operates
+ * @class Dispatch
+ * @param {Scene} context The context on which it operates
+ * @constructor
  */
 function Dispatch (context) {
 
@@ -58,7 +60,7 @@ function Dispatch (context) {
  * lookupNode takes a path and returns the node at the location specified
  * by the path, if one exists. If not, it returns undefined.
  *
- * @param {String} The location of the node specified by its path
+ * @param {String} location The location of the node specified by its path
  * 
  * @return {Node | undefined} The node at the requested path
  */
@@ -93,8 +95,10 @@ Dispatch.prototype.lookupNode = function lookupNode (location) {
  * receive the events in a breadth first traversal, meaning that parents
  * have the opportunity to react to the event before children.
  *
- * @param {String} event name
- * @param {Any} payload
+ * @param {String} event name of the event
+ * @param {Any} payload the event payload
+ *
+ * @return {undefined} undefined
  */
 Dispatch.prototype.dispatch = function dispatch (event, payload) {
     if (!event) throw new Error('dispatch requires an event name as it\'s first argument');
@@ -122,9 +126,11 @@ Dispatch.prototype.dispatch = function dispatch (event, payload) {
  * the path. That node receives the event first, and then every ancestor receives the event
  * until the context.
  *
- * @param {String} the path of the node
- * @param {String} the event name
- * @param {Any} the payload
+ * @param {String} path the path of the node
+ * @param {String} event the event name
+ * @param {Any} payload the payload
+ *
+ * @return {undefined} undefined
  */
 Dispatch.prototype.dispatchUIEvent = function dispatchUIEvent (path, event, payload) {
     if (!path) throw new Error('dispatchUIEvent needs a valid path to dispatch to');
@@ -149,8 +155,10 @@ Dispatch.prototype.dispatchUIEvent = function dispatchUIEvent (path, event, payl
  * pushing the result into the supplied array. This is a destructive change.
  *
  * @private
- * @param {String} the specified path
- * @param {Array} the array to which the result should be written
+ * @param {String} string the specified path
+ * @param {Array} target the array to which the result should be written
+ *
+ * @return {Array} the target after having been written to
  */
 function _splitTo (string, target) {
     target.length = 0; // clears the array first.

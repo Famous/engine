@@ -28,7 +28,7 @@
  * The transform class is responsible for calculating the transform of a particular
  * node from the data on the node and its parent
  *
- * @constructor {Transform}
+ * @constructor Transform
  */
 function Transform () {
     this._matrix = new Float32Array(16);
