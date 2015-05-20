@@ -572,7 +572,10 @@ WebGLRenderer.prototype.drawCutouts = function drawCutouts() {
     var buffers;
     var len = this.cutoutRegistryKeys.length;
 
-    if (len) this.gl.enable(this.gl.BLEND);
+    if (len) {
+        this.gl.enable(this.gl.BLEND);
+        this.gl.depthMask(true);
+    }
 
     for (var i = 0; i < len; i++) {
         cutout = this.cutoutRegistry[this.cutoutRegistryKeys[i]];
@@ -583,8 +586,6 @@ WebGLRenderer.prototype.drawCutouts = function drawCutouts() {
         this.program.setUniforms(cutout.uniformKeys, cutout.uniformValues);
         this.drawBuffers(buffers, cutout.drawType, cutout.geometry);
     }
-
-    if (len) this.gl.disable(this.gl.BLEND);
 };
 
 /**
