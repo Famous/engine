@@ -49,9 +49,8 @@ function Mesh (node, options) {
         geometry: null,
         flatShading: null,
         glossiness: null,
-        baseColor: [0, 0, 0, 1],
         positionOffset: null,
-        normals: null,
+        normals: null
     };
 
     if (options) this.setDrawOptions(options);
@@ -63,10 +62,8 @@ function Mesh (node, options) {
  * which displaces the position of each vertex in world space.
  *
  * @method setDrawOptions
- * @chainable
  *
  * @param {Object} Options
- * @chainable
  * @return {Mesh} this
  */
 Mesh.prototype.setDrawOptions = function setDrawOptions (options) {
@@ -91,11 +88,9 @@ Mesh.prototype.getDrawOptions = function getDrawOptions () {
  * geometry and looks for buffers to send to the renderer to update geometry.
  *
  * @method setGeometry
- * @chainable
  *
  * @param {Geometry|String}     Geometry    Geometry to be associated with the mesh.
  * @param {Object}              Options     Various configurations for geometries.
- * @chainable
  * @return {Mesh} this
  */
 Mesh.prototype.setGeometry = function setGeometry (geometry, options) {
@@ -154,34 +149,29 @@ Mesh.prototype.getGeometry = function getGeometry () {
 */
 Mesh.prototype.setBaseColor = function setBaseColor (color) {
     var uniformValue;
+    var isMaterial = color.__isAMaterial__;
+    var isColor = !!color.getNormalizedRGBA;
 
-    if (color.__isAMaterial__) {
+    if (isMaterial) {
         this.value.color = null;
         this.value.expressions.baseColor = color;
         uniformValue = color;
     }
-    else if (color.getNormalizedRGB) {
+    else if (isColor) {
         this.value.expressions.baseColor = null;
         this.value.color = color;
-        var value = color.getNormalizedRGB();
-        this.value.baseColor[0] = value[0];
-        this.value.baseColor[1] = value[1];
-        this.value.baseColor[2] = value[2];
-
-        uniformValue = this.value.baseColor;
+        uniformValue = color.getNormalizedRGBA();
     }
 
     if (this._initialized) {
 
         // If a material expression
-
-        if (color.__isAMaterial__) {
+        if (isMaterial) {
             this._changeQueue.push('MATERIAL_INPUT');
         }
 
         // If a color component
-
-        else if (color.getNormalizedRGB) {
+        else if (isColor) {
             this._changeQueue.push('GL_UNIFORMS');
         }
 
@@ -209,7 +199,6 @@ Mesh.prototype.getBaseColor = function getBaseColor () {
  *
  * @method setFlatShading
  * @param {boolean} Boolean
- * @chainable
  * @return {Mesh} this
  */
 Mesh.prototype.setFlatShading = function setFlatShading (bool) {
@@ -243,18 +232,19 @@ Mesh.prototype.getFlatShading = function getFlatShading () {
  * pixel.
  *
  * @method normal
- * @chainable
  *
  * @param {Object|Array} Material, Image or vec3
  * @return {Mesh} this
  */
 Mesh.prototype.setNormals = function setNormals (materialExpression) {
-    if (materialExpression.__isAMaterial__) {
+    var isMaterial = materialExpression.__isAMaterial__;
+
+    if (isMaterial) {
         this.value.expressions.normals = materialExpression;
     }
 
     if (this._initialized) {
-        this._changeQueue.push(materialExpression.__isAMaterial__ ? 'MATERIAL_INPUT' : 'UNIFORM_INPUT');
+        this._changeQueue.push(isMaterial ? 'MATERIAL_INPUT' : 'UNIFORM_INPUT');
         this._changeQueue.push('u_normals');
         this._changeQueue.push(materialExpression);
     }
@@ -281,15 +271,17 @@ Mesh.prototype.getNormals = function getNormals (materialExpression) {
  * @method setGlossiness
  * @param {MaterialExpression|Color}    glossiness     Accepts either a material expression or Color instance
  * @param {Number}                      strength       Optional value for changing the strength of the glossiness
- * @chainable
  * @return {Mesh} this
  */
 Mesh.prototype.setGlossiness = function setGlossiness(glossiness, strength) {
-    if (glossiness.__isAMaterial__) {
+    var isMaterial = glossiness.__isAMaterial__;
+    var isColor = !!glossiness.getNormalizedRGB;
+
+    if (isMaterial) {
         this.value.glossiness = [null, null];
         this.value.expressions.glossiness = glossiness;
     }
-    else if (glossiness.getNormalizedRGB) {
+    else if (isColor) {
         this.value.expressions.glossiness = null;
         this.value.glossiness = [glossiness, strength || 20];
         glossiness = glossiness ? glossiness.getNormalizedRGB() : [0, 0, 0];
@@ -297,7 +289,7 @@ Mesh.prototype.setGlossiness = function setGlossiness(glossiness, strength) {
     }
 
     if (this._initialized) {
-        this._changeQueue.push(glossiness.__isAMaterial__ ? 'MATERIAL_INPUT' : 'GL_UNIFORMS');
+        this._changeQueue.push(isMaterial ? 'MATERIAL_INPUT' : 'GL_UNIFORMS');
         this._changeQueue.push('u_glossiness');
         this._changeQueue.push(glossiness);
     }
@@ -321,16 +313,15 @@ Mesh.prototype.getGlossiness = function getGlossiness() {
  * space.
  *
  * @method setPositionOffset
- * @chainable
  *
  * @param {MaterialExpression|Array}
- * @chainable
  * @return {Mesh} this
  */
 Mesh.prototype.setPositionOffset = function positionOffset(materialExpression) {
     var uniformValue;
+    var isMaterial = materialExpression.__isAMaterial__;
 
-    if (materialExpression.__isAMaterial__) {
+    if (isMaterial) {
         this.value.expressions.positionOffset = materialExpression;
         uniformValue = materialExpression;
     }
@@ -341,7 +332,7 @@ Mesh.prototype.setPositionOffset = function positionOffset(materialExpression) {
     }
 
     if (this._initialized) {
-        this._changeQueue.push(materialExpression.__isAMaterial__ ? 'MATERIAL_INPUT' : 'GL_UNIFORMS');
+        this._changeQueue.push(isMaterial ? 'MATERIAL_INPUT' : 'GL_UNIFORMS');
         this._changeQueue.push('u_positionOffset');
         this._changeQueue.push(uniformValue);
     }
@@ -420,7 +411,7 @@ Mesh.prototype.onUpdate = function onUpdate() {
         if (this.value.color && this.value.color.isActive()) {
             this._node.sendDrawCommand('GL_UNIFORMS');
             this._node.sendDrawCommand('u_baseColor');
-            this._node.sendDrawCommand(this.value.color.getNormalizedRGB());
+            this._node.sendDrawCommand(this.value.color.getNormalizedRGBA());
             this._node.requestUpdateOnNextTick(this._id);
         }
         if (this.value.glossiness && this.value.glossiness[0] && this.value.glossiness[0].isActive()) {
