@@ -34,6 +34,7 @@ var GeometryIds = 0;
  * @constructor
  *
  * @param {Object} options instantiation options
+ * @return {undefined} undefined
  */
 function Geometry(options) {
     this.options = options || {};

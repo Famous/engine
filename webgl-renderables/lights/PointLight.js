@@ -33,8 +33,10 @@ var Light = require('./Light');
  * @class PointLight
  * @constructor
  * @component
+ * @augments Light
  * @param {LocalDispatch} dispatch LocalDispatch to be retrieved
  *                                 from the corresponding Render Node
+ * @return {undefined} undefined
  */
 function PointLight(node) {
     Light.call(this, node);
@@ -56,6 +58,7 @@ PointLight.prototype.constructor = PointLight;
  * Receives transform change updates from the scene graph.
  *
  * @private
+ * @return {undefined} undefined
  */
 PointLight.prototype.onTransformChange = function onTransformChange (transform) {
     if (!this._requestingUpdate) {

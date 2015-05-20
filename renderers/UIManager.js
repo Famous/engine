@@ -93,7 +93,7 @@ function UIManager (thread, compositor, renderLoop) {
  * Returns the thread being used by the UIManager.
  * This could either be an an actual web worker or a `FamousEngine` singleton.
  *
- * @method getThread
+ * @method
  *
  * @return {Worker|FamousEngine}  Either a web worker or a `FamousEngine` singleton.
  */
@@ -104,7 +104,7 @@ UIManager.prototype.getThread = function getThread() {
 /**
  * Returns the compositor being used by this UIManager.
  *
- * @method getCompositor
+ * @method
  *
  * @return {Compositor}     The compositor used by the UIManager.
  */
@@ -115,7 +115,7 @@ UIManager.prototype.getCompositor = function getCompositor() {
 /**
  * Returns the engine being used by this UIManager.
  *
- * @method getEngine
+ * @method
  *
  * @return {Engine} The engine used by the UIManager.
  */
@@ -128,10 +128,11 @@ UIManager.prototype.getEngine = function getEngine() {
  * Used for updating the notion of time within the managed thread by sending
  * a FRAME command and sending messages to
  *
- * @method update
+ * @method
  *
  * @param  {Number} time unix timestamp to be passed down to the worker as a
  *                       FRAME command
+ * @return {undefined} undefined
  */
 UIManager.prototype.update = function update (time) {
     this._thread.postMessage(['FRAME', time]);
