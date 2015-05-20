@@ -1152,6 +1152,10 @@ Node.prototype.setSizeMode = function setSizeMode (x, y, z) {
  *
  * @method
  *
+ * @param {Array} vec the array to write size mode to
+ * @param {Number} index the index to write to in the array
+ * @param {String|Number} val the value to write
+ *
  * @return {Bool} whether or not the sizemode has been changed for this index.
  */
 Node.prototype._resolveSizeMode = function _resolveSizeMode (vec, index, val) {
@@ -1180,6 +1184,8 @@ Node.prototype._resolveSizeMode = function _resolveSizeMode (vec, index, val) {
  * @param {Number} x    x-Size in pixels ("width").
  * @param {Number} y    y-Size in pixels ("height").
  * @param {Number} z    z-Size in pixels ("depth").
+ *
+ * @return {Node} this
  */
 Node.prototype.setProportionalSize = function setProportionalSize (x, y, z) {
     var vec3 = this.value.size.proportional;
@@ -1220,6 +1226,8 @@ Node.prototype.setProportionalSize = function setProportionalSize (x, y, z) {
  *                      pixels ("height").
  * @param {Number} z    z-Size to be added to the relatively sized node in
  *                      pixels ("depth").
+ *
+ * @return {Node} this
  */
 Node.prototype.setDifferentialSize = function setDifferentialSize (x, y, z) {
     var vec3 = this.value.size.differential;
@@ -1253,6 +1261,8 @@ Node.prototype.setDifferentialSize = function setDifferentialSize (x, y, z) {
  * @param {Number} x    x-Size in pixels ("width").
  * @param {Number} y    y-Size in pixels ("height").
  * @param {Number} z    z-Size in pixels ("depth").
+ * 
+ * @return {Node} this
  */
 Node.prototype.setAbsoluteSize = function setAbsoluteSize (x, y, z) {
     var vec3 = this.value.size.absolute;
@@ -1370,6 +1380,8 @@ Node.prototype.getComponents = function getComponents () {
  *
  * @param  {Number} time    high-resolution timstamp, usually retrieved using
  *                          requestAnimationFrame
+ *
+ * @return {Node} this
  */
 Node.prototype.update = function update (time){
     this._inUpdate = true;
@@ -1419,6 +1431,8 @@ Node.prototype.update = function update (time){
  *
  * @param  {Node} parent    parent node
  * @param  {String} myId    path to node (e.g. `body/0/1`)
+ *
+ * @return {Node} this
  */
 Node.prototype.mount = function mount (parent, myId) {
     if (this.isMounted()) return;
@@ -1453,7 +1467,9 @@ Node.prototype.mount = function mount (parent, myId) {
  * Dismounts (detaches) the node from the scene graph by removing it as a
  * child of its parent.
  *
- * @method dismount
+ * @method
+ *
+ * @return {Node} this
  */
 Node.prototype.dismount = function dismount () {
     if (!this.isMounted()) return;
@@ -1492,6 +1508,8 @@ Node.prototype.dismount = function dismount () {
  * @param  {Node} parent        The parent node.
  * @param  {String} parentId    The parent id (path to parent).
  * @param  {Number} index       Id the node should be mounted to.
+ *
+ * @return {Node} this
  */
 Node.prototype.onParentMount = function onParentMount (parent, parentId, index) {
     return this.mount(parent, parentId + '/' + index);
@@ -1502,6 +1520,8 @@ Node.prototype.onParentMount = function onParentMount (parent, parentId, index) 
  * unmounted.
  *
  * @method onParentDismount
+ *
+ * @return {Node} this
  */
 Node.prototype.onParentDismount = function onParentDismount () {
     return this.dismount();
