@@ -418,46 +418,129 @@ Node.prototype.getPosition = function getPosition () {
     return this.value.vectors.position;
 };
 
+/**
+ * Returns the node's current rotation
+ *
+ * @method getRotation
+ *
+ * @return {Float32Array} an array of four values, showing the rotation as a quaternion
+ */
 Node.prototype.getRotation = function getRotation () {
     return this.value.vectors.rotation;
 };
 
+/**
+ * Returns the scale of the node
+ *
+ * @method
+ *
+ * @return {Float32Array} an array showing the current scale vector
+ */
 Node.prototype.getScale = function getScale () {
     return this.value.vectors.scale;
 };
 
+/**
+ * Returns the current size mode of the node
+ *
+ * @method
+ *
+ * @return {Float32Array} an array of numbers showing the current size mode
+ */
 Node.prototype.getSizeMode = function getSizeMode () {
     return this.value.size.sizeMode;
 };
 
+/**
+ * Returns the current proportional size
+ *
+ * @method
+ *
+ * @return {Float32Array} a vector 3 showing the current proportional size
+ */
 Node.prototype.getProportionalSize = function getProportionalSize () {
     return this.value.size.proportional;
 };
 
+/**
+ * Returns the differential size of the node
+ *
+ * @method
+ *
+ * @return {Float32Array} a vector 3 showing the current differential size
+ */
 Node.prototype.getDifferentialSize = function getDifferentialSize () {
     return this.value.size.differential;
 };
 
+/**
+ * Returns the absolute size of the node
+ *
+ * @method
+ *
+ * @return {Float32Array} a vector 3 showing the current absolute size of the node
+ */
 Node.prototype.getAbsoluteSize = function getAbsoluteSize () {
     return this.value.size.absolute;
 };
 
+/**
+ * Returns the current Render Size of the node. Note that the render size
+ * is asynchronous (will always be one frame behind) and needs to be explicitely
+ * calculated by setting the proper size mode.
+ *
+ * @method
+ *
+ * @return {Float32Array} a vector 3 showing the current render size
+ */
 Node.prototype.getRenderSize = function getRenderSize () {
     return this.value.size.render;
 };
 
+/**
+ * Returns the external size of the node
+ *
+ * @method
+ *
+ * @return {Float32Array} a vector 3 of the final calculated side of the node
+ */
 Node.prototype.getSize = function getSize () {
     return this._calculatedValues.size;
 };
 
+/**
+ * Returns the current world transform of the node
+ *
+ * @method
+ *
+ * @return {Float32Array} a 16 value transform
+ */
 Node.prototype.getTransform = function getTransform () {
     return this._calculatedValues.transform;
 };
 
+/**
+ * Get the list of the UI Events that are currently associated with this node
+ *
+ * @method
+ *
+ * @return {Array} an array of strings representing the current subscribed UI event of this node
+ */
 Node.prototype.getUIEvents = function getUIEvents () {
     return this.value.UIEvents;
 };
 
+/**
+ * Adds a new child to this node. If this method is called with no argument it will
+ * create a new node, however it can also be called with an existing node which it will
+ * append to the node that this method is being called on. Returns the new or passed in node.
+ *
+ * @method
+ * 
+ * @param {Node | void} child the node to appended or no node to create a new node.
+ *
+ * @return {Node} the appended node.
+ */
 Node.prototype.addChild = function addChild (child) {
     var index = child ? this._children.indexOf(child) : -1;
     child = child ? child : new Node();
@@ -477,6 +560,16 @@ Node.prototype.addChild = function addChild (child) {
     return child;
 };
 
+/**
+ * Removes a child node from another node. The passed in node must be
+ * a child of the node that this method is called upon. 
+ *
+ * @method
+ * 
+ * @param {Node} child node to be removed
+ *
+ * @return {Boolean} whether or not the node was successfully removed
+ */
 Node.prototype.removeChild = function removeChild (child) {
     var index = this._children.indexOf(child);
     var added = index !== -1;
