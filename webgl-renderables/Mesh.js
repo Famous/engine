@@ -69,7 +69,7 @@ function Mesh (node, options) {
  * @chainable
  * @return {Mesh} this
  */
-Mesh.prototype.setDrawOptions = function setOptions (options) {
+Mesh.prototype.setDrawOptions = function setDrawOptions (options) {
     this._changeQueue.push('GL_SET_DRAW_OPTIONS');
     this._changeQueue.push(options);
     return this;

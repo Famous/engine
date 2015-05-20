@@ -134,20 +134,4 @@ test('Light', function(t) {
 
         t.end();
     });
-
-    t.test('Light.prototype.clean', function(t) {
-
-        light = createLight();
-        t.equal(typeof light.clean, 'function',
-            'should be a function');
-
-        t.true(light.queue,
-            'should have a populated queue');
-
-        light.clean();
-        t.equal(light.queue.length, 0,
-            'should have an empty (cleaned) queue');
-
-        t.end();
-    });
 });
