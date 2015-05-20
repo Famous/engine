@@ -40,7 +40,7 @@ var Size = require('./Size');
  * @param {String} selector a string which is a dom selector
  *                 signifying which dom element the context
  *                 should be set upon
- * @param {Famous} a class which conforms to Famous' interface
+ * @param {Famous} updater a class which conforms to Famous' interface
  *                 it needs to be able to send methods to
  *                 the renderers and update nodes in the scene graph
  */
@@ -111,8 +111,10 @@ Scene.prototype.getDispatch = function getDispatch () {
  * graph to the payload, which must be an array of numbers of at least
  * length three representing the pixel size in 3 dimensions.
  *
- * @param {String} event
- * @param {*} payload
+ * @param {String} event the name of the event being received
+ * @param {*} payload the object being sent
+ *
+ * @return {undefined} undefined
  */
 Scene.prototype.onReceive = function onReceive (event, payload) {
     // TODO: In the future the dom element that the context is attached to
