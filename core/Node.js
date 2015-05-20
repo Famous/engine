@@ -645,6 +645,17 @@ Node.prototype.removeComponent = function removeComponent (component) {
     return component;
 };
 
+/**
+ * Subscribes a node to a UI Event. All components on the node
+ * will have the opportunity to begin listening to that event
+ * and alerting the scene graph.
+ *
+ * @method
+ *
+ * @param {String} eventName the name of the event
+ *
+ * @return {undefined}
+ */
 Node.prototype.addUIEvent = function addUIEvent (eventName) {
     var UIEvents = this.getUIEvents();
     var components = this._components;
@@ -658,9 +669,18 @@ Node.prototype.addUIEvent = function addUIEvent (eventName) {
             if (component && component.onAddUIEvent) component.onAddUIEvent(eventName);
         }
     }
-    return added;
 };
 
+/**
+ * Private method for the Node to request an update for itself.
+ *
+ * @method
+ * @private
+ *
+ * @param {Boolean} force whether or not to force the update
+ *
+ * @return {undefined}
+ */
 Node.prototype._requestUpdate = function _requestUpdate (force) {
     if (force || (!this._requestingUpdate && this._globalUpdater)) {
         this._globalUpdater.requestUpdate(this);
@@ -668,6 +688,18 @@ Node.prototype._requestUpdate = function _requestUpdate (force) {
     }
 };
 
+/**
+ * Private method to set an optional value in an array, and 
+ * request an update if this changes the value of the array.
+ *
+ * @method
+ *
+ * @param {Array} vec the array to insert the value into
+ * @param {Number} index the index at which to insert the value
+ * @param {Any} val the value to potentially insert (if not null or undefined)
+ *
+ * @return {Boolean} whether or not a new value was inserted.
+ */
 Node.prototype._vecOptionalSet = function _vecOptionalSet (vec, index, val) {
     if (val != null && vec[index] !== val) {
         vec[index] = val;
@@ -677,6 +709,15 @@ Node.prototype._vecOptionalSet = function _vecOptionalSet (vec, index, val) {
     return false;
 };
 
+/**
+ * Shows the node, which is to say, calls onShow on all of the
+ * node's components. Renderable components can then issue the
+ * draw commands necessary to be shown.
+ *
+ * @method
+ *
+ * @return {Node} this
+ */
 Node.prototype.show = function show () {
     var i = 0;
     var items = this._components;
@@ -701,6 +742,15 @@ Node.prototype.show = function show () {
     return this;
 };
 
+/**
+ * Hides the node, which is to say, calls onHide on all of the
+ * node's components. Renderable components can then issue
+ * the draw commands necessary to be hidden
+ *
+ * @method
+ *
+ * @return {Node} this
+ */
 Node.prototype.hide = function hide () {
     var i = 0;
     var items = this._components;
@@ -725,6 +775,18 @@ Node.prototype.hide = function hide () {
     return this;
 };
 
+/**
+ * Sets the align value of the node. Will call onAlignChange 
+ * on all of the Node's components.
+ *
+ * @method
+ *
+ * @param {Number} x
+ * @param {Number} y
+ * @param {Number} z
+ *
+ * @return {Node} this
+ */
 Node.prototype.setAlign = function setAlign (x, y, z) {
     var vec3 = this.value.offsets.align;
     var propogate = false;
@@ -749,6 +811,18 @@ Node.prototype.setAlign = function setAlign (x, y, z) {
     return this;
 };
 
+/**
+ * Sets the mount point value of the node. Will call onMountPointChange
+ * on all of the node's components.
+ *
+ * @method
+ *
+ * @param {Number} x
+ * @param {Number} y
+ * @param {Number} z
+ *
+ * @return {Node} this
+ */
 Node.prototype.setMountPoint = function setMountPoint (x, y, z) {
     var vec3 = this.value.offsets.mountPoint;
     var propogate = false;
@@ -773,6 +847,18 @@ Node.prototype.setMountPoint = function setMountPoint (x, y, z) {
     return this;
 };
 
+/**
+ * Sets the origin value of the node. Will call onOriginChange
+ * on all of the node's components.
+ *
+ * @method
+ *
+ * @param {Number} x
+ * @param {Number} y
+ * @param {Number} z
+ *
+ * @return {Node} this
+ */
 Node.prototype.setOrigin = function setOrigin (x, y, z) {
     var vec3 = this.value.offsets.origin;
     var propogate = false;
@@ -797,7 +883,18 @@ Node.prototype.setOrigin = function setOrigin (x, y, z) {
     return this;
 };
 
-
+/**
+ * Sets the position of the node. Will call onPositionChange
+ * on all of the node's components.
+ *
+ * @method
+ *
+ * @param {Number} x
+ * @param {Number} y
+ * @param {Number} z
+ *
+ * @return {Node} this
+ */
 Node.prototype.setPosition = function setPosition (x, y, z) {
     var vec3 = this.value.vectors.position;
     var propogate = false;
@@ -823,6 +920,21 @@ Node.prototype.setPosition = function setPosition (x, y, z) {
     return this;
 };
 
+/**
+ * Sets the rotation of the node. Will call onRotationChange
+ * on all of the node's components. This method takes either
+ * Euler angles or a quaternion. If the fourth argument is undefined
+ * Euler angles are assumed.
+ *
+ * @method
+ *
+ * @param {Number} x Either the rotation around the x axis or the magnitude in x of the axis of rotation.
+ * @param {Number} y Either the rotation around the y axis or the magnitude in y of the axis of rotation.
+ * @param {Number} z Either the rotation around the z axis or the magnitude in z of the axis of rotation.
+ * @param {Number|undefined} the amount of rotation around the axis of rotation, if a quaternion is specified.
+ *
+ * @return {undefined}
+ */
 Node.prototype.setRotation = function setRotation (x, y, z, w) {
     var quat = this.value.vectors.rotation;
     var propogate = false;
@@ -910,6 +1022,18 @@ Node.prototype.setRotation = function setRotation (x, y, z, w) {
     return this;
 };
 
+/**
+ * Sets the scale of the node. The default value is 1 in all dimensions.
+ * The node's components will have onScaleChanged called on them.
+ *
+ * @method
+ *
+ * @param {Number} x
+ * @param {Number} y
+ * @param {Number} z
+ *
+ * @return {Node} this
+ */
 Node.prototype.setScale = function setScale (x, y, z) {
     var vec3 = this.value.vectors.scale;
     var propogate = false;
@@ -934,6 +1058,16 @@ Node.prototype.setScale = function setScale (x, y, z) {
     return this;
 };
 
+/**
+ * Sets the value of the opacity of this node. All of the node's
+ * components will have onOpacityChange called on them/
+ *
+ * @method
+ *
+ * @param {Number} val Value of the opacity. 1 is the default.
+ *
+ * @return {Node} this
+ */
 Node.prototype.setOpacity = function setOpacity (val) {
     if (val !== this.value.showState.opacity) {
         this.value.showState.opacity = val;
@@ -1130,6 +1264,8 @@ Node.prototype.setAbsoluteSize = function setAbsoluteSize (x, y, z) {
     return this;
 };
 
+/**
+ * Private method for alerting all components that 
 Node.prototype._transformChanged = function _transformChanged (transform) {
     var i = 0;
     var items = this._components;
