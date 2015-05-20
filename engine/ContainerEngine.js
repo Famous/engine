@@ -33,7 +33,6 @@ var now = require('./now');
  * started and stopped.
  * 
  * @class ContainerEngine
- * @constructor
  */
 function ContainerEngine() {
     this._updates = [];
@@ -48,6 +47,16 @@ function ContainerEngine() {
     });
 }
 
+/**
+ * When there is a `FRAME` message passed into the window
+ *
+ * @method
+ * @private
+ *
+ * @param {Object} ev event payload from the window
+ * 
+ * @return {ContainerEngine} this
+ */
 ContainerEngine.prototype._onWindowMessage = function _onWindowMessage(ev) {
     if (
         this._running &&
@@ -61,8 +70,7 @@ ContainerEngine.prototype._onWindowMessage = function _onWindowMessage(ev) {
 /**
  * Starts the ContainerEngine.
  *
- * @method start
- * @chainable
+ * @method
  * 
  * @return {ContainerEngine} this
  */
@@ -75,8 +83,7 @@ ContainerEngine.prototype.start = function start() {
 /**
  * Stops the ContainerEngine.
  *
- * @method stop
- * @chainable
+ * @method
  * 
  * @return {ContainerEngine} this
  */
@@ -89,10 +96,9 @@ ContainerEngine.prototype.stop = function stop() {
 /**
  * Determines whether the ContainerEngine is currently running or not.
  *
- * @method isRunning
+ * @method
  * 
- * @return {Boolean}    boolean value indicating whether the ContainerEngine is
- *                      currently running or not
+ * @return {Boolean} boolean value indicating whether the ContainerEngine is currently running or not
  */
 ContainerEngine.prototype.isRunning = function isRunning() {
     return this._running;
@@ -101,12 +107,11 @@ ContainerEngine.prototype.isRunning = function isRunning() {
 /**
  * Updates all registered objects.
  *
- * @method step
- * @chainable
+ * @method
  * 
- * @param  {Number} time high resolution timstamp used for invoking the
- *                       `update` method on all registered objects
- * @return {ContainerEngine}      this
+ * @param {Number} time high resolution timstamp used for invoking the `update` method on all registered objects
+ *
+ * @return {ContainerEngine} this
  */
 ContainerEngine.prototype.step = function step (time) {
     for (var i = 0, len = this._updates.length ; i < len ; i++) {
@@ -119,13 +124,12 @@ ContainerEngine.prototype.step = function step (time) {
  * Registeres an updateable object which `update` method should be invoked on
  * every paint, starting on the next paint (assuming the ContainerEngine is running).
  *
- * @method update
- * @chainable
+ * @method
  * 
- * @param  {Object} updateable          object to be updated
- * @param  {Function} updateable.update update function to be called on the
- *                                      registered object
- * @return {ContainerEngine}                     this
+ * @param {Object} updateable object to be updated
+ * @param {Function} updateable.update update function to be called on the registered object
+ *
+ * @return {ContainerEngine} this
  */
 ContainerEngine.prototype.update = function update(updateable) {
     if (this._updates.indexOf(updateable) === -1) {
@@ -138,12 +142,11 @@ ContainerEngine.prototype.update = function update(updateable) {
  * Deregisters an updateable object previously registered using `update` to be
  * no longer updated.
  *
- * @method noLongerUpdate
- * @chainable
+ * @method
  * 
- * @param  {Object} updateable          updateable object previously
- *                                      registered using `update`
- * @return {ContainerEngine}                     this
+ * @param {Object} updateable updateable object previously registered using `update`
+ *
+ * @return {ContainerEngine} this
  */
 ContainerEngine.prototype.noLongerUpdate = function noLongerUpdate(updateable) {
     var index = this._updates.indexOf(updateable);

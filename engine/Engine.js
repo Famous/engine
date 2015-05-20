@@ -67,7 +67,6 @@ if (DOCUMENT_ACCESS) {
  * when switching tabs.
  * 
  * @class Engine
- * @constructor
  */
 function Engine() {
     var _this = this;
@@ -103,6 +102,14 @@ function Engine() {
     }
 }
 
+/**
+ * Handle the switching of tabs.
+ *
+ * @method
+ * _private
+ * 
+ * @return {undefined} undefined
+ */
 Engine.prototype._onVisibilityChange = function _onVisibilityChange() {
     if (document[VENDOR_HIDDEN]) {
         this._onUnfocus();
@@ -116,8 +123,10 @@ Engine.prototype._onVisibilityChange = function _onVisibilityChange() {
  * Internal helper function to be invoked as soon as the window/ tab is being
  * focused after a visibiltiy change.
  * 
- * @method  _onFocus
+ * @method
  * @private
+ *
+ * @return {undefined} undefined
  */ 
 Engine.prototype._onFocus = function _onFocus() {
     if (this._startOnVisibilityChange) {
@@ -131,6 +140,8 @@ Engine.prototype._onFocus = function _onFocus() {
  * 
  * @method  _onFocus
  * @private
+ *
+ * @return {undefined} undefined
  */ 
 Engine.prototype._onUnfocus = function _onUnfocus() {
     this._stop();
@@ -141,8 +152,7 @@ Engine.prototype._onUnfocus = function _onUnfocus() {
  * visibiltiy), the engine will be retarted when switching back to a visible
  * state.
  *
- * @method start
- * @chainable
+ * @method
  * 
  * @return {Engine} this
  */
@@ -155,11 +165,13 @@ Engine.prototype.start = function start() {
 };
 
 /**
- * Internal version of {@link Engine#start}, not affecting behavior on visibilty
+ * Internal version of Engine's start function, not affecting behavior on visibilty
  * change.
  * 
- * @method  _start
+ * @method
  * @private
+*
+ * @return {undefined} undefined
  */ 
 Engine.prototype._start = function _start() {
     this._running = true;
@@ -170,8 +182,7 @@ Engine.prototype._start = function _start() {
 /**
  * Stops the Engine.
  *
- * @method stop
- * @chainable
+ * @method
  * 
  * @return {Engine} this
  */
@@ -184,11 +195,13 @@ Engine.prototype.stop = function stop() {
 };
 
 /**
- * Internal version of {@link Engine#stop}, not affecting behavior on visibilty
+ * Internal version of Engine's stop function, not affecting behavior on visibilty
  * change.
  * 
- * @method  _stop
+ * @method
  * @private
+ *
+ * @return {undefined} undefined
  */ 
 Engine.prototype._stop = function _stop() {
     this._running = false;
@@ -201,10 +214,9 @@ Engine.prototype._stop = function _stop() {
 /**
  * Determines whether the Engine is currently running or not.
  *
- * @method isRunning
+ * @method
  * 
- * @return {Boolean}    boolean value indicating whether the Engine is
- *                      currently running or not
+ * @return {Boolean} boolean value indicating whether the Engine is currently running or not
  */
 Engine.prototype.isRunning = function isRunning() {
     return this._running;
@@ -213,12 +225,11 @@ Engine.prototype.isRunning = function isRunning() {
 /**
  * Updates all registered objects.
  *
- * @method step
- * @chainable
+ * @method
  * 
- * @param  {Number} time high resolution timstamp used for invoking the
- *                       `update` method on all registered objects
- * @return {Engine}      this
+ * @param {Number} time high resolution timstamp used for invoking the `update` method on all registered objects
+ *
+ * @return {Engine} this
  */
 Engine.prototype.step = function step (time) {
     this._time = time;
@@ -240,12 +251,10 @@ Engine.prototype.step = function step (time) {
  * Method being called by `requestAnimationFrame` on every paint. Indirectly
  * recursive by scheduling a future invocation of itself on the next paint.
  *
- * @method loop
- * @chainable
+ * @method
  * 
- * @param  {Number} time high resolution timstamp used for invoking the
- *                       `update` method on all registered objects
- * @return {Engine}      this
+ * @param {Number} time high resolution timstamp used for invoking the `update` method on all registered objects
+ * @return {Engine} this
  */
 Engine.prototype.loop = function loop(time) {
     this.step(time);
@@ -257,13 +266,12 @@ Engine.prototype.loop = function loop(time) {
  * Registeres an updateable object which `update` method should be invoked on
  * every paint, starting on the next paint (assuming the Engine is running).
  *
- * @method update
- * @chainable
+ * @method
  * 
- * @param  {Object} updateable          object to be updated
- * @param  {Function} updateable.update update function to be called on the
- *                                      registered object
- * @return {Engine}                     this
+ * @param {Object} updateable object to be updated
+ * @param {Function} updateable.update update function to be called on the registered object
+ *
+ * @return {Engine} this
  */
 Engine.prototype.update = function update(updateable) {
     if (this._updates.indexOf(updateable) === -1) {
@@ -276,12 +284,11 @@ Engine.prototype.update = function update(updateable) {
  * Deregisters an updateable object previously registered using `update` to be
  * no longer updated.
  *
- * @method noLongerUpdate
- * @chainable
+ * @method
  * 
- * @param  {Object} updateable          updateable object previously
- *                                      registered using `update`
- * @return {Engine}                     this
+ * @param {Object} updateable updateable object previously registered using `update`
+ *
+ * @return {Engine} this
  */
 Engine.prototype.noLongerUpdate = function noLongerUpdate(updateable) {
     var index = this._updates.indexOf(updateable);
