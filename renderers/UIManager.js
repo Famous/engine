@@ -53,15 +53,15 @@
  * @param {Compositor} compositor       an instance of Compositor used to
  *                                      extract enqueued draw commands from to
  *                                      be sent to the thread.
- * @param {Engine} engine               an instance of Engine used for
+ * @param {RenderLoop} renderLoop           an instance of Engine used for
  *                                      executing the `ENGINE` commands on.
  */
-function UIManager (thread, compositor, engine) {
+function UIManager (thread, compositor, renderLoop) {
     this._thread = thread;
     this._compositor = compositor;
-    this._engine = engine;
+    this._renderLoop = renderLoop;
 
-    this._engine.update(this);
+    this._renderLoop.update(this);
 
     var _this = this;
     this._thread.onmessage = function (ev) {
@@ -69,10 +69,10 @@ function UIManager (thread, compositor, engine) {
         if (message[0] === 'ENGINE') {
             switch (message[1]) {
                 case 'START':
-                    _this._engine.start();
+                    _this._renderLoop.start();
                     break;
                 case 'STOP':
-                    _this._engine.stop();
+                    _this._renderLoop.stop();
                     break;
                 default:
                     console.error(
@@ -117,10 +117,10 @@ UIManager.prototype.getCompositor = function getCompositor() {
  *
  * @method getEngine
  *
- * @return {Engine}     The engine used by the UIManager.
+ * @return {Engine} The engine used by the UIManager.
  */
 UIManager.prototype.getEngine = function getEngine() {
-    return this._engine;
+    return this._renderLoop;
 };
 
 /**

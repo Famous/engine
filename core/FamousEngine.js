@@ -29,7 +29,7 @@ var Scene = require('./Scene');
 var Channel = require('./Channel');
 var UIManager = require('../renderers/UIManager');
 var Compositor = require('../renderers/Compositor');
-var Engine = require('../engine/Engine');
+var RequestAnimationFrameLoop = require('../render-loops/RequestAnimationFrameLoop');
 
 var ENGINE_START = ['ENGINE', 'START'];
 var ENGINE_STOP = ['ENGINE', 'STOP'];
@@ -75,8 +75,8 @@ function FamousEngine() {
  */
 FamousEngine.prototype.init = function init(options) {
     this.compositor = options && options.compositor || new Compositor();
-    this.engine = options && options.engine || new Engine();
-    this.uiManager = new UIManager(this.getChannel(), this.compositor, this.engine);
+    this.renderLoop = options && options.renderLoop || new RequestAnimationFrameLoop();
+    this.uiManager = new UIManager(this.getChannel(), this.compositor, this.renderLoop);
     return this;
 };
 

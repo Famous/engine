@@ -25,7 +25,7 @@
 'use strict';
 
 module.exports = {
-    Engine: require('./Engine'),
-    ContainerEngine: require('./ContainerEngine'),
+    RequestAnimationFrameLoop: require('./RequestAnimationFrameLoop'),
+    ContainerLoop: require('./ContainerLoop'),
     now: require('./now')
 };
