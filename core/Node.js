@@ -117,6 +117,9 @@ Node.DEFAULT_SIZE = Size.DEFAULT;
 /**
  * A Node spec holds the "data" associated with a Node.
  *
+ * @class Spec
+ * @constructor
+ *
  * @property {String} location path to the node (e.g. "body/0/1")
  * @property {Object} showState
  * @property {Boolean} showState.mounted
@@ -182,6 +185,8 @@ Node.prototype.getLocation = function getLocation () {
 
 /**
  * @alias getId
+ *
+ * @return {String} the path of the Node
  */
 Node.prototype.getId = Node.prototype.getLocation;
 
@@ -193,6 +198,8 @@ Node.prototype.getId = Node.prototype.getLocation;
  *
  * @param  {String} event   Event type.
  * @param  {Object} payload Event object to be dispatched.
+ *
+ * @return {Node} this
  */
 Node.prototype.emit = function emit (event, payload) {
     var p = this.getParent();
@@ -299,6 +306,8 @@ Node.prototype.getParent = function getParent () {
  * @param  {Object} requester   If the requester has an `onUpdate` method, it
  *                              will be invoked during the next update phase of
  *                              the node.
+ *
+ * @return {Node} this
  */
 Node.prototype.requestUpdate = function requestUpdate (requester) {
     if (this._inUpdate || !this.isMounted())
@@ -318,6 +327,8 @@ Node.prototype.requestUpdate = function requestUpdate (requester) {
  * @param  {Object} requester   If the requester has an `onUpdate` method, it
  *                              will be invoked during the next update phase of
  *                              the node.
+ *
+ * @return {Node} this
  */
 Node.prototype.requestUpdateOnNextTick = function requestUpdateOnNextTick (requester) {
     this._nextUpdateQueue.push(requester);
@@ -325,10 +336,9 @@ Node.prototype.requestUpdateOnNextTick = function requestUpdateOnNextTick (reque
 };
 
 /**
- * If the context has been created using @{@link Famous.createContext}, the
- * @{@link Famous} singleton will be the global updater.
+ * Get the object responsible for updating this node.
  *
- * @method getUpdater
+ * @method 
  *
  * @return {Object} The global updater.
  */
@@ -629,6 +639,8 @@ Node.prototype.getComponent = function getComponent (index) {
  *
  * @param  {Object} component   An component that has previously been added
  *                              using @{@link addComponent}.
+ *
+ * @return {Node} this
  */
 Node.prototype.removeComponent = function removeComponent (component) {
     var index = this._components.indexOf(component);
@@ -654,7 +666,7 @@ Node.prototype.removeComponent = function removeComponent (component) {
  *
  * @param {String} eventName the name of the event
  *
- * @return {undefined}
+ * @return {undefined} undefined
  */
 Node.prototype.addUIEvent = function addUIEvent (eventName) {
     var UIEvents = this.getUIEvents();
@@ -679,7 +691,7 @@ Node.prototype.addUIEvent = function addUIEvent (eventName) {
  *
  * @param {Boolean} force whether or not to force the update
  *
- * @return {undefined}
+ * @return {undefined} undefined
  */
 Node.prototype._requestUpdate = function _requestUpdate (force) {
     if (force || (!this._requestingUpdate && this._globalUpdater)) {
@@ -781,9 +793,9 @@ Node.prototype.hide = function hide () {
  *
  * @method
  *
- * @param {Number} x
- * @param {Number} y
- * @param {Number} z
+ * @param {Number} x Align value in the x dimension.
+ * @param {Number} y Align value in the y dimension.
+ * @param {Number} z Align value in the z dimension.
  *
  * @return {Node} this
  */
@@ -817,9 +829,9 @@ Node.prototype.setAlign = function setAlign (x, y, z) {
  *
  * @method
  *
- * @param {Number} x
- * @param {Number} y
- * @param {Number} z
+ * @param {Number} x MountPoint value in x dimension
+ * @param {Number} y MountPoint value in y dimension
+ * @param {Number} z MountPoint value in z dimension
  *
  * @return {Node} this
  */
@@ -853,9 +865,9 @@ Node.prototype.setMountPoint = function setMountPoint (x, y, z) {
  *
  * @method
  *
- * @param {Number} x
- * @param {Number} y
- * @param {Number} z
+ * @param {Number} x Origin value in x dimension
+ * @param {Number} y Origin value in y dimension
+ * @param {Number} z Origin value in z dimension
  *
  * @return {Node} this
  */
@@ -889,9 +901,9 @@ Node.prototype.setOrigin = function setOrigin (x, y, z) {
  *
  * @method
  *
- * @param {Number} x
- * @param {Number} y
- * @param {Number} z
+ * @param {Number} x Position in x
+ * @param {Number} y Position in y
+ * @param {Number} z Position in z
  *
  * @return {Node} this
  */
@@ -931,9 +943,9 @@ Node.prototype.setPosition = function setPosition (x, y, z) {
  * @param {Number} x Either the rotation around the x axis or the magnitude in x of the axis of rotation.
  * @param {Number} y Either the rotation around the y axis or the magnitude in y of the axis of rotation.
  * @param {Number} z Either the rotation around the z axis or the magnitude in z of the axis of rotation.
- * @param {Number|undefined} the amount of rotation around the axis of rotation, if a quaternion is specified.
+ * @param {Number|undefined} w the amount of rotation around the axis of rotation, if a quaternion is specified.
  *
- * @return {undefined}
+ * @return {undefined} undefined
  */
 Node.prototype.setRotation = function setRotation (x, y, z, w) {
     var quat = this.value.vectors.rotation;
@@ -1028,9 +1040,9 @@ Node.prototype.setRotation = function setRotation (x, y, z, w) {
  *
  * @method
  *
- * @param {Number} x
- * @param {Number} y
- * @param {Number} z
+ * @param {Number} x Scale value in x
+ * @param {Number} y Scale value in y
+ * @param {Number} z Scale value in z
  *
  * @return {Node} this
  */
@@ -1107,6 +1119,8 @@ Node.prototype.setOpacity = function setOpacity (val) {
  *                        y direction ("height").
  * @param {SizeMode} z    The size mode being used for determining the size in
  *                        z direction ("depth").
+ *
+ * @return {Node} this
  */
 Node.prototype.setSizeMode = function setSizeMode (x, y, z) {
     var vec3 = this.value.size.sizeMode;
@@ -1136,7 +1150,7 @@ Node.prototype.setSizeMode = function setSizeMode (x, y, z) {
  * A protected method that resolves string representations of size mode
  * to numeric values and applies them.
  *
- * @method _resolveSizeMode
+ * @method
  *
  * @return {Bool} whether or not the sizemode has been changed for this index.
  */
@@ -1272,7 +1286,7 @@ Node.prototype.setAbsoluteSize = function setAbsoluteSize (x, y, z) {
  *
  * @param {Float32Array} transform The transform that has changed
  *
- * @return {undefined}
+ * @return {undefined} undefined
  */
 Node.prototype._transformChanged = function _transformChanged (transform) {
     var i = 0;
@@ -1303,7 +1317,7 @@ Node.prototype._transformChanged = function _transformChanged (transform) {
  *
  * @param {Float32Array} size the size that has changed
  *
- * @return {undefined}
+ * @return {undefined} undefined
  */
 Node.prototype._sizeChanged = function _sizeChanged (size) {
     var i = 0;
@@ -1523,7 +1537,7 @@ Node.prototype.receive = function receive (type, ev) {
  *
  * @method
  *
- * @return {undefined}
+ * @return {undefined} undefined
  */
 Node.prototype._requestUpdateWithoutArgs = function _requestUpdateWithoutArgs () {
     if (!this._requestingUpdate) this._requestUpdate();
@@ -1537,7 +1551,7 @@ Node.prototype._requestUpdateWithoutArgs = function _requestUpdateWithoutArgs ()
  *
  * @param {Number} current time
  *
- * @return {undefined}
+ * @return {undefined} undefined
  */
 Node.prototype.onUpdate = Node.prototype.update;
 
@@ -1567,7 +1581,7 @@ Node.prototype.onParentHide = Node.prototype.hide;
  *
  * @method
  *
- * @return {undefined}
+ * @return {undefined} undefined
  */
 Node.prototype.onParentTransformChange = Node.prototype._requestUpdateWithoutArgs;
 
@@ -1577,7 +1591,7 @@ Node.prototype.onParentTransformChange = Node.prototype._requestUpdateWithoutArg
  *
  * @method
  *
- * @return {undefined}
+ * @return {undefined} undefined
  */
 Node.prototype.onParentSizeChange = Node.prototype._requestUpdateWithoutArgs;
 
@@ -1630,7 +1644,7 @@ Node.prototype.onDismount = Node.prototype.dismount;
  * @param {String} event name
  * @param {Object} payload
  *
- * @return {undefined}
+ * @return {undefined} undefined
  */
 Node.prototype.onReceive = Node.prototype.receive;
 
