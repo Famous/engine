@@ -48,7 +48,7 @@ function createMesh(options) {
  * Dummy material expression
  */
 var materialExpression = {
-    _compile: function() { return 'sampleExpression'; }
+    __isAMaterial__: true
 };
 
 /**
@@ -204,12 +204,13 @@ test('Mesh', function(t) {
         }, 'throws an error for geometry string references that are not included');
 
         t.doesNotThrow(function() {
+            mesh._initialized = true;
             mesh.setGeometry('Sphere');
         }, 'accepts string references for geometries');
 
         var geometry = mesh.value.geometry;
-
-        t.true(contains(['GL_SET_GEOMETRY', geometry.id, geometry.spec.type, geometry.spec.dynamic], mesh._changeQueue),
+        
+        t.true(contains(['GL_SET_GEOMETRY', geometry.spec.id, geometry.spec.type, geometry.spec.dynamic], mesh._changeQueue),
             'sends the appropriate commands for geometry');
 
         t.end();
@@ -240,34 +241,29 @@ test('Mesh', function(t) {
         t.end();
     });
 
-    t.test('Mesh.prototype._pushActiveCommands', function(t) {
-
-        mesh = createMesh().mesh;
-        t.equal(typeof mesh._pushActiveCommands, 'function',
-            'should be a function');
-
-        t.end();
-    });
-
     t.test('Mesh.prototype.setBaseColor', function(t) {
 
         mesh = createMesh().mesh;
+        mesh._initialized = true;
+
         t.equal(typeof mesh.setBaseColor, 'function',
             'should be a function');
 
-        t.false(mesh._expressions.baseColor,
+        t.false(mesh.value.expressions.baseColor,
             'should not have a material expression by default');
 
         mesh.setBaseColor(materialExpression);
-        t.true(contains(['sampleExpression'], mesh._changeQueue),
+        t.true(contains([materialExpression], mesh._changeQueue),
             'should be able to take a material expression');
 
         t.false(mesh._color,
             'should not have a color by default');
 
-        mesh.setBaseColor(new MockColor());
-        t.true(contains(['1,1,1'], mesh._changeQueue),
-            'should be able to take a Color instance');
+        var length = mesh._changeQueue.length;
+        var c = new MockColor();
+        mesh.setBaseColor(c);
+        
+        t.true(length < mesh._changeQueue.length, 'should be able to take a Color instance');
 
         t.end();
     });
@@ -279,7 +275,8 @@ test('Mesh', function(t) {
             'should be a function');
 
         mesh.setBaseColor(materialExpression);
-        t.true(mesh.getBaseColor()._compile,
+        console.log(mesh.getBaseColor());
+        t.true(mesh.getBaseColor().__isAMaterial__,
             'should be able to take a material expression');
 
         mesh.setBaseColor(new MockColor());
@@ -299,7 +296,7 @@ test('Mesh', function(t) {
             'should be false by default');
 
         mesh.setFlatShading(true);
-        t.true(mesh._flatShading,
+        t.true(mesh.value._flatShading,
             'should be true when set to true');
 
         mesh.setFlatShading(false);
@@ -337,7 +334,7 @@ test('Mesh', function(t) {
 
 
         mesh.setNormals(materialExpression);
-        t.true(contains(['MATERIAL_INPUT', 'normal', 'sampleExpression'], mesh._changeQueue),
+        t.true(contains(['MATERIAL_INPUT', 'normal', materialExpression], mesh._changeQueue),
             'should be able to take a normal material expression');
 
         t.end();
@@ -350,7 +347,7 @@ test('Mesh', function(t) {
             'should be a function');
 
         mesh.setNormals(materialExpression);
-        t.true(mesh.getNormals()._compile,
+        t.true(mesh.getNormals().__isAMaterial__,
             'should be able to return the Normals expression');
 
         t.end();
@@ -364,7 +361,7 @@ test('Mesh', function(t) {
             'should be a function');
 
         mesh.setGlossiness(materialExpression);
-        t.true(contains(['MATERIAL_INPUT', 'glossiness', 'sampleExpression'], mesh._changeQueue),
+        t.true(contains(['MATERIAL_INPUT', 'glossiness', materialExpression], mesh._changeQueue),
             'should take a material expression for glossiness');
 
         mesh.setGlossiness(10, { duration: 1000 }, function() {
@@ -388,7 +385,7 @@ test('Mesh', function(t) {
             'should be a function');
 
         mesh.setGlossiness(materialExpression);
-        t.true(mesh.getGlossiness()._compile,
+        t.true(mesh.getGlossiness().__isAMaterial__,
             'should be able to return the glossiness expression');
 
         mesh.setGlossiness(10);
@@ -406,7 +403,7 @@ test('Mesh', function(t) {
             'should be a function');
 
         mesh.setPositionOffset(materialExpression);
-        t.true(contains(['MATERIAL_INPUT', 'positionOffset', 'sampleExpression'], mesh._changeQueue),
+        t.true(contains(['MATERIAL_INPUT', 'positionOffset', materialExpression], mesh._changeQueue),
             'should take a material expression for positionOffset');
 
         mesh.setPositionOffset(10, { duration: 1000 }, function() {
@@ -431,7 +428,7 @@ test('Mesh', function(t) {
             'should be a function');
 
         mesh.setPositionOffset(materialExpression);
-        t.true(mesh.getPositionOffset()._compile,
+        t.true(mesh.getPositionOffset().__isAMaterial__,
             'should be able to return the glossiness expression');
 
         mesh.setPositionOffset([10, 10, 10]);
