@@ -34,6 +34,7 @@ var Geometry = require('./Geometry');
  * @constructor
  *
  * @param {Object} options instantiation options
+ * @return {undefined} undefined
  */
 function DynamicGeometry(options) {
     Geometry.call(this, options);
@@ -57,7 +58,7 @@ DynamicGeometry.prototype.getLength = function getLength() {
  * Gets the buffer object based on buffer name. Throws error
  * if bufferName is not provided.
  *
- * @method getVertexBuffer
+ * @method
  *
  * @param  {String}  bufferName     name of vertexBuffer to be retrieved.
  * @return {Object}                 value of buffer with corresponding bufferName.
@@ -75,7 +76,7 @@ DynamicGeometry.prototype.getVertexBuffer = function getVertexBuffer(bufferName)
  * Sets a vertex buffer with given name to input value. Registers a new
  * buffer if one does not exist with given name.
  *
- * @method  setVertexBuffer
+ * @method
  * @param  {String} bufferName  Name of vertexBuffer to be set.
  * @param  {Array}  value       Input data to fill target buffer.
  * @param  {Number} size        Vector size of input buffer data.
@@ -101,7 +102,7 @@ DynamicGeometry.prototype.setVertexBuffer = function setVertexBuffer(bufferName,
 /**
  * Copies and sets all buffers from another geometry instance.
  *
- * @method fromGeometry
+ * @method
  *
  * @param  {Object} geometry    Geometry instance to copy buffers from.
  * @return {Object}             current geometry.
@@ -119,54 +120,54 @@ DynamicGeometry.prototype.fromGeometry = function fromGeometry(geometry) {
 };
 
 /**
- *  Set the positions of the vertices in this geometry.
+ * Set the positions of the vertices in this geometry.
  *
- *  @method setVertexPositions
- *  @param  {Array}     value   New value for vertex position buffer
- *  @return {Object}            current geometry.
+ * @method
+ * @param  {Array}     value   New value for vertex position buffer
+ * @return {Object}            current geometry.
  */
 DynamicGeometry.prototype.setVertexPositions = function (value) {
     return this.setVertexBuffer('a_pos', value, 3);
 };
 
 /**
- *  Set the normals on this geometry.
+ * Set the normals on this geometry.
  *
- *  @method setNormals
- *  @param  {Array}     value   Value to set normal buffer to.
- *  @return {Object}            current geometry.
+ * @method
+ * @param  {Array}     value   Value to set normal buffer to.
+ * @return {Object}            current geometry.
  */
 DynamicGeometry.prototype.setNormals = function (value) {
     return this.setVertexBuffer('a_normals', value, 3);
 };
 
 /**
- *  Set the texture coordinates on this geometry.
+ * Set the texture coordinates on this geometry.
  *
- *  @method setTextureCoords
- *  @param  {Array}     value   New value for texture coordinates buffer.
- *  @return {Object}            current geometry.
+ * @method
+ * @param  {Array}     value   New value for texture coordinates buffer.
+ * @return {Object}            current geometry.
  */
 DynamicGeometry.prototype.setTextureCoords = function (value) {
     return this.setVertexBuffer('a_texCoord', value, 2);
 };
 
 /**
- *  Set the texture coordinates on this geometry.
- *  @method setTextureCoords
- *  @param  {Array}     value   New value for index buffer
- *  @return {Object}            current geometry.
+ * Set the texture coordinates on this geometry.
+ * @method
+ * @param  {Array}     value   New value for index buffer
+ * @return {Object}            current geometry.
  */
 DynamicGeometry.prototype.setIndices = function (value) {
     return this.setVertexBuffer('indices', value, 1);
 };
 
 /**
- *  Set the WebGL drawing primitive for this geometry.
+ * Set the WebGL drawing primitive for this geometry.
  *
- *  @method setDrawType
- *  @param  {String} value  New drawing primitive for geometry
- *  @return {Object}        current geometry.
+ * @method
+ * @param  {String} value  New drawing primitive for geometry
+ * @return {Object}        current geometry.
  */
 DynamicGeometry.prototype.setDrawType = function (value) {
     this.spec.type = value.toUpperCase();
@@ -176,7 +177,7 @@ DynamicGeometry.prototype.setDrawType = function (value) {
 /**
  * Returns the 'pos' vertex buffer of the geometry.
  *
- * @method getVertexPositions
+ * @method
  * @return {Array} Vertex buffer.
  */
 DynamicGeometry.prototype.getVertexPositions = function () {
@@ -185,7 +186,7 @@ DynamicGeometry.prototype.getVertexPositions = function () {
 
 /**
  * Returns the 'normal' vertex buffer of the geometry.
- * @method getNormals
+ * @method
  * @return {Array} Vertex Buffer.
  */
 DynamicGeometry.prototype.getNormals = function () {
@@ -194,7 +195,7 @@ DynamicGeometry.prototype.getNormals = function () {
 
 /**
  * Returns the 'textureCoord' vertex buffer of the geometry.
- * @method getTextureCoords
+ * @method
  * @return {Array} Vertex Buffer.
  */
 DynamicGeometry.prototype.getTextureCoords = function () {

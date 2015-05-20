@@ -1,18 +1,18 @@
 /**
  * The MIT License (MIT)
- * 
+ *
  * Copyright (c) 2015 Famous Industries Inc.
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -32,7 +32,8 @@ var createCheckerboard = require('./createCheckerboard');
  * @class TextureManager
  * @constructor
  *
- * @param {WebGL_Context} gl Context used to create and bind textures.
+ * @param {WebGL_Context} gl    Context used to create and bind textures.
+ * @return {undefined}          undefined
  */
 function TextureManager(gl) {
     this.registry = [];
@@ -40,19 +41,20 @@ function TextureManager(gl) {
 
     this._activeTexture = 0;
     this._boundTexture = null;
-    
+
     this._checkerboard = createCheckerboard();
 
     this.gl = gl;
 }
 
 /**
- * Update function used by WebGLRenderer to queue resamples on 
+ * Update function used by WebGLRenderer to queue resamples on
  * registered textures.
  *
- * @method update
+ * @method
  *
- * @param {Number} time Time in milliseconds according to the compositor.
+ * @param {Number}      time    Time in milliseconds according to the compositor.
+ * @return {undefined}          undefined
  */
 TextureManager.prototype.update = function update(time) {
     var registryLength = this.registry.length;
@@ -75,11 +77,12 @@ TextureManager.prototype.update = function update(time) {
  * Creates a spec and creates a texture based on given texture data.
  * Handles loading assets if necessary.
  *
- * @method register
+ * @method
  *
- * @param {Object} input Object containing texture id, texture data
- * and options used to draw texture.
- * @param {Number} slot Texture slot to bind generated texture to.
+ * @param {Object}  input   Object containing texture id, texture data
+ *                          and options used to draw texture.
+ * @param {Number}  slot    Texture slot to bind generated texture to.
+ * @return {undefined}      undefined
  */
 TextureManager.prototype.register = function register(input, slot) {
     var source = input.data;
@@ -144,14 +147,14 @@ TextureManager.prototype.register = function register(input, slot) {
 /**
  * Loads an image from a string or Image object and executes a callback function.
  *
- * @method loadImage
+ * @method
  * @private
  *
- * @param {Object | String} img The input image data to load as an asset.
- * @param {Function} callback The callback function to be fired when
- * the image has finished loading.
+ * @param {Object|String}   img         The input image data to load as an asset.
+ * @param {Function}        callback    The callback function to be fired when
+ *                                      the image has finished loading.
  *
- * @return {Object} Image object being loaded.
+ * @return {Object}                     Image object being loaded.
  */
 function loadImage (input, callback) {
     var image = (typeof input === 'string' ? new Image() : input) || {};
@@ -165,12 +168,13 @@ function loadImage (input, callback) {
 }
 
 /**
- * Sets active texture slot and binds target texture.  Also handles 
+ * Sets active texture slot and binds target texture.  Also handles
  * resampling when necessary.
  *
- * @method bindTexture
+ * @method
  *
- * @param {Number} id Identifier used to retreive texture spec.
+ * @param {Number}      id  Identifier used to retreive texture spec.
+ * @return {undefined}      undefined
  */
 TextureManager.prototype.bindTexture = function bindTexture(id) {
     var spec = this.registry[id];

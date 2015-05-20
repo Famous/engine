@@ -32,6 +32,7 @@
  * @component
  * @param {Node} node The controlling node
  *                    from the corresponding Render Node
+ * @return {undefined} undefined
  */
 function Light(node) {
     this._node = node;
@@ -45,9 +46,8 @@ function Light(node) {
 /**
 * Changes the color of the light, using the 'Color' utility component.
 *
-* @method setColor
+* @method
 * @param {Color} Color instance
-* @chainable
 * @return {Light} this
 */
 Light.prototype.setColor = function setColor(color) {
@@ -68,7 +68,7 @@ Light.prototype.setColor = function setColor(color) {
 /**
 * Returns the current color.
 
-* @method getColor
+* @method
 * @returns {Color} Color
 */
 Light.prototype.getColor = function getColor() {
@@ -79,7 +79,8 @@ Light.prototype.getColor = function getColor() {
 * Sends draw commands to the renderer
 *
 * @private
-* @method onUpdate
+* @method
+* @return {undefined} undefined
 */
 Light.prototype.onUpdate = function onUpdate() {
     var path = this._node.getLocation();
