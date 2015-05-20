@@ -65,11 +65,26 @@ Size.ABSOLUTE = 1;
 Size.RENDER = 2;
 Size.DEFAULT = Size.RELATIVE;
 
+/**
+ * Set which mode each axis of Size will have its dimensions
+ * calculated by.
+ *
+ * @method
+ *
+ * @return {Size} this
+ */
 Size.prototype.setMode = function setMode(x, y, z) {
     this._node.setSizeMode(x, y, z);
     return this;
 };
 
+/**
+ * Return the name of the Size component
+ *
+ * @method
+ *
+ * @return {String} Name of the component
+ */
 Size.prototype.toString = function toString() {
     return 'Size';
 };

@@ -43,6 +43,13 @@ function Opacity(node) {
     this._requestingUpdate = false;
 }
 
+/**
+ * Return the name of the Opacity component
+ *
+ * @method
+ *
+ * @return {String} Name of the component
+ */
 Opacity.prototype.toString = function toString() {
     return 'Opacity';
 };
