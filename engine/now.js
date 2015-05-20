@@ -23,6 +23,7 @@
  */
 'use strict';
 
+// Polyfill for performance.now()
 var now = typeof performance !== 'undefined' ? function() {
     return performance.now();
 } : Date.now;
