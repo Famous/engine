@@ -300,7 +300,7 @@ test('Mesh', function(t) {
             'should be true when set to true');
 
         mesh.setFlatShading(false);
-        t.false(mesh._flatShading,
+        t.false(mesh.value._flatShading,
             'should be false when set to false');
 
         t.end();
