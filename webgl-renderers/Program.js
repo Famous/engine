@@ -147,14 +147,14 @@ function Program(gl, options) {
  * @param {String} name Name of target input of material.
  * @param {Object} material Compiled material object being verified.
  *
- * @return {Object} Current program.
+ * @return {Program} this Current program.
  */
 Program.prototype.registerMaterial = function registerMaterial(name, material) {
     var compiled = material;
     var type = inputTypes[name];
     var mask = masks[type];
 
-    if ((this.registeredMaterials[material._id] & mask) === mask) return;
+    if ((this.registeredMaterials[material._id] & mask) === mask) return this;
 
     var k;
 
@@ -254,18 +254,21 @@ Program.prototype.resetProgram = function resetProgram() {
     }
 
     for(i = 0; i < this.uniformNames.length; i++) {
-        name = this.uniformNames[i], value = this.uniformValues[i];
+        name = this.uniformNames[i];
+        value = this.uniformValues[i];
         vertexHeader.push('uniform ' + TYPES[value.length] + name + ';\n');
         fragmentHeader.push('uniform ' + TYPES[value.length] + name + ';\n');
     }
 
     for(i = 0; i < this.attributeNames.length; i++) {
-        name = this.attributeNames[i], value = this.attributeValues[i];
+        name = this.attributeNames[i];
+        value = this.attributeValues[i];
         vertexHeader.push('attribute ' + TYPES[value.length] + name + ';\n');
     }
 
     for(i = 0; i < this.varyingNames.length; i++) {
-        name = this.varyingNames[i], value = this.varyingValues[i];
+        name = this.varyingNames[i];
+        value = this.varyingValues[i];
         vertexHeader.push('varying ' + TYPES[value.length]  + name + ';\n');
         fragmentHeader.push('varying ' + TYPES[value.length] + name + ';\n');
     }
