@@ -76,7 +76,8 @@ function UIManager (thread, compositor, renderLoop) {
                     );
                     break;
             }
-        } else {
+        }
+        else {
             _this._compositor.receiveCommands(message);
         }
     };

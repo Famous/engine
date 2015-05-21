@@ -1,18 +1,18 @@
 /**
  * The MIT License (MIT)
- * 
+ *
  * Copyright (c) 2015 Famous Industries Inc.
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -29,7 +29,6 @@ var test = require('tape');
 var Color = require('../Color');
 
 var time = 0;
-var _now = Date.now;
 
 /**
  * A list of inputs with various arguments to test color
@@ -41,7 +40,7 @@ function createArguments() {
         { type: 'hex',          arg: '#faebd7' },
         { type: 'rgb',          arg: [250, 235, 215] },
         { type: 'colorName',    arg: 'antiquewhite' },
-        { type: 'instance',     arg: new Color('antiquewhite') },
+        { type: 'instance',     arg: new Color('antiquewhite') }
     ];
     inputs.forEach(function(input) {
         input.transition = transition;
@@ -66,12 +65,11 @@ function callback(t, input) {
 test('Color', function(t) {
     t.test('Time setup', function(t) {
         Transitionable.Clock = Date;
-        
+
         time = 0;
 
         Date.now = function() { return time; };
-        t.equal(typeof Date.now, 'function',
-            'should be a function');
+        t.equal(typeof Date.now, 'function', 'should be a function');
 
         time = 50;
         t.equal(Date.now(), 50,
@@ -477,8 +475,11 @@ test('Color', function(t) {
 
         inputs.forEach(function(input) {
             var color = new Color();
-            t.equal(Color.determineType(input.arg), input.type,
-                type(input) + 'should be identified');
+            t.equal(
+                Color.determineType(input.arg),
+                input.type,
+                type(input) + 'should be identified'
+            );
         });
 
         t.end();

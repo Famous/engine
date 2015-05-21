@@ -265,7 +265,8 @@ Transitionable.prototype._interpolate = function _interpolate(output, from, to, 
                 output[key] = this._interpolate(output[key], from[key], to[key], progress, method);
             }
         }
-    } else {
+    }
+    else {
         output = from + progress * (to - from);
     }
     return output;
@@ -445,7 +446,8 @@ Transitionable.prototype.set = function(state, transition, callback) {
     if (transition == null) {
         this.from(state);
         if (callback) callback();
-    } else {
+    }
+    else {
         this.to(state, transition.curve, transition.duration, callback, transition.method);
     }
     return this;
