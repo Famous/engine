@@ -37,7 +37,7 @@ test('OBJLoader', function(t) {
         t.ok(OBJLoader.load instanceof Function, 'should have a .load method');
 
         OBJLoader.requests[teapotURL] = [function(res) {
-            var geom = res[0]
+            var geom = res[0];
             t.equal(typeof geom, 'object', 'should return an object');
 
             t.ok(geom.vertices, 'returned object should have vertices');
