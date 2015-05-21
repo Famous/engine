@@ -87,8 +87,8 @@ function Context(selector, compositor) {
 
     this._initDOM = false;
 
-    this.initCommandCallbacks();
     this._commandCallbacks = [];
+    this.initCommandCallbacks();
 
     this.updateSize();
 }
@@ -249,7 +249,7 @@ Context.prototype.checkInit = function checkInit () {
  *
  * @return {Number} iterator indicating progress through the command queue.
  */
-Context.prototype.receive = function receive(pathArr, path, commands, iterator) {
+Context.prototype.receive = function receive(path, commands, iterator) {
     var localIterator = iterator;
 
     var command = commands[++localIterator];
@@ -534,4 +534,3 @@ function changeViewTransform (context, path, commands, iterator) {
 }
 
 module.exports = Context;
-

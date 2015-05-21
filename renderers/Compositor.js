@@ -59,7 +59,7 @@ function Compositor() {
 Compositor.prototype.onResize = function onResize () {
     this._resized = true;
     for (var selector in this._contexts) {
-        this._contexts[selector].onResize();
+        this._contexts[selector].updateSize();
     }
 };
 
