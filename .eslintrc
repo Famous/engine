@@ -21,7 +21,7 @@
     "no-shadow": 0, //Too much noise from tests, might consider to enable it as a warning later
     "no-undefined": 1,
     "no-unused-vars": [2, {"vars": "all", "args": "none"}],
-    "no-use-before-define": 2,
+    "no-use-before-define": [0, "nofunc"],
     // Stylistic Issues
     "brace-style": [1, "stroustrup"],
     "camelcase": 0, //Too much noise from tests, might consider to enable it as a warning later
