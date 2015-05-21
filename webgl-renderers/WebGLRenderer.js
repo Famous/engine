@@ -24,9 +24,7 @@
 
 'use strict';
 
-var Texture = require('./Texture');
 var Program = require('./Program');
-var Buffer = require('./Buffer');
 var BufferRegistry = require('./BufferRegistry');
 var Plane = require('../webgl-geometries/primitives/Plane');
 var sorter = require('./radixSort');
@@ -182,10 +180,11 @@ WebGLRenderer.prototype.getWebGLContext = function getWebGLContext(canvas) {
 WebGLRenderer.prototype.createLight = function createLight(path) {
     this.numLights++;
     this.lightRegistryKeys.push(path);
-    return this.lightRegistry[path] = {
+    this.lightRegistry[path] = {
         color: [0, 0, 0],
         position: [0, 0, 0]
     };
+    return this.lightRegistry[path];
 };
 
 /**
@@ -210,7 +209,7 @@ WebGLRenderer.prototype.createMesh = function createMesh(path) {
         u_flatShading: 0,
         u_glossiness: [0, 0, 0, 0]
     });
-    return this.meshRegistry[path] = {
+    this.meshRegistry[path] = {
         depth: null,
         uniformKeys: uniforms.keys,
         uniformValues: uniforms.values,
@@ -220,6 +219,7 @@ WebGLRenderer.prototype.createMesh = function createMesh(path) {
         textures: [],
         visible: true
     };
+    return this.meshRegistry[path];
 };
 
 /**
@@ -249,8 +249,6 @@ WebGLRenderer.prototype.setCutoutState = function setCutoutState(path, usesCutou
  * @return {Object} Newly created cutout spec.
  */
 WebGLRenderer.prototype.getOrSetCutout = function getOrSetCutout(path) {
-    var geometry;
-
     if (this.cutoutRegistry[path]) {
         return this.cutoutRegistry[path];
     }
@@ -265,13 +263,15 @@ WebGLRenderer.prototype.getOrSetCutout = function getOrSetCutout(path) {
 
         this.cutoutRegistryKeys.push(path);
 
-        return this.cutoutRegistry[path] = {
+        this.cutoutRegistry[path] = {
             uniformKeys: uniforms.keys,
             uniformValues: uniforms.values,
             geometry: this.cutoutGeometry.spec.id,
             drawType: this.cutoutGeometry.spec.type,
             visible: true
         };
+
+        return this.cutoutRegistry[path];
     }
 };
 
@@ -420,7 +420,7 @@ WebGLRenderer.prototype.setLightColor = function setLightColor(path, r, g, b) {
 **/
 WebGLRenderer.prototype.handleMaterialInput = function handleMaterialInput(path, name, material) {
     var mesh = this.meshRegistry[path] || this.createMesh(path);
-    var material = compileMaterial(material, mesh.textures.length);
+    material = compileMaterial(material, mesh.textures.length);
 
     // Set uniforms to enable texture!
 
@@ -556,7 +556,8 @@ WebGLRenderer.prototype.drawMeshes = function drawMeshes() {
         if (mesh.uniformValues[0] < 1) {
             gl.depthMask(false);
             gl.enable(gl.BLEND);
-        } else {
+        }
+        else {
             gl.depthMask(true);
             gl.disable(gl.BLEND);
         }
@@ -681,9 +682,10 @@ WebGLRenderer.prototype.drawBuffers = function drawBuffers(vertexBuffers, mode, 
     var buffer;
     var iter;
     var j;
+    var i;
 
     iter = vertexBuffers.keys.length;
-    for (var i = 0; i < iter; i++) {
+    for (i = 0; i < iter; i++) {
         attribute = vertexBuffers.keys[i];
 
         // Do not set vertexAttribPointer if index buffer.
@@ -730,7 +732,8 @@ WebGLRenderer.prototype.drawBuffers = function drawBuffers(vertexBuffers, mode, 
 
     // Disable any attributes that not currently being used.
 
-    for(var i = 0, len = this.state.enabledAttributesKeys.length; i < len; i++) {
+    var len = this.state.enabledAttributesKeys.length;
+    for (i = 0; i < len; i++) {
         var key = this.state.enabledAttributesKeys[i];
         if (this.state.enabledAttributes[key] && vertexBuffers.keys.indexOf(key) === -1) {
             gl.disableVertexAttribArray(this.program.attributeLocations[key]);
@@ -800,7 +803,7 @@ function renderOffscreen(callback, size, texture) {
 
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     gl.bindRenderbuffer(gl.RENDERBUFFER, null);
-};
+}
 
 /**
  * Diagnoses the failed intialization of an FBO.
@@ -817,17 +820,17 @@ function checkFrameBufferStatus(gl) {
         case gl.FRAMEBUFFER_COMPLETE:
             break;
         case gl.FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
-            throw("Incomplete framebuffer: FRAMEBUFFER_INCOMPLETE_ATTACHMENT"); break;
+            throw 'Incomplete framebuffer: FRAMEBUFFER_INCOMPLETE_ATTACHMENT';
         case gl.FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
-            throw("Incomplete framebuffer: FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT"); break;
+            throw 'Incomplete framebuffer: FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT';
         case gl.FRAMEBUFFER_INCOMPLETE_DIMENSIONS:
-            throw("Incomplete framebuffer: FRAMEBUFFER_INCOMPLETE_DIMENSIONS"); break;
+            throw 'Incomplete framebuffer: FRAMEBUFFER_INCOMPLETE_DIMENSIONS';
         case gl.FRAMEBUFFER_UNSUPPORTED:
-            throw("Incomplete framebuffer: FRAMEBUFFER_UNSUPPORTED"); break;
+            throw 'Incomplete framebuffer: FRAMEBUFFER_UNSUPPORTED';
         default:
-            throw("Incomplete framebuffer: " + status);
+            throw 'Incomplete framebuffer: ' + status;
     }
-};
+}
 
 /**
  * Updates the width and height of parent canvas, sets the viewport size on

@@ -151,6 +151,6 @@ Texture.prototype.readBack = function readBack(x, y, width, height) {
 function isPowerOfTwo(width, height) {
     return (width & width - 1) === 0
         && (height & height - 1) === 0;
-};
+}
 
 module.exports = Texture;

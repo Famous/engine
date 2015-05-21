@@ -161,8 +161,14 @@ function loadImage (input, callback) {
         image.crossOrigin = 'anonymous';
 
     if (!image.src) image.src = input;
-    if (!image.complete) image.onload = function () { callback(image); };
-    else callback(image);
+    if (!image.complete) {
+        image.onload = function () {
+            callback(image);
+        };
+    }
+    else {
+        callback(image);
+    }
 
     return image;
 }
