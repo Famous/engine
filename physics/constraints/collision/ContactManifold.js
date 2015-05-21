@@ -37,12 +37,12 @@ var OMFreeContact = ObjectManager.freeContact;
 /**
  * Helper function to clamp a value to a given range.
  *
- * @method clamp
- * @param {Number} value
- * @param {Number} lower
- * @param {Number} upper
- * @return {Number}
+ * @method
  * @private
+ * @param {Number} value The value to clamp.
+ * @param {Number} lower The lower limit.
+ * @param {Number} upper The upper limit
+ * @return {Number} The clamped value.
  */
 function clamp(value, lower, upper) {
     return value < lower ? lower : value > upper ? upper : value;
@@ -79,12 +79,12 @@ function ContactManifoldTable() {
  * Create a new contact manifold. Tracked by the collisionMatrix according to
  * its low-high ordered ID pair.
  *
- * @method addManifold
- * @param {Number} lowId
- * @param {Number} highID
- * @param {Particle} bodyA
- * @param {Particle} bodyB
- * @return {ContactManifold}
+ * @method
+ * @param {Number} lowID The lower id of the pair of bodies.
+ * @param {Number} highID The higher id of the pair of bodies.
+ * @param {Particle} bodyA The first body.
+ * @param {Particle} bodyB The second body.
+ * @return {ContactManifold} The new manifold.
  */
 ContactManifoldTable.prototype.addManifold = function addManifold(lowID, highID, bodyA, bodyB) {
     var collisionMatrix = this.collisionMatrix;
@@ -101,9 +101,10 @@ ContactManifoldTable.prototype.addManifold = function addManifold(lowID, highID,
 /**
  * Remove a manifold and free it for later reuse.
  *
- * @method removeManifold
- * @param {ContactManifold} manifold
- * @param {Number} index
+ * @method
+ * @param {ContactManifold} manifold The manifold to remove.
+ * @param {Number} index The index of the manifold.
+ * @return {undefined} undefined
  */
 ContactManifoldTable.prototype.removeManifold = function removeManifold(manifold, index) {
     var collisionMatrix = this.collisionMatrix;
@@ -118,8 +119,9 @@ ContactManifoldTable.prototype.removeManifold = function removeManifold(manifold
 /**
  * Update each of the manifolds, removing those that no longer contain contact points.
  *
- * @method update
- * @param {Number} dt
+ * @method
+ * @param {Number} dt Delta time.
+ * @return {undefined} undefined
  */
 ContactManifoldTable.prototype.update = function update(dt) {
     var manifolds = this.manifolds;
@@ -138,8 +140,9 @@ ContactManifoldTable.prototype.update = function update(dt) {
 /**
  * Warm start all Contacts, and perform precalculations needed in the iterative solver.
  *
- * @method prepContacts
- * @param {Number} dt
+ * @method
+ * @param {Number} dt Delta time.
+ * @return {undefined} undefined
  */
 ContactManifoldTable.prototype.prepContacts = function prepContacts(dt) {
     var manifolds = this.manifolds;
@@ -158,7 +161,8 @@ ContactManifoldTable.prototype.prepContacts = function prepContacts(dt) {
 /**
  * Resolve all contact manifolds.
  *
- * @method resolveManifolds
+ * @method
+ * @return {undefined} undefined
  */
 ContactManifoldTable.prototype.resolveManifolds = function resolveManifolds() {
     var manifolds = this.manifolds;
@@ -172,10 +176,11 @@ ContactManifoldTable.prototype.resolveManifolds = function resolveManifolds() {
 /**
  * Create a new Contact, also creating a new Manifold if one does not already exist for that pair.
  *
- * @method registerContact
- * @param {Body} bodyA
- * @param {Body} bodyB
- * @param {CollisionData} collisionData
+ * @method
+ * @param {Body} bodyA The first body.
+ * @param {Body} bodyB The second body.
+ * @param {CollisionData} collisionData The data for the collision.
+ * @return {undefined} undefined
  */
 ContactManifoldTable.prototype.registerContact = function registerContact(bodyA, bodyB, collisionData) {
     var lowID;
@@ -209,10 +214,10 @@ var THRESHOLD = 10;
 /**
  * Class to keep track of Contact points.
  * @class manifold
- * @param {Number} lowId
- * @param {Number} highId
- * @param {Body} bodyA
- * @param {Body} bodyB
+ * @param {Number} lowID The lower id of the pair of bodies.
+ * @param {Number} highID The higher id of the pair of bodies.
+ * @param {Particle} bodyA The first body.
+ * @param {Particle} bodyB The second body.
  */
 function Manifold(lowID, highID, bodyA, bodyB) {
     this.lowID = lowID;
@@ -230,9 +235,12 @@ function Manifold(lowID, highID, bodyA, bodyB) {
 /**
  * Used by ObjectManager to reset the object with different data.
  *
- * @method reset
- * @param {Object[]} args
- * @chainable
+ * @method
+ * @param {Number} lowID The lower id of the pair of bodies.
+ * @param {Number} highID The higher id of the pair of bodies.
+ * @param {Particle} bodyA The first body.
+ * @param {Particle} bodyB The second body.
+ * @return {Manifold} this
  */
 Manifold.prototype.reset = function reset(lowID, highID, bodyA, bodyB) {
     this.lowID = lowID;
@@ -252,10 +260,11 @@ Manifold.prototype.reset = function reset(lowID, highID, bodyA, bodyB) {
 /**
  * Create a new Contact point and add it to the Manifold.
  *
- * @method addContact
- * @param {Body} bodyA
- * @param {Body} bodyB
- * @param {CollisionData} collisionData
+ * @method
+ * @param {Body} bodyA The first body.
+ * @param {Body} bodyB The second body.
+ * @param {CollisionData} collisionData The data for the collision.
+ * @return {undefined} undefined
  */
 Manifold.prototype.addContact = function addContact(bodyA, bodyB, collisionData) {
     var index = this.lru;
@@ -268,9 +277,10 @@ Manifold.prototype.addContact = function addContact(bodyA, bodyB, collisionData)
 /**
  * Remove and free a Contact for later reuse.
  *
- * @method removeContact
- * @param {Contact} contact
- * @param {Number} index
+ * @method
+ * @param {Contact} contact The Contact to remove.
+ * @param {Number} index The index of the Contact.
+ * @return {undefined} undefined
  */
 Manifold.prototype.removeContact = function removeContact(contact, index) {
     this.contacts[index] = null;
@@ -285,9 +295,9 @@ Manifold.prototype.removeContact = function removeContact(contact, index) {
  * Check if a Contact already exists for the collision data within a certain tolerance.
  * If found, remove the Contact.
  *
- * @method contains
- * @param {CollisionData} collisionData
- * @return {Boolean}
+ * @method
+ * @param {CollisionData} collisionData The data for the collision.
+ * @return {Boolean} The containment check.
  */
 Manifold.prototype.contains = function contains(collisionData) {
     var wA = collisionData.worldContactA;
@@ -314,8 +324,8 @@ Manifold.prototype.contains = function contains(collisionData) {
  * Remove Contacts the local points of which have drifted above a certain tolerance.
  * Return true or false to indicate that the Manifold still contains at least one Contact.
  *
- * @method update
- * @return {Boolean} whether or not the manifold persists
+ * @method
+ * @return {Boolean} Whether or not the manifold persists.
  */
 Manifold.prototype.update = function update() {
     var contacts = this.contacts;
@@ -357,7 +367,8 @@ Manifold.prototype.update = function update() {
 /**
  * Resolve all contacts.
  *
- * @method resolveContacts
+ * @method
+ * @return {undefined} undefined
  */
 Manifold.prototype.resolveContacts = function resolveContacts() {
     var contacts = this.contacts;
@@ -372,9 +383,9 @@ Manifold.prototype.resolveContacts = function resolveContacts() {
  * The end of the resolve chain, and where the actual impulses are applied.
  *
  * @class Contact
- * @param {Body} bodyA
- * @param {Body} bodyB
- * @param {CollisionData} collisionData
+ * @param {Body} bodyA The first body.
+ * @param {Body} bodyB The second body.
+ * @param {CollisionData} collisionData The data for the collision.
  */
 function Contact(bodyA, bodyB, collisionData) {
     this.bodyA = bodyA;
@@ -395,9 +406,11 @@ function Contact(bodyA, bodyB, collisionData) {
 /**
  * Used by ObjectManager to reset the object with different data.
  *
- * @method reset
- * @param {Object[]} args
- * @chainable
+ * @method
+ * @param {Body} bodyA The first body.
+ * @param {Body} bodyB The second body.
+ * @param {CollisionData} collisionData The data for the collision.
+ * @return {Contact} this
  */
 Contact.prototype.reset = function reset(bodyA, bodyB, collisionData) {
     this.bodyA = bodyA;
@@ -421,7 +434,8 @@ Contact.prototype.reset = function reset(bodyA, bodyB, collisionData) {
  * Initialization method called on instantiantion or reset of the Contact. Performs
  * precalculations that will not change over the life of the Contact.
  *
- * @method init
+ * @method
+ * @return {undefined} undefined
  */
 Contact.prototype.init = function init() {
     var data = this.data;
@@ -471,8 +485,9 @@ Contact.prototype.init = function init() {
 /**
  * Warm start the Contact, prepare for the iterative solver, and reset impulses.
  *
- * @method update
- * @param {Number} dt
+ * @method
+ * @param {Number} dt Delta time.
+ * @return {undefined} undefined
  */
 Contact.prototype.update = function update(dt) {
     var data = this.data;
@@ -519,7 +534,8 @@ Contact.prototype.update = function update(dt) {
 /**
  * Apply impulses to resolve the contact and simulate friction.
  *
- * @method resolve
+ * @method
+ * @return {undefined} undefined
  */
 Contact.prototype.resolve = function resolve() {
     var data = this.data;

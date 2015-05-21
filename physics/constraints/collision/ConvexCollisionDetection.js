@@ -1,18 +1,18 @@
 /**
  * The MIT License (MIT)
- * 
+ *
  * Copyright (c) 2015 Famous Industries Inc.
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -47,9 +47,9 @@ var INVDIRECTION_REGISTER = new Vec3();
  * original pair.
  *
  * @class GJK_EPASupportPoint
- * @param {Vec3} vertex
- * @param {Vec3} worldVertexA
- * @param {Vec3} worldVertexAB
+ * @param {Vec3} vertex The point in Minkowski space.
+ * @param {Vec3} worldVertexA The one vertex.
+ * @param {Vec3} worldVertexB The other vertex.
  */
 function GJK_EPASupportPoint(vertex, worldVertexA, worldVertexB) {
     this.vertex = vertex;
@@ -60,9 +60,11 @@ function GJK_EPASupportPoint(vertex, worldVertexA, worldVertexB) {
 /**
  * Used by ObjectManager to reset the object with different data.
  *
- * @method reset
- * @param {Object[]} args
- * @chainable
+ * @method
+ * @param {Vec3} vertex The point in Minkowski space.
+ * @param {Vec3} worldVertexA The one vertex.
+ * @param {Vec3} worldVertexB The other vertex.
+ * @return {GJK_EPASupportPoint} this
  */
 GJK_EPASupportPoint.prototype.reset = function reset(vertex, worldVertexA, worldVertexB) {
     this.vertex = vertex;
@@ -75,8 +77,9 @@ GJK_EPASupportPoint.prototype.reset = function reset(vertex, worldVertexA, world
 /**
  * Free the DynamicGeomtetry and associate vertices and features for later reuse.
  *
- * @method freeGJK_EPADynamicGeometry
- * @param {DynamicGeometry} geometry
+ * @method
+ * @param {DynamicGeometry} geometry The geometry to release to the pool.
+ * @return {undefined} undefined
  */
 function freeGJK_EPADynamicGeometry(geometry) {
     var vertices = geometry.vertices;
@@ -100,11 +103,11 @@ function freeGJK_EPADynamicGeometry(geometry) {
 /**
  * Find the point in Minkowski space furthest in a given direction for two convex Bodies.
  *
- * @method minkowskiSupport
- * @param {Body} body1
- * @param {Body} body2
- * @param {Vec3} direction
- * @return {GJK_EPASupportPoint}
+ * @method
+ * @param {Particle} body1 The one body.
+ * @param {Particle} body2 The other body.
+ * @param {Vec3} direction The search direction.
+ * @return {GJK_EPASupportPoint} The result.
  */
 function minkowskiSupport(body1, body2, direction) {
     var inverseDirection = Vec3.scale(direction, -1, INVDIRECTION_REGISTER);
@@ -118,12 +121,12 @@ function minkowskiSupport(body1, body2, direction) {
 
 /**
  * Gilbert-Johnson-Keerthi collision detection. Returns a DynamicGeometry simplex if the bodies are found
- * to have collided or false for no collsion.
+ * to have collided, or false for no collsion.
  *
- * @method GJK
- * param {Body} body1
- * param {Body} body2
- * @return {DynamicGeometry | Boolean}
+ * @method
+ * @param {Particle} body1 The one body.
+ * @param {Particle} body2 The other body.
+ * @return {DynamicGeometry|Boolean} Result of the GJK query.
  */
 function GJK(body1, body2) {
     var support = minkowskiSupport;
@@ -150,11 +153,11 @@ function GJK(body1, body2) {
  * Expanding Polytope Algorithm--penetration depth, collision normal, and contact points.
  * Returns a CollisonData object.
  *
- * @method EPA
- * @param {Body} body1
- * @param {Body} body2
- * @param {DynamicGeometry} polytope
- * @return {CollisionData}
+ * @method
+ * @param {Body} body1 The one body.
+ * @param {Body} body2 The other body.
+ * @param {DynamicGeometry} polytope The seed simplex from GJK.
+ * @return {CollisionData} The collision data.
  */
 function EPA(body1, body2, polytope) {
     var support = minkowskiSupport;

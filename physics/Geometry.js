@@ -1,18 +1,18 @@
 /**
  * The MIT License (MIT)
- * 
+ *
  * Copyright (c) 2015 Famous Industries Inc.
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -39,7 +39,7 @@ var TRIPLE_REGISTER = new Vec3();
  * The so called triple product. Used to find a vector perpendicular to (v2 - v1) in the direction of v3.
  * (v1 x v2) x v3.
  *
- * @method tripleProduct
+ * @method
  * @private
  * @param {Vec3} v1 The first Vec3.
  * @param {Vec3} v2 The second Vec3.
@@ -58,7 +58,7 @@ function tripleProduct(v1, v2, v3) {
 /**
  * Of a set of vertices, retrieves the vertex furthest in the given direction.
  *
- * @method _hullSupport
+ * @method
  * @private
  * @param {Vec3[]} vertices The reference set of Vec3's.
  * @param {Vec3} direction The direction to compare against.
@@ -112,9 +112,11 @@ function DynamicGeometryFeature(distance, normal, vertexIndices) {
 /**
  * Used by ObjectManager to reset objects.
  *
- * @method reset
- * @param {Array} args Argument array analogous to that used in instantiation.
- * @chainable
+ * @method
+ * @param {Number} distance Distance from the origin.
+ * @param {Vec3} normal Vec3 normal to the feature.
+ * @param {Number[]} vertexIndices Indices of the vertices which compose the feature.
+ * @return {DynamicGeometryFeature} this
  */
 DynamicGeometryFeature.prototype.reset = function(distance, normal, vertexIndices) {
     this.distance = distance;
@@ -145,9 +147,8 @@ function DynamicGeometry() {
 /**
  * Used by ObjectManager to reset objects.
  *
- * @method reset
- * @param {Array} args Argument array analogous to that used in instantiation.
- * @chainable
+ * @method
+ * @return {DynamicGeometry} this
  */
 DynamicGeometry.prototype.reset = function reset() {
     this.vertices = [];
@@ -167,8 +168,9 @@ DynamicGeometry.prototype.reset = function reset() {
 /**
  * Add a vertex to the polyhedron.
  *
- * @method addVertex
+ * @method
  * @param {Object} vertexObj Object returned by the support function.
+ * @return {undefined} undefined
  */
 DynamicGeometry.prototype.addVertex = function(vertexObj) {
     var index = this._IDPool.vertices.length ? this._IDPool.vertices.pop() : this.vertices.length;
@@ -180,8 +182,9 @@ DynamicGeometry.prototype.addVertex = function(vertexObj) {
 /**
  * Remove a vertex and push its location in the vertex array to the IDPool for later use.
  *
- * @method removeVertex
+ * @method
  * @param {Number} index Index of the vertex to remove.
+ * @return {Object} vertex The vertex object.
  */
 DynamicGeometry.prototype.removeVertex = function(index) {
     var vertex = this.vertices[index];
@@ -195,10 +198,11 @@ DynamicGeometry.prototype.removeVertex = function(index) {
 /**
  * Add a feature (facet) to the polyhedron. Used internally in the reshaping process.
  *
- * @method addFeature
+ * @method
  * @param {Number} distance The distance of the feature from the origin.
  * @param {Vec3} normal The facet normal.
  * @param {Number[]} vertexIndices The indices of the vertices which compose the feature.
+ * @return {undefined} undefined
  */
 DynamicGeometry.prototype.addFeature = function(distance, normal, vertexIndices) {
     var index = this._IDPool.features.length ? this._IDPool.features.pop() : this.features.length;
@@ -209,8 +213,9 @@ DynamicGeometry.prototype.addFeature = function(distance, normal, vertexIndices)
 /**
  * Remove a feature and push its location in the feature array to the IDPool for later use.
  *
- * @method removeFeature
+ * @method
  * @param {Number} index Index of the feature to remove.
+ * @return {undefined} undefined
  */
 DynamicGeometry.prototype.removeFeature = function(index) {
     var feature = this.features[index];
@@ -224,18 +229,18 @@ DynamicGeometry.prototype.removeFeature = function(index) {
 /**
  * Retrieve the last vertex object added to the geometry.
  *
- * @method getLastVertex
- * @return {Object}
+ * @method
+ * @return {Object} The last vertex added.
  */
 DynamicGeometry.prototype.getLastVertex = function() {
     return this.vertices[this.lastVertexIndex];
 };
 
 /**
- * Of the closest face to the origin, returns the normal vector pointed away from the origin.
+ * Return the feature closest to the origin.
  *
- * @method getFeatureClosestToOrigin
- * @return {Object}
+ * @method
+ * @return {DynamicGeometryFeature} The closest feature.
  */
 DynamicGeometry.prototype.getFeatureClosestToOrigin = function() {
     var min = Infinity;
@@ -256,12 +261,13 @@ DynamicGeometry.prototype.getFeatureClosestToOrigin = function() {
  * Adds edge if not already on the frontier, removes if the edge or its reverse are on the frontier.
  * Used when reshaping DynamicGeometry's.
  *
- * @method _validateEdge
+ * @method
  * @private
  * @param {Object[]} vertices Vec3 reference array.
- * @param {Number[][]} frontier Current edges potentially separating the features to remove from the persistant shape.
+ * @param {Array.<Number[]>} frontier Current edges potentially separating the features to remove from the persistant shape.
  * @param {Number} start The index of the starting Vec3 on the edge.
  * @param {Number} end The index of the culminating Vec3.
+ * @return {undefined} undefined
  */
 function _validateEdge(vertices, frontier, start, end) {
     var e0 = vertices[start].vertex;
@@ -284,8 +290,9 @@ function _validateEdge(vertices, frontier, start, end) {
  * its (convex) shape to include the new point by adding triangle features. Uses referencePoint, a point on the shape's
  * interior, to ensure feature normals point outward, else takes referencePoint to be the origin.
  *
- * @method reshape
+ * @method
  * @param {Vec3} referencePoint Point known to be in the interior, used to orient feature normals.
+ * @return {undefined} undefined
  */
 DynamicGeometry.prototype.reshape = function(referencePoint) {
     var vertices = this.vertices;
@@ -349,7 +356,7 @@ DynamicGeometry.prototype.reshape = function(referencePoint) {
  * orthogonal to the current working simplex and point toward the origin.
  * Calls callback on the removed point.
  *
- * @method simplexContainsOrigin
+ * @method
  * @param {Vec3} direction Vector used to store the new search direction.
  * @param {Function} callback Function invoked with the removed vertex, used e.g. to free the vertex object
  * in the object manager.
@@ -448,9 +455,8 @@ DynamicGeometry.prototype.simplexContainsOrigin = function(direction, callback) 
  * create custom GL meshes.
  *
  * @class ConvexHull
- * @constructor
  * @param {Vec3[]} vertices Cloud of vertices of which the enclosing convex hull is desired.
- * @param {Number} [iterations = 1e3] Maximum number of vertices to compose the convex hull.
+ * @param {Number} iterations Maximum number of vertices to compose the convex hull.
  */
 function ConvexHull(vertices, iterations) {
     iterations = iterations || 1e3;
@@ -528,7 +534,7 @@ function ConvexHull(vertices, iterations) {
 /**
  * Performs the actual computation of the convex hull.
  *
- * @method _computeConvexHull
+ * @method
  * @private
  * @param {Vec3[]} vertices Cloud of vertices of which the enclosing convex hull is desired.
  * @param {Number} maxIterations Maximum number of vertices to compose the convex hull.
@@ -661,13 +667,14 @@ function _computeConvexHull(vertices, maxIterations) {
  * Helper function used in _computePolyhedralProperties.
  * Sets f0 - f2 and g0 - g2 depending on w0 - w2.
  *
- * @method _subexpressions
+ * @method
  * @private
  * @param {Number} w0 Reference x coordinate.
  * @param {Number} w1 Reference y coordinate.
  * @param {Number} w2 Reference z coordinate.
  * @param {Number[]} f One of two output registers to contain the result of the calculation.
  * @param {Number[]} g One of two output registers to contain the result of the calculation.
+ * @return {undefined} undefined
  */
 function _subexpressions(w0, w1, w2, f, g) {
     var t0 = w0 + w1;
@@ -684,10 +691,10 @@ function _subexpressions(w0, w1, w2, f, g) {
 /**
  * Determines various properties of the volume.
  *
- * @method _computePolyhedralProperties
+ * @method
  * @private
  * @param {Vec3[]} vertices The vertices of the polyhedron.
- * @param {Number[][]} indices Array of arrays of indices of vertices composing the triangular features of the polyhedron,
+ * @param {Array.<Number[]>} indices Array of arrays of indices of vertices composing the triangular features of the polyhedron,
  * one array for each feature.
  * @return {Object} Object holding the calculated span, volume, center, and euler tensor.
  */

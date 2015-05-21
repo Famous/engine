@@ -1,18 +1,18 @@
 /**
  * The MIT License (MIT)
- * 
+ *
  * Copyright (c) 2015 Famous Industries Inc.
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -49,8 +49,9 @@ function Force(targets, options) {
 /**
  * Decorates the Force with the options object.
  *
- * @method setOptions
+ * @method
  * @param {Object} options The options hash.
+ * @return {undefined} undefined
  */
 Force.prototype.setOptions = function setOptions(options) {
     for (var key in options) this[key] = options[key];
@@ -60,8 +61,9 @@ Force.prototype.setOptions = function setOptions(options) {
 /**
  * Add a target or targets to the Force.
  *
- * @method addTarget
+ * @method
  * @param {Particle} target The body to begin targetting.
+ * @return {undefined} undefined
  */
 Force.prototype.addTarget = function addTarget(target) {
     this.targets.push(target);
@@ -70,8 +72,9 @@ Force.prototype.addTarget = function addTarget(target) {
 /**
  * Remove a target or targets from the Force.
  *
- * @method addTarget
+ * @method
  * @param {Particle} target The body to stop targetting.
+ * @return {undefined} undefined
  */
 Force.prototype.removeTarget = function removeTarget(target) {
     var index = this.targets.indexOf(target);
@@ -82,17 +85,19 @@ Force.prototype.removeTarget = function removeTarget(target) {
 /**
  * Method invoked upon instantiation and the setting of options.
  *
- * @method init
+ * @method
  * @param {Object} options The options hash.
+ * @return {undefined} undefined
  */
 Force.prototype.init = function init(options) {};
 
 /**
  * Apply forces on each target.
  *
- * @method update
+ * @method
  * @param {Number} time The current time in the physics engine.
  * @param {Number} dt The physics engine frame delta.
+ * @return {undefined} undefined
  */
 Force.prototype.update = function update(time, dt) {};
 

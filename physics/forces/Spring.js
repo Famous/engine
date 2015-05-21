@@ -1,18 +1,18 @@
 /**
  * The MIT License (MIT)
- * 
+ *
  * Copyright (c) 2015 Famous Industries Inc.
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -34,9 +34,11 @@ var DAMPING_REGISTER = new Vec3();
  * A force that accelerates a Particle towards a specific anchor point. Can be anchored to
  * a Vec3 or another source Particle.
  *
- *  @class Spring
- *  @extends Force
- *  @param {Object} options options to set on drag
+ * @class Spring
+ * @extends Force
+ * @param {Particle} source The optional source of the spring.
+ * @param {Particle[]} targets The targets to affect.
+ * @param {Object} options The options hash.
  */
 function Spring(source, targets, options) {
     this.source = source || null;
@@ -50,12 +52,11 @@ Spring.prototype.constructor = Spring;
 var PI = Math.PI;
 
 /**
- * A FENE (Finitely Extensible Nonlinear Elastic) spring force
- *      see: http://en.wikipedia.org/wiki/FENE
- * @attribute FENE
- * @type Function
- * @param {Number} dist current distance target is from source body
- * @param {Number} rMax maximum range of influence
+ * A FENE (Finitely Extensible Nonlinear Elastic) spring force. See: http://en.wikipedia.org/wiki/FENE
+ *
+ * @property {Function} FENE
+ * @param {Number} dist Current distance from source body.
+ * @param {Number} rMax Maximum range of influence.
  * @return {Number} unscaled force
  */
 Spring.FENE = function(dist, rMax) {
@@ -67,9 +68,8 @@ Spring.FENE = function(dist, rMax) {
 /**
  * A Hookean spring force, linear in the displacement
  *      see: http://en.wikipedia.org/wiki/Hooke's_law
- * @attribute HOOKE
- * @type Function
- * @param {Number} dist current distance target is from source body
+ * @property {Function} HOOKE
+ * @param {Number} dist Current distance from source body/
  * @return {Number} unscaled force
  */
 Spring.HOOKE = function(dist) {
@@ -79,8 +79,9 @@ Spring.HOOKE = function(dist) {
 /**
  * Initialize the Force. Sets defaults if a property was not already set.
  *
- * @method init
+ * @method
  * @param {Object} options The options hash.
+ * @return {undefined} undefined
  */
 Spring.prototype.init = function(options) {
     this.max = this.max || Infinity;
@@ -106,7 +107,8 @@ Spring.prototype.init = function(options) {
 /**
  * Apply the force.
  *
- * @method update
+ * @method
+ * @return {undefined} undefined
  */
 Spring.prototype.update = function() {
     var source = this.source;

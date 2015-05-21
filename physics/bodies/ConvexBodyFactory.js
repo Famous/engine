@@ -1,18 +1,18 @@
 /**
  * The MIT License (MIT)
- * 
+ *
  * Copyright (c) 2015 Famous Industries Inc.
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -35,9 +35,9 @@ var TEMP_REGISTER = new Vec3();
 /**
  * Returns a constructor for a physical body reflecting the shape defined by input ConvexHull or Vec3 array.
  *
- * @method ConvexBodyFactory
- * @param {ConvexHull | Vec3[]} hull
- * @return {Function} The constructor.
+ * @method
+ * @param {ConvexHull | Vec3[]} hull ConvexHull instance or Vec3 array.
+ * @return {Function} The constructor for the custom convex body type.
  */
 function ConvexBodyFactory(hull) {
     if (!(hull instanceof ConvexHull)) {
@@ -86,11 +86,12 @@ function ConvexBodyFactory(hull) {
     /**
      * Set the size and recalculate
      *
-     * @method setSize
+     * @method
      * @chainable
      * @param {Number} x The x span.
      * @param {Number} y The y span.
      * @param {Number} z The z span.
+     * @return {ConvexBody} this
      */
     ConvexBody.prototype.setSize = function setSize(x,y,z) {
         var originalSize = hull.polyhedralProperties.size;
@@ -118,8 +119,8 @@ function ConvexBodyFactory(hull) {
     /**
      * Update the local inertia and inverse inertia to reflect the current size.
      *
-     * @method updateLocalInertia
-     * @chainable
+     * @method
+     * @return {ConvexBody} this
      */
     ConvexBody.prototype.updateLocalInertia = function updateInertia() {
         var scaleX = this._scale[0];
@@ -136,7 +137,8 @@ function ConvexBodyFactory(hull) {
     /**
      * Retrieve the vertex furthest in a direction. Used internally for collision detection.
      *
-     * @method support
+     * @method
+     * @param {Vec3} direction The direction in which to search.
      * @return {Vec3} The furthest vertex.
      */
     ConvexBody.prototype.support = function support(direction) {
@@ -157,8 +159,8 @@ function ConvexBodyFactory(hull) {
     /**
      * Update vertices to reflect current orientation.
      *
-     * @method updateShape
-     * @chainable
+     * @method
+     * @return {ConvexBody} this
      */
     ConvexBody.prototype.updateShape = function updateShape() {
         var vertices = this.vertices;
@@ -187,9 +189,10 @@ function ConvexBodyFactory(hull) {
 /**
  * Determines mass and inertia tensor based off the density, size, and facet information of the polyhedron.
  *
- * @method _computeInertiaProperties
+ * @method
  * @private
  * @param {Mat33} T The matrix transforming the intial set of vertices to a set reflecting the body size.
+ * @return {undefined} undefined
  */
 function _computeInertiaProperties(T) {
     var polyhedralProperties = this.hull.polyhedralProperties;

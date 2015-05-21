@@ -36,13 +36,13 @@ var VB2_REGISTER = new Vec3();
 var WxR_REGISTER = new Vec3();
 
 /**
- *  A constraint that maintains positions and orientations with respect to a specific anchor point.
+ * A constraint that maintains positions and orientations with respect to a specific anchor point.
  *
- *  @class BallAndSocket
- *  @extends Constraint
- *  @param {Particle} a One of the bodies.
- *  @param {Particle} b The other body.
- *  @param {Options} options An object of configurable options.
+ * @class BallAndSocket
+ * @extends Constraint
+ * @param {Particle} a One of the bodies.
+ * @param {Particle} b The other body.
+ * @param {Options} options An object of configurable options.
  */
 function BallAndSocket(a, b, options) {
     this.a = a;
@@ -63,7 +63,8 @@ BallAndSocket.prototype.constructor = BallAndSocket;
 /**
  * Initialize the BallAndSocket. Sets defaults if a property was not already set.
  *
- * @method init
+ * @method
+ * @return {undefined} undefined
  */
 BallAndSocket.prototype.init = function() {
     var w = this.anchor;
@@ -84,9 +85,10 @@ BallAndSocket.prototype.init = function() {
 /**
  * Detect violations of the constraint. Warm start the constraint, if possible.
  *
- * @method update
+ * @method
  * @param {Number} time The current time in the physics engine.
  * @param {Number} dt The physics engine frame delta.
+ * @return {undefined} undefined
  */
 BallAndSocket.prototype.update = function(time, dt) {
     var a = this.a;
@@ -135,7 +137,8 @@ BallAndSocket.prototype.update = function(time, dt) {
 /**
  * Apply impulses to resolve the constraint.
  *
- * @method resolve
+ * @method
+ * @return {undefined} undefined
  */
 BallAndSocket.prototype.resolve = function resolve() {
     var a = this.a;
