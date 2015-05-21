@@ -38,14 +38,15 @@ test('OBJLoader', function(t) {
         t.ok(OBJLoader.load instanceof Function, 'should have a .load method');
 
         OBJLoader.requests[teapotURL] = [function(res) {
-            t.equal(typeof res, 'object', 'should return an object');
+            var geom = res[0]
+            t.equal(typeof geom, 'object', 'should return an object');
 
-            t.ok(res.vertices, 'returned object should have vertices');
-            t.ok(res.textureCoords, 'returned object should have textureCoords');
-            t.ok(res.indices, 'returned object should have indices');
-            t.ok(res.normals, 'returned object should have normals');
+            t.ok(geom.vertices, 'returned object should have vertices');
+            t.ok(geom.textureCoords, 'returned object should have textureCoords');
+            t.ok(geom.indices, 'returned object should have indices');
+            t.ok(geom.normals, 'returned object should have normals');
 
-            normalized = isNormalized(res.vertices);
+            normalized = isNormalized(geom.vertices);
 
             t.ok(!normalized, 'vertices should not be normalized by default');
 
@@ -63,7 +64,7 @@ test('OBJLoader', function(t) {
         //
 
         OBJLoader.requests[teapotURL] = [function(res) {
-            normalized = isNormalized(res.vertices);
+            normalized = isNormalized(res[0].vertices);
 
             t.ok(normalized, 'Vertices should be normalized optionally');
         }];
