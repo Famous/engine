@@ -1,18 +1,18 @@
 /**
  * The MIT License (MIT)
- * 
+ *
  * Copyright (c) 2015 Famous Industries Inc.
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -28,7 +28,7 @@ var Texture = require('./Texture');
 var Program = require('./Program');
 var Buffer = require('./Buffer');
 var BufferRegistry = require('./BufferRegistry');
-var Plane = require('../webgl-geometries').Plane;
+var Plane = require('../webgl-geometries/primitives/Plane');
 var sorter = require('./radixSort');
 var keyValueToArrays = require('../utilities/keyValueToArrays');
 var TextureManager = require('./TextureManager');
@@ -37,19 +37,19 @@ var compileMaterial = require('./compileMaterial');
 var identity = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
 
 var globalUniforms = keyValueToArrays({
-    'u_NumLights': 0,
-    'u_AmbientLight': new Array(3),
-    'u_LightPosition': new Array(3),
-    'u_LightColor': new Array(3),
-    'perspective': new Array(16),
-    'time': 0,
-    'view': new Array(16)
+    'u_numLights': 0,
+    'u_ambientLight': new Array(3),
+    'u_lightPosition': new Array(3),
+    'u_lightColor': new Array(3),
+    'u_perspective': new Array(16),
+    'u_time': 0,
+    'u_view': new Array(16)
 });
 
 /**
  * WebGLRenderer is a private class that manages all interactions with the WebGL
- * API.  Each frame it receives commands from the compositor and updates its
- * registries accordingly.  Subsequently, the draw function is called and the
+ * API. Each frame it receives commands from the compositor and updates its
+ * registries accordingly. Subsequently, the draw function is called and the
  * WebGLRenderer issues draw calls for all meshes in its registry.
  *
  * @class WebGLRenderer
@@ -58,12 +58,14 @@ var globalUniforms = keyValueToArrays({
  * @param {Element} canvas          The DOM element that GL will paint itself
  *                                  onto.
  * @param {Compositor} compositor   Compositor used for querying the time from.
- *
+ * @return {undefined} undefined
  */
 function WebGLRenderer(canvas, compositor) {
+    canvas.classList.add('famous-webgl-renderer');
+
     this.canvas = canvas;
     this.compositor = compositor;
-    
+
     for (var key in this.constructor.DEFAULT_STYLES) {
         this.canvas.style[key] = this.constructor.DEFAULT_STYLES[key];
     }
@@ -84,7 +86,7 @@ function WebGLRenderer(canvas, compositor) {
     this.meshRegistryKeys = [];
 
     this.cutoutRegistry = {};
-    
+
     this.cutoutRegistryKeys = [];
 
     /**
@@ -110,7 +112,7 @@ function WebGLRenderer(canvas, compositor) {
         enabledAttributesKeys: []
     };
 
-    this.resolutionName = ['resolution'];
+    this.resolutionName = ['u_resolution'];
     this.resolutionValues = [];
 
     this.cachedSize = [];
@@ -128,25 +130,26 @@ function WebGLRenderer(canvas, compositor) {
     The final component (this.projectionTransform[15]) is initialized as 1 because certain projection models,
     e.g. the WC3 specified model, keep the XY plane as the projection hyperplane.
     */
-    
     this.projectionTransform = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, -0.000001, 0, -1, 1, 0, 1];
 
+    // TODO: remove this hack
+
     var cutout = this.cutoutGeometry = new Plane();
-    this.bufferRegistry.allocate(cutout.id, 'pos', cutout.spec.bufferValues[0], 3);
-    this.bufferRegistry.allocate(cutout.id, 'texCoord', cutout.spec.bufferValues[1], 2);
-    this.bufferRegistry.allocate(cutout.id, 'normals', cutout.spec.bufferValues[2], 3);
-    this.bufferRegistry.allocate(cutout.id, 'indices', cutout.spec.bufferValues[3], 1);
+
+    this.bufferRegistry.allocate(cutout.spec.id, 'a_pos', cutout.spec.bufferValues[0], 3);
+    this.bufferRegistry.allocate(cutout.spec.id, 'a_texCoord', cutout.spec.bufferValues[1], 2);
+    this.bufferRegistry.allocate(cutout.spec.id, 'a_normals', cutout.spec.bufferValues[2], 3);
+    this.bufferRegistry.allocate(cutout.spec.id, 'indices', cutout.spec.bufferValues[3], 1);
 }
 
 /**
  * Attempts to retreive the WebGLRenderer context using several
- * accessors.  For browser compatability.  Throws on error.
+ * accessors. For browser compatability. Throws on error.
  *
- * @method getWebGLContext
+ * @method
  *
- * @param {Object} canvas Canvas element from which the context is retreived.
- *
- * @return {Object} WebGLContext of canvas element.
+ * @param {Object}  canvas  Canvas element from which the context is retreived.
+ * @return {Object}         WebGLContext of canvas element.
  */
 WebGLRenderer.prototype.getWebGLContext = function getWebGLContext(canvas) {
     var names = ['webgl', 'experimental-webgl', 'webkit-3d', 'moz-webgl'];
@@ -169,11 +172,9 @@ WebGLRenderer.prototype.getWebGLContext = function getWebGLContext(canvas) {
 /**
  * Adds a new base spec to the light registry at a given path.
  *
- * @method createLight
- *
- * @param {String} Path used as id of new light in lightRegistry.
- *
- * @return {Object} Newly created light spec.
+ * @method
+ * @param {String}  path    Path used as id of new light in lightRegistry.
+ * @return {Object}         Newly created light spec.
  */
 WebGLRenderer.prototype.createLight = function createLight(path) {
     this.numLights++;
@@ -187,23 +188,23 @@ WebGLRenderer.prototype.createLight = function createLight(path) {
 /**
  * Adds a new base spec to the mesh registry at a given path.
  *
- * @method createMesh
+ * @method
  *
- * @param {String} Path used as id of new mesh in meshRegistry.
- *
- * @return {Object} Newly created mesh spec.
+ * @param {String}  path    Path used as id of new mesh in meshRegistry.
+ * @return {Object}         Newly created mesh spec.
  */
 WebGLRenderer.prototype.createMesh = function createMesh(path) {
     this.meshRegistryKeys.push(path);
+
     var uniforms = keyValueToArrays({
-        opacity: 1,
-        transform: identity,
-        size: [0, 0, 0],
-        baseColor: [0.5, 0.5, 0.5, 1],
-        positionOffset: [0, 0, 0],
-        u_Normals: [0, 0, 0],
-        u_FlatShading: 0,
-        glossiness: [0, 0, 0, 0]
+        u_opacity: 1,
+        u_transform: identity,
+        u_size: [0, 0, 0],
+        u_baseColor: [0.5, 0.5, 0.5, 1],
+        u_positionOffset: [0, 0, 0],
+        u_normals: [0, 0, 0],
+        u_flatShading: 0,
+        u_glossiness: [0, 0, 0, 0]
     });
     return this.meshRegistry[path] = {
         depth: null,
@@ -217,20 +218,30 @@ WebGLRenderer.prototype.createMesh = function createMesh(path) {
     };
 };
 
+/**
+ * Sets flag on indicating whether to do skip draw phase for
+ * cutout mesh at given path.
+ *
+ * @method
+ *
+ * @param {String}  path        Path used as id of target cutout mesh.
+ * @param {Boolean} usesCutout  Indicates the presence of a
+ *                              cutout mesh.
+ * @return {undefined}          undefined
+ */
 WebGLRenderer.prototype.setCutoutState = function setCutoutState(path, usesCutout) {
     var cutout = this.getOrSetCutout(path);
 
     cutout.visible = usesCutout;
-}
+};
 
 /**
  * Creates or retreives cutout
  *
- * @method getOrSetCutout
+ * @method
  *
- * @param {String} Path used as id of new mesh in meshRegistry.
- *
- * @return {Object} Newly created cutout spec.
+ * @param {String}  path    Path used as id of target cutout mesh.
+ * @return {Object}         Newly created cutout spec.
  */
 WebGLRenderer.prototype.getOrSetCutout = function getOrSetCutout(path) {
     var geometry;
@@ -240,11 +251,11 @@ WebGLRenderer.prototype.getOrSetCutout = function getOrSetCutout(path) {
     }
     else {
         var uniforms = keyValueToArrays({
-            opacity: 0,
-            transform: identity,
-            size: [0, 0, 0],
-            origin: [0, 0, 0],
-            baseColor: [0, 0, 0, 1]
+            u_opacity: 0,
+            u_transform: identity.slice(),
+            u_size: [0, 0, 0],
+            u_origin: [0, 0, 0],
+            u_baseColor: [0, 0, 0, 1]
         });
 
         this.cutoutRegistryKeys.push(path);
@@ -252,20 +263,35 @@ WebGLRenderer.prototype.getOrSetCutout = function getOrSetCutout(path) {
         return this.cutoutRegistry[path] = {
             uniformKeys: uniforms.keys,
             uniformValues: uniforms.values,
-            geometry: this.cutoutGeometry.id,
-            drawType: 4,
+            geometry: this.cutoutGeometry.spec.id,
+            drawType: this.cutoutGeometry.spec.type,
             visible: true
         };
     }
 };
 
-
+/**
+ * Sets flag on indicating whether to do skip draw phase for
+ * mesh at given path.
+ *
+ * @method
+ * @param {String}      path        Path used as id of target mesh.
+ * @param {Boolean}     visibility  Indicates the visibility of target mesh.
+ * @return {undefined}              undefined
+ */
 WebGLRenderer.prototype.setMeshVisibility = function setMeshVisibility(path, visibility) {
     var mesh = this.meshRegistry[path] || this.createMesh(path);
-    
+
     mesh.visible = visibility;
 };
 
+/**
+ * Deletes a mesh from the meshRegistry.
+ *
+ * @method
+ * @param {String}      path    Path used as id of target mesh.
+ * @return {undefined}          undefined
+ */
 WebGLRenderer.prototype.removeMesh = function removeMesh(path) {
     var keyLocation = this.meshRegistryKeys.indexOf(path);
     this.meshRegistryKeys.splice(keyLocation, 1);
@@ -275,29 +301,34 @@ WebGLRenderer.prototype.removeMesh = function removeMesh(path) {
 /**
  * Creates or retreives cutout
  *
- * @method setCutoutUniform
- *
- * @param {String} Path used as id of cutout in cutout registry.
- * @param {String} uniformLocation identifier used to upload value
- * @param {Array} value of uniform data
- *
+ * @method
+ * @param {String}  path            Path used as id of cutout in cutout registry.
+ * @param {String}  uniformName     Identifier used to upload value
+ * @param {Array}   uniformValue    Value of uniform data
+ * @return {undefined}              undefined
  */
 WebGLRenderer.prototype.setCutoutUniform = function setCutoutUniform(path, uniformName, uniformValue) {
     var cutout = this.getOrSetCutout(path);
 
     var index = cutout.uniformKeys.indexOf(uniformName);
 
-    cutout.uniformValues[index] = uniformValue;
+    if (Array.isArray(uniformValue)) {
+        for (var i = 0, len = uniformValue.length; i < len; i++) {
+            cutout.uniformValues[index][i] = uniformValue[i];
+        }
+    }
+    else {
+        cutout.uniformValues[index] = uniformValue;
+    }
 };
 
 /**
  * Edits the options field on a mesh
  *
- * @method setMeshOptions
- *
- * @param {String} Path used as id of cutout in cutout registry.
- * @param {Object} map of draw options for mesh
- *
+ * @method
+ * @param {String} path     Path used as id of target mesh.
+ * @param {Object} options  Map of draw options for mesh
+ * @return {undefined}      undefined
 **/
 WebGLRenderer.prototype.setMeshOptions = function(path, options) {
     var mesh = this.meshRegistry[path] || this.createMesh(path);
@@ -309,13 +340,13 @@ WebGLRenderer.prototype.setMeshOptions = function(path, options) {
 /**
  * Changes the color of the fixed intensity lighting in the scene
  *
- * @method setAmbientLightColor
+ * @method
  *
- * @param {String} path used as id of light
- * @param {Number} red channel
- * @param {Number} green channel
- * @param {Number} blue channel
- *
+ * @param {String}      path    Path used as id of light
+ * @param {Number}      r       red channel
+ * @param {Number}      g       green channel
+ * @param {Number}      b       blue channel
+ * @return {undefined}          undefined
 **/
 WebGLRenderer.prototype.setAmbientLightColor = function setAmbientLightColor(path, r, g, b) {
     this.ambientLightColor[0] = r;
@@ -327,13 +358,13 @@ WebGLRenderer.prototype.setAmbientLightColor = function setAmbientLightColor(pat
 /**
  * Changes the location of the light in the scene
  *
- * @method setLightPosition
+ * @method
  *
- * @param {String} path used as id of light
- * @param {Number} x position
- * @param {Number} y position
- * @param {Number} z position
- *
+ * @param {String} path     Path used as id of light
+ * @param {Number} x        x position
+ * @param {Number} y        y position
+ * @param {Number} z        z position
+ * @return {undefined} undefined
 **/
 WebGLRenderer.prototype.setLightPosition = function setLightPosition(path, x, y, z) {
     var light = this.lightRegistry[path] || this.createLight(path);
@@ -347,13 +378,13 @@ WebGLRenderer.prototype.setLightPosition = function setLightPosition(path, x, y,
 /**
  * Changes the color of a dynamic intensity lighting in the scene
  *
- * @method setLightColor
+ * @method
  *
- * @param {String} path used as id of light in light Registry.
- * @param {Number} red channel
- * @param {Number} green channel
- * @param {Number} blue channel
- *
+ * @param {String} path     Path used as id of light in light Registry.
+ * @param {Number} r        red channel
+ * @param {Number} g        green channel
+ * @param {Number} b        blue channel
+ * @return {undefined} undefined
 **/
 WebGLRenderer.prototype.setLightColor = function setLightColor(path, r, g, b) {
     var light = this.lightRegistry[path] || this.createLight(path);
@@ -367,12 +398,12 @@ WebGLRenderer.prototype.setLightColor = function setLightColor(path, r, g, b) {
 /**
  * Compiles material spec into program shader
  *
- * @method handleMateriaInput
+ * @method
  *
- * @param {String} Path used as id of cutout in cutout registry.
- * @param {String} which rendering input the material is bound to
- * @param {Object} material spec
- *
+ * @param {String}      path         Path used as id of cutout in cutout registry.
+ * @param {String}      name         Name that the rendering input the material is bound to
+ * @param {Object}      material     Material spec
+ * @return {undefined}  undefined
 **/
 WebGLRenderer.prototype.handleMaterialInput = function handleMaterialInput(path, name, material) {
     var mesh = this.meshRegistry[path] || this.createMesh(path);
@@ -401,13 +432,13 @@ WebGLRenderer.prototype.handleMaterialInput = function handleMaterialInput(path,
 /**
  * Changes the geometry data of a mesh
  *
- * @method setGeometry
+ * @method
  *
- * @param {String} Path used as id of cutout in cutout registry.
- * @param {Object} Geometry object containing vertex data to be drawn
- * @param {Number} primitive identifier
- * @param {Boolean} will the geometry data change?
- *
+ * @param {String}      path        Path used as id of cutout in cutout registry.
+ * @param {Object}      geometry    Geometry object containing vertex data to be drawn
+ * @param {Number}      drawType    Primitive identifier
+ * @param {Boolean}     dynamic     Whether geometry is dynamic
+ * @return {undefined}  undefined
 **/
 WebGLRenderer.prototype.setGeometry = function setGeometry(path, geometry, drawType, dynamic) {
     var mesh = this.meshRegistry[path] || this.createMesh(path);
@@ -422,17 +453,18 @@ WebGLRenderer.prototype.setGeometry = function setGeometry(path, geometry, drawT
 /**
  * Uploads a new value for the uniform data when the mesh is being drawn
  *
- * @method setMeshUniform
+ * @method
  *
- * @param {String} Path used as id of mesh in mesh registry
- * @param {String} uniformLocation identifier used to upload value
- * @param {Array} value of uniform data
- *
+ * @param {String}      path            Path used as id of mesh in mesh registry
+ * @param {String}      uniformName     Identifier used to upload value
+ * @param {Array}       uniformValue    Value of uniform data
+ * @return {undefined}  undefined
 **/
 WebGLRenderer.prototype.setMeshUniform = function setMeshUniform(path, uniformName, uniformValue) {
     var mesh = this.meshRegistry[path] || this.createMesh(path);
 
     var index = mesh.uniformKeys.indexOf(uniformName);
+
     if (index === -1) {
         mesh.uniformKeys.push(uniformName);
         mesh.uniformValues.push(uniformValue);
@@ -443,16 +475,18 @@ WebGLRenderer.prototype.setMeshUniform = function setMeshUniform(path, uniformNa
 };
 
 /**
- * Triggers the 'draw' phase of the WebGLRenderer.  Iterates through registries
+ * Triggers the 'draw' phase of the WebGLRenderer. Iterates through registries
  * to set uniforms, set attributes and issue draw commands for renderables.
  *
- * @method bufferData
+ * @method
  *
- * @param {String} Path used as id of mesh in mesh registry
- * @param {Number} Id of geometry in geometry registry
- * @param {String} Attribute location name
- * @param {Array} Vertex data
- * @param {Number} The dimensions of the vertex
+ * @param {String}      path            Path used as id of mesh in mesh registry
+ * @param {Number}      geometryId      Id of geometry in geometry registry
+ * @param {String}      bufferName      Attribute location name
+ * @param {Array}       bufferValue     Vertex data
+ * @param {Number}      bufferSpacing   The dimensions of the vertex
+ * @param {Boolean}     dynamic         Whether geometry is dynamic
+ * @return {undefined}  undefined
  */
 WebGLRenderer.prototype.bufferData = function bufferData(path, geometryId, bufferName, bufferValue, bufferSpacing, isDynamic) {
     this.bufferRegistry.allocate(geometryId, bufferName, bufferValue, bufferSpacing, isDynamic);
@@ -461,26 +495,36 @@ WebGLRenderer.prototype.bufferData = function bufferData(path, geometryId, buffe
 };
 
 /**
- * Triggers the 'draw' phase of the WebGLRenderer.  Iterates through registries
+ * Triggers the 'draw' phase of the WebGLRenderer. Iterates through registries
  * to set uniforms, set attributes and issue draw commands for renderables.
  *
- * @method draw
+ * @method
  *
- * @param {Object} renderState Parameters provided by the compositor, that
- * affect the rendering of all renderables.
+ * @param {Object}      renderState     Parameters provided by the compositor, that
+ *                                      affect the rendering of all renderables.
+ * @return {undefined}  undefined
  */
 WebGLRenderer.prototype.draw = function draw(renderState) {
     var time = this.compositor.getTime();
-    
+
     this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
     this.textureManager.update(time);
-    
-    this.setGlobalUniforms(renderState);
+
     this.meshRegistryKeys = sorter(this.meshRegistryKeys, this.meshRegistry);
+
+    this.setGlobalUniforms(renderState);
     this.drawCutouts();
     this.drawMeshes();
 };
 
+/**
+ * Iterates through and draws all registered meshes. This includes
+ * binding textures, handling draw options, setting mesh uniforms
+ * and drawing mesh buffers.
+ *
+ * @method
+ * @return {undefined} undefined
+ */
 WebGLRenderer.prototype.drawMeshes = function drawMeshes() {
     var gl = this.gl;
     var buffers;
@@ -504,9 +548,9 @@ WebGLRenderer.prototype.drawMeshes = function drawMeshes() {
 
         var j = mesh.textures.length;
         while (j--) this.textureManager.bindTexture(mesh.textures[j]);
-        
+
         if (mesh.options) this.handleOptions(mesh.options, mesh);
-        
+
         this.program.setUniforms(mesh.uniformKeys, mesh.uniformValues);
         this.drawBuffers(buffers, mesh.drawType, mesh.geometry);
 
@@ -514,12 +558,22 @@ WebGLRenderer.prototype.drawMeshes = function drawMeshes() {
     }
 };
 
+/**
+ * Iterates through and draws all registered cutout meshes. Blending
+ * is disabled, cutout uniforms are set and finally buffers are drawn.
+ *
+ * @method
+ * @return {undefined} undefined
+ */
 WebGLRenderer.prototype.drawCutouts = function drawCutouts() {
     var cutout;
     var buffers;
     var len = this.cutoutRegistryKeys.length;
 
-    if (len) this.gl.enable(this.gl.BLEND);
+    if (len) {
+        this.gl.enable(this.gl.BLEND);
+        this.gl.depthMask(true);
+    }
 
     for (var i = 0; i < len; i++) {
         cutout = this.cutoutRegistry[this.cutoutRegistryKeys[i]];
@@ -530,10 +584,16 @@ WebGLRenderer.prototype.drawCutouts = function drawCutouts() {
         this.program.setUniforms(cutout.uniformKeys, cutout.uniformValues);
         this.drawBuffers(buffers, cutout.drawType, cutout.geometry);
     }
-
-    if (len) this.gl.disable(this.gl.BLEND);
 };
 
+/**
+ * Sets uniforms to be shared by all meshes.
+ *
+ * @method
+ *
+ * @param {Object}      renderState     Draw state options passed down from compositor.
+ * @return {undefined}  undefined
+ */
 WebGLRenderer.prototype.setGlobalUniforms = function setGlobalUniforms(renderState) {
     var light;
     var stride;
@@ -570,13 +630,12 @@ WebGLRenderer.prototype.setGlobalUniforms = function setGlobalUniforms(renderSta
      * of converting from homogenous coordinates to NDC (normalized device coordinates)
      * the x and y values of the point are divided by w, which implements perspective.
      */
-
     this.projectionTransform[0] = 1 / (this.cachedSize[0] * 0.5);
     this.projectionTransform[5] = -1 / (this.cachedSize[1] * 0.5);
     this.projectionTransform[11] = renderState.perspectiveTransform[11];
 
     globalUniforms.values[4] = this.projectionTransform;
-    globalUniforms.values[5] = this.compositor.getTime() % 100000 / 1000;
+    globalUniforms.values[5] = this.compositor.getTime() * 0.001;
     globalUniforms.values[6] = renderState.viewTransform;
 
     this.program.setUniforms(globalUniforms.keys, globalUniforms.values);
@@ -585,11 +644,12 @@ WebGLRenderer.prototype.setGlobalUniforms = function setGlobalUniforms(renderSta
 /**
  * Loads the buffers and issues the draw command for a geometry.
  *
- * @method drawBuffers
+ * @method
  *
- * @param {Object} vertexBuffers All buffers used to draw the geometry.
- * @param {Number} mode Enumerator defining what primitive to draw
- * @param {Number} id ID of geometry being drawn.
+ * @param {Object}  vertexBuffers    All buffers used to draw the geometry.
+ * @param {Number}  mode             Enumerator defining what primitive to draw
+ * @param {Number}  id               ID of geometry being drawn.
+ * @return {undefined} undefined
  */
 WebGLRenderer.prototype.drawBuffers = function drawBuffers(vertexBuffers, mode, id) {
     var gl = this.gl;
@@ -651,7 +711,7 @@ WebGLRenderer.prototype.drawBuffers = function drawBuffers(vertexBuffers, mode, 
     // Disable any attributes that not currently being used.
 
     for(var i = 0, len = this.state.enabledAttributesKeys.length; i < len; i++) {
-        var key = this.state.enabledAttributes[this.state.enabledAttributesKeys[i]];
+        var key = this.state.enabledAttributesKeys[i];
         if (this.state.enabledAttributes[key] && vertexBuffers.keys.indexOf(key) === -1) {
             gl.disableVertexAttribArray(this.program.attributeLocations[key]);
             this.state.enabledAttributes[key] = false;
@@ -675,10 +735,10 @@ WebGLRenderer.prototype.drawBuffers = function drawBuffers(vertexBuffers, mode, 
                 this.state.boundElementBuffer = buffer;
             }
 
-            gl.drawElements(mode, length, gl.UNSIGNED_SHORT, 2 * offset);
+            gl.drawElements(gl[mode], length, gl.UNSIGNED_SHORT, 2 * offset);
         }
         else {
-            gl.drawArrays(mode, 0, length);
+            gl.drawArrays(gl[mode], 0, length);
         }
     }
 
@@ -688,11 +748,12 @@ WebGLRenderer.prototype.drawBuffers = function drawBuffers(vertexBuffers, mode, 
 /**
  * Wraps draw methods in bound frame buffer
  *
- * @method renderOffscreen
+ * @method
  *
- * @param {Function} callback The render function to be called after setup and before cleanup.
- * @param {Array} size Size of framebuffer being drawn to.
- * @param {Object} texture Location where the render data is stored.
+ * @param {Function}    callback    The render function to be called after setup and before cleanup.
+ * @param {Array}       size        Size of framebuffer being drawn to.
+ * @param {Object}      texture     Location where the render data is stored.
+ * @return {undefined}  undefined
  */
 function renderOffscreen(callback, size, texture) {
     var gl = this.gl;
@@ -723,9 +784,10 @@ function renderOffscreen(callback, size, texture) {
 /**
  * Diagnoses the failed intialization of an FBO.
  *
- * @method checkFrameBufferStatus
+ * @method
  *
- * @param {Object} the WebGLContext that owns this FBO.
+ * @param {Object}  gl  the WebGLContext that owns this FBO.
+ * @return {undefined}  undefined
  */
 function checkFrameBufferStatus(gl) {
     var status = gl.checkFramebufferStatus(gl.FRAMEBUFFER);
@@ -751,10 +813,10 @@ function checkFrameBufferStatus(gl) {
  * the WebGL context and updates the resolution uniform for the shader program.
  * Size is retreived from the container object of the renderer.
  *
- * @method updateSize
+ * @method
  *
- * @param {Array} width, height and depth of canvas
- *
+ * @param {Array}       size    width, height and depth of canvas
+ * @return {undefined}          undefined
  */
 WebGLRenderer.prototype.updateSize = function updateSize(size) {
     if (size) {
@@ -775,18 +837,20 @@ WebGLRenderer.prototype.updateSize = function updateSize(size) {
  * Updates the state of the WebGL drawing context based on custom parameters
  * defined on a mesh.
  *
- * @method handleOptions
+ * @method
  *
- * @param {Object} options Draw state options to be set to the context.
+ * @param {Object}      options Draw state options to be set to the context.
+ * @param {Mesh}        mesh    Associated Mesh
+ * @return {undefined}          undefined
  */
 WebGLRenderer.prototype.handleOptions = function handleOptions(options, mesh) {
     var gl = this.gl;
     if (!options) return;
 
-    if (options.side == 'double') {
-        this.cullFace(this.gl.FRONT);
+    if (options.side === 'double') {
+        this.gl.cullFace(this.gl.FRONT);
         this.drawBuffers(this.bufferRegistry.registry[mesh.geometry], mesh.drawType, mesh.geometry);
-        this.cullFace(this.gl.BACK);
+        this.gl.cullFace(this.gl.BACK);
     }
 
     if (options.blending) gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
@@ -796,9 +860,10 @@ WebGLRenderer.prototype.handleOptions = function handleOptions(options, mesh) {
 /**
  * Resets the state of the WebGL drawing context to default values.
  *
- * @method resetOptions
+ * @method
  *
- * @param {Object} options Draw state options to be set to the context.
+ * @param {Object}      options     Draw state options to be set to the context.
+ * @return {undefined}  undefined
  */
 WebGLRenderer.prototype.resetOptions = function resetOptions(options) {
     var gl = this.gl;

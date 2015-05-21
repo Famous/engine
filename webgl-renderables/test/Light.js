@@ -102,16 +102,6 @@ test('Light', function(t) {
         t.end();
     });
 
-    t.test('Light.prototype.toString', function(t) {
-
-        t.equal(typeof Light.prototype.toString, 'function',
-            'should be a function');
-
-        t.equal(Light.prototype.toString(), 'Light');
-
-        t.end();
-    });
-
     t.test('Light.prototype.setColor', function(t) {
 
         light = createLight();
@@ -141,22 +131,6 @@ test('Light', function(t) {
         light.setColor(new MockColor());
         t.true(light.getColor() instanceof MockColor,
             'should be able to return the color instance');
-
-        t.end();
-    });
-
-    t.test('Light.prototype.clean', function(t) {
-
-        light = createLight();
-        t.equal(typeof light.clean, 'function',
-            'should be a function');
-
-        t.true(light.queue,
-            'should have a populated queue');
-
-        light.clean();
-        t.equal(light.queue.length, 0,
-            'should have an empty (cleaned) queue');
 
         t.end();
     });

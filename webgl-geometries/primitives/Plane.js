@@ -40,7 +40,7 @@ var GeometryHelper = require('../GeometryHelper');
  * @return {Object} constructed geometry
  */
 function Plane(options) {
-    var options = options || {};
+    options = options || {};
     var detailX = options.detailX || options.detail || 1;
     var detailY = options.detailY || options.detail || 1;
 
@@ -48,8 +48,6 @@ function Plane(options) {
     var textureCoords = [];
     var normals       = [];
     var indices       = [];
-
-    var backface;
 
     for (var y = 0; y <= detailY; y++) {
         var t = y / detailY;
@@ -78,9 +76,9 @@ function Plane(options) {
 
     return new Geometry({
         buffers: [
-            { name: 'pos', data: vertices },
-            { name: 'texCoord', data: textureCoords, size: 2 },
-            { name: 'normals', data: normals },
+            { name: 'a_pos', data: vertices },
+            { name: 'a_texCoord', data: textureCoords, size: 2 },
+            { name: 'a_normals', data: normals },
             { name: 'indices', data: indices, size: 1 }
         ]
     });

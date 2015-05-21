@@ -26,14 +26,14 @@
 
 var test = require('tape');
 
-var Engine = require('../Engine');
+var RequestAnimationFrameLoop = require('../RequestAnimationFrameLoop');
 
-test('Engine', function(t) {
+test('RequestAnimationFrameLoop', function(t) {
     t.test('constructor', function(t) {
         t.plan(2);
         var engine;
         t.doesNotThrow(function() {
-            engine = new Engine();
+            engine = new RequestAnimationFrameLoop();
         });
 
         var updateable = {
@@ -48,21 +48,21 @@ test('Engine', function(t) {
 
     t.test('start method', function(t) {
         t.plan(1);
-        var engine = new Engine();
+        var engine = new RequestAnimationFrameLoop();
         t.equal(typeof engine.start, 'function', 'engine.start should be a function');
         engine.stop();
     });
 
     t.test('stop method', function(t) {
         t.plan(1);
-        var engine = new Engine();
+        var engine = new RequestAnimationFrameLoop();
         t.equal(typeof engine.stop, 'function', 'engine.stop should be a function');
         engine.stop();
     });
 
     t.test('isRunning method', function(t) {
         t.plan(3);
-        var engine = new Engine();
+        var engine = new RequestAnimationFrameLoop();
         t.equal(typeof engine.isRunning, 'function', 'engine.isRunning should be a function');
         t.equal(engine.isRunning(), true, 'engine should be running as soon as it has been initialized');
         engine.stop();
@@ -71,28 +71,28 @@ test('Engine', function(t) {
 
     t.test('step method', function(t) {
         t.plan(1);
-        var engine = new Engine();
+        var engine = new RequestAnimationFrameLoop();
         t.equal(typeof engine.step, 'function', 'engine.step should be a function');
         engine.stop();
     });
 
     t.test('loop method', function(t) {
         t.plan(1);
-        var engine = new Engine();
+        var engine = new RequestAnimationFrameLoop();
         t.equal(typeof engine.loop, 'function', 'engine.loop should be a function');
         engine.stop();
     });
 
     t.test('update method', function(t) {
         t.plan(1);
-        var engine = new Engine();
+        var engine = new RequestAnimationFrameLoop();
         t.equal(typeof engine.update, 'function', 'engine.update should be a function');
         engine.stop();
     });
 
     t.test('noLongerUpdate method', function(t) {
         t.plan(8);
-        var engine = new Engine();
+        var engine = new RequestAnimationFrameLoop();
         t.equal(typeof engine.noLongerUpdate, 'function', 'engine.noLongerUpdate should be a function');
 
         var c = 0;

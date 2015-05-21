@@ -1,18 +1,18 @@
 /**
  * The MIT License (MIT)
- * 
+ *
  * Copyright (c) 2015 Famous Industries Inc.
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -107,6 +107,9 @@ Transitionable.Clock = FamousEngine.getClock();
  *                                                          to be called after
  *                                                          the transition is
  *                                                          complete
+ * @param  {String}                 [method]                method used for
+ *                                                          interpolation
+ *                                                          (e.g. slerp)
  * @return {Transitionable}         this
  */
 Transitionable.prototype.to = function to(finalState, curve, duration, callback, method) {
@@ -174,6 +177,11 @@ Transitionable.prototype.delay = function delay(duration, callback) {
  * @param  {Function}               [callback]      callback function to be
  *                                                  called after the transition
  *                                                  is complete
+ * @param {String}                  [method]        optional method used for
+ *                                                  interpolating between the
+ *                                                  values. Set to `slerp` for
+ *                                                  spherical linear
+ *                                                  interpolation.
  * @return {Transitionable}         this
  */
 Transitionable.prototype.override = function override(finalState, curve, duration, callback, method) {
@@ -187,13 +195,30 @@ Transitionable.prototype.override = function override(finalState, curve, duratio
     return this;
 };
 
+
+/**
+ * Used for interpolating between the start and end state of the currently
+ * running transition
+ *
+ * @method  _interpolate
+ * @private
+ *
+ * @param  {Object|Array|Number} output     Where to write to (in order to avoid
+ *                                          object allocation and therefore GC).
+ * @param  {Object|Array|Number} from       Start state of current transition.
+ * @param  {Object|Array|Number} to         End state of current transition.
+ * @param  {Number} progress                Progress of the current transition,
+ *                                          in [0, 1]
+ * @param  {String} method                  Method used for interpolation (e.g.
+ *                                          slerp)
+ * @return {Object|Array|Number}            output
+ */
 Transitionable.prototype._interpolate = function _interpolate(output, from, to, progress, method) {
     if (to instanceof Object) {
         if (method === 'slerp') {
             var x, y, z, w;
             var qx, qy, qz, qw;
             var omega, cosomega, sinomega, scaleFrom, scaleTo;
-            var resx, resy, resz, resw;
 
             x = from[0];
             y = from[1];
@@ -204,6 +229,14 @@ Transitionable.prototype._interpolate = function _interpolate(output, from, to, 
             qy = to[1];
             qz = to[2];
             qw = to[3];
+
+            if (progress === 1) {
+                output[0] = qx;
+                output[1] = qy;
+                output[2] = qz;
+                output[3] = qw;
+                return output;
+            }
 
             cosomega = w * qw + x * qx + y * qy + z * qz;
             if ((1.0 - cosomega) > 1e-5) {
@@ -238,6 +271,21 @@ Transitionable.prototype._interpolate = function _interpolate(output, from, to, 
     return output;
 };
 
+
+/**
+ * Internal helper method used for synchronizing the current, absolute state of
+ * a transition to a given output array, object literal or number. Supports
+ * nested state objects by through recursion.
+ *
+ * @method  _sync
+ * @private
+ *
+ * @param  {Number|Array|Object} output     Where to write to (in order to avoid
+ *                                          object allocation and therefore GC).
+ * @param  {Number|Array|Object} input      Input state to proxy onto the
+ *                                          output.
+ * @return {Number|Array|Object} output     Passed in output object.
+ */
 Transitionable.prototype._sync = function _sync(output, input) {
     if (typeof input === 'number') output = input;
     else if (input instanceof Array) {
@@ -261,10 +309,11 @@ Transitionable.prototype._sync = function _sync(output, input) {
  *
  * @method get
  *
- * @param {Number=} timestamp Evaluate the curve at a normalized version of this
- *    time. If omitted, use current time. (Unix epoch time)
- * @return {Number|Array.Number} beginning state
- *    interpolated to this point in time.
+ * @param {Number=} t               Evaluate the curve at a normalized version
+ *                                  of this time. If omitted, use current time
+ *                                  (Unix epoch time retrieved from Clock).
+ * @return {Number|Array.Number}    Beginning state interpolated to this point
+ *                                  in time.
  */
 Transitionable.prototype.get = function get(t) {
     if (this._queue.length === 0) return this._state;
@@ -273,7 +322,13 @@ Transitionable.prototype.get = function get(t) {
     t = t ? t : this.constructor.Clock.now();
 
     var progress = (t - this._startedAt) / this._queue[2];
-    this._state = this._interpolate(this._state, this._from, this._queue[0], this._queue[1](progress > 1 ? 1 : progress), this._queue[4]);
+    this._state = this._interpolate(
+        this._state,
+        this._from,
+        this._queue[0],
+        this._queue[1](progress > 1 ? 1 : progress),
+        this._queue[4]
+    );
     var state = this._state;
     if (progress >= 1) {
         this._startedAt = this._startedAt + this._queue[2];
@@ -293,7 +348,9 @@ Transitionable.prototype.get = function get(t) {
  *
  * @method isActive
  *
- * @return {boolean}
+ * @return {Boolean}    Boolean indicating whether there is at least one pending
+ *                      transition. Paused transitions are still being
+ *                      considered active.
  */
 Transitionable.prototype.isActive = function isActive() {
     return this._queue.length > 0;
@@ -337,7 +394,7 @@ Transitionable.prototype.isPaused = function isPaused() {
 };
 
 /**
- * Resume transition.
+ * Resume a previously paused transition.
  *
  * @method resume
  * @chainable
@@ -358,8 +415,9 @@ Transitionable.prototype.resume = function resume() {
  * @chainable
  * @deprecated Use `.from` instead!
  *
- * @param {Number|Array.Number|Object.<number, number>} startState
+ * @param {Number|Array.Number|Object.<number, number>} start
  *    stable state to set to
+ * @return {Transitionable}                             this
  */
 Transitionable.prototype.reset = function(start) {
     return this.from(start);
@@ -374,13 +432,14 @@ Transitionable.prototype.reset = function(start) {
  * @chainable
  * @deprecated Use `.to` instead!
  *
- * @param {Number|FamousEngineMatrix|Array.Number|Object.<number, number>} endState
+ * @param {Number|FamousEngineMatrix|Array.Number|Object.<number, number>} state
  *    end state to which we interpolate
  * @param {transition=} transition object of type {duration: number, curve:
  *    f[0,1] -> [0,1] or name}. If transition is omitted, change will be
  *    instantaneous.
  * @param {function()=} callback Zero-argument function to call on observed
  *    completion (t=1)
+ * @return {Transitionable} this
  */
 Transitionable.prototype.set = function(state, transition, callback) {
     if (transition == null) {

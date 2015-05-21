@@ -71,6 +71,7 @@ test('GeometryHelper', function(t) {
         var indices = [0, 1, 2];
 
         var normals = GeometryHelper.computeNormals(vertices, indices);
+        
         t.equals(normals.length, vertices.length, 'Normals should be length of vertices');
         t.deepEquals([0, 0, 1], normals.slice(0, 3), 'Should return correct normals');
         t.deepEquals([0, 0, 1], normals.slice(3, 6), 'Should return correct normals');

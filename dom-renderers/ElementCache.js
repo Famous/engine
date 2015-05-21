@@ -24,9 +24,7 @@
 
 'use strict';
 
-/**
- * Transform identity matrix.
- */ 
+// Transform identity matrix. 
 var ident = [
     1, 0, 0, 0,
     0, 1, 0, 0,
@@ -40,15 +38,18 @@ var ident = [
  * setting the actual `transform`-property) and post render size (final size as
  * being rendered to the DOM).
  * 
- * @class   ElementCache
+ * @class ElementCache
  *  
- * @param  {Element} element    DOMElement
- * @param  {String} path        Path used for uniquely identifying the location
- *                              in the scene graph.
+ * @param {Element} element DOMElement
+ * @param {String} path Path used for uniquely identifying the location in the scene graph.
  */ 
 function ElementCache (element, path) {
     this.element = element;
     this.path = path;
+    this.content = null;
+    this.size = new Int16Array(3);
+    this.explicitHeight = false;
+    this.explicitWidth = false;
     this.worldTransform = new Float32Array(ident);
     this.invertedParent = new Float32Array(ident);
     this.finalTransform = new Float32Array(ident);

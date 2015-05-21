@@ -1,0 +1,41 @@
+{
+  "env": {
+    "browser": true,
+    "node": true
+  },
+  "rules": {
+    // Possible Errors
+    "comma-dangle": 1,
+    "valid-jsdoc": 0, //Moved to a separate script check-jsdoc
+    // Best Practices
+    "block-scoped-var": 1,
+    "curly": [0, "multi"],
+    "dot-location": [0, "object"], //Too much noise for now, might consider to enable it as a warning later
+    "eqeqeq": [2, "allow-null"],
+    "no-loop-func": 1,
+    "no-multi-spaces": 0,
+    "no-self-compare": 1,
+    // Strict Mode
+    "strict": 1,
+    // Variables
+    "no-shadow": 0, //Too much noise from tests, might consider to enable it as a warning later
+    "no-undefined": 1,
+    "no-unused-vars": [2, {"vars": "all", "args": "none"}],
+    "no-use-before-define": 2,
+    // Stylistic Issues
+    "brace-style": [1, "stroustrup"],
+    "camelcase": 0, //Too much noise from tests, might consider to enable it as a warning later
+    "comma-spacing": [0, {"before": false, "after": true}], //Noise
+    "consistent-this": 1,
+    "eol-last": 1,
+    "key-spacing": 0,
+    "new-cap": 1,
+    "no-trailing-spaces": 0,
+    "no-mixed-spaces-and-tabs": 0, //Too much noise for now, might consider to enable it as a warning later
+    "no-underscore-dangle": 0,
+    "quotes": [0, "single"], //Too much noise for now, might consider to enable it as a warning later
+    "semi-spacing": 0, //Too much noise for now, might consider to enable it as a warning later
+    "space-infix-ops": 0,
+    "space-unary-ops": 0 //Too much noise for now, might consider to enable it as a warning later
+  }
+}

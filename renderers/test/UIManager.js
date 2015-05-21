@@ -25,27 +25,43 @@
 'use strict';
 
 var test = require('tape');
-var ThreadManager = require('../ThreadManager');
+var UIManager = require('../UIManager');
 
-test('ThreadManager', function(t) {
+function noop() {}
+
+test('UIManager', function(t) {
     t.test('constructor', function(t) {
-        t.plan(2);
+        t.plan(3);
 
-        t.equal(typeof ThreadManager, 'function', 'ThreadManager should be a function');
-
-        var noop = function() {};
-
-        t.doesNotThrow(function() {
-            new ThreadManager({
-                onmessage: null,
-                onerror: null,
-                postMessage: noop
-            }, {
-                receiveCommands: noop,
-                drawCommands: noop,
-                clearCommands: noop
-            });
-        }, 'ThreadManager constructor should not throw an error');
+        t.equal(typeof UIManager, 'function', 'UIManager should be a function');
+        
+        var registeredUpdateables = [];
+        
+        var uiManager = new UIManager({
+            onmessage: null,
+            onerror: null,
+            postMessage: noop
+        }, {
+            receiveCommands: noop,
+            drawCommands: noop,
+            clearCommands: noop
+        }, {
+            update: function (updateable) {
+                registeredUpdateables.push(updateable);
+            }
+        });
+        
+        t.equal(
+            registeredUpdateables.length,
+            1,
+            'uimanager should register exactly one updateable on the engine'
+        );
+        t.equal(
+            registeredUpdateables[0],
+            uiManager,
+            'uiManager should register itself as an updateable on ' +
+            'the passed in engine'
+        );
     });
 
     t.test('update method', function(t) {
@@ -57,17 +73,19 @@ test('ThreadManager', function(t) {
         };
         var compositor = {
             drawCommands: function() {
-                actions.push(['drawCommands'])
+                actions.push(['drawCommands']);
             },
             clearCommands: function() {
-                actions.push(['clearCommands'])
+                actions.push(['clearCommands']);
             }
         };
-        var threadManager = new ThreadManager(thread, compositor);
-        t.equal(typeof threadManager.update, 'function', 'threadManager.update should be a function');
+        var uiManager = new UIManager(thread, compositor, {
+            update: noop
+        });
+        t.equal(typeof uiManager.update, 'function', 'uiManager.update should be a function');
 
-        threadManager.update(123);
-        threadManager.update(124);
+        uiManager.update(123);
+        uiManager.update(124);
 
         t.deepEqual(actions, [
             ['postMessage', ['FRAME', 123]],
@@ -86,11 +104,12 @@ test('ThreadManager', function(t) {
     t.test('getCompositor/ getThread method', function(t) {
         var thread = {};
         var compositor = {};
-        var threadManager = new ThreadManager(thread, compositor);
-        t.equal(typeof threadManager.getThread, 'function', 'threadManager.getThread should be a function');
-        t.equal(typeof threadManager.getCompositor, 'function', 'threadManager.getCompositor should be a function');
-        t.equal(threadManager.getThread(), thread, 'threadManager.getThread should return used thread');
-        t.equal(threadManager.getCompositor(), compositor, 'threadManager.getCompositor should return used thread');
+        var engine = {update: noop};
+        var uiManager = new UIManager(thread, compositor, engine);
+        t.equal(typeof uiManager.getThread, 'function', 'uiManager.getThread should be a function');
+        t.equal(typeof uiManager.getCompositor, 'function', 'uiManager.getCompositor should be a function');
+        t.equal(uiManager.getThread(), thread, 'uiManager.getThread should return used thread');
+        t.equal(uiManager.getCompositor(), compositor, 'uiManager.getCompositor should return used thread');
         t.end();
     });
 
@@ -121,10 +140,14 @@ test('ThreadManager', function(t) {
                 clearedCommands = true;
             }
         };
+        
+        var engine = {
+            update: noop
+        };
 
-        var threadManager = new ThreadManager(thread, compositor);
-        t.equal(typeof thread.onmessage, 'function', 'threadManager should decorate thread#onmessage');
-        t.equal(typeof thread.onerror, 'function', 'threadManager should decorate thread#onerror');
+        var uiManager = new UIManager(thread, compositor, engine);
+        t.equal(typeof thread.onmessage, 'function', 'uiManager should decorate thread#onmessage');
+        t.equal(typeof thread.onerror, 'function', 'uiManager should decorate thread#onerror');
 
         thread.onmessage(commands);
         thread.onmessage({
@@ -134,7 +157,7 @@ test('ThreadManager', function(t) {
         t.equal(clearedCommands, false);
 
         t.deepEqual(postedMessages, []);
-        threadManager.update(123);
+        uiManager.update(123);
         t.deepEqual(postedMessages, [
             ['FRAME', 123],
             ['DRAW', 'COMMANDS']

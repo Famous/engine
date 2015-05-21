@@ -29,7 +29,7 @@ var math = require('./Math');
 var vendorPrefix = require('../utilities/vendorPrefix');
 var eventMap = require('./events/EventMap');
 
-var TRANSFORM = vendorPrefix('transform');
+var TRANSFORM = null;
 
 /**
  * DOMRenderer is a class responsible for adding elements
@@ -40,11 +40,14 @@ var TRANSFORM = vendorPrefix('transform');
  *
  * @class DOMRenderer
  *
- * @param {HTMLElement} an element.
- * @param {String} the selector of the element.
- * @param {Compositor}
+ * @param {HTMLElement} element an element.
+ * @param {String} selector the selector of the element.
+ * @param {Compositor} compositor the compositor controlling the renderer
  */
 function DOMRenderer (element, selector, compositor) {
+    element.classList.add('famous-dom-renderer');
+
+    TRANSFORM = TRANSFORM || vendorPrefix('transform');
     this._compositor = compositor; // a reference to the compositor
 
     this._target = null; // a register for holding the current
@@ -90,21 +93,20 @@ function DOMRenderer (element, selector, compositor) {
  * `sendEvent` method.
  * Delegates events if possible by attaching the event listener to the context.
  *
- * @method  subscribe
+ * @method
  *
- * @param  {String} path            Path uniquely describing the location of the
- *                                  element in the scene graph.
- * @param  {String} type            DOM event type (e.g. click, mouseover).
- * @param  {Boolean} preventDefault Whether or not the default browser action
- *                                  should be prevented.
- */ 
+ * @param {String} type DOM event type (e.g. click, mouseover).
+ * @param {Boolean} preventDefault Whether or not the default browser action should be prevented.
+ *
+ * @return {undefined} undefined
+ */
 DOMRenderer.prototype.subscribe = function subscribe(type, preventDefault) {
     // TODO preventDefault should be a separate command
     this._assertTargetLoaded();
-    
+
     this._target.preventDefault[type] = preventDefault;
     this._target.subscribe[type] = true;
-    
+
     if (
         !this._target.listeners[type] && !this._root.listeners[type]
     ) {
@@ -118,53 +120,69 @@ DOMRenderer.prototype.subscribe = function subscribe(type, preventDefault) {
  * Function to be added using `addEventListener` to the corresponding
  * DOMElement.
  *
- * @method  _triggerEvent
+ * @method
  * @private
  *
- * @param  {Event} ev  DOM Event payload.
+ * @param {Event} ev DOM Event payload
+ *
+ * @return {undefined} undefined
  */
 DOMRenderer.prototype._triggerEvent = function _triggerEvent(ev) {
+    // Use ev.path, which is an array of Elements (polyfilled if needed).
     var evPath = ev.path ? ev.path : _getPath(ev);
+    // First element in the path is the element on which the event has actually
+    // been emitted.
     for (var i = 0; i < evPath.length; i++) {
+        // Skip nodes that don't have a dataset property or data-fa-path
+        // attribute.
         if (!evPath[i].dataset) continue;
         var path = evPath[i].dataset.faPath;
         if (!path) continue;
-        
+
+        // Stop further event propogation and path traversal as soon as the
+        // first ElementCache subscribing for the emitted event has been found.
         if (this._elements[path].subscribe[ev.type]) {
             ev.stopPropagation();
 
+            // Optionally preventDefault. This needs forther consideration and
+            // should be optional. Eventually this should be a separate command/
+            // method.
             if (this._elements[path].preventDefault[ev.type]) {
                 ev.preventDefault();
             }
-    
-            var normalizedEvent = eventMap[ev.type][0];
-            normalizedEvent.proxy(ev);
-            this._compositor.sendEvent(path, ev.type, normalizedEvent);
+
+            var NormalizedEventConstructor = eventMap[ev.type][0];
+
+            // Finally send the event to the Worker Thread through the
+            // compositor.
+            this._compositor.sendEvent(path, ev.type, new NormalizedEventConstructor(ev));
+
+            break;
         }
-        
-        break;
     }
 };
 
 
 /**
- * getSizeOf gets the dom size of a particular famo.us element
+ * getSizeOf gets the dom size of a particular DOM element.  This is
+ * needed for render sizing in the scene graph.
  *
- * @method getSizeOf
- * @param {String} path
+ * @method
+ *
+ * @param {String} path path of the Node in the scene graph
  *
  * @return {Array} a vec3 of the offset size of the dom element
  */
-DOMRenderer.prototype.getSizeOf = function getSizeOf (path) {
+DOMRenderer.prototype.getSizeOf = function getSizeOf(path) {
     var element = this._elements[path];
     if (!element) return;
-    element = element.element;
-    var res = {val: [element.offsetWidth, element.offsetHeight, 0]};
+
+    var res = {val: element.size};
     this._compositor.sendEvent(path, 'resize', res);
     return res;
 };
 
-function _getPath (ev) {
+function _getPath(ev) {
     // TODO move into _triggerEvent, avoid object allocation
     var path = [];
     var node = ev.target;
@@ -180,11 +198,11 @@ function _getPath (ev) {
  * Determines the size of the context by querying the DOM for `offsetWidth` and
  * `offsetHeight`.
  *
- * @method  getSize
+ * @method 
  *
- * @return {Array}  Offset size.
+ * @return {Array} Offset size.
  */
-DOMRenderer.prototype.getSize = function getSize () {
+DOMRenderer.prototype.getSize = function getSize() {
     this._size[0] = this._root.element.offsetWidth;
     this._size[1] = this._root.element.offsetHeight;
     return this._size;
@@ -197,12 +215,13 @@ DOMRenderer.prototype._getSize = DOMRenderer.prototype.getSize;
  * Executes the retrieved draw commands. Draw commands only refer to the
  * cross-browser normalized `transform` property.
  *
- * @method  draw
+ * @method
  *
- * @param  {type} renderState description
- * @return {type}             description
+ * @param {Object} renderState description
+ *
+ * @return {undefined} undefined
  */
-DOMRenderer.prototype.draw = function draw (renderState) {
+DOMRenderer.prototype.draw = function draw(renderState) {
     if (renderState.perspectiveDirty) {
         this.perspectiveDirty = true;
 
@@ -237,24 +256,24 @@ DOMRenderer.prototype.draw = function draw (renderState) {
 /**
  * Internal helper function used for ensuring that a path is currently loaded.
  *
- * @method  _asserPathLoaded
+ * @method
  * @private
  *
- * @throws  Throws an error if no path is loaded.
+ * @return {undefined} undefined
  */
-DOMRenderer.prototype._assertPathLoaded = function _asserPathLoaded () {
+DOMRenderer.prototype._assertPathLoaded = function _asserPathLoaded() {
     if (!this._path) throw new Error('path not loaded');
 };
 
 /**
  * Internal helper function used for ensuring that a parent is currently loaded.
  *
- * @method  _asserPathLoaded
+ * @method
  * @private
  *
- * @throws  Throws an error if no parent is loaded.
+ * @return {undefined} undefined
  */
-DOMRenderer.prototype._assertParentLoaded = function _assertParentLoaded () {
+DOMRenderer.prototype._assertParentLoaded = function _assertParentLoaded() {
     if (!this._parent) throw new Error('parent not loaded');
 };
 
@@ -262,12 +281,12 @@ DOMRenderer.prototype._assertParentLoaded = function _assertParentLoaded () {
  * Internal helper function used for ensuring that children are currently
  * loaded.
  *
- * @method  _asserPathLoaded
+ * @method
  * @private
  *
- * @throws  Throws an error if no chilren are loaded.
+ * @return {undefined} undefined
  */
-DOMRenderer.prototype._assertChildrenLoaded = function _assertChildrenLoaded () {
+DOMRenderer.prototype._assertChildrenLoaded = function _assertChildrenLoaded() {
     if (!this._children) throw new Error('children not loaded');
 };
 
@@ -276,19 +295,19 @@ DOMRenderer.prototype._assertChildrenLoaded = function _assertChildrenLoaded () 
  *
  * @method  _assertTargetLoaded
  *
- * @throws  Throws an error if no target is currently loaded.
+ * @return {undefined} undefined
  */
-DOMRenderer.prototype._assertTargetLoaded = function _assertTargetLoaded () {
+DOMRenderer.prototype._assertTargetLoaded = function _assertTargetLoaded() {
     if (!this._target) throw new Error('No target loaded');
 };
 
 /**
  * Finds and sets the parent of the currently loaded element (path).
  *
- * @method  findParent
+ * @method
  * @private
  *
- * @return {ElementCache}   Parent element.
+ * @return {ElementCache} Parent element.
  */
 DOMRenderer.prototype.findParent = function findParent () {
     this._assertPathLoaded();
@@ -308,15 +327,15 @@ DOMRenderer.prototype.findParent = function findParent () {
 /**
  * Finds all children of the currently loaded element.
  *
- * @method findChildren
+ * @method
  * @private
  *
- * @param  {Array} [array]  Output-Array used for writing to (subsequently
- *                          appending children).
- * @return {Array}          Result
+ * @param {Array} array Output-Array used for writing to (subsequently appending children)
+ *
+ * @return {Array} array of children elements
  */
-DOMRenderer.prototype.findChildren = function findChildren (array) {
-    // TODO Optimize me.
+DOMRenderer.prototype.findChildren = function findChildren(array) {
+    // TODO: Optimize me.
     this._assertPathLoaded();
 
     var path = this._path + '/';
@@ -352,11 +371,11 @@ DOMRenderer.prototype.findChildren = function findChildren (array) {
 /**
  * Used for determining the target loaded under the current path.
  *
- * @method  findTarget
+ * @method
  *
- * @return {ElementCache|undefined}     Element loaded under defined path.
+ * @return {ElementCache|undefined} Element loaded under defined path.
  */
-DOMRenderer.prototype.findTarget = function findTarget () {
+DOMRenderer.prototype.findTarget = function findTarget() {
     this._target = this._elements[this._path];
     return this._target;
 };
@@ -365,10 +384,11 @@ DOMRenderer.prototype.findTarget = function findTarget () {
 /**
  * Loads the passed in path.
  *
- * @method  loadPath
+ * @method 
  *
- * @param  {String} path    Path to be loaded.
- * @return {String}         Loaded path
+ * @param {String} path Path to be loaded
+ *
+ * @return {String} Loaded path
  */
 DOMRenderer.prototype.loadPath = function loadPath (path) {
     this._path = path;
@@ -380,9 +400,11 @@ DOMRenderer.prototype.loadPath = function loadPath (path) {
  * Inserts a DOMElement at the currently loaded path, assuming no target is
  * loaded. Only one DOMElement can be associated with each path.
  *
- * @method  insertEl
+ * @method
  *
- * @param  {String} tagName     Tag name (capitalization will be normalized).
+ * @param {String} tagName Tag name (capitalization will be normalized).
+ *
+ * @return {undefined} undefined
  */
 DOMRenderer.prototype.insertEl = function insertEl (tagName) {
     if (!this._target ||
@@ -410,10 +432,12 @@ DOMRenderer.prototype.insertEl = function insertEl (tagName) {
 /**
  * Sets a property on the currently loaded target.
  *
- * @method  setProperty
+ * @method
  *
- * @param  {String} name    Property name (e.g. background, color, font)
- * @param  {String} value   Proprty value (e.g. black, 20px)
+ * @param {String} name Property name (e.g. background, color, font)
+ * @param {String} value Proprty value (e.g. black, 20px)
+ *
+ * @return {undefined} undefined
  */
 DOMRenderer.prototype.setProperty = function setProperty (name, value) {
     this._assertTargetLoaded();
@@ -423,57 +447,125 @@ DOMRenderer.prototype.setProperty = function setProperty (name, value) {
 
 /**
  * Sets the size of the currently loaded target.
- * Removes any explicit sizing constraints when passed in `true`
+ * Removes any explicit sizing constraints when passed in `false`
  * ("true-sizing").
  *
- * @method  setSize
+ * @method
  *
- * @param  {Number|true} width   Width to be set.
- * @param  {Number|true} height  Height to be set.
+ * @param {Number|false} width   Width to be set.
+ * @param {Number|false} height  Height to be set.
+ *
+ * @return {undefined} undefined
  */
 DOMRenderer.prototype.setSize = function setSize (width, height) {
     this._assertTargetLoaded();
-    this._target.element.style.width = (width === false) ? '' : width + 'px';
-    this._target.element.style.height = (height === false) ? '' : height + 'px';
+
+    this.setWidth(width);
+    this.setHeight(height);
 };
 
+/**
+ * Sets the width of the currently loaded target.
+ * Removes any explicit sizing constraints when passed in `false`
+ * ("true-sizing").
+ *
+ * @method
+ *
+ * @param {Number|false} width Width to be set.
+ *
+ * @return {undefined} undefined
+ */
+DOMRenderer.prototype.setWidth = function setWidth(width) {
+    this._assertTargetLoaded();
+
+    var contentWrapper = this._target.content;
+
+    if (width === false) {
+        this._target.explicitWidth = true;
+        if (contentWrapper) contentWrapper.style.width = '';
+        width = contentWrapper ? contentWrapper.offsetWidth : 0;
+        this._target.element.style.width = width + 'px';
+    } else {
+        this._target.explicitWidth = false;
+        if (contentWrapper) contentWrapper.style.width = width + 'px';
+        this._target.element.style.width = width + 'px';
+    }
+
+    this._target.size[0] = width;
+};
+
+/**
+ * Sets the height of the currently loaded target.
+ * Removes any explicit sizing constraints when passed in `false`
+ * ("true-sizing").
+ *
+ * @method
+ *
+ * @param {Number|false} height Height to be set.
+ *
+ * @return {undefined} undefined
+ */
+DOMRenderer.prototype.setHeight = function setHeight(height) {
+    this._assertTargetLoaded();
+
+    var contentWrapper = this._target.content;
+
+    if (height === false) {
+        this._target.explicitHeight = true;
+        if (contentWrapper) contentWrapper.style.height = '';
+        height = contentWrapper ? contentWrapper.offsetHeight : 0;
+        this._target.element.style.height = height + 'px';
+    } else {
+        this._target.explicitHeight = false;
+        if (contentWrapper) contentWrapper.style.height = height + 'px';
+        this._target.element.style.height = height + 'px';
+    }
+
+    this._target.size[1] = height;
+};
 
 /**
  * Sets an attribute on the currently loaded target.
  *
- * @method  setAttribute
+ * @method
  *
- * @param  {String} name    Attribute name (e.g. href)
- * @param  {String} value   Attribute value (e.g. http://famo.us)
+ * @param {String} name Attribute name (e.g. href)
+ * @param {String} value Attribute value (e.g. http://famous.org)
+ *
+ * @return {undefined} undefined
  */
-DOMRenderer.prototype.setAttribute = function setAttribute (name, value) {
+DOMRenderer.prototype.setAttribute = function setAttribute(name, value) {
     this._assertTargetLoaded();
     this._target.element.setAttribute(name, value);
 };
 
-
 /**
  * Sets the `innerHTML` content of the currently loaded target.
  *
- * @method  setContent
+ * @method
  *
- * @param  {String} content     Content to be set as `innerHTML`.
+ * @param {String} content Content to be set as `innerHTML`
+ *
+ * @return {undefined} undefined
  */
-DOMRenderer.prototype.setContent = function setContent (content) {
+DOMRenderer.prototype.setContent = function setContent(content) {
     this._assertTargetLoaded();
     this.findChildren();
 
-    var i;
-
-    // TODO Temporary solution
-    for (i = 0 ; i < this._children.length ; i++) {
-        this._target.element.removeChild(this._children[i].element);
+    if (!this._target.content) {
+        this._target.content = document.createElement('div');
+        this._target.content.classList.add('famous-dom-element-content');
+        this._target.element.insertBefore(
+            this._target.content,
+            this._target.element.firstChild
+        );
     }
+    this._target.content.innerHTML = content;
 
-    this._target.element.innerHTML = content;
-
-    for (i = 0 ; i < this._children.length ; i++)
-        this._target.element.appendChild(this._children[i].element);
+    this.setSize(
+        this._target.explicitWidth ? false : this._target.size[0],
+        this._target.explicitHeight ? false : this._target.size[1]
+    );
 };
 
 
@@ -481,11 +573,13 @@ DOMRenderer.prototype.setContent = function setContent (content) {
  * Sets the passed in transform matrix (world space). Inverts the parent's world
  * transform.
  *
- * @method  setMatrix
+ * @method
  *
- * @param  {Float32Array} [transform]   World transform.
+ * @param {Float32Array} transform The transform for the loaded DOM Element in world space
+ *
+ * @return {undefined} undefined
  */
-DOMRenderer.prototype.setMatrix = function setMatrix (transform) {
+DOMRenderer.prototype.setMatrix = function setMatrix(transform) {
     // TODO Don't multiply matrics in the first place.
     this._assertTargetLoaded();
     this.findParent();
@@ -527,11 +621,13 @@ DOMRenderer.prototype.setMatrix = function setMatrix (transform) {
 /**
  * Adds a class to the classList associated with the currently loaded target.
  *
- * @method  addClass
+ * @method
  *
- * @param  {String} domClass    Class name to be added to the current target.
+ * @param {String} domClass Class name to be added to the current target.
+ *
+ * @return {undefined} undefined
  */
-DOMRenderer.prototype.addClass = function addClass (domClass) {
+DOMRenderer.prototype.addClass = function addClass(domClass) {
     this._assertTargetLoaded();
     this._target.element.classList.add(domClass);
 };
@@ -541,12 +637,13 @@ DOMRenderer.prototype.addClass = function addClass (domClass) {
  * Removes a class from the classList associated with the currently loaded
  * target.
  *
- * @method  removeClass
+ * @method
  *
- * @param  {String} domClass    Class name to be removed from currently loaded
- *                              target.
+ * @param {String} domClass Class name to be removed from currently loaded target.
+ *
+ * @return {undefined} undefined
  */
-DOMRenderer.prototype.removeClass = function removeClass (domClass) {
+DOMRenderer.prototype.removeClass = function removeClass(domClass) {
     this._assertTargetLoaded();
     this._target.element.classList.remove(domClass);
 };
@@ -558,7 +655,7 @@ DOMRenderer.prototype.removeClass = function removeClass (domClass) {
  * @method  _stringifyMatrix
  * @private
  *
- * @param  {Array} m    Matrix as an array or array-like object.
+ * @param {Array} m    Matrix as an array or array-like object.
  * @return {String}     Stringified matrix as `matrix3d`-property.
  */
 DOMRenderer.prototype._stringifyMatrix = function _stringifyMatrix(m) {

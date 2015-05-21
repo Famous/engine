@@ -1,18 +1,18 @@
 /**
  * The MIT License (MIT)
- * 
+ *
  * Copyright (c) 2015 Famous Industries Inc.
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -27,6 +27,8 @@
 var Particle = require('./bodies/Particle');
 var Constraint = require('./constraints/Constraint');
 var Force = require('./forces/Force');
+
+var CallbackStore = require('../utilities/CallbackStore');
 
 var Vec3 = require('../math/Vec3');
 var Quaternion = require('../math/Quaternion');
@@ -43,6 +45,8 @@ var DELTA_REGISTER = new Vec3();
  * @param {Object} options A hash of configurable options.
  */
 function PhysicsEngine(options) {
+    this.events = new CallbackStore();
+
     options = options || {};
     /** @prop bodies The bodies currently active in the engine. */
     this.bodies = [];
@@ -75,9 +79,6 @@ function PhysicsEngine(options) {
     this.origin = options.origin || new Vec3();
     this.orientation = options.orientation ? options.orientation.normalize() :  new Quaternion();
 
-    this.prestep = [];
-    this.poststep = [];
-
     this.frameDependent = options.frameDependent || false;
 
     this.transformBuffers = {
@@ -85,6 +86,45 @@ function PhysicsEngine(options) {
         rotation: [0, 0, 0, 1]
     };
 }
+
+/**
+ * Listen for a specific event.
+ *
+ * @method on
+ * @param {String} key
+ * @param {Function} callback
+ * @chainable
+ */
+PhysicsEngine.prototype.on = function on(key, callback) {
+    this.events.on(key, callback);
+    return this;
+};
+
+/**
+ * Stop listening for a specific event.
+ *
+ * @method on
+ * @param {String} key
+ * @param {Function} callback
+ * @chainable
+ */
+PhysicsEngine.prototype.off = function off(key, callback) {
+    this.events.off(key, callback);
+    return this;
+};
+
+/**
+ * Trigger an event.
+ *
+ * @method on
+ * @param {String} key
+ * @param {Object} payload
+ * @chainable
+ */
+PhysicsEngine.prototype.trigger = function trigger(key, payload) {
+    this.events.trigger(key, payload);
+    return this;
+};
 
 /**
  * Set the origin of the world.
@@ -285,9 +325,7 @@ PhysicsEngine.prototype.update = function update(time) {
     var force, body, constraint;
 
     while(delta > step) {
-        for (i = 0, len = this.prestep.length; i < len; i++) {
-            this.prestep[i](time, dt);
-        }
+        this.events.trigger('prestep', time);
 
         // Update Forces on particles
         for (i = 0, len = forces.length; i < len; i++) {
@@ -326,9 +364,7 @@ PhysicsEngine.prototype.update = function update(time) {
             _integratePose(body, dt);
         }
 
-        for (i = 0, len = this.poststep.length; i < len; i++) {
-            this.poststep[i](time, dt);
-        }
+        this.events.trigger('poststep', time);
 
         if (frameDependent) delta = 0;
         else delta -= step;

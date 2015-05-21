@@ -27,16 +27,12 @@
 var Transitionable = require('../transitions/Transitionable');
 
 /**
- * Size component used for managing the size of the underlying RenderContext.
+ * Size component used for managing the size of the Node it is attached to.
  * Supports absolute and relative (proportional and differential) sizing.
  *
  * @class Size
- * @constructor
- * @component
  *
- * @param {LocalDispatch} node LocalDispatch to be retrieved from
- *                                 corresponding RenderNode of the Size
- *                                 component
+ * @param {Node} node Node that the Size component is attached to
  */
 function Size(node) {
     this._node = node;
@@ -69,11 +65,26 @@ Size.ABSOLUTE = 1;
 Size.RENDER = 2;
 Size.DEFAULT = Size.RELATIVE;
 
+/**
+ * Set which mode each axis of Size will have its dimensions
+ * calculated by.
+ *
+ * @method
+ *
+ * @return {Size} this
+ */
 Size.prototype.setMode = function setMode(x, y, z) {
     this._node.setSizeMode(x, y, z);
     return this;
 };
 
+/**
+ * Return the name of the Size component
+ *
+ * @method
+ *
+ * @return {String} Name of the component
+ */
 Size.prototype.toString = function toString() {
     return 'Size';
 };
@@ -104,12 +115,12 @@ Size.prototype.toString = function toString() {
  */
 
 /**
-* Returns serialized state of the component.
-*
-* @method getValue
-*
-* @return {absoluteSizeValue|relativeSizeValue}
-*/
+ * Returns serialized state of the component.
+ *
+ * @method
+ *
+ * @return {Object} the internal state of the component
+ */
 Size.prototype.getValue = function getValue() {
     return {
         sizeMode: this._node.value.sizeMode,
@@ -132,17 +143,14 @@ Size.prototype.getValue = function getValue() {
 };
 
 /**
-* Updates state of component.
-*
-* @method setValue
-*
-* @param {absoluteSizeValue|relativeSizeValue} state state encoded in same
-*                                                    format as state retrieved
-*                                                    through `getValue`
-* @return {Boolean}                                  boolean indicating
-*                                                    whether the new state has
-*                                                    been applied
-*/
+ * Updates state of component.
+ *
+ * @method
+ *
+ * @param {Object} state state encoded in same format as state retrieved through `getValue`
+ *
+ * @return {Boolean} boolean indicating whether the new state has been applied
+ */
 Size.prototype.setValue = function setValue(state) {
     if (this.toString() === state.component) {
         this.setMode.apply(this, state.sizeMode);
@@ -159,9 +167,29 @@ Size.prototype.setValue = function setValue(state) {
     return false;
 };
 
+/**
+ * Helper function that grabs the activity of a certain type of size.
+ *
+ * @method
+ * @private
+ *
+ * @param {Object} type Representation of a type of the sizing model
+ *
+ * @return {Boolean} boolean indicating whether the new state has been applied
+ */
 Size.prototype._isActive = function _isActive(type) {
     return type.x.isActive() || type.y.isActive() || type.z.isActive();
 };
+
+/**
+ * Helper function that grabs the activity of a certain type of size.
+ *
+ * @method
+ *
+ * @param {String} type Type of size
+ *
+ * @return {Boolean} boolean indicating whether the new state has been applied
+ */
 
 Size.prototype.isActive = function isActive(){
     return (
@@ -171,6 +199,14 @@ Size.prototype.isActive = function isActive(){
     );
 };
 
+/**
+ * When the node this component is attached to updates, update the value
+ * of the Node's size.
+ *
+ * @method
+ *
+ * @return {undefined} undefined
+ */
 Size.prototype.onUpdate = function onUpdate() {
     var abs = this._absolute;
     this._node.setAbsoluteSize(
@@ -199,8 +235,7 @@ Size.prototype.onUpdate = function onUpdate() {
 /**
 * Applies absolute size.
 *
-* @method setAbsolute
-* @chainable
+* @method
 *
 * @param {Number} x used to set absolute size in x-direction (width)
 * @param {Number} y used to set absolute size in y-direction (height)
@@ -245,8 +280,7 @@ Size.prototype.setAbsolute = function setAbsolute(x, y, z, options, callback) {
 /**
 * Applies proportional size.
 *
-* @method setProportional
-* @chainable
+* @method
 *
 * @param {Number} x used to set proportional size in x-direction (width)
 * @param {Number} y used to set proportional size in y-direction (height)
@@ -292,8 +326,7 @@ Size.prototype.setProportional = function setProportional(x, y, z, options, call
 /**
 * Applies differential size to Size component.
 *
-* @method setDifferential
-* @chainable
+* @method
 *
 * @param {Number} x used to set differential size in x-direction (width)
 * @param {Number} y used to set differential size in y-direction (height)
@@ -301,6 +334,7 @@ Size.prototype.setProportional = function setProportional(x, y, z, options, call
 * @param {Object} options options hash
 * @param {Function} callback callback function to be executed after the
 *                            transitions have been completed
+* @return {Size} this
 */
 Size.prototype.setDifferential = function setDifferential(x, y, z, options, callback) {
     if (!this._requestingUpdate) {
@@ -336,12 +370,12 @@ Size.prototype.setDifferential = function setDifferential(x, y, z, options, call
 };
 
 /**
-* Retrieves the computed size applied to the underlying RenderContext.
-*
-* @method get
-*
-* @return {Number[]} size three dimensional computed size
-*/
+ * Retrieves the computed size applied to the underlying Node.
+ *
+ * @method
+ *
+ * @return {Array} size three dimensional computed size
+ */
 Size.prototype.get = function get () {
     return this._node.getSize();
 };
@@ -349,8 +383,7 @@ Size.prototype.get = function get () {
 /**
  * Halts all currently active size transitions.
  *
- * @method halt
- * @chainable
+ * @method
  *
  * @return {Size} this
  */

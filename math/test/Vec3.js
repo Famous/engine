@@ -290,8 +290,6 @@ test('Vec3', function(t) {
 
     t.test('applyMatrix method', function(t) {
         // TODO
-        var matrix = new MockMatrix([1, 2, 3]);
-
 
         t.end();
     });

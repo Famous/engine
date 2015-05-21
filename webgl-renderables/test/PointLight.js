@@ -102,29 +102,19 @@ test('PointLight', function(t) {
         t.end();
     });
 
-    t.test('PointLight.prototype.toString', function(t) {
-
-        t.equal(typeof PointLight.prototype.toString, 'function',
-            'should be a function');
-
-        t.equal(PointLight.prototype.toString(), 'PointLight');
-
-        t.end();
-    });
-
     t.test('PointLight.prototype._receiveTransformChange', function(t) {
 
         pointLight = createPointLight();
-        t.equal(typeof pointLight._receiveTransformChange, 'function',
+        t.equal(typeof pointLight.onTransformChange, 'function',
             'should be a function');
 
         var dispatch = new MockDispatch();
         t.doesNotThrow(function() {
-            pointLight._receiveTransformChange(dispatch.getContext()._transform);
+            pointLight.onTransformChange(dispatch.getContext()._transform);
         }, 'should not throw an error given an appropriate input');
 
         t.throws(function() {
-            pointLight._receiveTransformChange();
+            pointLight.onTransformChange();
         }, 'should throw an error without a dispatch');
 
         t.true(contains(['GL_LIGHT_POSITION'], pointLight.queue),

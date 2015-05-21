@@ -1,18 +1,18 @@
 /**
  * The MIT License (MIT)
- * 
+ *
  * Copyright (c) 2015 Famous Industries Inc.
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -36,11 +36,11 @@ var GeometryHelper = require('../GeometryHelper');
  *
  * @param {Object} options Parameters that alter the
  * vertex buffers of the generated geometry.
- * 
+ *
  * @return {Object} constructed geometry
  */
 function Circle (options) {
-    var options  = options || {};
+    options  = options || {};
     var detail   = options.detail || 30;
     var buffers  = getCircleBuffers(detail, true);
 
@@ -53,9 +53,9 @@ function Circle (options) {
 
     return new Geometry({
         buffers: [
-            { name: 'pos', data: buffers.vertices },
-            { name: 'texCoord', data: textureCoords, size: 2 },
-            { name: 'normals', data: normals },
+            { name: 'a_pos', data: buffers.vertices },
+            { name: 'a_texCoord', data: textureCoords, size: 2 },
+            { name: 'a_normals', data: normals },
             { name: 'indices', data: buffers.indices, size: 1 }
         ]
     });
@@ -67,8 +67,7 @@ function getCircleTexCoords (vertices) {
 
     for (var i = 0; i < nFaces; i++) {
         var x = vertices[i * 3],
-            y = vertices[i * 3 + 1],
-            z = vertices[i * 3 + 2];
+            y = vertices[i * 3 + 1];
 
         textureCoords.push(0.5 + x * 0.5, 0.5 + -y * 0.5);
     }
@@ -80,15 +79,14 @@ function getCircleTexCoords (vertices) {
  * Calculates and returns all vertex positions, texture
  * coordinates and normals of the circle primitive.
  *
- * @method getBuffers
+ * @method
  *
  * @param {Number} detail Amount of detail that determines how many
  * vertices are created and where they are placed
- * 
+ *
  * @return {Object} constructed geometry
  */
 function getCircleBuffers(detail) {
-    var detail = detail;
     var vertices = [0, 0, 0];
     var indices = [];
     var counter = 1;

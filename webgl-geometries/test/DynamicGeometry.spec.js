@@ -33,14 +33,14 @@ test('DynamicGeometry', function(t) {
 
         t.ok(geometry.spec instanceof Object, 'should have a spec object');
         t.equal(geometry.spec.bufferNames.length, 0, 'should not have any vertex buffers by default');
-        t.ok(geometry.spec.type === 4, 'should have correct default draw style.');
+        t.ok(geometry.spec.type === 'TRIANGLES', 'should have correct default draw style.');
 
         var indexValue = [[1, 2, 3]];
         var secondGeometry = new DynamicGeometry({
             buffers: [{ name: 'indices', data: indexValue, size: 1 }]
         });
 
-        t.notEqual(geometry.id, secondGeometry.id, 'should have unique ID');
+        t.notEqual(geometry.id, secondGeometry.spec.id, 'should have unique ID');
         t.ok(secondGeometry.spec.bufferNames.indexOf('indices') !== -1, 'should pass buffer names to geometry spec');
         t.ok(secondGeometry.spec.bufferValues.indexOf(indexValue) !== -1, 'should pass buffer values to geometry spec');
 
@@ -101,7 +101,7 @@ test('DynamicGeometry', function(t) {
 
         var geometry = new DynamicGeometry({
             buffers: [{
-                name: 'pos', data: posAttribArray
+                name: 'a_pos', data: posAttribArray
             }]
         });
 
@@ -130,13 +130,13 @@ test('DynamicGeometry', function(t) {
         geometry.setVertexPositions(vertexPositions);
 
         t.deepEquals(
-            geometry.spec.bufferValues[geometry.spec.bufferNames.indexOf('pos')],
+            geometry.spec.bufferValues[geometry.spec.bufferNames.indexOf('a_pos')],
             vertexPositions,
             'Should set vertex data to the pos attribute of the geometry'
         );
 
         t.equals(
-            geometry.spec.bufferSpacings[geometry.spec.bufferNames.indexOf('pos')],
+            geometry.spec.bufferSpacings[geometry.spec.bufferNames.indexOf('a_pos')],
             3,
             'Should set buffer spacing to 3 for pos attribute'
         );
@@ -151,13 +151,13 @@ test('DynamicGeometry', function(t) {
         geometry.setNormals(vertexNormals);
 
         t.deepEquals(
-            geometry.spec.bufferValues[geometry.spec.bufferNames.indexOf('normals')],
+            geometry.spec.bufferValues[geometry.spec.bufferNames.indexOf('a_normals')],
             vertexNormals,
             'Should set vertex data to the "normal" attribute of the geometry'
         );
 
         t.equals(
-            geometry.spec.bufferSpacings[geometry.spec.bufferNames.indexOf('normals')],
+            geometry.spec.bufferSpacings[geometry.spec.bufferNames.indexOf('a_normals')],
             3,
             'Should set buffer spacing to 3 for normal attribute'
         );
@@ -172,13 +172,13 @@ test('DynamicGeometry', function(t) {
         geometry.setTextureCoords(textureCoords);
 
         t.deepEquals(
-            geometry.spec.bufferValues[geometry.spec.bufferNames.indexOf('texCoord')],
+            geometry.spec.bufferValues[geometry.spec.bufferNames.indexOf('a_texCoord')],
             textureCoords,
             'Should set vertex data to the "texCoord" attribute of the geometry'
         );
 
         t.equals(
-            geometry.spec.bufferSpacings[geometry.spec.bufferNames.indexOf('texCoord')],
+            geometry.spec.bufferSpacings[geometry.spec.bufferNames.indexOf('a_texCoord')],
             2,
             'Should set buffer spacing to 2 for texCoord attribute'
         );

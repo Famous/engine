@@ -114,15 +114,15 @@ var snippets = {
 
     /* The normal function returns the 3-dimensional surface normal, which is a vector that is perpendicular to the tangent plane at that point.*/
 
-    normal: { glsl: 'vec4((v_Normal + 1.0) * 0.5, 1.0);', output: 4 },
+    normal: { glsl: 'vec4((v_normal + 1.0) * 0.5, 1.0);', output: 4 },
 
     /* The uv function returns the 2-dimensional vector that maps the object's 3-dimensional vertices to a 2D plane. */
 
-    uv: {glsl:'v_TextureCoordinate;', output: 2},
+    uv: {glsl:'v_textureCoordinate;', output: 2},
 
     /* The mesh position function returns the transformed fragment's position in world-space.  */
 
-    meshPosition: {glsl:'(v_Position + 1.0) * 0.5;', output: 3},
+    meshPosition: {glsl:'(v_position + 1.0) * 0.5;', output: 3},
 
 
     normalize: {glsl: 'normalize(%1)', output: {1: 1, 2: 2, 3: 3, 4: 4}},
@@ -132,14 +132,14 @@ var snippets = {
 
     /* The image function fetches the model's */
 
-    image: {glsl:'texture2D($TEXTURE, v_TextureCoordinate);', output: 4 },
+    image: {glsl:'texture2D($TEXTURE, v_textureCoordinate);', output: 4 },
 
 
     /* The constant function returns a static value which is defined at compile-time that cannot be changed dynamically.*/
 
     constant: {glsl: '%1;'},
 
-    /* The Parameter expression has values that can be modified (dynamically during runtime in some cases) in a MaterialInstance of the base material containing the parameter. These expressions should be given unique names, via the Parameter Name property, to be used when identifying the specific parameter in the MaterialInstance. If two parameters of the same type have the same name in the same material, they will be assumed to be the same parameter. Changing the value of the parameter in the MaterialInstance would change the value of both the parameter expressions in the material. A default value for the parameter will also be set in the base material. This will be the value of the parameter in the MaterialInstance unless it is overridden and modified there. */
+    /* The Parameter function has values that can be modified (dynamically during runtime in some cases) in a MaterialInstance of the base material containing the parameter. These expressions should be given unique names, via the Parameter Name property, to be used when identifying the specific parameter in the MaterialInstance. If two parameters of the same type have the same name in the same material, they will be assumed to be the same parameter. Changing the value of the parameter in the MaterialInstance would change the value of both the parameter expressions in the material. A default value for the parameter will also be set in the base material. This will be the value of the parameter in the MaterialInstance unless it is overridden and modified there. */
 
     parameter: {uniforms: {parameter: 1}, glsl: 'parameter;'},
     vec3: {glsl: 'vec3(%1);', output: 3},
@@ -152,8 +152,8 @@ expressions.registerExpression = function registerExpression(name, schema) {
     };
 };
 
-for (var name in snippets) {
-    expressions.registerExpression(name, snippets[name]);
+for (var snippetName in snippets) {
+    expressions.registerExpression(snippetName, snippets[snippetName]);
 }
 
 /**
@@ -207,8 +207,3 @@ expressions.Texture = function (source) {
 expressions.Custom = function (schema, inputs, uniforms) {
     return new Material('custom', {glsl: schema, output: 1, uniforms: uniforms || {}} , inputs);
 };
-
-function typeofConst(c) {
-    if (Array.isArray(c)) return 'vec' + c.length + ' ';
-    else return 'float ';
-}

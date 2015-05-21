@@ -42,8 +42,6 @@ var GeometryHelper = require('../GeometryHelper');
 function Icosahedron() {
     var t = ( 1 + Math.sqrt( 5 ) ) / 2;
 
-    var geometry;
-    var detail;
     var vertices = [
         - 1,   t,  0,    1,  t,  0,   - 1, - t,  0,    1, - t,  0,
           0, - 1, -t,    0,  1, -t,     0, - 1,  t,    0,   1,  t,
@@ -65,9 +63,9 @@ function Icosahedron() {
 
     return new Geometry({
         buffers: [
-            { name: 'pos', data: vertices },
-            { name: 'texCoord', data: textureCoords, size: 2 },
-            { name: 'normals', data: normals },
+            { name: 'a_pos', data: vertices },
+            { name: 'a_texCoord', data: textureCoords, size: 2 },
+            { name: 'a_normals', data: normals },
             { name: 'indices', data: indices, size: 1 }
         ]
     });

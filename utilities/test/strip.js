@@ -22,7 +22,7 @@
  * THE SOFTWARE.
  */
 
-'use strict'
+'use strict';
 
 var test = require('tape');
 var strip = require('../strip');

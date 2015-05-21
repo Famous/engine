@@ -50,7 +50,7 @@ CallbackStore.prototype.on = function on (key, callback) {
     callbackList.push(callback);
     return function () {
         callbackList.splice(callbackList.indexOf(callback), 1);
-    }
+    };
 };
 
 /**

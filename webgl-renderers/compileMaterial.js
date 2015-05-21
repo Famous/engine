@@ -1,18 +1,18 @@
 /**
  * The MIT License (MIT)
- * 
+ *
  * Copyright (c) 2015 Famous Industries Inc.
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -31,11 +31,15 @@ var types = {
 };
 
 /**
- * Converts material graph into chunk
+ * Traverses material to create a string of glsl code to be applied in
+ * the vertex or fragment shader.
  *
- * @method _compile
+ * @method
  * @protected
  *
+ * @param {Object}      material    Material to be compiled.
+ * @param {Number}      textureSlot Next available texture slot for Mesh.
+ * @return {undefined}  undefined
  */
 function compileMaterial(material, textureSlot) {
     var glsl = '';
@@ -47,8 +51,8 @@ function compileMaterial(material, textureSlot) {
 
     _traverse(material, function (node, depth) {
         if (! node.chunk) return;
-        
-        var type = types[_getOutputType(node)];
+
+        var type = types[_getOutputLength(node)];
         var label = _makeLabel(node);
         var output = _processGLSL(node.chunk.glsl, node.inputs, textures.length + textureSlot);
 
@@ -72,14 +76,8 @@ function compileMaterial(material, textureSlot) {
     };
 }
 
-/**
- * Iterates over material graph
- *
- * @method traverse
- * @chainable
- *
- * @param {Function} invoked upon every expression in the graph
- */
+// Recursively iterates over a material's inputs, invoking a given callback
+// with the current material
 function _traverse(material, callback) {
 	var inputs = material.inputs;
     var len = inputs && inputs.length;
@@ -93,7 +91,9 @@ function _traverse(material, callback) {
     return material;
 }
 
-function _getOutputType(node) {
+// Helper function used to infer length of the output
+// from a given material node.
+function _getOutputLength(node) {
 
     // Handle constant values
 
@@ -101,34 +101,40 @@ function _getOutputType(node) {
     if (Array.isArray(node)) return node.length;
 
     // Handle materials
-    
+
     var output = node.chunk.output;
     if (typeof output === 'number') return output;
 
     // Handle polymorphic output
 
-    var key = node.inputs.map(function recurse(node) { return _getOutputType(node); }).join(',');
+    var key = node.inputs.map(function recurse(node) { return _getOutputLength(node); }).join(',');
     return output[key];
 }
 
+// Helper function to run replace inputs and texture tags with
+// correct glsl.
 function _processGLSL(str, inputs, textureSlot) {
     return str
         .replace(/%\d/g, function (s) {
             return _makeLabel(inputs[s[1]-1]);
         })
-        .replace(/\$TEXTURE/, 'u_Textures[' + textureSlot + ']');
+        .replace(/\$TEXTURE/, 'u_textures[' + textureSlot + ']');
 }
 
+// Helper function used to create glsl definition of the
+// input material node.
 function _makeLabel (n) {
     if (Array.isArray(n)) return arrayToVec(n);
     if (typeof n == 'object') return 'fa_' + (n._id);
     else return n.toFixed(6);
 }
 
+// Helper to copy the properties of an object onto another object.
 function _extend (a, b) {
 	for (var k in b) a[k] = b[k];
 }
 
+// Helper to create glsl vector representation of a javascript array.
 function _arrayToVec(array) {
     var len = array.length;
     return 'vec' + len + '(' + array.join(',')  + ')';

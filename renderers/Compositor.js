@@ -1,18 +1,18 @@
 /**
  * The MIT License (MIT)
- * 
+ *
  * Copyright (c) 2015 Famous Industries Inc.
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -25,24 +25,28 @@
 'use strict';
 
 var Context = require('./Context');
+var injectCSS = require('./inject-css');
 
 /**
  * Instantiates a new Compositor, used for routing commands received from the
- * WebWorker to the WebGL and DOM renderer.
+ * the global FamousEngine core singleton or WebWorker to the WebGL and DOM renderer.
  *
  * @class Compositor
  * @constructor
+ * @return {undefined} undefined
  */
 function Compositor() {
+    injectCSS();
+
     this._contexts = {};
     this._outCommands = [];
     this._inCommands = [];
-    this._time = null
+    this._time = null;
 
     this._resized = false;
 
     var _this = this;
-    window.addEventListener('resize', function(ev) {
+    window.addEventListener('resize', function() {
         _this._resized = true;
     });
 }
@@ -50,42 +54,45 @@ function Compositor() {
 /**
  * Retrieves the time being used by the internal clock managed by
  * `FamousEngine`.
- * 
- * @method  getTime
- *  
- * @return {Number}     Clock time.
- */ 
+ *
+ * @method
+ *
+ * @return {Number} Clock time.
+ */
 Compositor.prototype.getTime = function getTime() {
     return this._time;
 };
 
 /**
- * Schedules an event to be sent to the WebWorker the next time the out command
+ * Schedules an event to be sent the next time the out command
  * queue is being flushed.
  *
- * @method sendEvent
+ * @method
  * @private
  *
- * @param  {String} path    render path to the node the event should be
- *                          triggered on (*targeted event*)
- * @param  {String} ev      event type
- * @param  {Object} payload event object (serializable using structured
- *                          cloning algorithm)
+ * @param  {String} path Render path to the node the event should be triggered
+ * on (*targeted event*)
+ * @param  {String} ev Event type
+ * @param  {Object} payload Event object (serializable using structured cloning
+ * algorithm)
+ *
+ * @return {undefined} undefined
  */
 Compositor.prototype.sendEvent = function sendEvent(path, ev, payload) {
     this._outCommands.push('WITH', path, 'TRIGGER', ev, payload);
 };
 
 /**
- * Internal helper method used for notifying the WebWorker about externally
+ * Internal helper method used for notifying externally
  * resized contexts (e.g. by resizing the browser window).
  *
- * @method sendResize
+ * @method
  * @private
  *
- * @param  {String} selector    render path to the node (context) that should
- *                              be resized
- * @param  {Array} size         new context size
+ * @param  {String} selector render path to the node (context) that should be resized
+ * @param  {Array} size new context size
+ *
+ * @return {undefined} undefined
  */
 Compositor.prototype.sendResize = function sendResize (selector, size) {
     this.sendEvent(selector, 'CONTEXT_RESIZE', size);
@@ -94,31 +101,33 @@ Compositor.prototype.sendResize = function sendResize (selector, size) {
 /**
  * Internal helper method used by `drawCommands`.
  *
- * @method handleWith
+ * @method
  * @private
  *
- * @param  {Array} commands     remaining message queue received from the
- *                              WebWorker, used to shift single messages from
+ * @param  {Number} iterator position index within the commands queue
+ * @param  {Array} commands remaining message queue received, used to
+ * shift single messages from
+ *
+ * @return {undefined} undefined
  */
 Compositor.prototype.handleWith = function handleWith (iterator, commands) {
     var path = commands[iterator];
     var pathArr = path.split('/');
     var context = this.getOrSetContext(pathArr.shift());
-    return context.receive(pathArr, path, commands, iterator);
+    return context.receive(path, commands, iterator);
 };
 
 /**
  * Retrieves the top-level Context associated with the passed in document
  * query selector. If no such Context exists, a new one will be instantiated.
  *
- * @method getOrSetContext
+ * @method
  * @private
  *
- * @param  {String} selector            document query selector used for
- *                                      retrieving the DOM node the
- *                                      VirtualElement should be attached to
- * @return {Object} result
- * @return {Context}                    final VirtualElement
+ * @param  {String} selector document query selector used for retrieving the
+ * DOM node the VirtualElement should be attached to
+ *
+ * @return {Object} context
  */
 Compositor.prototype.getOrSetContext = function getOrSetContext(selector) {
     if (this._contexts[selector]) return this._contexts[selector];
@@ -128,11 +137,14 @@ Compositor.prototype.getOrSetContext = function getOrSetContext(selector) {
 /**
  * Internal helper method used by `drawCommands`.
  *
- * @method giveSizeFor
+ * @method
  * @private
  *
- * @param  {Array} commands     remaining message queue received from the
- *                              WebWorker, used to shift single messages from
+ * @param  {Number} iterator position index within the commands queue
+ * @param  {Array} commands remaining message queue received, used to
+ * shift single messages
+ *
+ * @return {undefined} undefined
  */
 Compositor.prototype.giveSizeFor = function giveSizeFor(iterator, commands) {
     var selector = commands[iterator];
@@ -145,10 +157,9 @@ Compositor.prototype.giveSizeFor = function giveSizeFor(iterator, commands) {
  * command queue.
  * Called by ThreadManager.
  *
- * @method drawCommands
+ * @method
  *
- * @return {Array} outCommands  set of commands to be sent back to the
- *                              WebWorker
+ * @return {Array} outCommands set of commands to be sent back
  */
 Compositor.prototype.drawCommands = function drawCommands() {
     var commands = this._inCommands;
@@ -186,8 +197,10 @@ Compositor.prototype.drawCommands = function drawCommands() {
  * Used by ThreadManager to update the interal queue of incoming commands.
  * Receiving commands does not immediately start the rederning process.
  *
- * @param  {Array} commands     command queue to be processed by the
- *                              compositor's `drawCommands` method
+ * @param  {Array} commands command queue to be processed by the compositor's
+ * `drawCommands` method
+ *
+ * @return {undefined} undefined
  */
 Compositor.prototype.receiveCommands = function receiveCommands(commands) {
     var len = commands.length;
@@ -200,7 +213,9 @@ Compositor.prototype.receiveCommands = function receiveCommands(commands) {
  * Flushes the queue of outgoing "out" commands.
  * Called by ThreadManager.
  *
- * @method clearCommands
+ * @method
+ *
+ * @return {undefined} undefined
  */
 Compositor.prototype.clearCommands = function clearCommands() {
     this._inCommands.length = 0;

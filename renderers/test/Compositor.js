@@ -74,8 +74,8 @@ test('Compositor', function(t) {
         var wasCalled = false;
 
         compositor._inCommands.push(path);
-        compositor._contexts['body'] = new Context('body', compositor);
-        compositor._contexts['body'].receive = function() { wasCalled = true; };
+        compositor._contexts.body = new Context('body', compositor);
+        compositor._contexts.body.receive = function() { wasCalled = true; };
         compositor.handleWith(0, compositor._inCommands);
 
         t.equals(
@@ -151,7 +151,7 @@ test('Compositor', function(t) {
         for (var i = 0; i < contexts.length; i++) {
             contexts[i].draw = function() {
                 this.hasBeenDrawn = true;
-            }
+            };
         }
 
         compositor._inCommands.push('WITH', paths[0], 'WITH', paths[1], 'WITH', paths[2]);
@@ -211,7 +211,7 @@ test('Compositor', function(t) {
     t.end();
 });
 
-function shouldInclude (arr, t, target, deep) {
+function shouldInclude (arr, t, target) {
     return t.ok(
         ~arr.indexOf(target),
         'Should push a ' + target + ' command to the outCommands array'

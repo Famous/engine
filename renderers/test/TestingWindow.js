@@ -33,7 +33,7 @@ ClassList.prototype.add = function add(className) {
     this._classes.push(className);
 
     this._element.className += (' ' + className);
-}
+};
 
 function DOMElement(tagName) {
     this.style = {};
@@ -46,7 +46,7 @@ function DOMElement(tagName) {
 
 DOMElement.prototype.appendChild = function(element) {
     return this._children.push(element);
-}
+};
 
 function Document() {
     this.body = new DOMElement('body');
@@ -77,7 +77,6 @@ Document.prototype.querySelector = function(selector) {
 
 function _traverse(node, cb) {
     var i = node._children.length;
-    var child;
 
     cb(node);
 
@@ -86,6 +85,5 @@ function _traverse(node, cb) {
 
 module.exports = {
     document: new Document(),
-
-    addEventListener: function(ev, cb) {},
+    addEventListener: function() {}
 };

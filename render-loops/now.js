@@ -21,19 +21,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 'use strict';
 
-/**
- * Flat clone an object.
- * @memberof Utilities
- * @param {Object} obj - Object to clone
- * @return {Object} Cloned object
- */
-function flatClone(obj) {
-    var clone = {};
-    for (var key in obj) clone[key] = obj[key];
-    return clone;
-}
+// Polyfill for performance.now()
+var now = typeof performance !== 'undefined' ? function() {
+    return performance.now();
+} : Date.now;
 
-module.exports = flatClone;
+module.exports = now;

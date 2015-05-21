@@ -27,18 +27,29 @@
 var Position = require('./Position');
 
 /**
+ * Scale is a component that allows the tweening of a Node's scale. Scale
+ * happens about a Node's origin which is by default [0, 0, .5].
+ *
  * @class Scale
- * @constructor
- * @component
- * @param {LocalDispatch} dispatch LocalDispatch to be retrieved from corresponding Render Node of the Scale component
+ * @augments Position
+ *
+ * @param {Node} node Node that the Scale component will be attached to
  */
 function Scale(node) {
     Position.call(this, node);
+
     this._x.set(1);
     this._y.set(1);
     this._z.set(1);
 }
 
+/**
+ * Return the name of the Scale component
+ *
+ * @method
+ *
+ * @return {String} Name of the component
+ */
 Scale.prototype.toString = function toString() {
     return 'Scale';
 };
@@ -46,6 +57,14 @@ Scale.prototype.toString = function toString() {
 Scale.prototype = Object.create(Position.prototype);
 Scale.prototype.constructor = Scale;
 
+/**
+ * When the node this component is attached to updates, update the value
+ * of the Node's scale.
+ *
+ * @method
+ *
+ * @return {undefined} undefined
+ */
 Scale.prototype.update = function update() {
     this._node.setScale(this._x.get(), this._y.get(), this._z.get());
     this._checkUpdate();

@@ -34,8 +34,6 @@
  */
 function Mat33(values) {
     this.values = values || [1,0,0,0,1,0,0,0,1];
-
-    return this;
 }
 
 /**
@@ -191,9 +189,9 @@ Mat33.prototype.getDeterminant = function getDeterminant() {
     var M7 = M[7];
     var M8 = M[8];
 
-    var det = M[0]*(M4*M8 - M5*M7)
-            - M[1]*(M3*M8 - M5*M6)
-            + M[2]*(M3*M7 - M4*M6);
+    var det = M[0]*(M4*M8 - M5*M7) -
+              M[1]*(M3*M8 - M5*M6) +
+              M[2]*(M3*M7 - M4*M6);
 
     return det;
 };
@@ -217,9 +215,9 @@ Mat33.prototype.inverse = function inverse() {
     var M7 = M[7];
     var M8 = M[8];
 
-    var det = M0*(M4*M8 - M5*M7)
-            - M1*(M3*M8 - M5*M6)
-            + M2*(M3*M7 - M4*M6);
+    var det = M0*(M4*M8 - M5*M7) -
+              M1*(M3*M8 - M5*M6) +
+              M2*(M3*M7 - M4*M6);
 
     if (Math.abs(det) < 1e-40) return null;
 
@@ -271,9 +269,9 @@ Mat33.inverse = function inverse(matrix, output) {
     var M7 = M[7];
     var M8 = M[8];
 
-    var det = M0*(M4*M8 - M5*M7)
-            - M1*(M3*M8 - M5*M6)
-            + M2*(M3*M7 - M4*M6);
+    var det = M0*(M4*M8 - M5*M7) -
+              M1*(M3*M8 - M5*M6) +
+              M2*(M3*M7 - M4*M6);
 
     if (Math.abs(det) < 1e-40) return null;
 
