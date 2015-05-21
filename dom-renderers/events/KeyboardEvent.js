@@ -133,6 +133,13 @@ function KeyboardEvent(ev) {
      * @type Boolean
      */
     this.isComposing = ev.isComposing;
+
+    /**
+     * @name KeyboardEvent#keyCode
+     * @type String
+     * @deprecated
+     */
+    this.keyCode = ev.keyCode;
 }
 
 KeyboardEvent.prototype = Object.create(UIEvent.prototype);
