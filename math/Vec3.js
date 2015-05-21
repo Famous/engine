@@ -32,6 +32,7 @@ var sqrt = Math.sqrt;
  * A three-dimensional vector.
  *
  * @class Vec3
+ *
  * @param {Number} x The x component.
  * @param {Number} y The y component.
  * @param {Number} z The z component.
@@ -45,11 +46,13 @@ var Vec3 = function(x ,y, z){
 /**
  * Set the components of the current Vec3.
  *
- * @method set
+ * @method
+ *
  * @param {Number} x The x component.
  * @param {Number} y The y component.
  * @param {Number} z The z component.
- * @chainable
+ *
+ * @return {Vec3} this
  */
 Vec3.prototype.set = function set(x, y, z) {
     if (x != null) this.x = x;
@@ -62,9 +65,11 @@ Vec3.prototype.set = function set(x, y, z) {
 /**
  * Add the input v to the current Vec3.
  *
- * @method add
+ * @method
+ *
  * @param {Vec3} v The Vec3 to add.
- * @chainable
+ *
+ * @return {Vec3} this
  */
 Vec3.prototype.add = function add(v) {
     this.x += v.x;
@@ -77,9 +82,11 @@ Vec3.prototype.add = function add(v) {
 /**
  * Subtract the input v from the current Vec3.
  *
- * @method subtract
+ * @method
+ *
  * @param {Vec3} v The Vec3 to subtract.
- * @chainable
+ *
+ * @return {Vec3} this
  */
 Vec3.prototype.subtract = function subtract(v) {
     this.x -= v.x;
@@ -92,9 +99,11 @@ Vec3.prototype.subtract = function subtract(v) {
 /**
  * Rotate the current Vec3 by theta clockwise about the x axis.
  *
- * @method rotateX
+ * @method
+ *
  * @param {Number} theta Angle by which to rotate.
- * @chainable
+ *
+ * @return {Vec3} this
  */
 Vec3.prototype.rotateX = function rotateX(theta) {
     var y = this.y;
@@ -112,9 +121,11 @@ Vec3.prototype.rotateX = function rotateX(theta) {
 /**
  * Rotate the current Vec3 by theta clockwise about the y axis.
  *
- * @method rotateY
+ * @method
+ *
  * @param {Number} theta Angle by which to rotate.
- * @chainable
+ *
+ * @return {Vec3} this
  */
 Vec3.prototype.rotateY = function rotateY(theta) {
     var x = this.x;
@@ -132,9 +143,11 @@ Vec3.prototype.rotateY = function rotateY(theta) {
 /**
  * Rotate the current Vec3 by theta clockwise about the z axis.
  *
- * @method rotateZ
+ * @method
+ *
  * @param {Number} theta Angle by which to rotate.
- * @chainable
+ *
+ * @return {Vec3} this
  */
 Vec3.prototype.rotateZ = function rotateZ(theta) {
     var x = this.x;
@@ -152,9 +165,11 @@ Vec3.prototype.rotateZ = function rotateZ(theta) {
 /**
  * The dot product of the current Vec3 with input Vec3 v.
  *
- * @method dot
+ * @method
+ *
  * @param {Vec3} v The other Vec3.
- * @return {Number}
+ *
+ * @return {Vec3} this
  */
 Vec3.prototype.dot = function dot(v) {
     return this.x*v.x + this.y*v.y + this.z*v.z;
@@ -165,8 +180,10 @@ Vec3.prototype.dot = function dot(v) {
  * Stores the result in the current Vec3.
  *
  * @method cross
- * @param {Vec3} v The other Vec3.
- * @chainable
+ *
+ * @param {Vec3} v The other Vec3
+ *
+ * @return {Vec3} this
  */
 Vec3.prototype.cross = function cross(v) {
     var x = this.x;
@@ -186,9 +203,11 @@ Vec3.prototype.cross = function cross(v) {
 /**
  * Scale the current Vec3 by a scalar.
  *
- * @method scale
- * @param {Number} s The Number by which to scale.
- * @chainable
+ * @method
+ *
+ * @param {Number} s The Number by which to scale
+ *
+ * @return {Vec3} this
  */
 Vec3.prototype.scale = function scale(s) {
     this.x *= s;
@@ -201,8 +220,9 @@ Vec3.prototype.scale = function scale(s) {
 /**
  * Preserve the magnitude but invert the orientation of the current Vec3.
  *
- * @method invert
- * @chainable
+ * @method
+ *
+ * @return {Vec3} this
  */
 Vec3.prototype.invert = function invert() {
     this.x = -this.x;
@@ -215,9 +235,11 @@ Vec3.prototype.invert = function invert() {
 /**
  * Apply a function component-wise to the current Vec3.
  *
- * @method map
+ * @method
+ *
  * @param {Function} fn Function to apply.
- * @chainable
+ *
+ * @return {Vec3} this
  */
 Vec3.prototype.map = function map(fn) {
     this.x = fn(this.x);
@@ -230,8 +252,9 @@ Vec3.prototype.map = function map(fn) {
 /**
  * The magnitude of the current Vec3.
  *
- * @method length
- * @return {Number}
+ * @method
+ *
+ * @return {Number} the magnitude of the Vec3
  */
 Vec3.prototype.length = function length() {
     var x = this.x;
@@ -244,8 +267,9 @@ Vec3.prototype.length = function length() {
 /**
  * The magnitude squared of the current Vec3.
  *
- * @method length
- * @return {Number}
+ * @method
+ *
+ * @return {Number} magnitude of the Vec3 squared
  */
 Vec3.prototype.lengthSq = function lengthSq() {
     var x = this.x;
@@ -258,9 +282,11 @@ Vec3.prototype.lengthSq = function lengthSq() {
 /**
  * Copy the input onto the current Vec3.
  *
- * @method copy
- * @param {Vec3} v Vec3 to copy.
- * @chainable
+ * @method
+ *
+ * @param {Vec3} v Vec3 to copy
+ *
+ * @return {Vec3} this
  */
 Vec3.prototype.copy = function copy(v) {
     this.x = v.x;
@@ -272,8 +298,9 @@ Vec3.prototype.copy = function copy(v) {
 /**
  * Reset the current Vec3.
  *
- * @method clear
- * @chainable
+ * @method
+ *
+ * @return {Vec3} this
  */
 Vec3.prototype.clear = function clear() {
     this.x = 0;
@@ -285,8 +312,9 @@ Vec3.prototype.clear = function clear() {
 /**
  * Check whether the magnitude of the current Vec3 is exactly 0.
  *
- * @method isZero
- * @return {Boolean}
+ * @method
+ *
+ * @return {Boolean} whether or not the magnitude is zero
  */
 Vec3.prototype.isZero = function isZero() {
     return this.x === 0 && this.y === 0 && this.z === 0;
@@ -295,8 +323,9 @@ Vec3.prototype.isZero = function isZero() {
 /**
  * The array form of the current Vec3.
  *
- * @method toArray
- * @return {Number[]}
+ * @method
+ *
+ * @return {Array} a three element array representing the components of the Vec3
  */
 Vec3.prototype.toArray = function toArray() {
     return [this.x, this.y, this.z];
@@ -305,8 +334,9 @@ Vec3.prototype.toArray = function toArray() {
 /**
  * Preserve the orientation but change the length of the current Vec3 to 1.
  *
- * @method normalize
- * @chainable
+ * @method
+ *
+ * @return {Vec3} this
  */
 Vec3.prototype.normalize = function normalize() {
     var x = this.x;
@@ -326,9 +356,11 @@ Vec3.prototype.normalize = function normalize() {
  * Apply the rotation corresponding to the input (unit) Quaternion
  * to the current Vec3.
  *
- * @method applyRotation
- * @param {Quaternion} q Unit Quaternion representing the rotation to apply.
- * @chainable
+ * @method
+ *
+ * @param {Quaternion} q Unit Quaternion representing the rotation to apply
+ *
+ * @return {Vec3} this
  */
 Vec3.prototype.applyRotation = function applyRotation(q) {
     var cw = q.w;
@@ -359,9 +391,11 @@ Vec3.prototype.applyRotation = function applyRotation(q) {
 /**
  * Apply the input Mat33 the the current Vec3.
  *
- * @method applyMatrix
- * @param {Mat33} matrix Mat33 to apply.
- * @chainable
+ * @method
+ *
+ * @param {Mat33} matrix Mat33 to apply
+ *
+ * @return {Vec3} this
  */
 Vec3.prototype.applyMatrix = function applyMatrix(matrix) {
     var M = matrix.get();
@@ -379,9 +413,11 @@ Vec3.prototype.applyMatrix = function applyMatrix(matrix) {
 /**
  * Normalize the input Vec3.
  *
- * @method normalize
+ * @method
+ *
  * @param {Vec3} v The reference Vec3.
  * @param {Vec3} output Vec3 in which to place the result.
+ *
  * @return {Vec3} The normalize Vec3.
  */
 Vec3.normalize = function normalize(v, output) {
@@ -401,10 +437,12 @@ Vec3.normalize = function normalize(v, output) {
 /**
  * Apply a rotation to the input Vec3.
  *
- * @method applyRotation
+ * @method
+ *
  * @param {Vec3} v The reference Vec3.
  * @param {Quaternion} q Unit Quaternion representing the rotation to apply.
  * @param {Vec3} output Vec3 in which to place the result.
+ *
  * @return {Vec3} The rotated version of the input Vec3.
  */
 Vec3.applyRotation = function applyRotation(v, q, output) {
@@ -436,8 +474,10 @@ Vec3.applyRotation = function applyRotation(v, q, output) {
 /**
  * Clone the input Vec3.
  *
- * @method clone
+ * @method
+ *
  * @param {Vec3} v The Vec3 to clone.
+ *
  * @return {Vec3} The cloned Vec3.
  */
 Vec3.clone = function clone(v) {
@@ -447,10 +487,12 @@ Vec3.clone = function clone(v) {
 /**
  * Add the input Vec3's.
  *
- * @method add
+ * @method
+ *
  * @param {Vec3} v1 The left Vec3.
  * @param {Vec3} v2 The right Vec3.
  * @param {Vec3} output Vec3 in which to place the result.
+ *
  * @return {Vec3} The result of the addition.
  */
 Vec3.add = function add(v1, v2, output) {
@@ -463,10 +505,12 @@ Vec3.add = function add(v1, v2, output) {
 /**
  * Subtract the second Vec3 from the first.
  *
- * @method subtract
+ * @method
+ *
  * @param {Vec3} v1 The left Vec3.
  * @param {Vec3} v2 The right Vec3.
  * @param {Vec3} output Vec3 in which to place the result.
+ *
  * @return {Vec3} The result of the subtraction.
  */
 Vec3.subtract = function subtract(v1, v2, output) {
@@ -479,10 +523,12 @@ Vec3.subtract = function subtract(v1, v2, output) {
 /**
  * Scale the input Vec3.
  *
- * @method scale
+ * @method
+ *
  * @param {Vec3} v The reference Vec3.
  * @param {Number} s Number to scale by.
  * @param {Vec3} output Vec3 in which to place the result.
+ *
  * @return {Vec3} The result of the scaling.
  */
 Vec3.scale = function scale(v, s, output) {
@@ -495,9 +541,11 @@ Vec3.scale = function scale(v, s, output) {
 /**
  * The dot product of the input Vec3's.
  *
- * @method dotProduct
+ * @method
+ *
  * @param {Vec3} v1 The left Vec3.
  * @param {Vec3} v2 The right Vec3.
+ *
  * @return {Number} The dot product.
  */
 Vec3.dot = function dot(v1, v2) {
@@ -508,11 +556,13 @@ Vec3.dot = function dot(v1, v2) {
  * The (right-handed) cross product of the input Vec3's.
  * v1 x v2.
  *
- * @method crossProduct
+ * @method
+ *
  * @param {Vec3} v1 The left Vec3.
  * @param {Vec3} v2 The right Vec3.
  * @param {Vec3} output Vec3 in which to place the result.
- * @return {Vec3}
+ *
+ * @return {Object} the object the result of the cross product was placed into
  */
 Vec3.cross = function cross(v1, v2, output) {
     var x1 = v1.x;
@@ -531,11 +581,13 @@ Vec3.cross = function cross(v1, v2, output) {
 /**
  * The projection of v1 onto v2.
  *
- * @method project
+ * @method
+ *
  * @param {Vec3} v1 The left Vec3.
  * @param {Vec3} v2 The right Vec3.
  * @param {Vec3} output Vec3 in which to place the result.
- * @return {Vec3}
+ *
+ * @return {Object} the object the result of the cross product was placed into 
  */
 Vec3.project = function project(v1, v2, output) {
     var x1 = v1.x;
