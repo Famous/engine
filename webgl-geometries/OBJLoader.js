@@ -46,7 +46,7 @@ var OBJLoader = {
  * if the resource is not cached. Sets up the 'onresponse' function
  * as a callback for formatting and callback invocation.
  *
- * @method load
+ * @method
  *
  * @param {String}      url     URL of desired obj
  * @param {Function}    cb      Function to be fired upon successful formatting of obj
@@ -80,7 +80,7 @@ OBJLoader.load = function load(url, cb, options) {
  * returned string and stores the buffer data in cache.
  * Invokes all queued callbacks before clearing them.
  *
- * @method _onsuccess
+ * @method
  * @private
  *
  * @param {String}  URL of requested obj
@@ -102,7 +102,7 @@ OBJLoader._onsuccess = function _onsuccess(url, options, text) {
  * Takes raw string format of obj and converts it to a javascript
  * object representing the buffers needed to draw the geometry.
  *
- * @method format
+ * @method
  * @private
  *
  * @param {String}  raw obj data in text format
@@ -294,7 +294,7 @@ function format(text, options) {
         else if (line.indexOf('g ') !== -1) {
             if (faceVertices.length) {
                 geometries.push(
-                    packageBuffers(
+                    packageGeometry(
                         vertices,
                         normals,
                         texCoords,
@@ -313,7 +313,7 @@ function format(text, options) {
     }
 
     geometries.push(
-        packageBuffers(
+        packageGeometry(
             vertices,
             normals,
             texCoords,
@@ -327,7 +327,24 @@ function format(text, options) {
     return geometries;
 }
 
-function packageBuffers(v, n, t, fv, fn, ft, options) {
+/*
+ * Replaces all double spaces with single spaces and removes
+ * all trailing spaces from lines of a given string.
+ *
+ * @method
+ * @private
+ *
+ * @param {Array} v Pool of all vertices for OBJ.
+ * @param {Array} n Pool of all normals for OBJ.
+ * @param {Array} t Pool of all texture coordinates for OBJ.
+ * @param {Array} fv Vertices for each face of the geometry.
+ * @param {Array} fn Normals for each face of the geometry.
+ * @param {Array} ft Texture coordinates for each face of the geometry.
+ * @param {Object} options Optional paramters that affect face attributes.
+ *
+ * @return {Object} geometry buffers
+ */
+function packageGeometry(v, n, t, fv, fn, ft, options) {
     var cached = cacheVertices(
         v,
         n,
@@ -367,7 +384,7 @@ function packageBuffers(v, n, t, fv, fn, ft, options) {
  * Replaces all double spaces with single spaces and removes
  * all trailing spaces from lines of a given string.
  *
- * @method sanitize
+ * @method
  * @private
  *
  * @param {String} text String to be sanitized.
@@ -382,7 +399,7 @@ function sanitize(text) {
  * Takes a given pool of attributes and face definitions
  * and removes all duplicate vertices.
  *
- * @method cacheVertices
+ * @method
  * @private
  *
  * @param {Array} v     Pool of vertices used in face declarations.
@@ -451,7 +468,7 @@ function cacheVertices(v, n, t, fv, fn, ft) {
  * Flattens an array of arrays. Not recursive. Assumes
  * all children are arrays.
  *
- * @method flatten
+ * @method
  * @private
  *
  * @param {Array} arr Input array to be flattened.
