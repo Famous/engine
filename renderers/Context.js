@@ -59,11 +59,6 @@ function Context(selector, compositor) {
     // rendering and append element to the root element.
 
     var DOMLayerEl = document.createElement('div');
-    DOMLayerEl.style.width = '100%';
-    DOMLayerEl.style.height = '100%';
-    DOMLayerEl.style.transformStyle = 'preserve-3d';
-    DOMLayerEl.style.webkitTransformStyle = 'preserve-3d';
-
     this._rootEl.appendChild(DOMLayerEl);
 
     // Instantiate renderers
