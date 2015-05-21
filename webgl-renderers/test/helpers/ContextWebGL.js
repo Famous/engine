@@ -182,16 +182,7 @@ function ContextWebGL() {
     var uniformLocations = 1;
 
     for (i = 0; i < methods.length; i++) {
-        this[methods[i].name] = function (i) {
-            this[methods[i].name].callCount++;
-            this[methods[i].name].history.push(
-                Array.prototype.slice.call(arguments, 1)
-            );
-
-            if (methods[i].returnFn)
-                return methods[i].returnFn();
-
-        }.bind(this, i);
+        this[methods[i].name] = createMethod.call(this, i);
 
         this[methods[i].name].callCount = 0;
         this[methods[i].name].history = [];
@@ -201,6 +192,19 @@ function ContextWebGL() {
         this.getUniformLocation.callCount = this.getUniformLocation.callCount++ || 1;
         return uniformLocations++;
     }.bind(this);
+}
+
+function createMethod(i) {
+    return function (i) {
+        this[methods[i].name].callCount++;
+        this[methods[i].name].history.push(
+            Array.prototype.slice.call(arguments, 1)
+        );
+
+        if (methods[i].returnFn)
+            return methods[i].returnFn();
+
+    }.bind(this, i);
 }
 
 ContextWebGL.prototype.TEXTURE0 = 33984;

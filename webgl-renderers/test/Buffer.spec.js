@@ -31,7 +31,6 @@ test('Buffer', function(t) {
    t.test('constructor', function(t) {
        var testingContext = new TestingContext();
 
-       var spacing = 3;
        var buffer = new Buffer(
            testingContext.ELEMENT_ARRAY_BUFFER,
            Uint16Array,
@@ -42,18 +41,11 @@ test('Buffer', function(t) {
        t.equals(buffer.type, Uint16Array, 'should use input type');
        t.equals(buffer.buffer, null, 'should not create a buffer object on instantiation');
 
-       var buffer = new Buffer(
-           testingContext.ELEMENT_ARRAY_BUFFER,
-           Uint16Array,
-           testingContext
-       );
-
        t.end();
    });
 
    t.test('subData', function(t) {
        var testingContext = new TestingContext();
-       var spacing = 3;
        var buffer = new Buffer(
            testingContext.ELEMENT_ARRAY_BUFFER,
            Uint16Array,

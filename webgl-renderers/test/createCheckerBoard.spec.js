@@ -25,7 +25,6 @@
 'use strict';
 var test = require('tape');
 var createCheckerboard = require('../createCheckerboard');
-var TestingContext = require('./helpers/ContextWebGL');
 
 var grey = 221;
 var white = 255;
