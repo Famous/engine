@@ -61,8 +61,11 @@ var GeometryHelper = {};
  * @return {Object} Object containing generated vertices and indices.
  */
 GeometryHelper.generateParametric = function generateParametric(detailX, detailY, func, wrap) {
-    var vertices = [],
-        i, theta, phi, result, j;
+    var vertices = [];
+    var i;
+    var theta;
+    var phi;
+    var j;
 
     // We can wrap around slightly more than once for uv coordinates to look correct.
 
@@ -94,7 +97,7 @@ GeometryHelper.generateParametric = function generateParametric(detailX, detailY
         vertices: vertices,
         indices: indices
     };
-}
+};
 
 /**
  * Calculates normals belonging to each face of a geometry.
@@ -111,14 +114,9 @@ GeometryHelper.generateParametric = function generateParametric(detailX, detailY
  */
 GeometryHelper.computeNormals = function computeNormals(vertices, indices, out) {
     var normals = out || [];
-    var vertexThree;
-    var vertexTwo;
-    var vertexOne;
     var indexOne;
     var indexTwo;
     var indexThree;
-    var start;
-    var end;
     var normal;
     var j;
     var len = indices.length / 3;
@@ -178,10 +176,13 @@ GeometryHelper.computeNormals = function computeNormals(vertices, indices, out) 
  * @return {undefined} undefined
  */
 GeometryHelper.subdivide = function subdivide(indices, vertices, textureCoords) {
-    var triangleIndex = indices.length / 3,
-        abc,
-        face,
-        i, j, k, pos, tex;
+    var triangleIndex = indices.length / 3;
+    var face;
+    var i;
+    var j;
+    var k;
+    var pos;
+    var tex;
 
     while (triangleIndex--) {
         face = indices.slice(triangleIndex * 3, triangleIndex * 3 + 3);
@@ -202,7 +203,10 @@ GeometryHelper.subdivide = function subdivide(indices, vertices, textureCoords) 
             textureCoords.push.apply(textureCoords, Vec2.scale(Vec2.add(tex[0], tex[2], outputs[3]), 0.5, outputs[4]).toArray());
         }
 
-        i = vertices.length - 3, j = i + 1, k = i + 2;
+        i = vertices.length - 3;
+        j = i + 1;
+        k = i + 2;
+
         indices.push(i, j, k);
         indices.push(face[0], i, k);
         indices.push(i, face[1], j);
@@ -270,7 +274,9 @@ GeometryHelper.subdivideSpheroid = function subdivideSpheroid(vertices, indices)
         vertices.push.apply(vertices, Vec3.normalize(Vec3.add(abc[1], abc[2], outputs[0]), outputs[1]).toArray());
         vertices.push.apply(vertices, Vec3.normalize(Vec3.add(abc[0], abc[2], outputs[0]), outputs[1]).toArray());
 
-        i = vertices.length / 3 - 3, j = i + 1, k = i + 2;
+        i = vertices.length / 3 - 3;
+        j = i + 1;
+        k = i + 2;
 
         indices.push(i, j, k);
         indices.push(face[0], i, k);
@@ -294,11 +300,11 @@ GeometryHelper.subdivideSpheroid = function subdivideSpheroid(vertices, indices)
  * @return {Array} New list of calculated normals.
  */
 GeometryHelper.getSpheroidNormals = function getSpheroidNormals(vertices, out) {
-    var out = out || [];
+    out = out || [];
     var length = vertices.length / 3;
     var normalized;
 
-    for(var i = 0; i < length; i++) {
+    for (var i = 0; i < length; i++) {
         normalized = new Vec3(
             vertices[i * 3 + 0],
             vertices[i * 3 + 1],
@@ -326,7 +332,7 @@ GeometryHelper.getSpheroidNormals = function getSpheroidNormals(vertices, out) {
  * @return {Array} New list of calculated texture coordinates
  */
 GeometryHelper.getSpheroidUV = function getSpheroidUV(vertices, out) {
-    var out = out || [];
+    out = out || [];
     var length = vertices.length / 3;
     var vertex;
 
@@ -362,8 +368,7 @@ GeometryHelper.getSpheroidUV = function getSpheroidUV(vertices, out) {
  * @return {Array} New list of normalized vertices
  */
 GeometryHelper.normalizeAll = function normalizeAll(vertices, out) {
-    var out = out || [];
-    var vertex;
+    out = out || [];
     var len = vertices.length / 3;
 
     for (var i = 0; i < len; i++) {
@@ -385,7 +390,7 @@ GeometryHelper.normalizeAll = function normalizeAll(vertices, out) {
  * @return {Array} Output vertices.
  */
 GeometryHelper.normalizeVertices = function normalizeVertices(vertices, out) {
-    var out = out || [];
+    out = out || [];
     var len = vertices.length / 3;
     var vectors = [];
     var minX;
@@ -395,8 +400,9 @@ GeometryHelper.normalizeVertices = function normalizeVertices(vertices, out) {
     var minZ;
     var maxZ;
     var v;
+    var i;
 
-    for (var i = 0; i < len; i++) {
+    for (i = 0; i < len; i++) {
         v = vectors[i] = new Vec3(
             vertices[i * 3],
             vertices[i * 3 + 1],
@@ -411,7 +417,7 @@ GeometryHelper.normalizeVertices = function normalizeVertices(vertices, out) {
 
         if (minZ == null || v.z < minZ) minZ = v.z;
         if (maxZ == null || v.z > maxZ) maxZ = v.z;
-    };
+    }
 
     var translation = new Vec3(
         getTranslationFactor(maxX, minX),
@@ -425,7 +431,7 @@ GeometryHelper.normalizeVertices = function normalizeVertices(vertices, out) {
         getScaleFactor(maxZ + translation.z, minZ + translation.z)
     );
 
-    for (var i = 0; i < vectors.length; i++) {
+    for (i = 0; i < vectors.length; i++) {
         out.push.apply(out, vectors[i].add(translation).scale(scale).toArray());
     }
 
@@ -504,8 +510,6 @@ GeometryHelper.getAltitude = function altitude(v) {
 GeometryHelper.trianglesToLines = function triangleToLines(indices, out) {
     var numVectors = indices.length / 3;
     out = out || [];
-    var face;
-    var j;
     var i;
 
     for (i = 0; i < numVectors; i++) {
@@ -537,7 +541,7 @@ GeometryHelper.addBackfaceTriangles = function addBackfaceTriangles(vertices, in
 
     maxIndex++;
 
-    for (var i = 0; i < nFaces; i++) {
+    for (i = 0; i < nFaces; i++) {
         var indexOne = indices[i * 3],
             indexTwo = indices[i * 3 + 1],
             indexThree = indices[i * 3 + 2];
@@ -548,7 +552,7 @@ GeometryHelper.addBackfaceTriangles = function addBackfaceTriangles(vertices, in
     // Iterating instead of .slice() here to avoid max call stack issue.
 
     var nVerts = vertices.length;
-    for (var i = 0; i < nVerts; i++) {
+    for (i = 0; i < nVerts; i++) {
         vertices.push(vertices[i]);
     }
 };

@@ -97,7 +97,7 @@ function getCircleBuffers(detail) {
     for (var i = 0; i < detail + 1; i++) {
         theta = i / detail * Math.PI * 2;
 
-        x = Math.cos(theta),
+        x = Math.cos(theta);
         y = Math.sin(theta);
 
         vertices.push(x, y, 0);

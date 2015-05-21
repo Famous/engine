@@ -1,18 +1,18 @@
 /**
  * The MIT License (MIT)
- * 
+ *
  * Copyright (c) 2015 Famous Industries Inc.
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -36,7 +36,7 @@ var GeometryHelper = require('../GeometryHelper');
  *
  * @param {Object} options Parameters that alter the
  * vertex buffers of the generated geometry.
- * 
+ *
  * @return {Object} constructed geometry
  */
 function Plane(options) {
@@ -49,6 +49,8 @@ function Plane(options) {
     var normals       = [];
     var indices       = [];
 
+    var i;
+
     for (var y = 0; y <= detailY; y++) {
         var t = y / detailY;
         for (var x = 0; x <= detailX; x++) {
@@ -56,7 +58,7 @@ function Plane(options) {
             vertices.push(2. * (s - .5), 2 * (t - .5), 0);
             textureCoords.push(s, 1 - t);
             if (x < detailX && y < detailY) {
-                var i = x + y * (detailX + 1);
+                i = x + y * (detailX + 1);
                 indices.push(i, i + 1, i + detailX + 1);
                 indices.push(i + detailX + 1, i + 1, i + detailX + 2);
             }
@@ -65,14 +67,14 @@ function Plane(options) {
 
     if (options.backface !== false) {
         GeometryHelper.addBackfaceTriangles(vertices, indices);
-        
+
         // duplicate texture coordinates as well
 
         var len = textureCoords.length;
-        for (var i = 0; i < len; i++) textureCoords.push(textureCoords[i]);
+        for (i = 0; i < len; i++) textureCoords.push(textureCoords[i]);
     }
 
-    var normals = GeometryHelper.computeNormals(vertices, indices);
+    normals = GeometryHelper.computeNormals(vertices, indices);
 
     return new Geometry({
         buffers: [
@@ -82,6 +84,6 @@ function Plane(options) {
             { name: 'indices', data: indices, size: 1 }
         ]
     });
-};
+}
 
 module.exports = Plane;

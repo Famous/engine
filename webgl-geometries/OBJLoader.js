@@ -119,7 +119,7 @@ function format(text, options) {
     var lines = text.split('\n');
 
     var geometries = [];
-    var options = options || {};
+    options = options || {};
 
     var faceTexCoords = [];
     var faceVertices = [];
@@ -306,7 +306,7 @@ function format(text, options) {
                         faceTexCoords,
                         options
                     )
-                )
+                );
             }
 
             faceVertices.length = 0;
@@ -325,7 +325,7 @@ function format(text, options) {
             faceTexCoords,
             options
         )
-    )
+    );
 
     return geometries;
 }
