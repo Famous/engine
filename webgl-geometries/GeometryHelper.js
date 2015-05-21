@@ -503,7 +503,7 @@ GeometryHelper.getAltitude = function altitude(v) {
  */
 GeometryHelper.trianglesToLines = function triangleToLines(indices, out) {
     var numVectors = indices.length / 3;
-    var out = [];
+    out = out || [];
     var face;
     var j;
     var i;
