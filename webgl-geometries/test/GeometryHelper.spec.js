@@ -298,7 +298,7 @@ function generateRandomArray(numVerts, range) {
     var offset = range[1] - range[0];
 
     while (numVerts--) {
-        out.push(Math.random() * offset) + range[0];
+        out.push(Math.random() * offset + range[0]);
     }
 
     return out;
