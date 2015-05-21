@@ -67,9 +67,14 @@ Size.DEFAULT = Size.RELATIVE;
 
 /**
  * Set which mode each axis of Size will have its dimensions
- * calculated by.
+ * calculated by.  Size can be calculated by absolute pixel definitions,
+ * relative to its parent, or by the size of its renderables
  *
  * @method
+ *
+ * @param {Number} x the mode of size for the width
+ * @param {Number} y the mode of size for the height
+ * @param {Number} z the mode of size for the depth
  *
  * @return {Size} this
  */

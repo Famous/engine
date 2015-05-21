@@ -29,10 +29,8 @@
  *
  * @method
  *
- * @param {Array} out
- *   output array to store the return of the inversion
- * @param {Array} a
- *   transform matrix to be inversed
+ * @param {Array} out array to store the return of the inversion
+ * @param {Array} a transform matrix to inverse
  *
  * @return {Array} out
  *   output array that is storing the transform matrix
@@ -89,12 +87,9 @@ function invert (out, a) {
  *
  * @method
  *
- * @param {Array} out
- *   output array to store the return of the multiplication
- * @param {Array} a
- *   transform matrix to multiply
- * @param {Array} b
- *   transform matrix to multiple
+ * @param {Array} out array to store the return of the multiplication
+ * @param {Array} a transform matrix to multiply
+ * @param {Array} b transform matrix to multiply
  *
  * @return {Array} out
  *   output array that is storing the transform matrix
