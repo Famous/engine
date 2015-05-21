@@ -34,9 +34,6 @@ test('Texture', function(t) {
 
         t.ok(texture.id instanceof Object, 'should create a texture object');
 
-        t.equals(testingContext.texImage2D.callCount, 1, 'should call texImage2D');
-        t.equals(testingContext.texImage2D.history[0][8], null, 'should call texImage2D with a null value');
-
         t.equals(testingContext.pixelStorei.callCount, 2, 'should call pixelStorei');
         t.equals(testingContext.bindTexture.callCount, 1, 'should bind the texture');
 
