@@ -12,14 +12,14 @@
     "curly": [0, "multi"],
     "dot-location": [0, "object"], //Too much noise for now, might consider to enable it as a warning later
     "eqeqeq": [2, "allow-null"],
-    "no-loop-func": 1,
+    "no-loop-func": 0,
     "no-multi-spaces": 0,
     "no-self-compare": 1,
     // Strict Mode
     "strict": 1,
     // Variables
     "no-shadow": 0, //Too much noise from tests, might consider to enable it as a warning later
-    "no-undefined": 1,
+    "no-undefined": 0,
     "no-unused-vars": [2, {"vars": "all", "args": "none"}],
     "no-use-before-define": [0, "nofunc"],
     "no-new": 0,
@@ -30,7 +30,7 @@
     "consistent-this": [0, "_this"],
     "eol-last": 1,
     "key-spacing": 0,
-    "new-cap": 1,
+    "new-cap": 0,
     "no-trailing-spaces": 0,
     "no-mixed-spaces-and-tabs": 0, //Too much noise for now, might consider to enable it as a warning later
     "no-underscore-dangle": 0,
