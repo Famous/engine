@@ -41,25 +41,39 @@ function createMockNode(t) {
             this.sentDrawCommands.push(command);
         },
         shown: true,
-        isShown: function() { return this.shown; },
+        isShown: function() {
+            return this.shown;
+        },
         addComponent: function() {
             t.pass('should add itself as a component using addComponent');
         },
         location: 'body/0',
-        getLocation: function() { return this.location; } ,
+        getLocation: function() {
+            return this.location;
+        },
         transform: IDENT,
-        getTransform: function() { return this.transform; },
+        getTransform: function() {
+            return this.transform;
+        },
         requestUpdate: function() {
             t.pass('should requestUpdate after onMount');
         },
         size: [0, 0, 0],
-        getSize: function() { return this.size; },
+        getSize: function() {
+            return this.size;
+        },
         sizeMode: [0, 0, 0],
-        getSizeMode: function() { return this.sizeMode; },
+        getSizeMode: function() {
+            return this.sizeMode;
+        },
         uiEvents: [],
-        getUIEvents: function() { return this.uiEvents; },
+        getUIEvents: function() {
+            return this.uiEvents;
+        },
         opacity: 1,
-        getOpacity: function() { return this.opacity; }
+        getOpacity: function() {
+            return this.opacity;
+        }
     };
 }
 
@@ -264,7 +278,7 @@ test('DOMElement', function(t) {
     t.test('setContent method', function(t) {
         t.plan(5);
 
-        var node = new createMockNode(t);
+        var node = createMockNode(t);
         var domElement = new DOMElement(node);
         t.equal(
             typeof domElement.setContent,
@@ -287,7 +301,7 @@ test('DOMElement', function(t) {
     t.test('setProperty method', function (t) {
         t.plan(5);
 
-        var node = new createMockNode(t);
+        var node = createMockNode(t);
         var domElement = new DOMElement(node);
         t.equal(
             typeof domElement.setProperty,
