@@ -474,7 +474,7 @@ test('Color', function(t) {
             'should be a function');
 
         inputs.forEach(function(input) {
-            var color = new Color();
+            new Color();
             t.equal(
                 Color.determineType(input.arg),
                 input.type,
