@@ -38,11 +38,6 @@ var PathUtils = require('./Path');
  * @constructor
  */
 function Dispatch () {
-
-    this._context = context; // A reference to the context
-                             // on which the dispatcher
-                             // operates
-
     this._nodes = {}; // a container for constant time lookup of nodes
 
     this._queue = []; // The queue is used for two purposes
@@ -374,4 +369,3 @@ function _splitTo (string, target) {
 }
 
 module.exports = new Dispatch();
-
