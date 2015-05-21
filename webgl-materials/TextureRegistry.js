@@ -55,7 +55,8 @@ TextureRegistry.register = function register(accessor, data, options) {
     if (accessor) {
         this.registry[accessor] = { id: this.textureIds++, __isATexture__: true, data: data, options: options };
         return this.registry[accessor];
-    } else {
+    }
+	else {
         return { id: this.textureIds++, data: data, __isATexture__: true, options: options };
     }
 };

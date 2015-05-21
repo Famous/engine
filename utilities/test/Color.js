@@ -68,7 +68,9 @@ test('Color', function(t) {
 
         time = 0;
 
-        Date.now = function() { return time; };
+        Date.now = function() {
+            return time;
+        };
         t.equal(typeof Date.now, 'function', 'should be a function');
 
         time = 50;

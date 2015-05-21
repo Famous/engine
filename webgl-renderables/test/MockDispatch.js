@@ -39,11 +39,13 @@ MockDispatch.prototype.getContext = function getContext() {
         _origin: [50, 50, 50],
         _opacity: { value: 1 },
         _size: {
-            getTopDownSize: function() { return [100, 100, 100]; }
+            getTopDownSize: function() {
+                return [100, 100, 100];
+            }
         },
         _transform: {
             _matrix: [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]
-        },
+        }
     };
 };
 

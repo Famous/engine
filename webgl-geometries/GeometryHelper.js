@@ -240,7 +240,8 @@ GeometryHelper.getUniqueFaces = function getUniqueFaces(vertices, indices) {
             if (registered[index]) {
                 vertices.push(vertices[index * 3], vertices[index * 3 + 1], vertices[index * 3 + 2]);
                 indices[triangleIndex * 3 + i] = vertices.length / 3 - 1;
-            } else {
+            }
+            else {
                 registered[index] = true;
             }
         }
