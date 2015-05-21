@@ -118,6 +118,9 @@ function format(text, options) {
 
     var lines = text.split('\n');
 
+    var geometries = [];
+    var options = options || {};
+
     var faceTexCoords = [];
     var faceVertices = [];
     var faceNormals = [];
@@ -290,17 +293,69 @@ function format(text, options) {
                 }
             }
         }
+
+        else if (line.indexOf('g ') !== -1) {
+            if (faceVertices.length) {
+                geometries.push(
+                    packageGeometry(
+                        vertices,
+                        normals,
+                        texCoords,
+                        faceVertices,
+                        faceNormals,
+                        faceTexCoords,
+                        options
+                    )
+                )
+            }
+
+            faceVertices.length = 0;
+            faceTexCoords.length = 0;
+            faceNormals.length = 0;
+        }
     }
 
-    var cached = cacheVertices(
-        vertices,
-        normals,
-        texCoords,
-        faceVertices,
-        faceNormals,
-        faceTexCoords
-    );
+    geometries.push(
+        packageGeometry(
+            vertices,
+            normals,
+            texCoords,
+            faceVertices,
+            faceNormals,
+            faceTexCoords,
+            options
+        )
+    )
 
+    return geometries;
+}
+
+/*
+ * Replaces all double spaces with single spaces and removes
+ * all trailing spaces from lines of a given string.
+ *
+ * @method
+ * @private
+ *
+ * @param {Array} v Pool of all vertices for OBJ.
+ * @param {Array} n Pool of all normals for OBJ.
+ * @param {Array} t Pool of all texture coordinates for OBJ.
+ * @param {Array} fv Vertices for each face of the geometry.
+ * @param {Array} fn Normals for each face of the geometry.
+ * @param {Array} ft Texture coordinates for each face of the geometry.
+ * @param {Object} options Optional paramters that affect face attributes.
+ *
+ * @return {Object} geometry buffers
+ */
+function packageGeometry(v, n, t, fv, fn, ft, options) {
+    var cached = cacheVertices(
+        v,
+        n,
+        t,
+        fv,
+        fn,
+        ft
+    );
 
     cached.vertices = flatten(cached.vertices);
     cached.normals = flatten(cached.normals);
