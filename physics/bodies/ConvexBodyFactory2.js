@@ -33,7 +33,7 @@ var ConvexHull = Geometry.ConvexHull;
 var TEMP_REGISTER = new Vec3();
 
 /**
- * Returns a constructor for a physical body reflecting the shape defined by input ConvexHull or Vec3 array.
+ * Returns a constructor for a physical body reflecting the shape defined by input ConvexHull or Vec3 array
  *
  * @method
  * @param {ConvexHull | Vec3[]} hull ConvexHull instance or Vec3 array.
