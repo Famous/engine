@@ -88,7 +88,7 @@ Note: cloning only provides the Famo.us folder with all Famo.us code, but it doe
 [site-install]: http://famous.org/get-started.html
 [site-guides]: http://famous.org/learn
 [site-docs]: http://famous.org/
-[cli-rep]: http://github.com/Famous/famous-cli
+[cli-repo]: http://github.com/Famous/famous-cli
 [famous-organization-github]: http://github.com/Famous
 [famous-engine-seed]: http://github.com/Famous/engine-seed
 [contributing]: https://github.com/Famous/engine/blob/master/CONTRIBUTING.md
