@@ -52,12 +52,7 @@ function Context(selector, compositor) {
     this._compositor = compositor;
     this._rootEl = document.querySelector(selector);
 
-    // If root element is the body, update size on the context
-    // on window resize events.
-
-    if (this._rootEl === document.body) {
-        window.addEventListener('resize', this.updateSize.bind(this));
-    }
+    this._selector = selector;
 
     // Create DOM element to be used as root for all famous DOM
     // rendering and append element to the root element.
@@ -102,6 +97,7 @@ function Context(selector, compositor) {
  */
 Context.prototype.updateSize = function () {
     var newSize = this.DOMRenderer.getSize();
+    this._compositor.sendResize(this._selector, newSize);
 
     var width = newSize[0];
     var height = newSize[1];

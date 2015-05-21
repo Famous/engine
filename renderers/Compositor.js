@@ -183,11 +183,17 @@ Compositor.prototype.drawCommands = function drawCommands() {
         this._contexts[key].draw();
     }
 
-    if (this._resized && this._contexts.body) {
-        this.sendResize('body', this._contexts.body.getRootSize());
+    if (this._resized) {
+        this.updateSize();
     }
 
     return this._outCommands;
+};
+
+Compositor.prototype.updateSize = function updateSize() {
+    for (var selector in this._contexts) {
+        this._contexts[selector].updateSize();
+    }
 };
 
 /**
@@ -215,7 +221,7 @@ Compositor.prototype.receiveCommands = function receiveCommands(commands) {
 Compositor.prototype.clearCommands = function clearCommands() {
     this._inCommands.length = 0;
     this._outCommands.length = 0;
-    this._resized = null;
+    this._resized = false;
 };
 
 module.exports = Compositor;
