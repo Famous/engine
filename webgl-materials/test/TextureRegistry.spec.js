@@ -33,7 +33,7 @@ test('TextureRegistry', function(t) {
         var myTextureData = [];
         var firstTexture = TextureRegistry.register('myFirstTexture', myTextureData);
 
-        t.ok(TextureRegistry.registry['myFirstTexture'], 'Should create a texture object at given key');
+        t.ok(TextureRegistry.registry.myFirstTexture, 'Should create a texture object at given key');
         t.ok(firstTexture, 'Should return texture object');
         t.equals(firstTexture.data, myTextureData, 'Should store data in registry');
         t.ok(firstTexture.id, 'Should receive a id');
@@ -49,7 +49,7 @@ test('TextureRegistry', function(t) {
 
         var fourthTexture = TextureRegistry.register(null, []);
 
-        t.ok(!TextureRegistry.registry[null], 'Should not save texture in registry');
+        t.ok(!TextureRegistry.registry.null, 'Should not save texture in registry');
         t.ok(fourthTexture.id, 'Hidden textures should still receive ids');
 
         TextureRegistry.registry = {};

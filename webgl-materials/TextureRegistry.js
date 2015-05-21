@@ -1,18 +1,18 @@
 /**
  * The MIT License (MIT)
- * 
+ *
  * Copyright (c) 2015 Famous Industries Inc.
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -32,13 +32,13 @@
  * @class TextureRegistry
  */
 var TextureRegistry = {
-	registry: {},
-	textureIds: 1
+    registry: {},
+    textureIds: 1
 };
 
 /*
  * Registers a new Texture object with a unique id and input parameters to be
- * handled by the WebGLRenderer.  If no accessor is input the texture will be 
+ * handled by the WebGLRenderer.  If no accessor is input the texture will be
  * created but not store in the registry.
  *
  * @method register
@@ -52,8 +52,12 @@ var TextureRegistry = {
  * @return {Object} Newly generated texture object.
  */
 TextureRegistry.register = function register(accessor, data, options) {
-	if (accessor) return (this.registry[accessor] = { id: this.textureIds++, __isATexture__: true, data: data, options: options });
-	else return { id: this.textureIds++, data: data, __isATexture__: true, options: options };
+    if (accessor) {
+        this.registry[accessor] = { id: this.textureIds++, __isATexture__: true, data: data, options: options };
+        return this.registry[accessor];
+    } else {
+        return { id: this.textureIds++, data: data, __isATexture__: true, options: options };
+    }
 };
 
 /*
@@ -67,12 +71,12 @@ TextureRegistry.register = function register(accessor, data, options) {
  * @return {Object} Desired texture object.
  */
 TextureRegistry.get = function get(accessor) {
-	if (!this.registry[accessor]) {
-		throw 'Texture "' + accessor + '" not found!';
-	}
-	else {
-		return this.registry[accessor];
-	}
+    if (!this.registry[accessor]) {
+        throw 'Texture "' + accessor + '" not found!';
+    }
+    else {
+        return this.registry[accessor];
+    }
 };
 
 module.exports = TextureRegistry;
