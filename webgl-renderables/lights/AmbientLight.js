@@ -34,8 +34,10 @@ var Light = require('./Light');
  * @class AmbientLight
  * @constructor
  * @component
+ * @augments Light
  * @param {LocalDispatch} dispatch LocalDispatch to be retrieved
  *                                 from the corresponding Render Node
+ * @return {undefined} undefined
  */
 function AmbientLight(node) {
     Light.call(this, node);

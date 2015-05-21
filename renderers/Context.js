@@ -46,6 +46,7 @@ var DOMRenderer = require('../dom-renderers/DOMRenderer');
  *                                  context layer.
  * @param {Compositor}  compositor  Compositor reference to pass down to
  *                                  WebGLRenderer.
+ * @return {undefined} undefined
  */
 function Context(selector, compositor) {
     this._compositor = compositor;
@@ -97,7 +98,6 @@ function Context(selector, compositor) {
  * Queries DOMRenderer size and updates canvas size. Relays size information to
  * WebGLRenderer.
  *
- * @chainable
  * @return {Context} this
  */
 Context.prototype.updateSize = function () {
@@ -124,7 +124,8 @@ Context.prototype.updateSize = function () {
  * Draw function called after all commands have been handled for current frame.
  * Issues draw commands to all renderers with current renderState.
  *
- * @method draw
+ * @method
+ * @return {undefined} undefined
  */
 Context.prototype.draw = function draw() {
     this.DOMRenderer.draw(this._renderState);
@@ -137,7 +138,8 @@ Context.prototype.draw = function draw() {
 /**
  * Gets the size of the parent element of the DOMRenderer for this context.
  *
- * @method getRootSize
+ * @method
+ * @return {undefined} undefined
  */
 Context.prototype.getRootSize = function getRootSize() {
     return this.DOMRenderer.getSize();
@@ -148,7 +150,8 @@ Context.prototype.getRootSize = function getRootSize() {
  * of the canvas element and instantiation of the renderer. Also updates size
  * to pass size information to the renderer.
  *
- * @method initWebGL
+ * @method
+ * @return {undefined} undefined
  */
 Context.prototype.initWebGL = function initWebGL() {
     this.canvas = document.createElement('canvas');
@@ -160,7 +163,7 @@ Context.prototype.initWebGL = function initWebGL() {
 /**
  * Handles delegation of commands to renderers of this context.
  *
- * @method receive
+ * @method
  *
  * @param {String}  path        String used as identifier of a given node in the
  *                              scene graph.

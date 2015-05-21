@@ -34,6 +34,7 @@ var GeometryHelper = require('./GeometryHelper');
  *
  * @static
  * @class OBJLoader
+ * @return {undefined} undefined
  */
 var OBJLoader = {
     cached: {},
@@ -46,12 +47,13 @@ var OBJLoader = {
  * if the resource is not cached. Sets up the 'onresponse' function
  * as a callback for formatting and callback invocation.
  *
- * @method load
+ * @method
  *
  * @param {String}      url     URL of desired obj
  * @param {Function}    cb      Function to be fired upon successful formatting of obj
  * @param {Object}      options Options hash to that can affect the output of the OBJ
  *                              vertices.
+ * @return {undefined} undefined
  */
 OBJLoader.load = function load(url, cb, options) {
     if (!this.cached[url]) {
@@ -80,12 +82,13 @@ OBJLoader.load = function load(url, cb, options) {
  * returned string and stores the buffer data in cache.
  * Invokes all queued callbacks before clearing them.
  *
- * @method _onsuccess
+ * @method
  * @private
  *
  * @param {String}  URL of requested obj
  * @param {Object}  Options for formatting the OBJ
  * @param {String}  Content of the server response
+ * @return {undefined} undefined
  */
 OBJLoader._onsuccess = function _onsuccess(url, options, text) {
     var buffers = format.call(this, text, options || {});
@@ -102,7 +105,7 @@ OBJLoader._onsuccess = function _onsuccess(url, options, text) {
  * Takes raw string format of obj and converts it to a javascript
  * object representing the buffers needed to draw the geometry.
  *
- * @method format
+ * @method
  * @private
  *
  * @param {String}  raw obj data in text format
@@ -329,7 +332,7 @@ function format(text, options) {
  * Replaces all double spaces with single spaces and removes
  * all trailing spaces from lines of a given string.
  *
- * @method sanitize
+ * @method
  * @private
  *
  * @param {String} text String to be sanitized.
@@ -344,7 +347,7 @@ function sanitize(text) {
  * Takes a given pool of attributes and face definitions
  * and removes all duplicate vertices.
  *
- * @method cacheVertices
+ * @method
  * @private
  *
  * @param {Array} v     Pool of vertices used in face declarations.
@@ -413,7 +416,7 @@ function cacheVertices(v, n, t, fv, fn, ft) {
  * Flattens an array of arrays. Not recursive. Assumes
  * all children are arrays.
  *
- * @method flatten
+ * @method
  * @private
  *
  * @param {Array} arr Input array to be flattened.

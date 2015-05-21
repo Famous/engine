@@ -33,6 +33,7 @@ var injectCSS = require('./inject-css');
  *
  * @class Compositor
  * @constructor
+ * @return {undefined} undefined
  */
 function Compositor() {
     injectCSS();
@@ -54,7 +55,7 @@ function Compositor() {
  * Retrieves the time being used by the internal clock managed by
  * `FamousEngine`.
  *
- * @method  getTime
+ * @method
  *
  * @return {Number}     Clock time.
  */
@@ -66,7 +67,7 @@ Compositor.prototype.getTime = function getTime() {
  * Schedules an event to be sent the next time the out command
  * queue is being flushed.
  *
- * @method sendEvent
+ * @method
  * @private
  *
  * @param  {String} path    render path to the node the event should be
@@ -74,6 +75,7 @@ Compositor.prototype.getTime = function getTime() {
  * @param  {String} ev      event type
  * @param  {Object} payload event object (serializable using structured
  *                          cloning algorithm)
+ * @return {undefined} undefined
  */
 Compositor.prototype.sendEvent = function sendEvent(path, ev, payload) {
     this._outCommands.push('WITH', path, 'TRIGGER', ev, payload);
@@ -83,12 +85,13 @@ Compositor.prototype.sendEvent = function sendEvent(path, ev, payload) {
  * Internal helper method used for notifying externally
  * resized contexts (e.g. by resizing the browser window).
  *
- * @method sendResize
+ * @method
  * @private
  *
  * @param  {String} selector    render path to the node (context) that should
  *                              be resized
  * @param  {Array} size         new context size
+ * @return {undefined} undefined
  */
 Compositor.prototype.sendResize = function sendResize (selector, size) {
     this.sendEvent(selector, 'CONTEXT_RESIZE', size);
@@ -97,7 +100,7 @@ Compositor.prototype.sendResize = function sendResize (selector, size) {
 /**
  * Internal helper method used by `drawCommands`.
  *
- * @method handleWith
+ * @method
  * @private
  *
  * @param  {Number} iterator    position index within the commands queue
@@ -115,7 +118,7 @@ Compositor.prototype.handleWith = function handleWith (iterator, commands) {
  * Retrieves the top-level Context associated with the passed in document
  * query selector. If no such Context exists, a new one will be instantiated.
  *
- * @method getOrSetContext
+ * @method
  * @private
  *
  * @param  {String} selector            document query selector used for
@@ -132,12 +135,13 @@ Compositor.prototype.getOrSetContext = function getOrSetContext(selector) {
 /**
  * Internal helper method used by `drawCommands`.
  *
- * @method giveSizeFor
+ * @method
  * @private
  *
  * @param  {Number} iterator    position index within the commands queue
  * @param  {Array} commands     remaining message queue received,
  *                              used to shift single messages
+ * @return {undefined} undefined
  */
 Compositor.prototype.giveSizeFor = function giveSizeFor(iterator, commands) {
     var selector = commands[iterator];
@@ -150,7 +154,7 @@ Compositor.prototype.giveSizeFor = function giveSizeFor(iterator, commands) {
  * command queue.
  * Called by ThreadManager.
  *
- * @method drawCommands
+ * @method
  *
  * @return {Array} outCommands  set of commands to be sent back
  */
@@ -192,6 +196,7 @@ Compositor.prototype.drawCommands = function drawCommands() {
  *
  * @param  {Array} commands     command queue to be processed by the
  *                              compositor's `drawCommands` method
+ * @return {undefined} undefined
  */
 Compositor.prototype.receiveCommands = function receiveCommands(commands) {
     var len = commands.length;
@@ -204,7 +209,8 @@ Compositor.prototype.receiveCommands = function receiveCommands(commands) {
  * Flushes the queue of outgoing "out" commands.
  * Called by ThreadManager.
  *
- * @method clearCommands
+ * @method
+ * @return {undefined} undefined
  */
 Compositor.prototype.clearCommands = function clearCommands() {
     this._inCommands.length = 0;
