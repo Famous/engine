@@ -191,8 +191,8 @@ Node.prototype.getLocation = function getLocation () {
 Node.prototype.getId = Node.prototype.getLocation;
 
 /**
- * Dispatches the event on the node by recursively traversing the scene graph
- * upwards.
+ * Globally dispatches the event using the Scene's Dispatch. All nodes will
+ * receive the dispatched event.
  *
  * @method emit
  *
@@ -202,12 +202,13 @@ Node.prototype.getId = Node.prototype.getLocation;
  * @return {Node} this
  */
 Node.prototype.emit = function emit (event, payload) {
-    var p = this.getParent();
+    var current = this;
 
-    // the context is its own ancestor
-    while (p !== (p = p.getParent()));
+    while (current !== current.getParent()) {
+        current = current.getParent();
+    }
 
-    p.getDispatch().dispatch(event, payload);
+    current.getDispatch().dispatch(event, payload);
     return this;
 };
 
