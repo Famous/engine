@@ -30,13 +30,11 @@ var Transitionable = require('../transitions/Transitionable');
  * @class Color
  * @constructor
  *
- * @param {Color|String|Array}  [color]     Optional argument for setting color
- *                                          using Hex, a Color instance, color
- *                                          name or RGB.
- * @param {Object} [transition]             Optional transition.
- * @param {Function} [cb]                   Callback function to be called on
- *                                          completion of the initial
- *                                          transition.
+ * @param {Color|String|Array} color Optional argument for setting color using Hex, a Color instance, color name or RGB.
+ * @param {Object} transition Optional transition.
+ * @param {Function} cb Callback function to be called on completion of the initial transition.
+ *
+ * @return {undefined} undefined
  */
 function Color(color, transition, cb) {
     this._r = new Transitionable(0);
@@ -65,12 +63,12 @@ Color.prototype.toString = function toString() {
  * set([r, g, b], transition, callback)
  *
  * @method
- * @param {Color|String|Array}  color   Sets color using Hex, a Color instance,
- *                                      color name or RGB.
- * @param {Object} [transition]         Optional transition
- * @param {Function} [cb]               Callback function to be called on
- *                                      completion of the transition.
- * @return {Color}              this
+ *
+ * @param {Color|String|Array} color Sets color using Hex, a Color instance, color name or RGB.
+ * @param {Object} transition Optional transition
+ * @param {Function} cb Callback function to be called on completion of the transition.
+ *
+ * @return {Color} Color
  */
 Color.prototype.set = function set(color, transition, cb) {
     switch (Color.determineType(color)) {
@@ -86,8 +84,8 @@ Color.prototype.set = function set(color, transition, cb) {
  * Returns whether Color is still in an animating (transitioning) state.
  *
  * @method
- * @returns {Boolean} isActive      Boolean value indicating whether the there
- *                                  is an active transition.
+ *
+ * @returns {Boolean} Boolean value indicating whether the there is an active transition.
  */
 Color.prototype.isActive = function isActive() {
     return this._r.isActive() ||
@@ -100,7 +98,8 @@ Color.prototype.isActive = function isActive() {
  * Halt transition at current state and erase all pending actions.
  *
  * @method
- * @return {Color} this
+ *
+ * @return {Color} Color
  */
 Color.prototype.halt = function halt() {
     this._r.halt();
@@ -114,10 +113,12 @@ Color.prototype.halt = function halt() {
  * Sets the color values from another Color instance.
  *
  * @method
- * @param {Color}       color           Color instance.
- * @param {Object}      [transition]    Optional transition.
- * @param {Function}    [cb]            Optional callback function.
- * @return {Color}                      this
+ *
+ * @param {Color} color Color instance.
+ * @param {Object} transition Optional transition.
+ * @param {Function} cb Optional callback function.
+ *
+ * @return {Color} Color
  */
 Color.prototype.changeTo = function changeTo(color, transition, cb) {
     if (Color.isColorInstance(color)) {
@@ -131,10 +132,12 @@ Color.prototype.changeTo = function changeTo(color, transition, cb) {
  * Sets the color based on static color names.
  *
  * @method
- * @param {String}      Color           name
- * @param {Object}      transition      Optional transition parameters
- * @param {Function}    callback        Optional
- * @return {Color}                      this
+ *
+ * @param {String} name Color name
+ * @param {Object} transition Optional transition parameters
+ * @param {Function} cb Optional callback
+ *
+ * @return {Color} Color
  */
 Color.prototype.setColor = function setColor(name, transition, cb) {
     if (colorNames[name]) {
@@ -147,8 +150,10 @@ Color.prototype.setColor = function setColor(name, transition, cb) {
  * Returns the color in either RGB or with the requested format.
  *
  * @method
- * @param {String} option   Optional argument for determining which type of color to get (default is RGB)
- * @returns                 Color in either RGB or specific option value
+ *
+ * @param {String} option Optional argument for determining which type of color to get (default is RGB)
+ *
+ * @returns {Object} Color in either RGB or specific option value
  */
 Color.prototype.getColor = function getColor(option) {
     if (Color.isString(option)) option = option.toLowerCase();
@@ -159,10 +164,12 @@ Color.prototype.getColor = function getColor(option) {
  * Sets the R of the Color's RGB
  *
  * @method
- * @param {Integer}     r           R channel of color
- * @param {Object}      transition  Optional transition parameters
- * @param {Function}    callback    Optional callback
- * @return {Color}                  this
+ *
+ * @param {Number} r R channel of color
+ * @param {Object} transition Optional transition parameters
+ * @param {Function} cb Optional callback
+ *
+ * @return {Color} Color
  */
 Color.prototype.setR = function setR(r, transition, cb) {
     this._r.set(r, transition, cb);
@@ -173,10 +180,12 @@ Color.prototype.setR = function setR(r, transition, cb) {
  * Sets the G of the Color's RGB
  *
  * @method
- * @param {Integer}     g           G channel of color
- * @param {Object}      transition  Optional transition parameters
- * @param {Function}    callback    Optional callback
- * @return {Color}                  this
+ *
+ * @param {Number} g G channel of color
+ * @param {Object} transition Optional transition parameters
+ * @param {Function} cb Optional callback
+ *
+ * @return {Color} Color
  */
 Color.prototype.setG = function setG(g, transition, cb) {
     this._g.set(g, transition, cb);
@@ -187,10 +196,12 @@ Color.prototype.setG = function setG(g, transition, cb) {
  * Sets the B of the Color's RGB
  *
  * @method
- * @param {Integer}     b           B channel of color
- * @param {Object}      transition  Optional transition parameters
- * @param {Function}    callback    Optional callback
- * @return {Color}                  this
+ *
+ * @param {Number} b B channel of color
+ * @param {Object} transition Optional transition parameters
+ * @param {Function} cb Optional callback
+ *
+ * @return {Color} Color
  */
 Color.prototype.setB = function setB(b, transition, cb) {
     this._b.set(b, transition, cb);
@@ -201,10 +212,12 @@ Color.prototype.setB = function setB(b, transition, cb) {
  * Sets opacity value
  *
  * @method
- * @param {Integer}     opacity     Opacity value
- * @param {Object}      transition  Optional transition parameters
- * @param {Function}    callback    Optional callback
- * @return {Color}                  this
+ *
+ * @param {Number} opacity Opacity value
+ * @param {Object} transition Optional transition parameters
+ * @param {Function} cb Optional callback
+ *
+ * @return {Color} Color
  */
 Color.prototype.setOpacity = function setOpacity(opacity, transition, cb) {
     this._opacity.set(opacity, transition, cb);
@@ -215,12 +228,14 @@ Color.prototype.setOpacity = function setOpacity(opacity, transition, cb) {
  * Sets RGB
  *
  * @method
- * @param {Integer}     R           R channel of color
- * @param {Integer}     G           G channel of color
- * @param {Integer}     B           B channel of color
- * @param {Object}      transition  Optional transition parameters
- * @param {Function}    callback    Optional callback
- * @return {Color}                  this
+ *
+ * @param {Number} r R channel of color
+ * @param {Number} g G channel of color
+ * @param {Number} b B channel of color
+ * @param {Object} transition Optional transition parameters
+ * @param {Function} cb Optional callback
+ *
+ * @return {Color} Color
  */
 Color.prototype.setRGB = function setRGB(r, g, b, transition, cb) {
     this.setR(r, transition);
@@ -233,7 +248,8 @@ Color.prototype.setRGB = function setRGB(r, g, b, transition, cb) {
  * Returns R of RGB
  *
  * @method
- * @returns R R of Color
+ *
+ * @returns {Number} R of Color
  */
 Color.prototype.getR = function getR() {
     return this._r.get();
@@ -243,7 +259,8 @@ Color.prototype.getR = function getR() {
  * Returns G of RGB
  *
  * @method
- * @returns G G of Color
+ *
+ * @returns {Number} G of Color
  */
 Color.prototype.getG = function getG() {
     return this._g.get();
@@ -253,7 +270,8 @@ Color.prototype.getG = function getG() {
  * Returns B of RGB
  *
  * @method
- * @returns B B of Color
+ *
+ * @returns {Number} B of Color
  */
 Color.prototype.getB = function getB() {
     return this._b.get();
@@ -263,6 +281,7 @@ Color.prototype.getB = function getB() {
  * Returns Opacity value
  *
  * @method
+ *
  * @returns {Number} Opacity
  */
 Color.prototype.getOpacity = function getOpacity() {
@@ -273,7 +292,8 @@ Color.prototype.getOpacity = function getOpacity() {
  * Returns RGB
  *
  * @method
- * @returns RGB
+ *
+ * @returns {Array} RGB
  */
 Color.prototype.getRGB = function getRGB() {
     return [this.getR(), this.getG(), this.getB()];
@@ -283,7 +303,8 @@ Color.prototype.getRGB = function getRGB() {
  * Returns Normalized RGB
  *
  * @method
- * @returns Normalized RGB
+ *
+ * @returns {Array} Normalized RGB
  */
 Color.prototype.getNormalizedRGB = function getNormalizedRGB() {
     var r = this.getR() / 255.0;
@@ -296,7 +317,8 @@ Color.prototype.getNormalizedRGB = function getNormalizedRGB() {
  * Returns Normalized RGBA
  *
  * @method
- * @returns Normalized RGBA
+ *
+ * @returns {Array} Normalized RGBA
  */
 Color.prototype.getNormalizedRGBA = function getNormalizedRGB() {
     var r = this.getR() / 255.0;
@@ -310,7 +332,8 @@ Color.prototype.getNormalizedRGBA = function getNormalizedRGB() {
  * Returns the current color in Hex
  *
  * @method
- * @returns Hex Hex value
+ *
+ * @returns {String} Hex value
  */
 Color.prototype.getHex = function getHex() {
     var r = Color.toHex(this.getR());
@@ -323,10 +346,12 @@ Color.prototype.getHex = function getHex() {
  * Sets color using Hex
  *
  * @method
- * @param {String} Hex          Hex value
- * @param {Object} transition   Optional transition parameters
- * @param {Function} callback   Optional callback
- * @return {Color}              this
+ *
+ * @param {String} hex Hex value
+ * @param {Object} transition Optional transition parameters
+ * @param {Function} cb Optional callback
+ *
+ * @return {Color} Color
  */
 Color.prototype.setHex = function setHex(hex, transition, cb) {
     hex = (hex.charAt(0) === '#') ? hex.substring(1, hex.length) : hex;
@@ -349,8 +374,10 @@ Color.prototype.setHex = function setHex(hex, transition, cb) {
  * Converts a number to a hex value
  *
  * @method
- * @param       {Integer}   Number
- * @returns     Hex         value
+ *
+ * @param {Number} num Number
+ *
+ * @returns {String} Hex value
  */
 Color.toHex = function toHex(num) {
     var hex = num.toString(16);
@@ -361,8 +388,10 @@ Color.toHex = function toHex(num) {
  * Determines the given input with the appropriate configuration
  *
  * @method
- * @param   {Color|String|Array}    Color type
- * @returns {String}                Appropriate color type
+ *
+ * @param {Color|String|Array} type Color type
+ *
+ * @returns {String} Appropriate color type
  */
 Color.determineType = function determineType(type) {
     if (Color.isColorInstance(type)) return 'instance';
@@ -375,8 +404,10 @@ Color.determineType = function determineType(type) {
  * Returns a boolean checking whether input is a 'String'
  *
  * @method
- * @param               Primitive
- * @returns {Boolean}   Boolean
+ *
+ * @param {String} val String value
+ *
+ * @returns {Boolean} Boolean
  */
 Color.isString = function isString(val) {
     return (typeof val === 'string');
@@ -386,7 +417,9 @@ Color.isString = function isString(val) {
  * Returns a boolean checking whether string input has a hash (#) symbol
  *
  * @method
- * @param   {String}
+ *
+ * @param {String} val Value
+ *
  * @returns {Boolean} Boolean
  */
 Color.isHex = function isHex(val) {
@@ -398,8 +431,10 @@ Color.isHex = function isHex(val) {
  * Returns boolean whether the input is a Color instance
  *
  * @method
- * @param   Color       instance
- * @returns {Boolean}   Boolean
+ *
+ * @param {Color} val Value
+ *
+ * @returns {Boolean} Boolean
  */
 Color.isColorInstance = function isColorInstance(val) {
     return !!val.getColor;
