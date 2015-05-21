@@ -30,7 +30,6 @@ var MockDispatch = require('./MockDispatch');
 var MockColor = require('./MockColor');
 
 var time = 0;
-var _now = Date.now;
 var pointLight;
 
 /*
@@ -92,7 +91,7 @@ test('PointLight', function(t) {
             'should be a function');
 
         t.throws(function() {
-            light = new PointLight();
+            new PointLight();
         }, 'should throw an error if a node is not provided');
 
         pointLight = createPointLight();

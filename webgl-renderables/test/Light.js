@@ -30,7 +30,6 @@ var MockDispatch = require('./MockDispatch');
 var MockColor = require('./MockColor');
 
 var time = 0;
-var _now = Date.now;
 var light;
 
 /*

@@ -30,8 +30,8 @@ var MockDispatch = require('./MockDispatch');
 var MockColor = require('./MockColor');
 
 var time = 0;
-var _now = Date.now;
-var node, mesh, dispatch, geometry;
+var node;
+var mesh;
 
 /*
  * Helper function for creating a mesh using a dummy dispatch
@@ -148,7 +148,6 @@ test('Mesh', function(t) {
 
         node = createMesh();
         mesh = node.mesh;
-        dispatch = node.dispatch;
         t.equal(typeof mesh.onTransformChange, 'function',
             'should be a function');
 
@@ -165,7 +164,6 @@ test('Mesh', function(t) {
 
         node = createMesh();
         mesh = node.mesh;
-        dispatch = node.dispatch;
         t.equal(typeof mesh.onSizeChange, 'function',
             'should be a function');
 
@@ -181,7 +179,6 @@ test('Mesh', function(t) {
 
         node = createMesh();
         mesh = node.mesh;
-        dispatch = node.dispatch;
         t.equal(typeof mesh.onOpacityChange, 'function',
             'should be a function');
 
@@ -384,7 +381,7 @@ test('Mesh', function(t) {
         t.true(mesh.getGlossiness().__isAMaterial__,
             'should be able to return the glossiness expression');
 
-        var x = new MockColor()
+        var x = new MockColor();
         mesh.setGlossiness(x, 10);
         t.equal(mesh.getGlossiness()[0], x,
             'should be able to return the glossiness value');

@@ -40,7 +40,7 @@ function Light(node) {
     this._id = node.addComponent(this);
     this._requestingUpdate = false;
     this.queue = [];
-    this._color;
+    this._color = null;
     this.commands = { color: 'GL_LIGHT_COLOR' };
 }
 

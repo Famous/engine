@@ -30,7 +30,6 @@ var MockDispatch = require('./MockDispatch');
 var MockColor = require('./MockColor');
 
 var time = 0;
-var _now = Date.now;
 var ambientLight;
 
 /*
@@ -92,7 +91,7 @@ test('AmbientLight', function(t) {
             'should be a function');
 
         t.throws(function() {
-            light = new AmbientLight();
+            new AmbientLight();
         }, 'should throw an error if a node is not provided');
 
         ambientLight = createAmbientLight();
