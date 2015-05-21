@@ -202,13 +202,7 @@ Node.prototype.getId = Node.prototype.getLocation;
  * @return {Node} this
  */
 Node.prototype.emit = function emit (event, payload) {
-    var current = this;
-
-    while (current !== current.getParent()) {
-        current = current.getParent();
-    }
-
-    current.getDispatch().dispatch(event, payload);
+    Dispatch.dispatch(this.getLocation(), event, payload);
     return this;
 };
 
@@ -566,7 +560,8 @@ Node.prototype.addChild = function addChild (child) {
         this._children[index] = child;
     }
 
-    child.mount(this.getLocation() + '/' + index);
+    if (this.isMounted())
+        child.mount(this.getLocation() + '/' + index);
 
     return child;
 };
@@ -1431,6 +1426,8 @@ Node.prototype.mount = function mount (path) {
     var list = this._components;
     var len = list.length;
     var item;
+
+    TransformSystem.registerTransformAtPath(path);
 
     this._parent = parent;
     this._globalUpdater = parent.getUpdater();

@@ -32,10 +32,11 @@ var UIManager = require('../renderers/UIManager');
 var Compositor = require('../renderers/Compositor');
 var RequestAnimationFrameLoop = require('../render-loops/RequestAnimationFrameLoop');
 var TransformSystem = require('./TransformSystem');
+var Commands = require('./Commands');
 
-var ENGINE_START = ['ENGINE', 'START'];
-var ENGINE_STOP = ['ENGINE', 'STOP'];
-var TIME_UPDATE = ['TIME', null];
+var ENGINE_START = [Commands.ENGINE, Commands.START];
+var ENGINE_STOP = [Commands.ENGINE, Commands.STOP];
+var TIME_UPDATE = [Commands.TIME, null];
 
 /**
  * Famous has two responsibilities, one to act as the highest level
@@ -217,10 +218,10 @@ FamousEngine.prototype.handleMessage = function handleMessage (messages) {
     while (messages.length > 0) {
         command = messages.shift();
         switch (command) {
-            case 'WITH':
+            case Commands.WITH:
                 this.handleWith(messages);
                 break;
-            case 'FRAME':
+            case Commands.FRAME:
                 this.handleFrame(messages);
                 break;
             default:
@@ -246,7 +247,7 @@ FamousEngine.prototype.handleWith = function handleWith (messages) {
     var command = messages.shift();
 
     switch (command) {
-        case 'TRIGGER': // the TRIGGER command sends a UIEvent to the specified path
+        case Commands.TRIGGER: // the TRIGGER command sends a UIEvent to the specified path
             var type = messages.shift();
             var ev = messages.shift();
 

@@ -24,6 +24,8 @@
 
 'use strict';
 
+var Commands = require('../core/Commands');
+
 /**
  * Camera is a component that is responsible for sending information to the renderer about where
  * the camera is in the scene.  This allows the user to set the type of projection, the focal depth,
@@ -202,7 +204,7 @@ Camera.prototype.onUpdate = function onUpdate() {
     var path = this._node.getLocation();
 
     this._node
-        .sendDrawCommand('WITH')
+        .sendDrawCommand(Commands.WITH)
         .sendDrawCommand(path);
 
     if (this._perspectiveDirty) {
@@ -210,16 +212,16 @@ Camera.prototype.onUpdate = function onUpdate() {
 
         switch (this._projectionType) {
             case Camera.FRUSTUM_PROJECTION:
-                this._node.sendDrawCommand('FRUSTUM_PROJECTION');
+                this._node.sendDrawCommand(Commands.FRUSTRUM_PROJECTION);
                 this._node.sendDrawCommand(this._near);
                 this._node.sendDrawCommand(this._far);
                 break;
             case Camera.PINHOLE_PROJECTION:
-                this._node.sendDrawCommand('PINHOLE_PROJECTION');
+                this._node.sendDrawCommand(Commands.PINHOLE_PROJECTION);
                 this._node.sendDrawCommand(this._focalDepth);
                 break;
             case Camera.ORTHOGRAPHIC_PROJECTION:
-                this._node.sendDrawCommand('ORTHOGRAPHIC_PROJECTION');
+                this._node.sendDrawCommand(Commands.ORTHOGRAPHIC_PROJECTION);
                 break;
         }
     }
@@ -227,7 +229,7 @@ Camera.prototype.onUpdate = function onUpdate() {
     if (this._viewDirty) {
         this._viewDirty = false;
 
-        this._node.sendDrawCommand('CHANGE_VIEW_TRANSFORM');
+        this._node.sendDrawCommand(Commands.CHANGE_VIEW_TRANSFORM);
         this._node.sendDrawCommand(this._viewTransform[0]);
         this._node.sendDrawCommand(this._viewTransform[1]);
         this._node.sendDrawCommand(this._viewTransform[2]);

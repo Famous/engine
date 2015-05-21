@@ -80,7 +80,7 @@ Transform.prototype.getLocalTransform = function getLocalTransform () {
     return this.local;
 };
 
-Transform.prototype.getGlobalTransform = function getGlobalTransform () {
+Transform.prototype.getWorldTransform = function getWorldTransform () {
     if (!this.isBreakPoint())
         throw new Error('This transform is not calculating world transforms');
     return this.global;

@@ -354,6 +354,36 @@ DOMRenderer.prototype.loadPath = function loadPath (path) {
     return this._path;
 };
 
+/**
+ * Finds children of a parent element that are descendents of a inserted element in the scene
+ * graph. Appends those children to the inserted element.
+ *
+ * @method resolveChildren
+ * @return {void}
+ *
+ * @param {HTMLElement} element the inserted element
+ * @param {HTMLElement} parent the parent of the inserted element
+ */
+DOMRenderer.prototype.resolveChildren = function resolveChildren (element, parent) {
+    var i = 0;
+    var childNode;
+    var path = this._path;
+    var childPath;
+
+    while ((childNode = parent.childNodes[i])) {
+        if (!childNode.dataSet) {
+            i++;
+            continue;
+        }
+        childPath = childNode.dataSet.faPath;
+        if (!childPath) {
+            i++;
+            continue;
+        }
+        if (PathUtils.isDescendentOf(childPath, parent)) element.appendChild(childNode);
+        else i++;
+    }
+};
 
 /**
  * Inserts a DOMElement at the currently loaded path, assuming no target is
@@ -376,6 +406,11 @@ DOMRenderer.prototype.insertEl = function insertEl (tagName) {
         if (this._target) this._parent.element.removeChild(this._target.element);
 
         this._target = new ElementCache(document.createElement(tagName), this._path);
+
+        var el = this._target.element;
+        var parent = this._parent.element;
+
+        this.resolveChildren(el, parent);
 
         this._parent.element.appendChild(this._target.element);
         this._elements[this._path] = this._target;
@@ -585,7 +620,7 @@ DOMRenderer.prototype.removeClass = function removeClass(domClass) {
  */
 DOMRenderer.prototype._stringifyMatrix = function _stringifyMatrix(m) {
     var r = 'matrix3d(';
-
+    
     r += (m[0] < 0.000001 && m[0] > -0.000001) ? '0,' : m[0] + ',';
     r += (m[1] < 0.000001 && m[1] > -0.000001) ? '0,' : m[1] + ',';
     r += (m[2] < 0.000001 && m[2] > -0.000001) ? '0,' : m[2] + ',';
@@ -601,7 +636,7 @@ DOMRenderer.prototype._stringifyMatrix = function _stringifyMatrix(m) {
     r += (m[12] < 0.000001 && m[12] > -0.000001) ? '0,' : m[12] + ',';
     r += (m[13] < 0.000001 && m[13] > -0.000001) ? '0,' : m[13] + ',';
     r += (m[14] < 0.000001 && m[14] > -0.000001) ? '0,' : m[14] + ',';
-
+    
     r += m[15] + ')';
     return r;
 };
