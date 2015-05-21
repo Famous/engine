@@ -29,6 +29,7 @@
 var Size = require('./Size');
 var Dispatch = require('./Dispatch');
 var TransformSystem = require('./TransformSystem');
+var pathUtils = require('./Path');
 
 var SIZE_PROCESSOR = new Size();
 
@@ -1415,7 +1416,6 @@ Node.prototype.mount = function mount (path) {
     if (this.isMounted())
         throw new Error('Node is already mounted at: ' + this.getLocation());
     Dispatch.registerNodeAtPath(path, this);
-};
 
     var i = 0;
     var list = this._components;
@@ -1424,6 +1424,7 @@ Node.prototype.mount = function mount (path) {
 
     TransformSystem.registerTransformAtPath(path);
 
+    var parent = Dispatch.getNode(pathUtils.parent(path));
     this._parent = parent;
     this._globalUpdater = parent.getUpdater();
     this.value.location = path;
@@ -1438,6 +1439,7 @@ Node.prototype.mount = function mount (path) {
 
     if (!this._requestingUpdate) this._requestUpdate(true);
     return this;
+
 };
 
 /**
@@ -1451,6 +1453,7 @@ Node.prototype.mount = function mount (path) {
 Node.prototype.dismount = function dismount () {
     if (!this.isMounted()) 
         throw new Error('Node is not mounted');
+
     Dispatch.deregisterNodeAtPath(this.getLocation(), this);
 
     var i = 0;
@@ -1466,7 +1469,7 @@ Node.prototype.dismount = function dismount () {
     }
 
     if (!this._requestingUpdate) this._requestUpdate();
-    return this;
+
 };
 
 /**
