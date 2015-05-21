@@ -131,7 +131,7 @@ TextureManager.prototype.register = function register(input, slot) {
 
         // Handle image url
 
-        else if ('string' === typeof source) {
+        else if (typeof source === 'string') {
             loadImage(source, function (img) {
                 this.bindTexture(textureId);
                 texture.setImage(img);

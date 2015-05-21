@@ -30,7 +30,6 @@ var MockDispatch = require('./MockDispatch');
 var MockColor = require('./MockColor');
 
 var time = 0;
-var _now = Date.now;
 var light;
 
 /*
@@ -56,7 +55,9 @@ test('Light', function(t) {
     t.test('Time setup', function(t) {
         time = 0;
 
-        Date.now = function() { return time; };
+        Date.now = function() {
+            return time;
+        };
         t.equal(typeof Date.now, 'function',
             'should be a function');
 

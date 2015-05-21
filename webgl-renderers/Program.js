@@ -378,7 +378,7 @@ Program.prototype.setUniforms = function (uniformNames, uniformValue) {
     var len;
     var i;
 
-    if (!this.program) return;
+    if (!this.program) return this;
 
     len = uniformNames.length;
     for (i = 0; i < len; i++) {
@@ -472,7 +472,9 @@ Program.prototype.compileShader = function compileShader(shader, source) {
     this.gl.compileShader(shader);
     if (!this.gl.getShaderParameter(shader, this.gl.COMPILE_STATUS)) {
         console.error('compile error: ' + this.gl.getShaderInfoLog(shader));
-        console.error('1: ' + source.replace(/\n/g, function () { return '\n' + (i+=1) + ': '; }));
+        console.error('1: ' + source.replace(/\n/g, function () {
+            return '\n' + (i+=1) + ': ';
+        }));
     }
 
     return shader;

@@ -66,7 +66,8 @@ function BoxGeometry(options) {
     var j;
 
     for (i = 0; i < boxData.length; i++) {
-        data = boxData[i], v = i * 4;
+        data = boxData[i];
+        v = i * 4;
         for (j = 0; j < 4; j++) {
             d = data[j];
             var octant = pickOctant(d);

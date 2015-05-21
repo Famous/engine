@@ -129,28 +129,11 @@ Texture.prototype.readBack = function readBack(x, y, width, height) {
     var fb = gl.createFramebuffer();
     gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
     gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this.id, 0);
-    if (gl.checkFramebufferStatus(gl.FRAMEBUFFER) == gl.FRAMEBUFFER_COMPLETE) {
+    if (gl.checkFramebufferStatus(gl.FRAMEBUFFER) === gl.FRAMEBUFFER_COMPLETE) {
         pixels = new Uint8Array(width * height * 4);
         gl.readPixels(x, y, width, height, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
     }
     return pixels;
 };
-
-/*
- * Determines whether both input values are power-of-two numbers.
- *
- * @method
- * @private
- *
- * @param {Number} width    Number representing texture width.
- * @param {Number} height   Number representing texture height.
- *
- * @return {Boolean}        Boolean denoting whether the input dimensions
- *                          are both power-of-two values.
- */
-function isPowerOfTwo(width, height) {
-    return (width & width - 1) === 0
-        && (height & height - 1) === 0;
-}
 
 module.exports = Texture;

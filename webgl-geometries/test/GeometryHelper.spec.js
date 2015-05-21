@@ -51,7 +51,7 @@ test('GeometryHelper', function(t) {
         var detailX = 10;
         var detailY = 10;
 
-        var buffers = GeometryHelper.generateParametric(detailX, detailY, generator);
+        GeometryHelper.generateParametric(detailX, detailY, generator);
 
         t.equals(
             generator.callCount,
@@ -148,7 +148,7 @@ test('GeometryHelper', function(t) {
 
         t.equals(vertices.length, 9, 'Should not duplicate vertices when no duplicate faces are found');
 
-        var indices = [0, 1, 2, 0, 1, 2];
+        indices = [0, 1, 2, 0, 1, 2];
 
         GeometryHelper.getUniqueFaces(vertices, indices);
 

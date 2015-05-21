@@ -68,7 +68,9 @@ test('Color', function(t) {
 
         time = 0;
 
-        Date.now = function() { return time; };
+        Date.now = function() {
+            return time;
+        };
         t.equal(typeof Date.now, 'function', 'should be a function');
 
         time = 50;
@@ -474,7 +476,7 @@ test('Color', function(t) {
             'should be a function');
 
         inputs.forEach(function(input) {
-            var color = new Color();
+            new Color();
             t.equal(
                 Color.determineType(input.arg),
                 input.type,
