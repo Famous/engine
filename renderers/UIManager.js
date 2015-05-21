@@ -43,18 +43,14 @@
  * @class  UIManager
  * @constructor
  *
- * @param {Famous|Worker} thread        The thread being used to receive
- *                                      messages from and post messages to.
- *                                      Expected to expose a WebWorker-like
- *                                      API, which means providing a way to
- *                                      listen for updates by setting its
- *                                      `onmessage` property and sending
- *                                      updates using `postMessage`.
- * @param {Compositor} compositor       an instance of Compositor used to
- *                                      extract enqueued draw commands from to
- *                                      be sent to the thread.
- * @param {RenderLoop} renderLoop           an instance of Engine used for
- *                                      executing the `ENGINE` commands on.
+ * @param {Famous|Worker} thread The thread being used to receive messages
+ * from and post messages to. Expected to expose a WebWorker-like API, which
+ * means providing a way to listen for updates by setting its `onmessage`
+ * property and sending updates using `postMessage`.
+ * @param {Compositor} compositor an instance of Compositor used to extract
+ * enqueued draw commands from to be sent to the thread.
+ * @param {RenderLoop} renderLoop an instance of Engine used for executing
+ * the `ENGINE` commands on.
  */
 function UIManager (thread, compositor, renderLoop) {
     this._thread = thread;
@@ -95,7 +91,7 @@ function UIManager (thread, compositor, renderLoop) {
  *
  * @method
  *
- * @return {Worker|FamousEngine}  Either a web worker or a `FamousEngine` singleton.
+ * @return {Worker|FamousEngine} Either a web worker or a `FamousEngine` singleton.
  */
 UIManager.prototype.getThread = function getThread() {
     return this._thread;
@@ -106,7 +102,7 @@ UIManager.prototype.getThread = function getThread() {
  *
  * @method
  *
- * @return {Compositor}     The compositor used by the UIManager.
+ * @return {Compositor} The compositor used by the UIManager.
  */
 UIManager.prototype.getCompositor = function getCompositor() {
     return this._compositor;
@@ -131,7 +127,7 @@ UIManager.prototype.getEngine = function getEngine() {
  * @method
  *
  * @param  {Number} time unix timestamp to be passed down to the worker as a
- *                       FRAME command
+ * FRAME command
  * @return {undefined} undefined
  */
 UIManager.prototype.update = function update (time) {

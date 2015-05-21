@@ -42,10 +42,11 @@ var DOMRenderer = require('../dom-renderers/DOMRenderer');
  * @class Context
  * @constructor
  *
- * @param {String}      selector    Query selector used to locate root element of
- *                                  context layer.
- * @param {Compositor}  compositor  Compositor reference to pass down to
- *                                  WebGLRenderer.
+ * @param {String} selector Query selector used to locate root element of
+ * context layer.
+ * @param {Compositor} compositor Compositor reference to pass down to
+ * WebGLRenderer.
+ *
  * @return {undefined} undefined
  */
 function Context(selector, compositor) {
@@ -125,6 +126,7 @@ Context.prototype.updateSize = function () {
  * Issues draw commands to all renderers with current renderState.
  *
  * @method
+ *
  * @return {undefined} undefined
  */
 Context.prototype.draw = function draw() {
@@ -139,6 +141,7 @@ Context.prototype.draw = function draw() {
  * Gets the size of the parent element of the DOMRenderer for this context.
  *
  * @method
+ *
  * @return {undefined} undefined
  */
 Context.prototype.getRootSize = function getRootSize() {
@@ -151,6 +154,7 @@ Context.prototype.getRootSize = function getRootSize() {
  * to pass size information to the renderer.
  *
  * @method
+ *
  * @return {undefined} undefined
  */
 Context.prototype.initWebGL = function initWebGL() {
@@ -165,12 +169,13 @@ Context.prototype.initWebGL = function initWebGL() {
  *
  * @method
  *
- * @param {String}  path        String used as identifier of a given node in the
- *                              scene graph.
- * @param {Array}   commands    List of all commands from this frame.
- * @param {Number}  iterator    Number indicating progress through the command
- *                              queue.
- * @return {Number} iterator    indicating progress through the command queue.
+ * @param {String} path String used as identifier of a given node in the
+ * scene graph.
+ * @param {Array} commands List of all commands from this frame.
+ * @param {Number} iterator Number indicating progress through the command
+ * queue.
+ *
+ * @return {Number} iterator indicating progress through the command queue.
  */
 Context.prototype.receive = function receive(path, commands, iterator) {
     var localIterator = iterator;

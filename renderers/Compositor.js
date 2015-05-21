@@ -57,7 +57,7 @@ function Compositor() {
  *
  * @method
  *
- * @return {Number}     Clock time.
+ * @return {Number} Clock time.
  */
 Compositor.prototype.getTime = function getTime() {
     return this._time;
@@ -70,11 +70,12 @@ Compositor.prototype.getTime = function getTime() {
  * @method
  * @private
  *
- * @param  {String} path    render path to the node the event should be
- *                          triggered on (*targeted event*)
- * @param  {String} ev      event type
- * @param  {Object} payload event object (serializable using structured
- *                          cloning algorithm)
+ * @param  {String} path Render path to the node the event should be triggered
+ * on (*targeted event*)
+ * @param  {String} ev Event type
+ * @param  {Object} payload Event object (serializable using structured cloning
+ * algorithm)
+ *
  * @return {undefined} undefined
  */
 Compositor.prototype.sendEvent = function sendEvent(path, ev, payload) {
@@ -88,9 +89,9 @@ Compositor.prototype.sendEvent = function sendEvent(path, ev, payload) {
  * @method
  * @private
  *
- * @param  {String} selector    render path to the node (context) that should
- *                              be resized
- * @param  {Array} size         new context size
+ * @param  {String} selector render path to the node (context) that should be resized
+ * @param  {Array} size new context size
+ *
  * @return {undefined} undefined
  */
 Compositor.prototype.sendResize = function sendResize (selector, size) {
@@ -103,9 +104,11 @@ Compositor.prototype.sendResize = function sendResize (selector, size) {
  * @method
  * @private
  *
- * @param  {Number} iterator    position index within the commands queue
- * @param  {Array}  commands    remaining message queue received,
- *                              used to shift single messages from
+ * @param  {Number} iterator position index within the commands queue
+ * @param  {Array} commands remaining message queue received, used to
+ * shift single messages from
+ *
+ * @return {undefined} undefined
  */
 Compositor.prototype.handleWith = function handleWith (iterator, commands) {
     var path = commands[iterator];
@@ -121,11 +124,10 @@ Compositor.prototype.handleWith = function handleWith (iterator, commands) {
  * @method
  * @private
  *
- * @param  {String} selector            document query selector used for
- *                                      retrieving the DOM node the
- *                                      VirtualElement should be attached to
- * @return {Object} result
- * @return {Context}                    final VirtualElement
+ * @param  {String} selector document query selector used for retrieving the
+ * DOM node the VirtualElement should be attached to
+ *
+ * @return {Object} context
  */
 Compositor.prototype.getOrSetContext = function getOrSetContext(selector) {
     if (this._contexts[selector]) return this._contexts[selector];
@@ -138,9 +140,10 @@ Compositor.prototype.getOrSetContext = function getOrSetContext(selector) {
  * @method
  * @private
  *
- * @param  {Number} iterator    position index within the commands queue
- * @param  {Array} commands     remaining message queue received,
- *                              used to shift single messages
+ * @param  {Number} iterator position index within the commands queue
+ * @param  {Array} commands remaining message queue received, used to
+ * shift single messages
+ *
  * @return {undefined} undefined
  */
 Compositor.prototype.giveSizeFor = function giveSizeFor(iterator, commands) {
@@ -156,7 +159,7 @@ Compositor.prototype.giveSizeFor = function giveSizeFor(iterator, commands) {
  *
  * @method
  *
- * @return {Array} outCommands  set of commands to be sent back
+ * @return {Array} outCommands set of commands to be sent back
  */
 Compositor.prototype.drawCommands = function drawCommands() {
     var commands = this._inCommands;
@@ -194,8 +197,9 @@ Compositor.prototype.drawCommands = function drawCommands() {
  * Used by ThreadManager to update the interal queue of incoming commands.
  * Receiving commands does not immediately start the rederning process.
  *
- * @param  {Array} commands     command queue to be processed by the
- *                              compositor's `drawCommands` method
+ * @param  {Array} commands command queue to be processed by the compositor's
+ * `drawCommands` method
+ *
  * @return {undefined} undefined
  */
 Compositor.prototype.receiveCommands = function receiveCommands(commands) {
@@ -210,6 +214,7 @@ Compositor.prototype.receiveCommands = function receiveCommands(commands) {
  * Called by ThreadManager.
  *
  * @method
+ *
  * @return {undefined} undefined
  */
 Compositor.prototype.clearCommands = function clearCommands() {
