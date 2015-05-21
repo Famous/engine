@@ -1,18 +1,18 @@
 /**
  * The MIT License (MIT)
- * 
+ *
  * Copyright (c) 2015 Famous Industries Inc.
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -23,10 +23,6 @@
  */
 
 'use strict';
-
-var sin = Math.sin;
-var cos = Math.cos;
-var sqrt = Math.sqrt;
 
 /**
  * A two-dimensional vector.
@@ -126,8 +122,8 @@ Vec2.prototype.rotate = function(theta) {
     var x = this.x;
     var y = this.y;
 
-    var cosTheta = cos(theta);
-    var sinTheta = sin(theta);
+    var cosTheta = Math.cos(theta);
+    var sinTheta = Math.sin(theta);
 
     this.x = x * cosTheta - y * sinTheta;
     this.y = x * sinTheta + y * cosTheta;
@@ -200,7 +196,7 @@ Vec2.prototype.length = function length() {
     var x = this.x;
     var y = this.y;
 
-    return sqrt(x * x + y * y);
+    return Math.sqrt(x * x + y * y);
 };
 
 /**
@@ -268,7 +264,7 @@ Vec2.normalize = function normalize(v, output) {
     var x = v.x;
     var y = v.y;
 
-    var length = sqrt(x * x + y * y) || 1;
+    var length = Math.sqrt(x * x + y * y) || 1;
     length = 1 / length;
     output.x = v.x * length;
     output.y = v.y * length;
