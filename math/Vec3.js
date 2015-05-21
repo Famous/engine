@@ -1,18 +1,18 @@
 /**
  * The MIT License (MIT)
- * 
+ *
  * Copyright (c) 2015 Famous Industries Inc.
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -23,10 +23,6 @@
  */
 
 'use strict';
-
-var sin = Math.sin;
-var cos = Math.cos;
-var sqrt = Math.sqrt;
 
 /**
  * A three-dimensional vector.
@@ -109,8 +105,8 @@ Vec3.prototype.rotateX = function rotateX(theta) {
     var y = this.y;
     var z = this.z;
 
-    var cosTheta = cos(theta);
-    var sinTheta = sin(theta);
+    var cosTheta = Math.cos(theta);
+    var sinTheta = Math.sin(theta);
 
     this.y = y * cosTheta - z * sinTheta;
     this.z = y * sinTheta + z * cosTheta;
@@ -131,8 +127,8 @@ Vec3.prototype.rotateY = function rotateY(theta) {
     var x = this.x;
     var z = this.z;
 
-    var cosTheta = cos(theta);
-    var sinTheta = sin(theta);
+    var cosTheta = Math.cos(theta);
+    var sinTheta = Math.sin(theta);
 
     this.x = z * sinTheta + x * cosTheta;
     this.z = z * cosTheta - x * sinTheta;
@@ -153,8 +149,8 @@ Vec3.prototype.rotateZ = function rotateZ(theta) {
     var x = this.x;
     var y = this.y;
 
-    var cosTheta = cos(theta);
-    var sinTheta = sin(theta);
+    var cosTheta = Math.cos(theta);
+    var sinTheta = Math.sin(theta);
 
     this.x = x * cosTheta - y * sinTheta;
     this.y = x * sinTheta + y * cosTheta;
@@ -261,7 +257,7 @@ Vec3.prototype.length = function length() {
     var y = this.y;
     var z = this.z;
 
-    return sqrt(x * x + y * y + z * z);
+    return Math.sqrt(x * x + y * y + z * z);
 };
 
 /**
@@ -343,7 +339,7 @@ Vec3.prototype.normalize = function normalize() {
     var y = this.y;
     var z = this.z;
 
-    var len = sqrt(x * x + y * y + z * z) || 1;
+    var len = Math.sqrt(x * x + y * y + z * z) || 1;
     len = 1 / len;
 
     this.x *= len;
@@ -425,7 +421,7 @@ Vec3.normalize = function normalize(v, output) {
     var y = v.y;
     var z = v.z;
 
-    var length = sqrt(x * x + y * y + z * z) || 1;
+    var length = Math.sqrt(x * x + y * y + z * z) || 1;
     length = 1 / length;
 
     output.x = x * length;
