@@ -29,8 +29,11 @@
  *
  * @method loadURL
  * @memberof Utilities
- * @param {string} url URL of object
- * @param {function} callback callback to dispatch with content
+ *
+ * @param {String} url URL of object
+ * @param {Function} callback callback to dispatch with content
+ *
+ * @return {undefined} undefined
  */
 var loadURL = function loadURL(url, callback) {
     var xhr = new XMLHttpRequest();

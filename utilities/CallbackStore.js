@@ -1,18 +1,18 @@
 /**
  * The MIT License (MIT)
- * 
+ *
  * Copyright (c) 2015 Famous Industries Inc.
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -26,7 +26,7 @@
 
 /**
  * A lightweight, featureless EventEmitter.
- * 
+ *
  * @class CallbackStore
  * @constructor
  */
@@ -39,10 +39,12 @@ function CallbackStore () {
  *
  * @method on
  * @chainable
- * 
- * @param  {String}   key
- * @param  {Function} callback
- * @return {Function} A function to call if you want to remove the callback
+ *
+ * @param  {String}   key       The event type (e.g. `click`).
+ * @param  {Function} callback  A callback function to be invoked whenever `key`
+ *                              event is being triggered.
+ * @return {Function} destroy   A function to call if you want to remove the
+ *                              callback.
  */
 CallbackStore.prototype.on = function on (key, callback) {
     if (!this._events[key]) this._events[key] = [];
@@ -58,10 +60,12 @@ CallbackStore.prototype.on = function on (key, callback) {
  *
  * @method off
  * @chainable
- * 
- * @param  {String}          key
- * @param  {Function}        callback
- * @return {CallbackStore}   this
+ *
+ * @param  {String} key         The event type from which the callback function
+ *                              should be removed.
+ * @param  {Function} callback  The callback function to be removed from the
+ *                              listeners for key.
+ * @return {CallbackStore} this
  */
 CallbackStore.prototype.off = function off (key, callback) {
     var events = this._events[key];
@@ -74,9 +78,9 @@ CallbackStore.prototype.off = function off (key, callback) {
  *
  * @method trigger
  * @chainable
- * 
- * @param  {String}        key
- * @param  {Object}        payload
+ *
+ * @param  {String}        key      The event type.
+ * @param  {Object}        payload  The event payload (event object).
  * @return {CallbackStore} this
  */
 CallbackStore.prototype.trigger = function trigger (key, payload) {

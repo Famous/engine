@@ -42,6 +42,8 @@ var PREFIXES = ['', '-ms-', '-webkit-', '-moz-', '-o-'];
  *
  * @param {String} property     CSS property (no camelCase), e.g.
  *                              `border-radius`.
+ * @return {String} prefixed    Vendor prefixed version of passed in CSS
+ *                              property (e.g. `-webkit-border-radius`).
  */
 function vendorPrefix(property) {
     for (var i = 0; i < PREFIXES.length; i++) {
