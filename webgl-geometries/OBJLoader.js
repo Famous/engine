@@ -115,6 +115,9 @@ function format(text, options) {
 
     var lines = text.split('\n');
 
+    var geometries = [];
+    var options = options || {};
+
     var faceTexCoords = [];
     var faceVertices = [];
     var faceNormals = [];
@@ -287,17 +290,52 @@ function format(text, options) {
                 }
             }
         }
+
+        else if (line.indexOf('g ') !== -1) {
+            if (faceVertices.length) {
+                geometries.push(
+                    packageBuffers(
+                        vertices,
+                        normals,
+                        texCoords,
+                        faceVertices,
+                        faceNormals,
+                        faceTexCoords,
+                        options
+                    )
+                )
+            }
+
+            faceVertices.length = 0;
+            faceTexCoords.length = 0;
+            faceNormals.length = 0;
+        }
     }
 
-    var cached = cacheVertices(
-        vertices,
-        normals,
-        texCoords,
-        faceVertices,
-        faceNormals,
-        faceTexCoords
-    );
+    geometries.push(
+        packageBuffers(
+            vertices,
+            normals,
+            texCoords,
+            faceVertices,
+            faceNormals,
+            faceTexCoords,
+            options
+        )
+    )
 
+    return geometries;
+}
+
+function packageBuffers(v, n, t, fv, fn, ft, options) {
+    var cached = cacheVertices(
+        v,
+        n,
+        t,
+        fv,
+        fn,
+        ft
+    );
 
     cached.vertices = flatten(cached.vertices);
     cached.normals = flatten(cached.normals);
