@@ -30,6 +30,7 @@ var Node = require('./Node');
 var Size = require('./Size');
 var Dispatch = require('./Dispatch');
 var Commands = require('./Commands');
+var TransformSystem = require('./TransformSystem');
 
 /**
  * Scene is the bottom of the scene graph. It is its own
@@ -134,6 +135,17 @@ Scene.prototype.onReceive = function onReceive (event, payload) {
                              payload[2] ? payload[2] : 0);
 
     }
+};
+
+
+Scene.prototype.mount = function mount (path) {
+    if (this.isMounted())
+        throw new Error('Scene is already mounted at: ' + this.getLocation());
+    Dispatch.registerNodeAtPath(path, this);
+    this.value.location = path;
+    this.value.showState.mounted = true;
+    this._parent = this;
+    TransformSystem.registerTransformAtPath(path);
 };
 
 module.exports = Scene;
