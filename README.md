@@ -50,9 +50,9 @@ famous develop
 
 If you are looking for an easy way to get a Famous application up and running, check out our [seed project][famous-engine-seed].  This includes the FamousEngine, index.html file, preloaded CSS with friendly default values, and some boilerplate to get you started.
 
-### NPM
+### npm
 
-The Famous Engine is also available on NPM
+The Famous Engine is also available on npm.
 
 ```
 npm install famous
@@ -62,10 +62,10 @@ This will add the Famous Engine to your node_modules folder to be included into 
 
 ## Contributing
 
-Cloning this repository directly is primarily for those wishing to contribute to our codebase. Check out our [contributing instructions][contributing] to get involved. 
-    
+Cloning this repository directly is primarily for those wishing to contribute to our codebase. Check out our [contributing instructions][contributing] to get involved.
+
 Note: cloning only provides the Famo.us folder with all Famo.us code, but it does no application scaffolding. You will additionally need to create your own index.html.  Currently we have a dependency on glslify, a browserify transform to compile our glsl shaders.
-  
+
 ## Documentation
 
 - Rendered versions of the source code reference documentation: [docs][site-docs].
