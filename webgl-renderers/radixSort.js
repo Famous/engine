@@ -37,33 +37,40 @@ var buffer = new ArrayBuffer(4);
 var floatView = new Float32Array(buffer, 0, 1);
 var intView = new Int32Array(buffer, 0, 1);
 
+// comparator pulls relevant sorting keys out of mesh
 function comp(list, registry, i) {
     var key = list[i];
     var item = registry[key];
     return (item.depth ? item.depth : registry[key].uniformValues[1][14]) + normalizer;
 }
 
+//mutator function records mesh's place in previous pass
 function mutator(list, registry, i, value) {
     var key = list[i];
     registry[key].depth = intToFloat(value) - normalizer;
     return key;
 }
 
+//clean function removes mutator function's record
 function clean(list, registry, i) {
     registry[list[i]].depth = null;
 }
 
+//converts a javascript float to a 32bit integer using an array buffer
+//of size one
 function floatToInt(k) {
     floatView[0] = k;
     return intView[0];
 }
-
+//converts a 32 bit integer to a regular javascript float using an array buffer
+//of size one
 function intToFloat(k) {
     intView[0] = k;
     return floatView[0];
 }
 
-function sort(list, registry) {
+//sorts a list of mesh IDs according to their z-depth
+function radixSort(list, registry) {
     var pass = 0;
     var out = [];
 
@@ -113,4 +120,4 @@ function sort(list, registry) {
     return out;
 }
 
-module.exports = sort;
+module.exports = radixSort;

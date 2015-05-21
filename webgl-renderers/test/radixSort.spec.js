@@ -24,7 +24,7 @@
 
 'use strict';
 var test = require('tape');
-var sort = require('../radixSort');
+var radixSort = require('../radixSort');
 
 test('radixSort', function(t) {
     var registry = {};
@@ -35,8 +35,10 @@ test('radixSort', function(t) {
         meshList[meshList.length] = path;
     }
 
+    radixSort(meshList, registry);
+
     t.test('sort', function(t) {
-        t.equals(checkSorted(test), true, 'should be sorted by depth');
+        t.equals(checkSorted(meshList), true, 'should be sorted by depth');
 
         t.end();
     });
@@ -44,9 +46,12 @@ test('radixSort', function(t) {
     t.end();
 });
 
-function checkSorted (test){
+function checkSorted (list, registry){
+    var a, b;
     for (var i= 0; i < test.length - 1; i++) {
-        if (test[i].depth > test[i+1].depth)  return false;
+        a = list[i].uniformValues[1][14];
+        b = list[i+1].uniformValues[1][14];
+        if (a < b)  return false;
     }
     return true;
 }
