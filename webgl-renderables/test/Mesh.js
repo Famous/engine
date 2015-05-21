@@ -1,18 +1,18 @@
 /**
  * The MIT License (MIT)
- * 
+ *
  * Copyright (c) 2015 Famous Industries Inc.
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -33,7 +33,7 @@ var time = 0;
 var _now = Date.now;
 var node, mesh, dispatch, geometry;
 
-/**
+/*
  * Helper function for creating a mesh using a dummy dispatch
  */
 function createMesh(options) {
@@ -44,14 +44,14 @@ function createMesh(options) {
     };
 }
 
-/**
+/*
  * Dummy material expression
  */
 var materialExpression = {
     __isAMaterial__: true
 };
 
-/**
+/*
  * Helper function for checking whether N number of strings (checkList)
  * are contained in an array list (containerList)
  */
@@ -209,7 +209,7 @@ test('Mesh', function(t) {
         }, 'accepts string references for geometries');
 
         var geometry = mesh.value.geometry;
-        
+
         t.true(contains(['GL_SET_GEOMETRY', geometry.spec.id, geometry.spec.type, geometry.spec.dynamic], mesh._changeQueue),
             'sends the appropriate commands for geometry');
 
@@ -262,7 +262,7 @@ test('Mesh', function(t) {
         var length = mesh._changeQueue.length;
         var c = new MockColor();
         mesh.setBaseColor(c);
-        
+
         t.true(length < mesh._changeQueue.length, 'should be able to take a Color instance');
 
         t.end();
@@ -337,7 +337,7 @@ test('Mesh', function(t) {
         mesh.setNormals(materialExpression);
 
         t.true(contains(['MATERIAL_INPUT', 'u_normals', materialExpression], mesh._changeQueue),
-               
+
             'should be able to take a normal material expression');
 
         t.end();

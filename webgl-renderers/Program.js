@@ -111,8 +111,10 @@ var varyings = keyValueToArrays({
  * @class Program
  * @constructor
  *
- * @param {WebGL_Context}   gl  Context to be used to create the shader program.
- * @return {undefined}          undefined
+ * @param {WebGL_Context} gl Context to be used to create the shader program
+ * @param {Object} options Program options
+ *
+ * @return {undefined} undefined
  */
 function Program(gl, options) {
     this.gl = gl;
@@ -142,10 +144,10 @@ function Program(gl, options) {
  *
  * @method
  *
- * @param {String}  name        Name of target input of material.
- * @param {Object}  material    Compiled material object being verified.
+ * @param {String} name Name of target input of material.
+ * @param {Object} material Compiled material object being verified.
  *
- * @return {Object}             Current program.
+ * @return {Object} Current program.
  */
 Program.prototype.registerMaterial = function registerMaterial(name, material) {
     var compiled = material;
@@ -214,6 +216,7 @@ Program.prototype.registerMaterial = function registerMaterial(name, material) {
  * context.
  *
  * @method
+ *
  * @return {Program} Current program.
  */
 Program.prototype.resetProgram = function resetProgram() {
@@ -316,10 +319,10 @@ Program.prototype.resetProgram = function resetProgram() {
  * creates new entries in the cache when necessary.
  *
  * @method
- * @param {String}          targetName  Key of uniform spec being evaluated.
- * @param {Number|Array}    value       Value of uniform spec being evaluated.
- * @return {Boolean}        boolean     Indicating whether the uniform being set
- *                                      is cached.
+ * @param {String} targetName Key of uniform spec being evaluated.
+ * @param {Number|Array} value Value of uniform spec being evaluated.
+ *
+ * @return {Boolean} boolean Indicating whether the uniform being set is cached.
  */
 Program.prototype.uniformIsCached = function(targetName, value) {
     if(this.cachedUniforms[targetName] == null) {
@@ -359,9 +362,10 @@ Program.prototype.uniformIsCached = function(targetName, value) {
  * and set the appropriate uniforms to specify which chunks to use.
  *
  * @method
- * @param {Array} uniformNames  Array containing the keys of all uniforms to be set.
- * @param {Array} uniformValue  Array containing the values of all uniforms to be set.
- * @return {Program}            Current program.
+ * @param {Array} uniformNames Array containing the keys of all uniforms to be set.
+ * @param {Array} uniformValue Array containing the values of all uniforms to be set.
+ *
+ * @return {Program} Current program.
  */
 Program.prototype.setUniforms = function (uniformNames, uniformValue) {
     var gl = this.gl;
@@ -421,8 +425,9 @@ Program.prototype.setUniforms = function (uniformNames, uniformValue) {
  *
  * @method
  *
- * @param {Number|Array} value  Value from which uniform type is inferred.
- * @return {String}             Name of uniform function for given value.
+ * @param {Number|Array} value Value from which uniform type is inferred.
+ *
+ * @return {String} Name of uniform function for given value.
  */
 Program.prototype.getUniformTypeFromValue = function getUniformTypeFromValue(value) {
     if (Array.isArray(value) || value instanceof Float32Array) {
@@ -448,9 +453,10 @@ Program.prototype.getUniformTypeFromValue = function getUniformTypeFromValue(val
  *
  * @method
  *
- * @param {Object}  shader  Program to be compiled.
- * @param {String}  source  Source to be used in the shader.
- * @return {Object}         Compiled shader.
+ * @param {Object} shader Program to be compiled.
+ * @param {String} source Source to be used in the shader.
+ *
+ * @return {Object} Compiled shader.
  */
 Program.prototype.compileShader = function compileShader(shader, source) {
     var i = 1;

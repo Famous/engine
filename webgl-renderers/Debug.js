@@ -30,7 +30,8 @@
  * displaying errors.
  *
  * @method
- * @returns {Function}
+ *
+ * @returns {Function} Augmented function
  */
 module.exports = function Debug() {
     return _augmentFunction(

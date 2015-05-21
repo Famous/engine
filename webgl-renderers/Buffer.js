@@ -32,10 +32,11 @@
  * @class Buffer
  * @constructor
  *
- * @param {Number}          target  The bind target of the buffer to update: ARRAY_BUFFER or ELEMENT_ARRAY_BUFFER
- * @param {Object}          type    Array type to be used in calls to gl.bufferData.
- * @param {WebGLContext}    gl      The WebGL context that the buffer is hosted by.
- * @return {undefined}              undefined
+ * @param {Number} target The bind target of the buffer to update: ARRAY_BUFFER or ELEMENT_ARRAY_BUFFER
+ * @param {Object} type Array type to be used in calls to gl.bufferData.
+ * @param {WebGLContext} gl The WebGL context that the buffer is hosted by.
+ *
+ * @return {undefined} undefined
  */
 function Buffer(target, type, gl) {
     this.buffer = null;
@@ -50,6 +51,7 @@ function Buffer(target, type, gl) {
  * to the context. Runs bufferData with appropriate data.
  *
  * @method
+ *
  * @return {undefined} undefined
  */
 Buffer.prototype.subData = function subData() {

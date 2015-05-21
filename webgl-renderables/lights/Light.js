@@ -30,8 +30,9 @@
  * @class Light
  * @constructor
  * @component
- * @param {Node} node The controlling node
- *                    from the corresponding Render Node
+ *
+ * @param {Node} node The controlling node from the corresponding Render Node
+ *
  * @return {undefined} undefined
  */
 function Light(node) {
@@ -47,8 +48,10 @@ function Light(node) {
 * Changes the color of the light, using the 'Color' utility component.
 *
 * @method
-* @param {Color} Color instance
-* @return {Light} this
+*
+* @param {Color} color Color instance
+*
+* @return {Light} Light
 */
 Light.prototype.setColor = function setColor(color) {
     if (!color.getNormalizedRGB) return false;
@@ -69,6 +72,7 @@ Light.prototype.setColor = function setColor(color) {
 * Returns the current color.
 
 * @method
+*
 * @returns {Color} Color
 */
 Light.prototype.getColor = function getColor() {
@@ -80,6 +84,7 @@ Light.prototype.getColor = function getColor() {
 *
 * @private
 * @method
+*
 * @return {undefined} undefined
 */
 Light.prototype.onUpdate = function onUpdate() {
