@@ -177,6 +177,11 @@ Transitionable.prototype.delay = function delay(duration, callback) {
  * @param  {Function}               [callback]      callback function to be
  *                                                  called after the transition
  *                                                  is complete
+ * @param {String}                  [method]        optional method used for
+ *                                                  interpolating between the
+ *                                                  values. Set to `slerp` for
+ *                                                  spherical linear
+ *                                                  interpolation.
  * @return {Transitionable}         this
  */
 Transitionable.prototype.override = function override(finalState, curve, duration, callback, method) {
@@ -304,7 +309,7 @@ Transitionable.prototype._sync = function _sync(output, input) {
  *
  * @method get
  *
- * @param {Number=} timestamp       Evaluate the curve at a normalized version
+ * @param {Number=} t               Evaluate the curve at a normalized version
  *                                  of this time. If omitted, use current time
  *                                  (Unix epoch time retrieved from Clock).
  * @return {Number|Array.Number}    Beginning state interpolated to this point
@@ -343,7 +348,9 @@ Transitionable.prototype.get = function get(t) {
  *
  * @method isActive
  *
- * @return {boolean}
+ * @return {Boolean}    Boolean indicating whether there is at least one pending
+ *                      transition. Paused transitions are still being
+ *                      considered active.
  */
 Transitionable.prototype.isActive = function isActive() {
     return this._queue.length > 0;
@@ -408,8 +415,9 @@ Transitionable.prototype.resume = function resume() {
  * @chainable
  * @deprecated Use `.from` instead!
  *
- * @param {Number|Array.Number|Object.<number, number>} startState
+ * @param {Number|Array.Number|Object.<number, number>} start
  *    stable state to set to
+ * @return {Transitionable}                             this
  */
 Transitionable.prototype.reset = function(start) {
     return this.from(start);
@@ -424,13 +432,14 @@ Transitionable.prototype.reset = function(start) {
  * @chainable
  * @deprecated Use `.to` instead!
  *
- * @param {Number|FamousEngineMatrix|Array.Number|Object.<number, number>} endState
+ * @param {Number|FamousEngineMatrix|Array.Number|Object.<number, number>} state
  *    end state to which we interpolate
  * @param {transition=} transition object of type {duration: number, curve:
  *    f[0,1] -> [0,1] or name}. If transition is omitted, change will be
  *    instantaneous.
  * @param {function()=} callback Zero-argument function to call on observed
  *    completion (t=1)
+ * @return {Transitionable} this
  */
 Transitionable.prototype.set = function(state, transition, callback) {
     if (transition == null) {
