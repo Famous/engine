@@ -26,7 +26,6 @@
 
 var test = require('tape');
 var Quaternion = require('../Quaternion');
-var Vec3 = require('../Vec3');
 
 test('Quaternion', function(t) {
     t.test('constructor', function(t) {

@@ -1,18 +1,18 @@
 /**
  * The MIT License (MIT)
- * 
+ *
  * Copyright (c) 2015 Famous Industries Inc.
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -51,7 +51,7 @@ test('Mat33', function(t) {
         t.equal(typeof matrix.set, 'function', 'matrix.set should be a function');
 
         var desired = [ 0.1,0,0, 0,0.1,0, 0,20,0.1];
- 
+
         t.equal(matrix.set(desired), matrix, 'matrix.set should return matrix');
         t.deepEqual(matrix.get(), desired, 'matrix.set should set state of matrix');
         t.end();
@@ -74,7 +74,7 @@ test('Mat33', function(t) {
         t.equal(typeof matrix.vectorMultiply, 'function', 'matrix.vectorMultiply should be a function');
         var vectors = [
             [1, 2, 3],
-            [4, 5, 2],
+            [4, 5, 2]
         ];
         var matrices = [
             [ 4.1,0,4, 0,3.1,0, 0,20,0.1 ],
@@ -115,7 +115,7 @@ test('Mat33', function(t) {
 
         t.end();
     });
-    
+
     t.test('transpose method', function(t) {
         var matrix = new Mat33();
         t.equal(typeof matrix.transpose, 'function', 'matrix.transpose should be a function');
@@ -158,7 +158,7 @@ test('Mat33', function(t) {
         t.notEqual(Mat33.clone(m), m, 'matrix.clone should not return itself');
         t.notEqual(Mat33.clone(m).get(), m.get(), 'matrix.clone should clone deep');
     });
-    
+
     t.test('inverse method', function(t) {
         t.plan(2);
         t.equal(typeof Mat33.inverse, 'function', 'Mat33.inverse should be a function');

@@ -24,11 +24,18 @@
 
 'use strict';
 
+var sin = Math.sin;
+var cos = Math.cos;
+var asin = Math.asin;
+var acos = Math.acos;
+var atan2 = Math.atan2;
+var sqrt = Math.sqrt;
+
 /**
  * A vector-like object used to represent rotations. If theta is the angle of
  * rotation, and (x', y', z') is a normalized vector representing the axis of
- * rotation, then w = Math.cos(theta/2), x = Math.sin(theta/2)*x', y = Math.sin(theta/2)*y',
- * and z = Math.sin(theta/2)*z'.
+ * rotation, then w = cos(theta/2), x = sin(theta/2)*x', y = sin(theta/2)*y',
+ * and z = sin(theta/2)*z'.
  *
  * @class Quaternion
  *
@@ -176,7 +183,7 @@ Quaternion.prototype.length = function length() {
     var x = this.x;
     var y = this.y;
     var z = this.z;
-    return Math.sqrt(w * w + x * x + y * y + z * z);
+    return sqrt(w * w + x * x + y * y + z * z);
 };
 
 /**
@@ -191,8 +198,8 @@ Quaternion.prototype.normalize = function normalize() {
     var x = this.x;
     var y = this.y;
     var z = this.z;
-    var length = Math.sqrt(w * w + x * x + y * y + z * z);
-    if (length === 0) return;
+    var length = sqrt(w * w + x * x + y * y + z * z);
+    if (length === 0) return this;
     length = 1 / length;
     this.w *= length;
     this.x *= length;
@@ -297,10 +304,10 @@ Quaternion.prototype.slerp = function slerp(q, t, output) {
 
     cosomega = w * qw + x * qx + y * qy + z * qz;
     if ((1.0 - cosomega) > 1e-5) {
-        omega = Math.acos(cosomega);
-        sinomega = Math.sin(omega);
-        scaleFrom = Math.sin((1.0 - t) * omega) / sinomega;
-        scaleTo = Math.sin(t * omega) / sinomega;
+        omega = acos(cosomega);
+        sinomega = sin(omega);
+        scaleFrom = sin((1.0 - t) * omega) / sinomega;
+        scaleTo = sin(t * omega) / sinomega;
     }
     else {
         scaleFrom = 1.0 - t;
@@ -367,9 +374,9 @@ Quaternion.prototype.toEuler = function toEuler(output) {
     var ty = 2 * (x * z + y * w);
     ty = ty < -1 ? -1 : ty > 1 ? 1 : ty;
 
-    output.x = Math.atan2(2 * (x * w - y * z), 1 - 2 * (xx + yy));
-    output.y = Math.asin(ty);
-    output.z = Math.atan2(2 * (z * w - x * y), 1 - 2 * (yy + zz));
+    output.x = atan2(2 * (x * w - y * z), 1 - 2 * (xx + yy));
+    output.y = asin(ty);
+    output.z = atan2(2 * (z * w - x * y), 1 - 2 * (yy + zz));
 
     return output;
 };
@@ -392,12 +399,12 @@ Quaternion.prototype.fromEuler = function fromEuler(x, y, z) {
     var hy = y * 0.5;
     var hz = z * 0.5;
 
-    var sx = Math.sin(hx);
-    var sy = Math.sin(hy);
-    var sz = Math.sin(hz);
-    var cx = Math.cos(hx);
-    var cy = Math.cos(hy);
-    var cz = Math.cos(hz);
+    var sx = sin(hx);
+    var sy = sin(hy);
+    var sz = sin(hz);
+    var cx = cos(hx);
+    var cy = cos(hy);
+    var cz = cos(hz);
 
     this.w = cx * cy * cz - sx * sy * sz;
     this.x = sx * cy * cz + cx * sy * sz;
@@ -421,7 +428,7 @@ Quaternion.prototype.fromEuler = function fromEuler(x, y, z) {
  * @return {Quaternion} this
  */
 Quaternion.prototype.fromAngleAxis = function fromAngleAxis(angle, x, y, z) {
-    var len = Math.sqrt(x * x + y * y + z * z);
+    var len = sqrt(x * x + y * y + z * z);
     if (len === 0) {
         this.w = 1;
         this.x = this.y = this.z = 0;
@@ -429,8 +436,8 @@ Quaternion.prototype.fromAngleAxis = function fromAngleAxis(angle, x, y, z) {
     else {
         len = 1 / len;
         var halfTheta = angle * 0.5;
-        var s = Math.sin(halfTheta);
-        this.w = Math.cos(halfTheta);
+        var s = sin(halfTheta);
+        this.w = cos(halfTheta);
         this.x = s * x * len;
         this.y = s * y * len;
         this.z = s * z * len;
@@ -483,7 +490,7 @@ Quaternion.normalize = function normalize(q, output) {
     var x = q.x;
     var y = q.y;
     var z = q.z;
-    var length = Math.sqrt(w * w + x * x + y * y + z * z);
+    var length = sqrt(w * w + x * x + y * y + z * z);
     if (length === 0) return this;
     length = 1 / length;
     output.w *= length;

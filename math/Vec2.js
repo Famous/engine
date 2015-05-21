@@ -102,7 +102,8 @@ Vec2.prototype.scale = function scale(s) {
     if (s instanceof Vec2) {
         this.x *= s.x;
         this.y *= s.y;
-    } else {
+    }
+    else {
         this.x *= s;
         this.y *= s;
     }

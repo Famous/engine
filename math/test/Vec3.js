@@ -1,18 +1,18 @@
 /**
  * The MIT License (MIT)
- * 
+ *
  * Copyright (c) 2015 Famous Industries Inc.
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -45,11 +45,11 @@ test('Vec3', function(t) {
 
         var vec1 = new Vec3(1, 2, 3);
         t.deepEqual(vec1.toArray(), [1, 2, 3], 'Vec3 constructor should set initial state');
-        
+
         var vec2 = new Vec3();
         t.deepEqual(vec2.toArray(), [0, 0, 0], 'Vec3 constructor should defualt to [0, 0, 0]');
 
-        var vec3 = new Vec3(1, undefined, 3);
+        var vec3 = new Vec3(1, null, 3);
         t.deepEqual(vec3.toArray(), [1, 0, 3], 'Vec3 constructor should defualt to [0, 0, 0]');
 
         t.end();
@@ -66,7 +66,7 @@ test('Vec3', function(t) {
         t.deepEqual(vec.toArray(), [4, 5, 6]);
         t.end();
     });
-    
+
     t.test('add method', function(t) {
         var vector = new Vec3();
         t.equal(typeof vector.add, 'function', 'vector.add should be a function');
@@ -163,7 +163,7 @@ test('Vec3', function(t) {
 
         t.end();
     });
-    
+
     t.test('invert method', function(t) {
         var vector = new Vec3();
         t.equal(typeof vector.invert, 'function', 'vector.invert should be a function');
@@ -182,7 +182,7 @@ test('Vec3', function(t) {
 
     t.test('map method', function(t) {
         var vector = new Vec3();
-    
+
         t.equal(typeof vector.map, 'function', 'vector.map should be a function');
 
         var inverse = function(value) {
@@ -198,7 +198,7 @@ test('Vec3', function(t) {
 
     t.test('length method', function(t) {
         var vector = new Vec3();
-    
+
         t.equal(typeof vector.length, 'function', 'vector.length should be a function');
 
         t.equal((new Vec3(1, 1, 0)).length(), Math.sqrt(2));
@@ -307,7 +307,7 @@ test('Vec3', function(t) {
 
         t.end();
     });
-    
+
     t.test('add method', function(t) {
         t.equal(typeof Vec3.add, 'function', 'Vec3.add should be a function');
 
@@ -323,7 +323,7 @@ test('Vec3', function(t) {
 
         t.end();
     });
-    
+
     t.test('subtract method', function(t) {
         t.equal(typeof Vec3.subtract, 'function', 'Vec3.subtract should be a function');
 
@@ -367,7 +367,7 @@ test('Vec3', function(t) {
 
         t.end();
     });
-    
+
     t.test('cross method', function(t) {
         t.equal(typeof Vec3.cross, 'function', 'Vec3.cross should be a function');
 
@@ -382,7 +382,7 @@ test('Vec3', function(t) {
 
         t.end();
     });
-    
+
     t.test('project method', function(t) {
         t.equal(typeof Vec3.project, 'function', 'Vec3.project should be a function');
 
