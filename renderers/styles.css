@@ -1,0 +1,34 @@
+.famous-dom-renderer {
+    width: 100%;
+    height: 100%;
+    transformStyle: preserve-3d;
+    webkitTransformStyle: preserve-3d;
+}
+
+.famous-dom-element {
+    -webkit-transform-origin: 0% 0%;
+    transform-origin: 0% 0%;
+    -webkit-backface-visibility: visible;
+    backface-visibility: visible;
+    -webkit-transform-style: preserve-3d;
+    transform-style: preserve-3d;
+    -webkit-tap-highlight-color: transparent;
+    pointer-events: auto;
+    z-index: 1;
+}
+
+.famous-dom-element-content,
+.famous-dom-element {
+    position: absolute;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+}
+
+.famous-webgl-renderer {
+    pointerEvents: none;
+    position: absolute;
+    zIndex: 1;
+    top: 0;
+    left: 0;
+}

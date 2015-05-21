@@ -26,6 +26,7 @@
 
 var Context = require('./Context');
 var injectCSS = require('./inject-css');
+var Commands = require('../core/Commands');
 
 /**
  * Instantiates a new Compositor.
@@ -51,9 +52,16 @@ function Compositor() {
 
     var _this = this;
     window.addEventListener('resize', function() {
-        _this._resized = true;
+        _this.onResize();
     });
 }
+
+Compositor.prototype.onResize = function onResize () {
+    this._resized = true;
+    for (var selector in this._contexts) {
+        this._contexts[selector].onResize();
+    }
+};
 
 /**
  * Retrieves the time being used by the internal clock managed by
@@ -87,7 +95,7 @@ Compositor.prototype.getTime = function getTime() {
  * @return {undefined} undefined
  */
 Compositor.prototype.sendEvent = function sendEvent(path, ev, payload) {
-    this._outCommands.push('WITH', path, 'TRIGGER', ev, payload);
+    this._outCommands.push(Commands.WITH, path, Commands.TRIGGER, ev, payload);
 };
 
 /**
@@ -184,13 +192,13 @@ Compositor.prototype.drawCommands = function drawCommands() {
     var command = commands[localIterator];
     while (command) {
         switch (command) {
-            case 'TIME':
+            case Commands.TIME:
                 this._time = commands[++localIterator];
                 break;
-            case 'WITH':
+            case Commands.WITH:
                 localIterator = this.handleWith(++localIterator, commands);
                 break;
-            case 'NEED_SIZE_FOR':
+            case Commands.NEED_SIZE_FOR:
                 this.giveSizeFor(++localIterator, commands);
                 break;
         }

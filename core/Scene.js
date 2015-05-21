@@ -29,6 +29,7 @@
 var Node = require('./Node');
 var Size = require('./Size');
 var Dispatch = require('./Dispatch');
+var Commands = require('./Commands');
 
 /**
  * Scene is the bottom of the scene graph. It is its own
@@ -63,7 +64,7 @@ function Scene (selector, updater) {
                           // (it is its own parent)
     
     this._updater                  // message a request for the dom
-        .message('NEED_SIZE_FOR')  // size of the context so that
+        .message(Commands.NEED_SIZE_FOR)  // size of the context so that
         .message(selector);        // the scene graph has a total size
 
     this.show(); // the context begins shown (it's already present in the dom)

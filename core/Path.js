@@ -44,7 +44,8 @@ PathUtils.prototype.index = function index (path) {
     var length = path.length;
     var len = this.hasTrailingSlash(path) ? length - 1 : length;
     while (len--) if (path[len] === '/') break;
-    return parseInt(path.substring(len + 1));
+    var result = parseInt(path.substring(len + 1));
+    return isNaN(result) ? 0 : result;
 };
 
 PathUtils.prototype.indexAtDepth = function indexAtDepth (path, depth) {
@@ -65,10 +66,14 @@ PathUtils.prototype.parent = function parent (path) {
     return path.substring(0, path.lastIndexOf('/', path.length - 2));
 };
 
-PathUtils.prototype.isChildOf = function isChildOf(child, parent) {
+PathUtils.prototype.isChildOf = function isChildOf (child, parent) {
+    return this.isDescendentOf(child, parent) && this.depth(child) === this.depth(parent) + 1;
+};
+
+PathUtils.prototype.isDescendentOf = function isDescendentOf(child, parent) {
     child = this.hasTrailingSlash(child) ? child : child + '/';
     parent = this.hasTrailingSlash(parent) ? parent : parent + '/';
-    return child.indexOf(parent) !== -1;
+    return child.indexOf(parent) === 0;
 };
 
 PathUtils.prototype.getSelector = function getSelector(path) {

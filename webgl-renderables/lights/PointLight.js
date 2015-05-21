@@ -25,6 +25,8 @@
 'use strict';
 
 var Light = require('./Light');
+var Commands = require('../../core/Commands');
+var TransformSystem = require('../../core/TransformSystem');
 
 /**
  * PointLight extends the functionality of Light. PointLight is a light source
@@ -41,8 +43,9 @@ var Light = require('./Light');
  */
 function PointLight(node) {
     Light.call(this, node);
-    this.commands.position = 'GL_LIGHT_POSITION';
-    this.onTransformChange(node.getTransform());
+    this.commands.position = Commands.GL_LIGHT_POSITION;
+    TransformSystem.makeBreakPointAt(node.getLocation());
+    this.onTransformChange(TransformSystem.get(node.getLocation()));
 }
 
 /**
@@ -69,6 +72,7 @@ PointLight.prototype.onTransformChange = function onTransformChange (transform) 
         this._node.requestUpdate(this._id);
         this._requestingUpdate = true;
     }
+    transform = transform.getWorldTransform();
     this.queue.push(this.commands.position);
     this.queue.push(transform[12]);
     this.queue.push(transform[13]);
