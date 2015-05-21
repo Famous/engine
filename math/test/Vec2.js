@@ -43,7 +43,7 @@ test('Vec2', function(t) {
         vec = new Vec2();
         t.deepEqual(vec.toArray(), [0, 0], 'Vec2 constructor should default to [0, 0]');
 
-        vec = new Vec2(1, undefined);
+        vec = new Vec2(1, null);
         t.deepEqual(vec.toArray(), [1, 0], 'Vec2 constructor should default to [0, 0]');
 
         vec = new Vec2([1, 2]);
@@ -80,8 +80,8 @@ test('Vec2', function(t) {
         var vector = new Vec2();
         t.equal(typeof vector.subtract, 'function', 'vector.subtract should be a function');
 
-        t.deepEqual((new Vec2(0, 1)).subtract(new Vec2(0, 0)).toArray(), [0, 1,], 'vector.subtract should correctly subtracttract vectors');
-        t.deepEqual((new Vec2(1, 2)).subtract(new Vec2(4, 5)).toArray(), [-3, -3,], 'vector.subtract should correctly subtracttract vectors');
+        t.deepEqual((new Vec2(0, 1)).subtract(new Vec2(0, 0)).toArray(), [0, 1], 'vector.subtract should correctly subtracttract vectors');
+        t.deepEqual((new Vec2(1, 2)).subtract(new Vec2(4, 5)).toArray(), [-3, -3], 'vector.subtract should correctly subtracttract vectors');
         t.deepEqual((new Vec2(1, 1)).subtract(new Vec2(2, 1)).toArray(), [-1, 0], 'vector.subtract should correctly subtracttract vectors');
         t.deepEqual((new Vec2(3, 1)).subtract(new Vec2(5, 7)).toArray(), [-2, -6], 'vector.subtract should correctly subtracttract vectors');
 
