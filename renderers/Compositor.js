@@ -127,11 +127,17 @@ Compositor.prototype.handleWith = function handleWith (iterator, commands) {
  * @param  {String} selector document query selector used for retrieving the
  * DOM node the VirtualElement should be attached to
  *
- * @return {Object} context
+ * @return {Context} context
  */
 Compositor.prototype.getOrSetContext = function getOrSetContext(selector) {
-    if (this._contexts[selector]) return this._contexts[selector];
-    else return (this._contexts[selector] = new Context(selector, this));
+    if (this._contexts[selector]) {
+        return this._contexts[selector];
+    }
+    else {
+        var context = new Context(selector, this);
+        this._contexts[selector] = context;
+        return context;
+    }
 };
 
 /**

@@ -1,18 +1,18 @@
 /**
  * The MIT License (MIT)
- * 
+ *
  * Copyright (c) 2015 Famous Industries Inc.
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -30,34 +30,34 @@ var Vec3 = require('../../math/Vec3');
 test('GeometryHelper', function(t) {
     t.test('GeometryHelper.generateParametric', function(t) {
 
-    	t.ok(
-    		GeometryHelper.generateParametric instanceof Function, 
-    		'Should have generateParametric function'
-    	);
+        t.ok(
+            GeometryHelper.generateParametric instanceof Function,
+            'Should have generateParametric function'
+        );
 
-    	var generator = function generator(u, v, pos) {
-    		generator.callCount++;
+        var generator = function generator(u, v, pos) {
+            generator.callCount++;
 
-		    var x = Math.sin(u) * Math.cos(v);
-		    var y = Math.cos(u);
-		    var z = -Math.sin(u) * Math.sin(v);
+            var x = Math.sin(u) * Math.cos(v);
+            var y = Math.cos(u);
+            var z = -Math.sin(u) * Math.sin(v);
 
-		    pos[0] = x;
-		    pos[1] = y;
-		    pos[2] = z;
-		}
+            pos[0] = x;
+            pos[1] = y;
+            pos[2] = z;
+        };
         generator.callCount = 0;
 
-    	var detailX = 10;
-    	var detailY = 10;
+        var detailX = 10;
+        var detailY = 10;
 
-    	var buffers = GeometryHelper.generateParametric(detailX, detailY, generator);
+        var buffers = GeometryHelper.generateParametric(detailX, detailY, generator);
 
-    	t.equals(
-    		generator.callCount,
-    		(detailX + 1) * detailY,
-    		'Should call generator exactly (detailX + 1) * detailY times!'
-    	);
+        t.equals(
+            generator.callCount,
+            (detailX + 1) * detailY,
+            'Should call generator exactly (detailX + 1) * detailY times!'
+        );
 
         t.end();
     });
@@ -71,7 +71,7 @@ test('GeometryHelper', function(t) {
         var indices = [0, 1, 2];
 
         var normals = GeometryHelper.computeNormals(vertices, indices);
-        
+
         t.equals(normals.length, vertices.length, 'Normals should be length of vertices');
         t.deepEquals([0, 0, 1], normals.slice(0, 3), 'Should return correct normals');
         t.deepEquals([0, 0, 1], normals.slice(3, 6), 'Should return correct normals');
@@ -275,9 +275,7 @@ test('GeometryHelper', function(t) {
 });
 
 
-/*
-    Helpers
-*/
+// Helper methods used for testing
 
 function testVector(vertices, callback) {
     var numVectors = vertices.length / 3;
@@ -296,7 +294,7 @@ function isNormalized(len) {
 
 function generateRandomArray(numVerts, range) {
     var out = [];
-    var range = range || [0, 1];
+    range = range || [0, 1];
     var offset = range[1] - range[0];
 
     while (numVerts--) {

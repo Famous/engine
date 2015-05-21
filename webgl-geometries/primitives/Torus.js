@@ -41,7 +41,7 @@ var GeometryHelper = require('../GeometryHelper');
  */
 
 function Torus(options) {
-    var options  = options || {};
+    options  = options || {};
     var detail   = options.detail || 30;
     var holeRadius = options.holeRadius || 0.80;
     var tubeRadius = options.tubeRadius || 0.20;
@@ -79,6 +79,6 @@ Torus.generator = function generator(c, a, u, v, pos) {
     pos[0] = (c + a * Math.cos(2 * v)) * Math.sin(2 * u);
     pos[1] = -(c + a * Math.cos(2 * v)) * Math.cos(2 * u);
     pos[2] = a * Math.sin(2 * v);
-}
+};
 
 module.exports = Torus;

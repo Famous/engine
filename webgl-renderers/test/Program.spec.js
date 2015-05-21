@@ -29,7 +29,6 @@ var Program = require('../Program');
 var WebGLTestingContext = require('./helpers/ContextWebGL');
 
 var time = 0;
-var _now = Date.now;
 var program;
 
 /*

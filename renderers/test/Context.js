@@ -50,8 +50,17 @@ test('Context', function(t) {
     t.test('draw method', function(t) {
         var context = new Context('body');
 
-        context.DOMRenderer = { draw: function() { this.wasDrawn = true; } };
-        context.WebGLRenderer = { draw: function() { this.wasDrawn = true; } };
+        context.DOMRenderer = {
+            draw: function() {
+                this.wasDrawn = true;
+            }
+        };
+
+        context.WebGLRenderer = {
+            draw: function() {
+                this.wasDrawn = true;
+            }
+        };
 
         context.draw();
 

@@ -47,7 +47,8 @@ test('polyfills', function(t) {
             timestamps.push(time);
             if (timestamps.length < 60*10) {
                 rAF(loop);
-            } else {
+            }
+            else {
                 var fps = [];
                 var curr = 0;
                 var i;
@@ -56,7 +57,8 @@ test('polyfills', function(t) {
 
                     if (diff < 1000) {
                         fps[fps.length - 1]++;
-                    } else {
+                    }
+                    else {
                         curr = timestamps[i];
                         fps[fps.length] = 0;
                     }

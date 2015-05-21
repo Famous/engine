@@ -67,13 +67,15 @@ function injectCSS() {
     if (document.createStyleSheet) {
         var sheet = document.createStyleSheet();
         sheet.cssText = css;
-    } else {
+    }
+    else {
         var head = document.getElementsByTagName('head')[0];
         var style = document.createElement('style');
 
         if (style.styleSheet) {
             style.styleSheet.cssText = css;
-        } else {
+        }
+        else {
             style.appendChild(document.createTextNode(css));
         }
 
