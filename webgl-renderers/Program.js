@@ -378,7 +378,7 @@ Program.prototype.setUniforms = function (uniformNames, uniformValue) {
     var len;
     var i;
 
-    if (!this.program) return;
+    if (!this.program) return this;
 
     len = uniformNames.length;
     for (i = 0; i < len; i++) {
