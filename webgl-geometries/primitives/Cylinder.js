@@ -74,8 +74,9 @@ function Cylinder (options) {
  * @param {Number} r Cylinder radius.
  * @param {Number} u Longitudal progress from 0 to PI.
  * @param {Number} v Latitudal progress from 0 to PI.
+ * @param {Array} pos X, Y, Z position of vertex at given slice and stack.
  *
- * @return {Array} x, y and z coordinate of geometry.
+ * @return {undefined} undefined
  */
 Cylinder.generator = function generator(r, u, v, pos) {
     pos[1] = r * Math.sin(v);

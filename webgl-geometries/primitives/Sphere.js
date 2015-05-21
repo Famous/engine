@@ -71,7 +71,9 @@ function ParametricSphere (options) {
  * @method
  * @param {Number} u Longitudal progress from 0 to PI.
  * @param {Number} v Latitudal progress from 0 to PI.
- * @return {Array} x, y and z coordinates of geometry
+ * @param {Array} pos X, Y, Z position of vertex at given slice and stack.
+ *
+ * @return {undefined} undefined
  */
 ParametricSphere.generator = function generator(u, v, pos) {
     var x = Math.sin(u) * Math.cos(v);
