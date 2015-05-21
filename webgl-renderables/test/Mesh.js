@@ -279,10 +279,6 @@ test('Mesh', function(t) {
         t.true(mesh.getBaseColor().__isAMaterial__,
             'should be able to take a material expression');
 
-        mesh.setBaseColor(new MockColor());
-        t.true(mesh.getBaseColor().getColor,
-            'should be able to return the color instance');
-
         t.end();
     });
 
