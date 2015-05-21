@@ -1,18 +1,18 @@
 /**
  * The MIT License (MIT)
- * 
+ *
  * Copyright (c) 2015 Famous Industries Inc.
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -28,6 +28,7 @@
  * Axis-aligned bounding box. Used in collision broadphases.
  *
  * @class AABB
+ * @param {Particle} body The body around which to track a bounding box.
  */
 function AABB(body) {
     this._body = body;
@@ -54,7 +55,8 @@ var BACKWARD = 5;
 /**
  * Update the bounds to reflect the current orientation and position of the parent Body.
  *
- * @method update
+ * @method
+ * @return {undefined} undefined
  */
 AABB.prototype.update = function() {
     var body = this._body;
@@ -131,9 +133,10 @@ AABB.prototype.update = function() {
 /**
  * Check for overlap between two AABB's.
  *
- * @method checkOverlap
- * @param {AABB} aabb1
- * @param {AABB} aabb2
+ * @method
+ * @param {AABB} aabb1 The first bounding box.
+ * @param {AABB} aabb2 The second bounding box.
+ * @return {undefined} undefined
  */
 AABB.checkOverlap = function(aabb1, aabb2) {
     var vertices1 = aabb1.vertices;

@@ -1,18 +1,18 @@
 /**
  * The MIT License (MIT)
- * 
+ *
  * Copyright (c) 2015 Famous Industries Inc.
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -37,11 +37,12 @@ var PI = Math.PI;
 
 
 /**
- *  A constraint that keeps a physics body on a given implicit curve.
+ * A constraint that keeps a physics body on a given implicit curve.
  *
- *  @class Curve
- *  @constructor
- *  @extends Constraint
+ * @class Curve
+ * @extends Constraint
+ * @param {Particle[]} targets The bodies to track.
+ * @param {Object} options The options hash.
  */
 function Curve(targets, options) {
     if (targets) {
@@ -64,7 +65,8 @@ Curve.prototype.constructor = Curve;
 /**
  * Initialize the Curve. Sets defaults if a property was not already set.
  *
- * @method init
+ * @method
+ * @return {undefined} undefined
  */
 Curve.prototype.init = function() {
     this.equation1 = this.equation1 || function() {
@@ -83,9 +85,10 @@ Curve.prototype.init = function() {
 /**
  * Warmstart the constraint and prepare calculations used in the .resolve step.
  *
- * @method update
+ * @method
  * @param {Number} time The current time in the physics engine.
  * @param {Number} dt The physics engine frame delta.
+ * @return {undefined} undefined
  */
 Curve.prototype.update = function update(time, dt) {
     var targets = this.targets;
@@ -161,7 +164,8 @@ Curve.prototype.update = function update(time, dt) {
 /**
  * Adds a curve impulse to a physics body.
  *
- * @method resolve
+ * @method
+ * @return {undefined} undefined
  */
 Curve.prototype.resolve = function resolve() {
     var targets = this.targets;

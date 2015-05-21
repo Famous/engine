@@ -40,9 +40,7 @@ var _ID = 0;
  * such as size and coefficients of restitution and friction used in collision response.
  *
  * @class Particle
- * @extends Particle
- * @param {Object} options sets the initial state of the Particle
- * @constructor
+ * @param {Object} options Initial state of the body.
  */
 function Particle(options) {
     this.events = new CallbackStore();
@@ -90,10 +88,10 @@ function Particle(options) {
 /**
  * Listen for a specific event.
  *
- * @method on
- * @param {String} key
- * @param {Function} callback
- * @chainable
+ * @method
+ * @param {String} key Name of the event.
+ * @param {Function} callback Callback to register for the event.
+ * @return {Particle} this
  */
 Particle.prototype.on = function on(key, callback) {
     this.events.on(key, callback);
@@ -103,10 +101,10 @@ Particle.prototype.on = function on(key, callback) {
 /**
  * Stop listening for a specific event.
  *
- * @method on
- * @param {String} key
- * @param {Function} callback
- * @chainable
+ * @method
+ * @param {String} key Name of the event.
+ * @param {Function} callback Callback to deregister for the event.
+ * @return {Particle} this
  */
 Particle.prototype.off = function off(key, callback) {
     this.events.off(key, callback);
@@ -116,10 +114,10 @@ Particle.prototype.off = function off(key, callback) {
 /**
  * Trigger an event.
  *
- * @method on
- * @param {String} key
- * @param {Object} payload
- * @chainable
+ * @method
+ * @param {String} key Name of the event.
+ * @param {Object} payload Payload to pass to the event listeners.
+ * @return {Particle} this
  */
 Particle.prototype.trigger = function trigger(key, payload) {
     this.events.trigger(key, payload);
@@ -129,7 +127,7 @@ Particle.prototype.trigger = function trigger(key, payload) {
 /**
  * Getter for the restriction bitmask. Converts the restrictions to their string representation.
  *
- * @method getRestrictions
+ * @method
  * @return {String[]} restrictions
  */
 Particle.prototype.getRestrictions = function getRestrictions() {
@@ -149,10 +147,10 @@ Particle.prototype.getRestrictions = function getRestrictions() {
 /**
  * Setter for the particle restriction bitmask.
  *
- * @method setRestrictions
- * @param {String} transRestrictions
- * @param {String} rotRestrictions
- * @chainable
+ * @method
+ * @param {String} transRestrictions The restrictions to linear motion.
+ * @param {String} rotRestrictions The restrictions to rotational motion.
+ * @return {Particle} this
  */
 Particle.prototype.setRestrictions = function setRestrictions(transRestrictions, rotRestrictions) {
     transRestrictions = transRestrictions || '';
@@ -170,7 +168,7 @@ Particle.prototype.setRestrictions = function setRestrictions(transRestrictions,
 /**
  * Getter for mass
  *
- * @method getMass
+ * @method
  * @return {Number} mass
  */
 Particle.prototype.getMass = function getMass() {
@@ -178,11 +176,11 @@ Particle.prototype.getMass = function getMass() {
 };
 
 /**
- * Set the mass of the Particle.  Can be used to change the mass several times
+ * Set the mass of the Particle.
  *
- * @method setMass
- * @param {Number} mass
- * @chainable
+ * @method
+ * @param {Number} mass The mass.
+ * @return {Particle} this
  */
 Particle.prototype.setMass = function setMass(mass) {
     this.mass = mass;
@@ -193,7 +191,7 @@ Particle.prototype.setMass = function setMass(mass) {
 /**
  * Getter for inverse mass
  *
- * @method getInverseMass
+ * @method
  * @return {Number} inverse mass
  */
 Particle.prototype.getInverseMass = function() {
@@ -203,9 +201,8 @@ Particle.prototype.getInverseMass = function() {
 /**
  * Resets the inertia tensor and its inverse to reflect the current shape.
  *
- * @method updateLocalInertia
- * @chainable
- * @param {Mat33} Mat33
+ * @method
+ * @return {Particle} this
  */
 Particle.prototype.updateLocalInertia = function updateLocalInertia() {
     this.localInertia.set([0,0,0,0,0,0,0,0,0]);
@@ -216,8 +213,8 @@ Particle.prototype.updateLocalInertia = function updateLocalInertia() {
 /**
  * Updates the world inverse inertia tensor.
  *
- * @method updateInertia
- * @chainable
+ * @method
+ * @return {Particle} this
  */
 Particle.prototype.updateInertia = function updateInertia() {
     var localInvI = this.localInverseInertia;
@@ -233,7 +230,7 @@ Particle.prototype.updateInertia = function updateInertia() {
 /**
  * Getter for position
  *
- * @method getPosition
+ * @method
  * @return {Vec3} position
  */
 Particle.prototype.getPosition = function getPosition() {
@@ -243,12 +240,12 @@ Particle.prototype.getPosition = function getPosition() {
 /**
  * Setter for position
  *
- * @method setPosition
+ * @method
  * @param {Number} x the x coordinate for position
  * @param {Number} y the y coordinate for position
  * @param {Number} z the z coordinate for position
  * @return {Particle} this
- * @chainable
+ * @return {Particle} this
  */
 Particle.prototype.setPosition = function setPosition(x, y, z) {
     this.position.set(x, y, z);
@@ -258,7 +255,7 @@ Particle.prototype.setPosition = function setPosition(x, y, z) {
 /**
  * Getter for velocity
  *
- * @method getVelocity
+ * @method
  * @return {Vec3} velocity
  */
 Particle.prototype.getVelocity = function getVelocity() {
@@ -268,11 +265,11 @@ Particle.prototype.getVelocity = function getVelocity() {
 /**
  * Setter for velocity
  *
- * @method setvelocity
+ * @method
  * @param {Number} x the x coordinate for velocity
  * @param {Number} y the y coordinate for velocity
  * @param {Number} z the z coordinate for velocity
- * @chainable
+ * @return {Particle} this
  */
 Particle.prototype.setVelocity = function setVelocity(x, y, z) {
     this.velocity.set(x, y, z);
@@ -283,7 +280,7 @@ Particle.prototype.setVelocity = function setVelocity(x, y, z) {
 /**
  * Getter for momenutm
  *
- * @method getMomentum
+ * @method
  * @return {Vec3} momentum
  */
 Particle.prototype.getMomentum = function getMomentum() {
@@ -293,11 +290,11 @@ Particle.prototype.getMomentum = function getMomentum() {
 /**
  * Setter for momentum
  *
- * @method setMomentum
+ * @method
  * @param {Number} x the x coordinate for momentum
  * @param {Number} y the y coordinate for momentum
  * @param {Number} z the z coordinate for momentum
- * @chainable
+ * @return {Particle} this
  */
 Particle.prototype.setMomentum = function setMomentum(x, y, z) {
     this.momentum.set(x, y, z);
@@ -308,7 +305,7 @@ Particle.prototype.setMomentum = function setMomentum(x, y, z) {
 /**
  * Getter for orientation
  *
- * @method getOrientation
+ * @method
  * @return {Quaternion} orientation
  */
 Particle.prototype.getOrientation = function getOrientation() {
@@ -318,12 +315,12 @@ Particle.prototype.getOrientation = function getOrientation() {
 /**
  * Setter for orientation
  *
- * @method setOrientation
- * @param {Number} w
- * @param {Number} x
- * @param {Number} y
- * @param {Number} z
- * @chainable
+ * @method
+ * @param {Number} w The w component.
+ * @param {Number} x The x component.
+ * @param {Number} y The y component.
+ * @param {Number} z The z component.
+ * @return {Particle} this
  */
 Particle.prototype.setOrientation = function setOrientation(w,x,y,z) {
     this.orientation.set(w,x,y,z).normalize();
@@ -334,7 +331,7 @@ Particle.prototype.setOrientation = function setOrientation(w,x,y,z) {
 /**
  * Getter for angular velocity
  *
- * @method getAngularVelocity
+ * @method
  * @return {Vec3} angularVelocity
  */
 Particle.prototype.getAngularVelocity = function getAngularVelocity() {
@@ -344,10 +341,11 @@ Particle.prototype.getAngularVelocity = function getAngularVelocity() {
 /**
  * Setter for angular velocity
  *
- * @method setAngularVelocity
- * @param {Number} x
- * @param {Number} y
- * @param {Number} z
+ * @method
+ * @param {Number} x The x component.
+ * @param {Number} y The y component.
+ * @param {Number} z The z component.
+ * @return {Particle} this
  */
 Particle.prototype.setAngularVelocity = function setAngularVelocity(x,y,z) {
     this.angularVelocity.set(x,y,z);
@@ -360,7 +358,7 @@ Particle.prototype.setAngularVelocity = function setAngularVelocity(x,y,z) {
 /**
  * Getter for angular momentum
  *
- * @method getAngularMomentum
+ * @method
  * @return {Vec3} angular momentum
  */
 Particle.prototype.getAngularMomentum = function getAngularMomentum() {
@@ -370,10 +368,11 @@ Particle.prototype.getAngularMomentum = function getAngularMomentum() {
 /**
  * Setter for angular momentum
  *
- * @method setAngularMomentum
- * @param {Number} x
- * @param {Number} y
- * @param {Number} z
+ * @method
+ * @param {Number} x The x component.
+ * @param {Number} y The y component.
+ * @param {Number} z The z component.
+ * @return {Particle} this
  */
 Particle.prototype.setAngularMomentum = function setAngularMomentum(x,y,z) {
     this.angularMomentum.set(x,y,z);
@@ -384,7 +383,7 @@ Particle.prototype.setAngularMomentum = function setAngularMomentum(x,y,z) {
 /**
  * Getter for the force on the Particle
  *
- * @method getForce
+ * @method
  * @return {Vec3} force
  */
 Particle.prototype.getForce = function getForce() {
@@ -394,9 +393,11 @@ Particle.prototype.getForce = function getForce() {
 /**
  * Setter for the force on the Particle
  *
- * @method setForce
- * @param {Vec3} v the new Force
- * @chainable
+ * @method
+ * @param {Number} x The x component.
+ * @param {Number} y The y component.
+ * @param {Number} z The z component.
+ * @return {Particle} this
  */
 Particle.prototype.setForce = function setForce(x, y, z) {
     this.force.set(x, y, z);
@@ -406,7 +407,8 @@ Particle.prototype.setForce = function setForce(x, y, z) {
 /**
  * Getter for torque.
  *
- * @method getTorque
+ * @method
+ * @return {Vec3} torque
  */
 Particle.prototype.getTorque = function getTorque() {
     return this.torque;
@@ -415,9 +417,11 @@ Particle.prototype.getTorque = function getTorque() {
 /**
  * Setter for torque.
  *
- * @method setTorque
- * @param {Vec3} v
- * @chainable
+ * @method
+ * @param {Number} x The x component.
+ * @param {Number} y The y component.
+ * @param {Number} z The z component.
+ * @return {Particle} this
  */
 Particle.prototype.setTorque = function setTorque(x, y, z) {
     this.torque.set(x, y, z);
@@ -428,9 +432,9 @@ Particle.prototype.setTorque = function setTorque(x, y, z) {
  * Extends Particle.applyForce with an optional argument
  * to apply the force at an off-centered location, resulting in a torque.
  *
- * @method applyForce
- * @param force {Vec3} force
- * @param {Vec3} location off-center location on the Particle (optional)
+ * @method
+ * @param {Vec3} force Force to apply.
+ * @return {Particle} this
  */
 Particle.prototype.applyForce = function applyForce(force) {
     this.force.add(force);
@@ -440,8 +444,9 @@ Particle.prototype.applyForce = function applyForce(force) {
 /**
  * Applied a torque force to a Particle, inducing a rotation.
  *
- * @method applyTorque
- * @param torque {Vec3} torque
+ * @method
+ * @param {Vec3} torque Torque to apply.
+ * @return {Particle} this
  */
 Particle.prototype.applyTorque = function applyTorque(torque) {
     this.torque.add(torque);
@@ -451,8 +456,9 @@ Particle.prototype.applyTorque = function applyTorque(torque) {
 /**
  * Applies an impulse to momentum and updates velocity.
  *
- * @method applyImpulse
- * @param {Vec3} impulse
+ * @method
+ * @param {Vec3} impulse Impulse to apply.
+ * @return {Particle} this
  */
 Particle.prototype.applyImpulse = function applyImpulse(impulse) {
     this.momentum.add(impulse);
@@ -463,8 +469,9 @@ Particle.prototype.applyImpulse = function applyImpulse(impulse) {
 /**
  * Applies an angular impulse to angular momentum and updates angular velocity.
  *
- * @method applyAngularImpulse
- * @param {Vec3} angularImpulse
+ * @method
+ * @param {Vec3} angularImpulse Angular impulse to apply.
+ * @return {Particle} this
  */
 Particle.prototype.applyAngularImpulse = function applyAngularImpulse(angularImpulse) {
     this.angularMomentum.add(angularImpulse);
@@ -477,8 +484,8 @@ Particle.prototype.applyAngularImpulse = function applyAngularImpulse(angularImp
  * and return the point on the body's shape furthest in that direction. For point particles,
  * this returns the zero vector.
  *
- * @method support
- * @return {Vec3}
+ * @method
+ * @return {Vec3} The zero vector.
  */
 Particle.prototype.support = function support() {
     return ZERO_VECTOR;
@@ -488,7 +495,8 @@ Particle.prototype.support = function support() {
  * Update the body's shape to reflect current orientation. Called in Collision.
  * Noop for point particles.
  *
- * @method updateShape
+ * @method
+ * @return {undefined} undefined
  */
 Particle.prototype.updateShape = function updateShape() {};
 

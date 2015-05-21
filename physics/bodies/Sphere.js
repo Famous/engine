@@ -1,18 +1,18 @@
 /**
  * The MIT License (MIT)
- * 
+ *
  * Copyright (c) 2015 Famous Industries Inc.
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -34,7 +34,7 @@ var SUPPORT_REGISTER = new Vec3();
  *
  * @class Sphere
  * @extends Particle
- * @param {Object} options
+ * @param {Object} options The initial state of the body.
  */
 function Sphere(options) {
     Particle.call(this, options);
@@ -56,7 +56,7 @@ Sphere.prototype.constructor = Sphere;
 /**
  * Getter for radius.
  *
- * @method getRadius
+ * @method
  * @return {Number} radius
  */
 Sphere.prototype.getRadius = function getRadius() {
@@ -66,9 +66,9 @@ Sphere.prototype.getRadius = function getRadius() {
 /**
  * Setter for radius.
  *
- * @method setRadius
+ * @method
  * @param {Number} radius The intended radius of the sphere.
- * @chainable
+ * @return {Sphere} this
  */
 Sphere.prototype.setRadius = function setRadius(radius) {
     this.radius = radius;
@@ -80,7 +80,8 @@ Sphere.prototype.setRadius = function setRadius(radius) {
  * Infers the inertia tensor.
  *
  * @override
- * @method updateInertia
+ * @method
+ * @return {undefined} undefined
  */
 Sphere.prototype.updateLocalInertia = function updateInertia() {
     var m = this.mass;
@@ -104,9 +105,9 @@ Sphere.prototype.updateLocalInertia = function updateInertia() {
 /**
  * Returns the point on the sphere furthest in a given direction.
  *
- * @method support
- * @param {Vec3} direction
- * @param {Vec3}
+ * @method
+ * @param {Vec3} direction The direction in which to search.
+ * @return {Vec3} The support point.
  */
 Sphere.prototype.support = function support(direction) {
     return Vec3.scale(direction, this.radius, SUPPORT_REGISTER);

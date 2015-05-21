@@ -1,18 +1,18 @@
 /**
  * The MIT License (MIT)
- * 
+ *
  * Copyright (c) 2015 Famous Industries Inc.
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -36,13 +36,13 @@ var P_REGISTER = new Vec3();
 var PI = Math.PI;
 
 /**
- *  A constraint that keeps two bodies within a certain distance.
+ * A constraint that keeps two bodies within a certain distance.
  *
- *  @class Distance
- *  @extends Constraint
- *  @param {Particle} a One of the bodies.
- *  @param {Particle} b The other body.
- *  @param {Object} options An object of configurable options.
+ * @class Distance
+ * @extends Constraint
+ * @param {Particle} a One of the bodies.
+ * @param {Particle} b The other body.
+ * @param {Object} options An object of configurable options.
  */
 function Distance(a, b, options) {
     this.a = a;
@@ -63,7 +63,8 @@ Distance.prototype.constructor = Distance;
 /**
  * Initialize the Distance. Sets defaults if a property was not already set.
  *
- * @method init
+ * @method
+ * @return {undefined} undefined
  */
 Distance.prototype.init = function() {
     this.length = this.length || Vec3.subtract(this.b.position, this.a.position, P_REGISTER).length();
@@ -78,9 +79,10 @@ Distance.prototype.init = function() {
 /**
  * Detect violations of the constraint. Warm start the constraint, if possible.
  *
- * @method update
+ * @method
  * @param {Number} time The current time in the physics engine.
  * @param {Number} dt The physics engine frame delta.
+ * @return {undefined} undefined
  */
 Distance.prototype.update = function(time, dt) {
     var a = this.a;
@@ -141,7 +143,8 @@ Distance.prototype.update = function(time, dt) {
 /**
  * Apply impulses to resolve the constraint.
  *
- * @method resolve
+ * @method
+ * @return {undefined} undefined
  */
 Distance.prototype.resolve = function resolve() {
     var a = this.a;

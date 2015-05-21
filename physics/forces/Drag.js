@@ -1,18 +1,18 @@
 /**
  * The MIT License (MIT)
- * 
+ *
  * Copyright (c) 2015 Famous Industries Inc.
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -34,7 +34,8 @@ var FORCE_REGISTER = new Vec3();
  *
  * @class Drag
  * @extends Force
- * @param {Object} options
+ * @param {Particle[]} targets The targets to affect.
+ * @param {Object} options The options hash.
  */
 function Drag(targets, options) {
     Force.call(this, targets, options);
@@ -46,10 +47,9 @@ Drag.prototype.constructor = Drag;
 /**
  * Used to scale velocity in the computation of the drag force.
  *
- * @attribute QUADRATIC
- * @type Function
- * @param {Number} v
- * @return {Number} used to square the magnitude of the velocity
+ * @property {Function} QUADRATIC
+ * @param {Number} v The speed.
+ * @return {Number} The scale by which to multiply.
  */
 Drag.QUADRATIC = function QUADRATIC(v) {
     return v*v;
@@ -58,10 +58,9 @@ Drag.QUADRATIC = function QUADRATIC(v) {
 /**
  * Used to scale velocity in the computation of the drag force.
  *
- * @attribute LINEAR
- * @type Function
- * @param {Number} v
- * @return {Number} strength 1, will not scale the velocity
+ * @property {Function} LINEAR
+ * @param {Number} v The speed.
+ * @return {Number} The scale by which to multiply.
  */
 Drag.LINEAR = function LINEAR(v) {
     return v;
@@ -70,8 +69,9 @@ Drag.LINEAR = function LINEAR(v) {
 /**
  * Initialize the Force. Sets defaults if a property was not already set.
  *
- * @method init
+ * @method
  * @param {Object} options The options hash.
+ * @return {undefined} undefined
  */
 Drag.prototype.init = function() {
     this.max = this.max || Infinity;
@@ -82,7 +82,8 @@ Drag.prototype.init = function() {
 /**
  * Apply the force.
  *
- * @method update
+ * @method
+ * @return {undefined} undefined
  */
 Drag.prototype.update = function update() {
     var targets = this.targets;

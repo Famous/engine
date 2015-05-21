@@ -1,18 +1,18 @@
 /**
  * The MIT License (MIT)
- * 
+ *
  * Copyright (c) 2015 Famous Industries Inc.
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -37,7 +37,7 @@ var AXES = ['x', 'y', 'z'];
  * http://en.wikipedia.org/wiki/Sweep_and_prune
  *
  * @class SweepAndPrune
- * @param {Body[]} targets
+ * @param {Particle[]} targets The bodies to track.
  */
 function SweepAndPrune(targets) {
     this._sweepVolumes = [];
@@ -57,8 +57,9 @@ function SweepAndPrune(targets) {
 /**
  * Start tracking a body in the broad-phase.
  *
- * @method add
- * @param {Body} body
+ * @method
+ * @param {Body} body The body to track.
+ * @return {undefined} undefined
  */
 SweepAndPrune.prototype.add = function(body) {
     var boundingVolume = new AABB(body);
@@ -77,8 +78,9 @@ SweepAndPrune.prototype.add = function(body) {
 /**
  * Stop tracking a body in the broad-phase.
  *
- * @method add
- * @param {Body} body
+ * @method
+ * @param {Body} body The body to cease tracking.
+ * @return {undefined} undefined
  */
 SweepAndPrune.prototype.remove = function remove(body) {
     this._entityRegistry[body._ID] = null;
@@ -120,8 +122,8 @@ SweepAndPrune.prototype.remove = function remove(body) {
  * where swaps during the sort are taken to signify a potential change in overlap status for the two
  * relevant AABB's. Returns pairs of overlapping AABB's.
  *
- * @param update
- * @return {Particle[][]}
+ * @method
+ * @return {Array.<Particle[]>} The result of the broadphase.
  */
 SweepAndPrune.prototype.update = function() {
     var _sweepVolumes = this._sweepVolumes;
@@ -203,8 +205,7 @@ SweepAndPrune.prototype.update = function() {
  * Object used to associate an AABB with its endpoints in the sorted lists.
  *
  * @class SweepVolume
- * @constructor
- * @param {AABB} boundingVolume
+ * @param {AABB} boundingVolume The bounding volume to track.
  */
 function SweepVolume(boundingVolume) {
     this._boundingVolume = boundingVolume;
@@ -220,7 +221,8 @@ function SweepVolume(boundingVolume) {
 /**
  * Update the endpoints to reflect the current location of the AABB.
  *
- * @method update
+ * @method
+ * @return {undefined} undefined
  */
 SweepVolume.prototype.update = function() {
     var boundingVolume = this._boundingVolume;

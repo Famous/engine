@@ -1,18 +1,18 @@
 /**
  * The MIT License (MIT)
- * 
+ *
  * Copyright (c) 2015 Famous Industries Inc.
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -43,12 +43,12 @@ var VEC_REGISTER = new Vec3();
 /**
  * Helper function to clamp a value to a given range.
  *
- * @method clamp
+ * @method
  * @private
- * @param {Number} value
- * @param {Number} lower
- * @param {Number} upper
- * @return {Number}
+ * @param {Number} value The value to clamp.
+ * @param {Number} lower The lower end.
+ * @param {Number} upper The upper end.
+ * @return {Number} The clamped value.
  */
 function clamp(value, lower, upper) {
     return value < lower ? lower : value > upper ? upper : value;
@@ -58,12 +58,12 @@ function clamp(value, lower, upper) {
  * Object maintaining various figures of a collision. Registered in ObjectManager.
  *
  * @class CollisionData
- * @param {Number} penetration
- * @param {Vec3} normal
- * @param {Vec3} worldContactA
- * @param {Vec3} worldContactB
- * @param {Vec3} localContactA
- * @param {Vec3} localContactB
+ * @param {Number} penetration The degree of penetration.
+ * @param {Vec3} normal The normal for the collision.
+ * @param {Vec3} worldContactA The contact for A in world coordinates.
+ * @param {Vec3} worldContactB The contact for B in world coordinates.
+ * @param {Vec3} localContactA The contact for A in local coordinates.
+ * @param {Vec3} localContactB The contact for B in local coordinates.
  */
 function CollisionData(penetration, normal, worldContactA, worldContactB, localContactA, localContactB) {
     this.penetration = penetration;
@@ -77,9 +77,14 @@ function CollisionData(penetration, normal, worldContactA, worldContactB, localC
 /**
  * Used by ObjectManager to reset the object with different data.
  *
- * @method reset
- * @param {Object[]} args
- * @chainable
+ * @method
+ * @param {Number} penetration The degree of penetration.
+ * @param {Vec3} normal The normal for the collision.
+ * @param {Vec3} worldContactA The contact for A in world coordinates.
+ * @param {Vec3} worldContactB The contact for B in world coordinates.
+ * @param {Vec3} localContactA The contact for A in local coordinates.
+ * @param {Vec3} localContactB The contact for B in local coordinates.
+ * @return {CollisionData} this
  */
 CollisionData.prototype.reset = function reset(penetration, normal, worldContactA, worldContactB, localContactA, localContactB) {
     this.penetration = penetration;
@@ -97,7 +102,8 @@ CollisionData.prototype.reset = function reset(penetration, normal, worldContact
  *
  * @class Collision
  * @extends Constraint
- * @param {Object} options
+ * @param {Particle[]} targets The bodies to track.
+ * @param {Object} options The options hash.
  */
 function Collision(targets, options) {
     this.targets = [];
@@ -112,8 +118,8 @@ Collision.prototype.constructor = Collision;
 /**
  * Initialize the Collision tracker. Sets defaults if a property was not already set.
  *
- * @method init
- * @param {Object} options The options hash.
+ * @method
+ * @return {undefined} undefined
  */
 Collision.prototype.init = function() {
     if (this.broadPhase) {
@@ -128,9 +134,10 @@ Collision.prototype.init = function() {
  * collision detection. Warm starts the contacts based on the results of the previous physics frame
  * and prepares necesssary calculations for the resolution.
  *
- * @method update
+ * @method
  * @param {Number} time The current time in the physics engine.
  * @param {Number} dt The physics engine frame delta.
+ * @return {undefined} undefined
  */
  Collision.prototype.update = function update(time, dt) {
     this.contactManifoldTable.update(dt);
@@ -150,9 +157,10 @@ Collision.prototype.init = function() {
 /**
  * Apply impulses to resolve all Contact constraints.
  *
- * @method resolve
+ * @method
  * @param {Number} time The current time in the physics engine.
  * @param {Number} dt The physics engine frame delta.
+ * @return {undefined} undefined
  */
 Collision.prototype.resolve = function resolve(time, dt) {
     this.contactManifoldTable.resolveManifolds(dt);
@@ -161,8 +169,9 @@ Collision.prototype.resolve = function resolve(time, dt) {
 /**
  * Add a target or targets to the collision system.
  *
- * @method addTarget
- * @param {Particle}
+ * @method
+ * @param {Particle} target The body to begin tracking.
+ * @return {undefined} undefined
  */
 Collision.prototype.addTarget = function addTarget(target) {
     this.targets.push(target);
@@ -172,8 +181,9 @@ Collision.prototype.addTarget = function addTarget(target) {
 /**
  * Remove a target or targets from the collision system.
  *
- * @method addTarget
- * @param {Particle}
+ * @method
+ * @param {Particle} target The body to remove.
+ * @return {undefined} undefined
  */
 Collision.prototype.removeTarget = function removeTarget(target) {
     var index = this.targets.indexOf(target);
@@ -215,8 +225,9 @@ dispatch[SPHERE_WALL] = convexIntersectWall;
  *
  * Will detect the type of bodies in the collision.
  *
- * @method applyNarrowPhase
- * @param {Particle[]} targets
+ * @method
+ * @param {Particle[]} targets The targets.
+ * @return {undefined} undefined
  */
 Collision.prototype.applyNarrowPhase = function applyNarrowPhase(targets) {
     for (var i = 0, len = targets.length; i < len; i++) {
@@ -237,10 +248,11 @@ Collision.prototype.applyNarrowPhase = function applyNarrowPhase(targets) {
  * Detects sphere-sphere collisions and registers the Contact.
  *
  * @private
- * @method sphereIntersectSphere
- * @param {Object} context
- * @param {Sphere} sphere1
- * @param {Sphere} sphere2
+ * @method
+ * @param {Object} context The Collision instance.
+ * @param {Sphere} sphere1 One sphere collider.
+ * @param {Sphere} sphere2 The other sphere collider.
+ * @return {undefined} undefined
  */
 function sphereIntersectSphere(context, sphere1, sphere2) {
     var p1 = sphere1.position;
@@ -269,9 +281,10 @@ function sphereIntersectSphere(context, sphere1, sphere2) {
 /**
 * Detects box-sphere collisions and registers the Contact.
 *
-* @param {Object} context
-* @param {Box} box
-* @param {Sphere} sphere
+* @param {Object} context The Collision instance.
+* @param {Box} box The box collider.
+* @param {Sphere} sphere The sphere collider.
+* @return {undefined} undefined
 */
 function boxIntersectSphere(context, box, sphere) {
     if (box.type === SPHERE) {
@@ -333,9 +346,10 @@ function boxIntersectSphere(context, box, sphere) {
 * Detects convex-convex collisions and registers the Contact. Uses GJK to determine overlap and then
 * EPA to determine the actual collision data.
 *
-* @param {Object} context
-* @param {ConvexBody} convex1
-* @param {ConvexBody} convex2
+* @param {Object} context The Collision instance.
+* @param {Particle} convex1 One convex body collider.
+* @param {Particle} convex2 The other convex body collider.
+* @return {undefined} undefined
 */
 function convexIntersectConvex(context, convex1, convex2) {
     var glkSimplex = GJK(convex1, convex2);
@@ -350,9 +364,10 @@ function convexIntersectConvex(context, convex1, convex2) {
 /**
 * Detects convex-wall collisions and registers the Contact.
 *
-* @param {Object} context
-* @param {ConvexBody} convex
-* @param {ConvexBody} wall
+* @param {Object} context The Collision instance.
+* @param {Particle} convex The convex body collider.
+* @param {Wall} wall The wall collider.
+* @return {undefined} undefined
 */
 function convexIntersectWall(context, convex, wall) {
     if (convex.type === WALL) {

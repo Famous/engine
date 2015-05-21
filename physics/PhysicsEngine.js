@@ -90,10 +90,10 @@ function PhysicsEngine(options) {
 /**
  * Listen for a specific event.
  *
- * @method on
- * @param {String} key
- * @param {Function} callback
- * @chainable
+ * @method
+ * @param {String} key Name of the event.
+ * @param {Function} callback Callback to register for the event.
+ * @return {PhysicsEngine} this
  */
 PhysicsEngine.prototype.on = function on(key, callback) {
     this.events.on(key, callback);
@@ -103,10 +103,10 @@ PhysicsEngine.prototype.on = function on(key, callback) {
 /**
  * Stop listening for a specific event.
  *
- * @method on
- * @param {String} key
- * @param {Function} callback
- * @chainable
+ * @method
+ * @param {String} key Name of the event.
+ * @param {Function} callback Callback to deregister for the event.
+ * @return {PhysicsEngine} this
  */
 PhysicsEngine.prototype.off = function off(key, callback) {
     this.events.off(key, callback);
@@ -116,10 +116,10 @@ PhysicsEngine.prototype.off = function off(key, callback) {
 /**
  * Trigger an event.
  *
- * @method on
- * @param {String} key
- * @param {Object} payload
- * @chainable
+ * @method
+ * @param {String} key Name of the event.
+ * @param {Object} payload Payload to pass to the event listeners.
+ * @return {PhysicsEngine} this
  */
 PhysicsEngine.prototype.trigger = function trigger(key, payload) {
     this.events.trigger(key, payload);
@@ -129,11 +129,12 @@ PhysicsEngine.prototype.trigger = function trigger(key, payload) {
 /**
  * Set the origin of the world.
  *
- * @method setOrigin
+ * @method
  * @chainable
  * @param {Number} x The x component.
  * @param {Number} y The y component.
  * @param {Number} z The z component.
+ * @return {PhysicsEngine} this
  */
 PhysicsEngine.prototype.setOrigin = function setOrigin(x, y, z) {
     this.origin.set(x, y, z);
@@ -143,12 +144,13 @@ PhysicsEngine.prototype.setOrigin = function setOrigin(x, y, z) {
 /**
  * Set the orientation of the world.
  *
- * @method setOrientation
+ * @method
  * @chainable
  * @param {Number} w The w component.
  * @param {Number} x The x component.
  * @param {Number} y The y component.
  * @param {Number} z The z component.
+ * @return {PhysicsEngine} this
  */
 PhysicsEngine.prototype.setOrientation = function setOrientation(w, x, y, z) {
     this.orientation.set(w, x, y, z).normalize();
@@ -158,10 +160,12 @@ PhysicsEngine.prototype.setOrientation = function setOrientation(w, x, y, z) {
 /**
  * Private helper method to store an element in a library array.
  *
- * @method _addElement
+ * @method
  * @private
+ * @param {Object} context Object in possesion of the element arrays.
  * @param {Object} element The body, force, or constraint to add.
  * @param {String} key Where to store the element.
+ * @return {undefined} undefined
  */
 function _addElement(context, element, key) {
     var map = context._entityMaps[key];
@@ -177,10 +181,12 @@ function _addElement(context, element, key) {
 /**
  * Private helper method to remove an element from a library array.
  *
- * @method _removeElement
+ * @method
  * @private
+ * @param {Object} context Object in possesion of the element arrays.
  * @param {Object} element The body, force, or constraint to remove.
  * @param {String} key Where to store the element.
+ * @return {undefined} undefined
  */
 function _removeElement(context, element, key) {
     var map = context._entityMaps[key];
@@ -195,8 +201,8 @@ function _removeElement(context, element, key) {
 /**
  * Add a group of bodies, force, or constraints to the engine.
  *
- * @method add
- * @chainable
+ * @method
+ * @return {PhysicsEngine} this
  */
 PhysicsEngine.prototype.add = function add() {
     for (var j = 0, lenj = arguments.length; j < lenj; j++) {
@@ -218,8 +224,8 @@ PhysicsEngine.prototype.add = function add() {
 /**
  * Remove a group of bodies, force, or constraints from the engine.
  *
- * @method remove
- * @chainable
+ * @method
+ * @return {PhysicsEngine} this
  */
 PhysicsEngine.prototype.remove = function remove() {
     for (var j = 0, lenj = arguments.length; j < lenj; j++) {
@@ -241,8 +247,9 @@ PhysicsEngine.prototype.remove = function remove() {
 /**
  * Begin tracking a body.
  *
- * @method addBody
+ * @method
  * @param {Particle} body The body to track.
+ * @return {undefined} undefined
  */
 PhysicsEngine.prototype.addBody = function addBody(body) {
     _addElement(this, body, 'bodies');
@@ -251,8 +258,9 @@ PhysicsEngine.prototype.addBody = function addBody(body) {
 /**
  * Begin tracking a force.
  *
- * @method addForce
+ * @method
  * @param {Force} force The force to track.
+ * @return {undefined} undefined
  */
 PhysicsEngine.prototype.addForce = function addForce(force) {
     _addElement(this, force, 'forces');
@@ -261,8 +269,9 @@ PhysicsEngine.prototype.addForce = function addForce(force) {
 /**
  * Begin tracking a constraint.
  *
- * @method addConstraint
+ * @method
  * @param {Constraint} constraint The constraint to track.
+ * @return {undefined} undefined
  */
 PhysicsEngine.prototype.addConstraint = function addConstraint(constraint) {
     _addElement(this, constraint, 'constraints');
@@ -271,8 +280,9 @@ PhysicsEngine.prototype.addConstraint = function addConstraint(constraint) {
 /**
  * Stop tracking a body.
  *
- * @method removeBody
+ * @method
  * @param {Particle} body The body to stop tracking.
+ * @return {undefined} undefined
  */
 PhysicsEngine.prototype.removeBody = function removeBody(body) {
     _removeElement(this, body, 'bodies');
@@ -281,8 +291,9 @@ PhysicsEngine.prototype.removeBody = function removeBody(body) {
 /**
  * Stop tracking a force.
  *
- * @method removeForce
+ * @method
  * @param {Force} force The force to stop tracking.
+ * @return {undefined} undefined
  */
 PhysicsEngine.prototype.removeForce = function removeForce(force) {
     _removeElement(this, force, 'forces');
@@ -291,8 +302,9 @@ PhysicsEngine.prototype.removeForce = function removeForce(force) {
 /**
  * Stop tracking a constraint.
  *
- * @method removeConstraint
+ * @method
  * @param {Constraint} constraint The constraint to stop tracking.
+ * @return {undefined} undefined
  */
 PhysicsEngine.prototype.removeConstraint = function removeConstraint(constraint) {
     _removeElement(this, constraint, 'constraints');
@@ -302,8 +314,9 @@ PhysicsEngine.prototype.removeConstraint = function removeConstraint(constraint)
  * Update the physics system to reflect the changes since the last frame. Steps forward in increments of
  * PhysicsEngine.step.
  *
- * @method update
- * @param {Number} time
+ * @method
+ * @param {Number} time The time to which to update.
+ * @return {undefined} undefined
  */
 PhysicsEngine.prototype.update = function update(time) {
     if (this.time === 0) this.time = time;
@@ -374,9 +387,10 @@ PhysicsEngine.prototype.update = function update(time) {
 };
 
 /**
- * Get the transform equivalent to the Particle's position and orientation.
+ * Transform the body position and rotation to world coordinates.
  *
- * @method getTransform
+ * @method
+ * @param {Particle} body The body to retrieve the transform of.
  * @return {Object} Position and rotation of the boy, taking into account
  * the origin and orientation of the world.
  */
@@ -410,10 +424,11 @@ PhysicsEngine.prototype.getTransform = function getTransform(body) {
 /**
  * Update the Particle momenta based off of current incident force and torque.
  *
- * @method _integrateVelocity
+ * @method
  * @private
- * @param {Particle} body
- * @param {Number} dt delta time
+ * @param {Particle} body The body to update.
+ * @param {Number} dt Delta time.
+ * @return {undefined} undefined
  */
 function _integrateVelocity(body, dt) {
     body.momentum.add(Vec3.scale(body.force, dt, DELTA_REGISTER));
@@ -427,10 +442,11 @@ function _integrateVelocity(body, dt) {
 /**
  * Update the Particle position and orientation based off current translational and angular velocities.
  *
- * @method _integratePose
+ * @method
  * @private
- * @param {Particle} body
- * @param dt {Number} delta time
+ * @param {Particle} body The body to update.
+ * @param {Number} dt Delta time.
+ * @return {undefined} undefined
  */
 function _integratePose(body, dt) {
     if (body.restrictions !== 0) {
