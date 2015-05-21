@@ -52,6 +52,8 @@ var css = '.famous-dom-renderer {' +
 '}' +
 
 '.famous-webgl-renderer {' +
+    '-webkit-transform: translateZ(1000000px);' +  /* TODO: Fix when Safari Fixes*/
+    'transform: translateZ(1000000px)' +
     'pointer-events:none;' +
     'position:absolute;' +
     'z-index:1;' +
