@@ -1,18 +1,18 @@
 /**
  * The MIT License (MIT)
- * 
+ *
  * Copyright (c) 2015 Famous Industries Inc.
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -48,7 +48,7 @@ test('Clock', function(t) {
         t.plan(1);
         t.equal(typeof (new Clock()).getTime, 'function', 'clock.getTime should be a function');
     });
-   
+
     t.test('now method', function(t) {
         t.plan(1);
         t.equal(typeof (new Clock()).now, 'function', 'clock.now should be a function');
@@ -107,7 +107,8 @@ test('Clock', function(t) {
         clock.setTimeout(function() {
             if (second) {
                 t.fail('clock.setTimeout invoked second scheduled timer function before first one');
-            } else {
+            }
+            else {
                 t.pass('clock.setTimeout invoked first scheduled timer function before second one');
             }
             first = true;
@@ -115,7 +116,8 @@ test('Clock', function(t) {
         clock.setTimeout(function() {
             if (!first) {
                 t.fail('clock.setTimeout invoked second scheduled timer function before first one');
-            } else {
+            }
+            else {
                 t.pass('clock.setTimeout invoked first scheduled timer function before second one');
             }
             second = true;
@@ -171,7 +173,7 @@ test('Clock', function(t) {
         t.equal(clock.now(), 100);
 
         t.equal(clock.getScale(), 1, 'Clock should be initialized with a time scale of 1 (realtime)');
-        
+
         clock.step(120);
         t.equal(clock.now(), 120);
         clock.setScale(0.5);
@@ -180,7 +182,7 @@ test('Clock', function(t) {
 
         clock.step(150);
         t.equal(clock.now(), 135);
-        
+
         clock.step(210);
         t.equal(clock.now(), 165);
 
@@ -188,7 +190,7 @@ test('Clock', function(t) {
         t.equal(clock.getScale(), 1);
         clock.step(220);
         t.equal(clock.now(), 175);
-        
+
         t.end();
     });
 });

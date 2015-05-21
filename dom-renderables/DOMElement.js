@@ -30,7 +30,7 @@ var RENDER_SIZE = 2;
 
 /**
  * A DOMElement is a component that can be added to a Node with the
- * purpose of sending draw commands to the renderer. Renderables send draw commands 
+ * purpose of sending draw commands to the renderer. Renderables send draw commands
  * to through their Nodes to the Compositor where they are acted upon.
  *
  * @class DOMElement
@@ -285,7 +285,7 @@ DOMElement.prototype.onHide = function onHide() {
 /**
  * Enables or disables WebGL 'cutout' for this element, which affects
  * how the element is layered with WebGL objects in the scene.  This is designed
- * mainly as a way to acheive 
+ * mainly as a way to acheive
  *
  * @method
  *
@@ -365,7 +365,8 @@ DOMElement.prototype.onAddUIEvent = function onAddUIEvent(UIEvent) {
     if (this._UIEvents.indexOf(UIEvent) === -1) {
         this._subscribe(UIEvent);
         this._UIEvents.push(UIEvent);
-    } else if (this._inDraw) {
+    }
+    else if (this._inDraw) {
         this._subscribe(UIEvent);
     }
     return this;

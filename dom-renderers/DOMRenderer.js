@@ -175,7 +175,7 @@ DOMRenderer.prototype._triggerEvent = function _triggerEvent(ev) {
  */
 DOMRenderer.prototype.getSizeOf = function getSizeOf(path) {
     var element = this._elements[path];
-    if (!element) return;
+    if (!element) return null;
 
     var res = {val: element.size};
     this._compositor.sendEvent(path, 'resize', res);
@@ -198,7 +198,7 @@ function _getPath(ev) {
  * Determines the size of the context by querying the DOM for `offsetWidth` and
  * `offsetHeight`.
  *
- * @method 
+ * @method
  *
  * @return {Array} Offset size.
  */
@@ -384,7 +384,7 @@ DOMRenderer.prototype.findTarget = function findTarget() {
 /**
  * Loads the passed in path.
  *
- * @method 
+ * @method
  *
  * @param {String} path Path to be loaded
  *
@@ -485,7 +485,8 @@ DOMRenderer.prototype.setWidth = function setWidth(width) {
         if (contentWrapper) contentWrapper.style.width = '';
         width = contentWrapper ? contentWrapper.offsetWidth : 0;
         this._target.element.style.width = width + 'px';
-    } else {
+    }
+    else {
         this._target.explicitWidth = false;
         if (contentWrapper) contentWrapper.style.width = width + 'px';
         this._target.element.style.width = width + 'px';
@@ -515,7 +516,8 @@ DOMRenderer.prototype.setHeight = function setHeight(height) {
         if (contentWrapper) contentWrapper.style.height = '';
         height = contentWrapper ? contentWrapper.offsetHeight : 0;
         this._target.element.style.height = height + 'px';
-    } else {
+    }
+    else {
         this._target.explicitHeight = false;
         if (contentWrapper) contentWrapper.style.height = height + 'px';
         this._target.element.style.height = height + 'px';

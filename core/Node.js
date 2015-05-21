@@ -203,8 +203,10 @@ Node.prototype.getId = Node.prototype.getLocation;
  */
 Node.prototype.emit = function emit (event, payload) {
     var p = this.getParent();
+
     // the context is its own ancestor
     while (p !== (p = p.getParent()));
+
     p.getDispatch().dispatch(event, payload);
     return this;
 };
@@ -338,7 +340,7 @@ Node.prototype.requestUpdateOnNextTick = function requestUpdateOnNextTick (reque
 /**
  * Get the object responsible for updating this node.
  *
- * @method 
+ * @method
  *
  * @return {Object} The global updater.
  */
@@ -546,7 +548,7 @@ Node.prototype.getUIEvents = function getUIEvents () {
  * append to the node that this method is being called on. Returns the new or passed in node.
  *
  * @method
- * 
+ *
  * @param {Node | void} child the node to appended or no node to create a new node.
  *
  * @return {Node} the appended node.
@@ -572,10 +574,10 @@ Node.prototype.addChild = function addChild (child) {
 
 /**
  * Removes a child node from another node. The passed in node must be
- * a child of the node that this method is called upon. 
+ * a child of the node that this method is called upon.
  *
  * @method
- * 
+ *
  * @param {Node} child node to be removed
  *
  * @return {Boolean} whether or not the node was successfully removed
@@ -701,7 +703,7 @@ Node.prototype._requestUpdate = function _requestUpdate (force) {
 };
 
 /**
- * Private method to set an optional value in an array, and 
+ * Private method to set an optional value in an array, and
  * request an update if this changes the value of the array.
  *
  * @method
@@ -788,7 +790,7 @@ Node.prototype.hide = function hide () {
 };
 
 /**
- * Sets the align value of the node. Will call onAlignChange 
+ * Sets the align value of the node. Will call onAlignChange
  * on all of the Node's components.
  *
  * @method
@@ -1261,7 +1263,7 @@ Node.prototype.setDifferentialSize = function setDifferentialSize (x, y, z) {
  * @param {Number} x    x-Size in pixels ("width").
  * @param {Number} y    y-Size in pixels ("height").
  * @param {Number} z    z-Size in pixels ("depth").
- * 
+ *
  * @return {Node} this
  */
 Node.prototype.setAbsoluteSize = function setAbsoluteSize (x, y, z) {
@@ -1435,7 +1437,7 @@ Node.prototype.update = function update (time){
  * @return {Node} this
  */
 Node.prototype.mount = function mount (parent, myId) {
-    if (this.isMounted()) return;
+    if (this.isMounted()) return this;
     var i = 0;
     var list = this._components;
     var len = list.length;
@@ -1472,7 +1474,7 @@ Node.prototype.mount = function mount (parent, myId) {
  * @return {Node} this
  */
 Node.prototype.dismount = function dismount () {
-    if (!this.isMounted()) return;
+    if (!this.isMounted()) return this;
     var i = 0;
     var list = this._components;
     var len = list.length;

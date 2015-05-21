@@ -52,8 +52,11 @@ test('Scene', function(t) {
 
     t.test('getUpdater method', function(t) {
         var mockFamous = {
-            message: function() { return mockFamous; },
-            requestUpdate: function() {}
+            message: function() {
+                return mockFamous;
+            },
+            requestUpdate: function() {
+            }
         };
         var scene = new Scene('.scene-get-updater', mockFamous);
         t.equal(typeof scene.getUpdater, 'function', 'scene.getUpdater should be a function');
@@ -63,8 +66,11 @@ test('Scene', function(t) {
 
     t.test('getSelector method', function(t) {
         var mockFamous = {
-            message: function() { return mockFamous; },
-            requestUpdate: function() {}
+            message: function() {
+                return mockFamous;
+            },
+            requestUpdate: function() {
+            }
         };
         var scene = new Scene('.scene-get-selector', mockFamous);
         t.equal(typeof scene.getUpdater, 'function', 'scene.getUpdater should be a function');
@@ -74,7 +80,9 @@ test('Scene', function(t) {
 
     t.test('getDispatch method', function(t) {
         var mockFamous = {
-            message: function() { return mockFamous; },
+            message: function() {
+                return mockFamous;
+            },
             requestUpdate: function() {}
         };
         var scene = new Scene('.scene-get-dispatch', mockFamous);
