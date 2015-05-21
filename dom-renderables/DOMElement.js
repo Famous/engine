@@ -57,31 +57,26 @@ function DOMElement(node, options) {
     if (!node) throw new Error('DOMElement must be instantiated on a node');
 
     this._node = node;
+    this._changeQueue = [];
 
     this._requestingUpdate = false;
     this._renderSized = false;
     this._requestRenderSize = false;
-
-    this._changeQueue = [];
 
     this._UIEvents = node.getUIEvents().slice(0);
     this._classes = ['famous-dom-element'];
     this._requestingEventListeners = [];
     this._styles = {};
 
-    this.setProperty('display', node.isShown() ? 'none' : 'block');
-    this.onOpacityChange(node.getOpacity());
-
     this._attributes = {};
     this._content = '';
 
     this._tagName = options && options.tagName ? options.tagName : 'div';
-    this._id = node.addComponent(this);
-
     this._renderSize = [0, 0, 0];
 
     this._callbacks = new CallbackStore();
 
+    this._id = node ? node.addComponent(this) : null;
     this.setProperty('display', node.isShown() ? 'none' : 'block');
     this.onOpacityChange(node.getOpacity());
 

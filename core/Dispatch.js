@@ -83,7 +83,6 @@ Dispatch.prototype.registerNodeAtPath = function registerNodeAtPath (path, node)
  */
 Dispatch.prototype.deregisterNodeAtPath = function deregisterNodeAtPath (path, node) {
     if (this._nodes[path] !== node) throw new Error('Node is not registered at this path: ' + path);
-    this._nodes[path] = null;
     this.dismount(path);
 };
 
@@ -189,6 +188,8 @@ Dispatch.prototype.dismount = function dismount (path) {
 
     for (var i = 0, len = children.length ; i < len ; i++)
         this.deregisterNodeAtPath(children[i], path + '/' + i);
+
+    this._nodes[path] = null;
 };
 
 /**

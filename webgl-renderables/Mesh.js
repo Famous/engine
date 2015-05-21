@@ -183,7 +183,7 @@ Mesh.prototype.setBaseColor = function setBaseColor (color) {
         // If a color component
 
         else if (color.getNormalizedRGB) {
-            this._changeQueue.push(Commands.GL_BUFFER_DATA);
+            this._changeQueue.push(Commands.GL_UNIFORMS);
         }
 
         this._changeQueue.push('u_baseColor');

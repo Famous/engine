@@ -62,9 +62,6 @@ function Context(el, selector, compositor) {
     var DOMLayerEl = document.createElement('div');
     this._rootEl.appendChild(DOMLayerEl);
 
-    // Instantiate renderers
-
-    this.DOMRenderer = new DOMRenderer(DOMLayerEl, selector, compositor);
     this.WebGLRenderer = null;
     this._canvasEl = null;
 
@@ -88,7 +85,7 @@ function Context(el, selector, compositor) {
     this._commandCallbacks = [];
 
     this.initCommandCallbacks();
-    this.onResize();
+    this.updateSize();
 }
 
 /**
@@ -175,7 +172,7 @@ Context.prototype.initWebGL = function initWebGL() {
     this._canvasEl = document.createElement('canvas');
     this._rootEl.appendChild(this._canvasEl);
     this.WebGLRenderer = new WebGLRenderer(this._canvasEl, this._compositor);
-    this.onResize();
+    this.updateSize();
 };
 
 
@@ -192,7 +189,7 @@ Context.prototype.initWebGL = function initWebGL() {
  *
  * @return {Number} iterator indicating progress through the command queue.
  */
-Context.prototype.receive = function receive(pathArr, path, commands, iterator) {
+Context.prototype.receive = function receive(path, commands, iterator) {
     var localIterator = iterator;
 
     var command = commands[++localIterator];
