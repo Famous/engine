@@ -27,7 +27,7 @@
     "brace-style": [1, "stroustrup"],
     "camelcase": 0, //Too much noise from tests, might consider to enable it as a warning later
     "comma-spacing": [0, {"before": false, "after": true}], //Noise
-    "consistent-this": 1,
+    "consistent-this": [0, "_this"],
     "eol-last": 1,
     "key-spacing": 0,
     "new-cap": 1,
