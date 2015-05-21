@@ -71,7 +71,9 @@ function Torus(options) {
  * @param {Number} a Radius of tube.
  * @param {Number} u Longitudal progress from 0 to PI.
  * @param {Number} v Latitudal progress from 0 to PI.
- * @return {Array} x, y and z coordinate of the vertex.
+ * @param {Array} pos X, Y, Z position of vertex at given slice and stack.
+ *
+ * @return {undefined} undefined
  */
 Torus.generator = function generator(c, a, u, v, pos) {
     pos[0] = (c + a * Math.cos(2 * v)) * Math.sin(2 * u);
