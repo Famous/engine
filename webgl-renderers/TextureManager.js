@@ -32,8 +32,9 @@ var createCheckerboard = require('./createCheckerboard');
  * @class TextureManager
  * @constructor
  *
- * @param {WebGL_Context} gl    Context used to create and bind textures.
- * @return {undefined}          undefined
+ * @param {WebGL_Context} gl Context used to create and bind textures.
+ *
+ * @return {undefined} undefined
  */
 function TextureManager(gl) {
     this.registry = [];
@@ -150,11 +151,10 @@ TextureManager.prototype.register = function register(input, slot) {
  * @method
  * @private
  *
- * @param {Object|String}   img         The input image data to load as an asset.
- * @param {Function}        callback    The callback function to be fired when
- *                                      the image has finished loading.
+ * @param {Object|String} input The input image data to load as an asset.
+ * @param {Function} callback The callback function to be fired when the image has finished loading.
  *
- * @return {Object}                     Image object being loaded.
+ * @return {Object} Image object being loaded.
  */
 function loadImage (input, callback) {
     var image = (typeof input === 'string' ? new Image() : input) || {};
@@ -173,8 +173,9 @@ function loadImage (input, callback) {
  *
  * @method
  *
- * @param {Number}      id  Identifier used to retreive texture spec.
- * @return {undefined}      undefined
+ * @param {Number} id Identifier used to retreive texture spec
+ *
+ * @return {undefined} undefined
  */
 TextureManager.prototype.bindTexture = function bindTexture(id) {
     var spec = this.registry[id];

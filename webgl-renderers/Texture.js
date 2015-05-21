@@ -30,6 +30,10 @@
  *
  * @class Texture
  * @constructor
+ *
+ * @param {GL} gl GL
+ * @param {Object} options Options
+ *
  * @return {undefined} undefined
  */
 function Texture(gl, options) {

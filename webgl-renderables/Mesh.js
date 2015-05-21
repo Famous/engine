@@ -33,8 +33,10 @@ var Geometry = require('../webgl-geometries');
  * @class Mesh
  * @constructor
  * @renderable
- * @param {LocalDispatch}   Dispatch    LocalDispatch to be retrieved
- * @param {object}          Options     Optional params for configuring Mesh
+ *
+ * @param {Node} node Dispatch LocalDispatch to be retrieved
+ * @param {Object} options Optional params for configuring Mesh
+ *
  * @return {undefined} undefined
  */
 function Mesh (node, options) {
@@ -64,8 +66,8 @@ function Mesh (node, options) {
  *
  * @method
  *
- * @param {Object} Options
- * @return {Mesh} this
+ * @param {Object} options Draw options
+ * @return {Mesh} Current mesh
  */
 Mesh.prototype.setDrawOptions = function setDrawOptions (options) {
     this._changeQueue.push('GL_SET_DRAW_OPTIONS');
@@ -77,6 +79,7 @@ Mesh.prototype.setDrawOptions = function setDrawOptions (options) {
  * Get the mesh's custom options.
  *
  * @method
+ *
  * @returns {Object} Options
  */
 Mesh.prototype.getDrawOptions = function getDrawOptions () {
@@ -90,9 +93,10 @@ Mesh.prototype.getDrawOptions = function getDrawOptions () {
  *
  * @method
  *
- * @param {Geometry|String}     Geometry    Geometry to be associated with the mesh.
- * @param {Object}              Options     Various configurations for geometries.
- * @return {Mesh} this
+ * @param {Geometry|String} geometry Geometry to be associated with the mesh.
+ * @param {Object} options Various configurations for geometries.
+ *
+ * @return {Mesh} Mesh
  */
 Mesh.prototype.setGeometry = function setGeometry (geometry, options) {
     if (typeof geometry === 'string') {
@@ -133,7 +137,8 @@ Mesh.prototype.setGeometry = function setGeometry (geometry, options) {
  * Gets the geometry of a mesh.
  *
  * @method
- * @returns {Geometry} geometry Geometry of mesh
+ *
+ * @returns {Geometry} Geometry
  */
 Mesh.prototype.getGeometry = function getGeometry () {
     return this.value.geometry;
@@ -144,8 +149,10 @@ Mesh.prototype.getGeometry = function getGeometry () {
 * color using the 'Color' utility component.
 *
 * @method
-* @param {Object|Color} Material, image, vec3, or Color instance
-* @return {Mesh} this
+*
+* @param {Object|Color} color Material, image, vec3, or Color instance
+*
+* @return {Mesh} Mesh
 */
 Mesh.prototype.setBaseColor = function setBaseColor (color) {
     var uniformValue;
@@ -188,7 +195,8 @@ Mesh.prototype.setBaseColor = function setBaseColor (color) {
  * Returns either the material expression or the color instance of Mesh.
  *
  * @method
- * @returns {MaterialExpress|Color}
+ *
+ * @returns {MaterialExpress|Color} MaterialExpress or Color instance
  */
 Mesh.prototype.getBaseColor = function getBaseColor () {
     return this.value.expressions.baseColor || this.value.color;
@@ -198,8 +206,10 @@ Mesh.prototype.getBaseColor = function getBaseColor () {
  * Change whether the Mesh is affected by light. Default is true.
  *
  * @method
- * @param {boolean} Boolean
- * @return {Mesh} this
+ *
+ * @param {boolean} bool Boolean for setting flat shading
+ *
+ * @return {Mesh} Mesh
  */
 Mesh.prototype.setFlatShading = function setFlatShading (bool) {
     if (this._inDraw || this.value.flatShading !== bool) {
@@ -219,6 +229,7 @@ Mesh.prototype.setFlatShading = function setFlatShading (bool) {
  * Returns a boolean for whether Mesh is affected by light.
  *
  * @method
+ *
  * @returns {Boolean} Boolean
  */
 Mesh.prototype.getFlatShading = function getFlatShading () {
@@ -233,8 +244,9 @@ Mesh.prototype.getFlatShading = function getFlatShading () {
  *
  * @method
  *
- * @param {Object|Array} Material, Image or vec3
- * @return {Mesh} this
+ * @param {Object|Array} materialExpression Material, Image or vec3
+ *
+ * @return {Mesh} Mesh
  */
 Mesh.prototype.setNormals = function setNormals (materialExpression) {
     var isMaterial = materialExpression.__isAMaterial__;
@@ -258,7 +270,10 @@ Mesh.prototype.setNormals = function setNormals (materialExpression) {
  * Returns the Normals expression of Mesh
  *
  * @method
- * @returns The normals expression for Mesh
+ *
+ * @param {materialExpression} materialExpression Normals Material Expression
+ *
+ * @returns {Array} The normals expression for Mesh
  */
 Mesh.prototype.getNormals = function getNormals (materialExpression) {
     return this.value.expressions.normals;
@@ -269,9 +284,11 @@ Mesh.prototype.getNormals = function getNormals (materialExpression) {
  * scalar value
  *
  * @method
- * @param {MaterialExpression|Color}    glossiness     Accepts either a material expression or Color instance
- * @param {Number}                      strength       Optional value for changing the strength of the glossiness
- * @return {Mesh} this
+ *
+ * @param {MaterialExpression|Color} glossiness Accepts either a material expression or Color instance
+ * @param {Number} strength Optional value for changing the strength of the glossiness
+ *
+ * @return {Mesh} Mesh
  */
 Mesh.prototype.setGlossiness = function setGlossiness(glossiness, strength) {
     var isMaterial = glossiness.__isAMaterial__;
@@ -302,7 +319,8 @@ Mesh.prototype.setGlossiness = function setGlossiness(glossiness, strength) {
  * Returns material expression or scalar value for glossiness.
  *
  * @method
- * @returns {MaterialExpress|Number}
+ *
+ * @returns {MaterialExpress|Number} MaterialExpress or Number
  */
 Mesh.prototype.getGlossiness = function getGlossiness() {
     return this.value.expressions.glossiness || this.value.glossiness;
@@ -314,8 +332,9 @@ Mesh.prototype.getGlossiness = function getGlossiness() {
  *
  * @method
  *
- * @param {MaterialExpression|Array}
- * @return {Mesh} this
+ * @param {MaterialExpression|Array} materialExpression Position offset expression
+ *
+ * @return {Mesh} Mesh
  */
 Mesh.prototype.setPositionOffset = function positionOffset(materialExpression) {
     var uniformValue;
@@ -346,7 +365,8 @@ Mesh.prototype.setPositionOffset = function positionOffset(materialExpression) {
  * Returns position offset.
  *
  * @method
- * @returns {MaterialExpress|Number}
+ *
+ * @returns {MaterialExpress|Number} MaterialExpress or Number
  */
 Mesh.prototype.getPositionOffset = function getPositionOffset () {
     return this.value.expressions.positionOffset || this.value.positionOffset;
@@ -356,7 +376,8 @@ Mesh.prototype.getPositionOffset = function getPositionOffset () {
  * Get the mesh's expressions
  *
  * @method
- * @returns {Object} Options
+ *
+ * @returns {Object} Object
  */
 Mesh.prototype.getMaterialExpressions = function getMaterialExpressions () {
     return this.value.expressions;
@@ -366,6 +387,7 @@ Mesh.prototype.getMaterialExpressions = function getMaterialExpressions () {
  * Get the mesh's value
  *
  * @method
+ *
  * @returns {Number} Value
  */
 Mesh.prototype.getValue = function getValue () {
@@ -375,8 +397,9 @@ Mesh.prototype.getValue = function getValue () {
 /**
  * Queues the invalidations for Mesh
  *
- * @param  {String} expressionName
- * @return {Mesh} this
+ * @param {String} expressionName Expression Name
+ *
+ * @return {Mesh} Mesh
  */
 Mesh.prototype._pushInvalidations = function _pushInvalidations (expressionName) {
     var uniformKey;
@@ -398,6 +421,7 @@ Mesh.prototype._pushInvalidations = function _pushInvalidations (expressionName)
 *
 * @private
 * @method
+*
 * @return {undefined} undefined
 */
 Mesh.prototype.onUpdate = function onUpdate() {
@@ -443,8 +467,10 @@ Mesh.prototype.onUpdate = function onUpdate() {
  * Save reference to node, set its ID and call draw on Mesh.
  *
  * @method
- * @param  {LocalDispatch} node
- * @param  {Number} id      Identifier for Mesh
+ *
+ * @param {Node} node Node
+ * @param {Number} id Identifier for Mesh
+ *
  * @return {undefined} undefined
  */
 Mesh.prototype.onMount = function onMount (node, id) {
@@ -458,6 +484,7 @@ Mesh.prototype.onMount = function onMount (node, id) {
  * Queues the command for dismounting Mesh
  *
  * @method
+ *
  * @return {undefined} undefined
  */
 Mesh.prototype.onDismount = function onDismount () {
@@ -471,6 +498,7 @@ Mesh.prototype.onDismount = function onDismount () {
  * Makes Mesh visible
  *
  * @method
+ *
  * @return {undefined} undefined
  */
 Mesh.prototype.onShow = function onShow () {
@@ -483,6 +511,7 @@ Mesh.prototype.onShow = function onShow () {
  * Makes Mesh hidden
  *
  * @method
+ *
  * @return {undefined} undefined
  */
 Mesh.prototype.onHide = function onHide () {
@@ -496,6 +525,9 @@ Mesh.prototype.onHide = function onHide () {
  *
  * @method
  * @private
+ *
+ * @param {Array} transform Transform matric
+ *
  * @return {undefined} undefined
  */
 Mesh.prototype.onTransformChange = function onTransformChange (transform) {
@@ -513,6 +545,9 @@ Mesh.prototype.onTransformChange = function onTransformChange (transform) {
  *
  * @method
  * @private
+ *
+ * @param {Array} size Size
+ *
  * @return {undefined} undefined
  */
 Mesh.prototype.onSizeChange = function onSizeChange (size) {
@@ -530,6 +565,9 @@ Mesh.prototype.onSizeChange = function onSizeChange (size) {
  *
  * @method
  * @private
+ *
+ * @param {Number} opacity Opacity
+ *
  * @return {undefined} undefined
  */
 Mesh.prototype.onOpacityChange = function onOpacityChange (opacity) {
@@ -546,6 +584,9 @@ Mesh.prototype.onOpacityChange = function onOpacityChange (opacity) {
  * Adds functionality for UI events (TODO)
  *
  * @method
+ *
+ * @param {String} UIEvent UI Event
+ *
  * @return {undefined} undefined
  */
 Mesh.prototype.onAddUIEvent = function onAddUIEvent (UIEvent) {
@@ -556,6 +597,7 @@ Mesh.prototype.onAddUIEvent = function onAddUIEvent (UIEvent) {
  * Queues instance to be updated.
  *
  * @method
+ *
  * @return {undefined} undefined
  */
 Mesh.prototype._requestUpdate = function _requestUpdate () {
@@ -569,6 +611,7 @@ Mesh.prototype._requestUpdate = function _requestUpdate () {
  * Initializes the mesh with appropriate listeners.
  *
  * @method
+ *
  * @return {undefined} undefined
  */
 Mesh.prototype.init = function init () {
@@ -583,6 +626,7 @@ Mesh.prototype.init = function init () {
  * Draws given Mesh's current state.
  *
  * @method
+ *
  * @return {undefined} undefined
  */
 Mesh.prototype.draw = function draw () {

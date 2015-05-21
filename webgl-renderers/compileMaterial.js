@@ -37,9 +37,10 @@ var types = {
  * @method
  * @protected
  *
- * @param {Object}      material    Material to be compiled.
- * @param {Number}      textureSlot Next available texture slot for Mesh.
- * @return {undefined}  undefined
+ * @param {Object} material Material to be compiled.
+ * @param {Number} textureSlot Next available texture slot for Mesh.
+ *
+ * @return {undefined} undefined
  */
 function compileMaterial(material, textureSlot) {
     var glsl = '';
