@@ -28,8 +28,12 @@ var Context = require('./Context');
 var injectCSS = require('./inject-css');
 
 /**
- * Instantiates a new Compositor, used for routing commands received from the
- * the global FamousEngine core singleton or WebWorker to the WebGL and DOM renderer.
+ * Instantiates a new Compositor.
+ * The Compositor receives draw commands frm the UIManager and routes the to the
+ * respective context objects.
+ *
+ * Upon creation, it injects a stylesheet used for styling the individual
+ * renderers used in the context objects.
  *
  * @class Compositor
  * @constructor
@@ -55,17 +59,21 @@ function Compositor() {
  * Retrieves the time being used by the internal clock managed by
  * `FamousEngine`.
  *
+ * The time is being passed into core by the Engine through the UIManager.
+ * Since core has the ability to scale the time, the time needs to be passed
+ * back to the rendering system.
+ *
  * @method
  *
- * @return {Number} Clock time.
+ * @return {Number} time The clock time used in core.
  */
 Compositor.prototype.getTime = function getTime() {
     return this._time;
 };
 
 /**
- * Schedules an event to be sent the next time the out command
- * queue is being flushed.
+ * Schedules an event to be sent the next time the out command queue is being
+ * flushed.
  *
  * @method
  * @private
@@ -89,7 +97,8 @@ Compositor.prototype.sendEvent = function sendEvent(path, ev, payload) {
  * @method
  * @private
  *
- * @param  {String} selector render path to the node (context) that should be resized
+ * @param  {String} selector render path to the node (context) that should be
+ * resized
  * @param  {Array} size new context size
  *
  * @return {undefined} undefined
@@ -100,6 +109,8 @@ Compositor.prototype.sendResize = function sendResize (selector, size) {
 
 /**
  * Internal helper method used by `drawCommands`.
+ * Subsequent commands are being associated with the node defined the the path
+ * following the `WITH` command.
  *
  * @method
  * @private
@@ -146,7 +157,7 @@ Compositor.prototype.getOrSetContext = function getOrSetContext(selector) {
  * @method
  * @private
  *
- * @param  {Number} iterator position index within the commands queue
+ * @param  {Number} iterator position index within the command queue
  * @param  {Array} commands remaining message queue received, used to
  * shift single messages
  *
@@ -161,7 +172,7 @@ Compositor.prototype.giveSizeFor = function giveSizeFor(iterator, commands) {
 /**
  * Processes the previously via `receiveCommands` updated incoming "in"
  * command queue.
- * Called by ThreadManager.
+ * Called by UIManager on a frame by frame basis.
  *
  * @method
  *
@@ -199,6 +210,17 @@ Compositor.prototype.drawCommands = function drawCommands() {
     return this._outCommands;
 };
 
+
+/**
+ * Updates the size of all previously registered context objects.
+ * This results into CONTEXT_RESIZE events being sent and the root elements
+ * used by the individual renderers being resized to the the DOMRenderer's root
+ * size.
+ *
+ * @method
+ *
+ * @return {undefined} undefined
+ */
 Compositor.prototype.updateSize = function updateSize() {
     for (var selector in this._contexts) {
         this._contexts[selector].updateSize();
@@ -206,8 +228,10 @@ Compositor.prototype.updateSize = function updateSize() {
 };
 
 /**
- * Used by ThreadManager to update the interal queue of incoming commands.
- * Receiving commands does not immediately start the rederning process.
+ * Used by ThreadManager to update the internal queue of incoming commands.
+ * Receiving commands does not immediately start the rendering process.
+ *
+ * @method
  *
  * @param  {Array} commands command queue to be processed by the compositor's
  * `drawCommands` method

@@ -26,7 +26,7 @@
 
 /**
  * Channels are being used for interacting with the UI Thread when running in
- * a Web Worker or with the ThreadManager/ Compostior when running in single
+ * a Web Worker or with the UIManager/ Compositor when running in single
  * threaded mode (no Web Worker).
  *
  * @class Channel
@@ -69,7 +69,7 @@ Channel.prototype._enterWorkerMode = function _enterWorkerMode() {
 Channel.prototype.onMessage = null;
 
 /**
- * Sends a message to the ThreadManager.
+ * Sends a message to the UIManager.
  *
  * @param  {Any}    message Arbitrary message object.
  *
@@ -85,7 +85,7 @@ Channel.prototype.sendMessage = function sendMessage (message) {
 };
 
 /**
- * Meant to be overriden by the ThreadManager when running in the UI Thread.
+ * Meant to be overriden by the UIManager when running in the UI Thread.
  * Used for preserving API compatibility with Web Workers.
  * When running in Web Worker mode, this property won't be mutated.
  *
