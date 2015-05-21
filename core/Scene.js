@@ -52,7 +52,8 @@ function Scene (selector, updater) {
 
     Node.call(this);         // Scene inherits from node
 
-    this._updater = updater; // The updater that will both
+    this._updater = updater;
+    this._globalUpdater = updater; // The updater that will both
                              // send messages to the renderers
                              // and update dirty nodes
 
@@ -64,7 +65,7 @@ function Scene (selector, updater) {
     this.mount(selector); // Mount the context to itself
                           // (it is its own parent)
     
-    this._updater                  // message a request for the dom
+    this._globalUpdater                  // message a request for the dom
         .message(Commands.NEED_SIZE_FOR)  // size of the context so that
         .message(selector);        // the scene graph has a total size
 
