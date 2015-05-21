@@ -79,7 +79,7 @@ function createMockNode(t) {
 
 test('DOMElement', function(t) {
     t.test('constructor (default options)', function(t) {
-        t.plan(7);
+        t.plan(6);
 
         t.equal(typeof DOMElement, 'function', 'DOMElement should be a constructor function');
 
@@ -186,7 +186,6 @@ test('DOMElement', function(t) {
         domElement.onUpdate();
         t.deepEqual(
             node.sentDrawCommands,
-            [ 'WITH', 'body/4/45/4/5', 'CHANGE_SIZE', 100, 200, 'ADD_CLASS', 'famous-dom-element', 'CHANGE_PROPERTY', 'display', 'block', 'CHANGE_PROPERTY', 'opacity', 0.4, 'CHANGE_ATTRIBUTE', 'data-fa-path', 'body/4/45/4/5' ],
             'should send initial styles on first update. Should take into ' +
             'account size, UI Events etc. from Node'
         );
@@ -204,6 +203,7 @@ test('DOMElement', function(t) {
 
         var node = createMockNode(t);
         var domElement = new DOMElement(node);
+        domElement.onMount(node, 3);
 
         t.equal(typeof domElement.onMount, 'function', 'domElement.onMount should be a function');
         t.equal(typeof domElement.onUpdate, 'function', 'domElement.onUpdate should be a function');
@@ -230,11 +230,13 @@ test('DOMElement', function(t) {
             'being appended to the command queue'
         );
         node.sentDrawCommands.length = 0;
-
         domElement.onUpdate();
-        t.deepEqual(node.sentDrawCommands, []);
-
-        domElement.onDismount();
+        t.deepEqual(
+            node.sentDrawCommands,
+            [ 'WITH', 'body/3', 'DOM', 'CHANGE_SIZE', 0, 0, 'CHANGE_PROPERTY', 'display', true, 'CHANGE_PROPERTY', 'opacity', 1, 'CHANGE_PROPERTY', 'position', 'absolute', 'CHANGE_PROPERTY', '-webkit-transform-origin', '0% 0%', 'CHANGE_PROPERTY', 'transform-origin', '0% 0%', 'CHANGE_PROPERTY', '-webkit-backface-visibility', 'visible', 'CHANGE_PROPERTY', 'backface-visibility', 'visible', 'CHANGE_PROPERTY', '-webkit-transform-style', 'preserve-3d', 'CHANGE_PROPERTY', 'transform-style', 'preserve-3d', 'CHANGE_PROPERTY', '-webkit-tap-highlight-color', 'transparent', 'CHANGE_PROPERTY', 'pointer-events', 'auto', 'CHANGE_PROPERTY', 'z-index', '1', 'CHANGE_PROPERTY', 'box-sizing', 'border-box', 'CHANGE_PROPERTY', '-moz-box-sizing', 'border-box', 'CHANGE_PROPERTY', '-webkit-box-sizing', 'border-box', 'CHANGE_ATTRIBUTE', 'data-fa-path', 'body/0' ],
+            'should send initial styles on first update'
+        );
+        node.sentDrawCommands.length = 0;
         domElement.onUpdate();
         t.deepEqual(
             node.sentDrawCommands,
@@ -313,7 +315,6 @@ test('DOMElement', function(t) {
         domElement.setProperty('background', 'red');
         domElement.onUpdate(1);
 
-        // TODO
         // Properties are being read from an object. We can't make any
         // assumptions about the order in which commands are being added to the
         // command queue.

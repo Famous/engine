@@ -84,7 +84,7 @@ Dispatch.prototype.registerNodeAtPath = function registerNodeAtPath (path, node)
 Dispatch.prototype.deregisterNodeAtPath = function deregisterNodeAtPath (path, node) {
     if (this._nodes[path] !== node) throw new Error('Node is not registered at this path: ' + path);
     this._nodes[path] = null;
-    this.dismount(node, path);
+    this.dismount(path);
 };
 
 /**
@@ -162,7 +162,8 @@ Dispatch.prototype.mount = function mount (path) {
     var children = node.getChildren();
 
     for (var i = 0, len = children.length ; i < len ; i++)
-        this.registerNodeAtPath(children[i], path + '/' + i); 
+        if (!children[i].isMounted())
+            children[i].mount(path + '/' + i);
 };
 
 /**
@@ -323,18 +324,23 @@ Dispatch.prototype.dispatch = function dispatch (path, event, payload) {
 Dispatch.prototype.dispatchUIEvent = function dispatchUIEvent (path, event, payload) {
     if (!path) throw new Error('dispatchUIEvent needs a valid path to dispatch to');
     if (!event) throw new Error('dispatchUIEvent needs an event name as its second argument');
-
-    var queue = this._queue;
     var node;
 
     Event.call(payload);
-    payload.node = this.lookupNode(path); // After this call, the path is loaded into the queue
-                                          // (lookUp node doesn't clear the queue after the lookup)
+    node = this.getNode(path);
 
-    while (queue.length) {
-        node = queue.pop(); // pop nodes off of the queue to move up the ancestor chain.
-        if (node.onReceive) node.onReceive(event, payload);
-        if (payload.propagationStopped) break;
+    if (node) {
+        var parent;
+
+        payload.node = node; 
+
+        while (node) {
+            if (node.onReceive) node.onReceive(event, payload);
+            if (payload.propagationStopped) break;
+            parent = node.getParent();
+            if (parent === node) return;
+            node = parent;
+        }
     }
 };
 
