@@ -34,10 +34,10 @@
  *
  * @method strip
  *
- * @param  {*}          primitive or (non-)serializable object without
- *                      circular references
- * @return {*}          primitive or (nested) object only containing primitive
- *                      types (serializable)
+ * @param  {*} obj              A primitive or (non-)serializable object without
+ *                              circular references.
+ * @return {*} strippedObj      A primitive or (nested) object only containing
+ *                              primitive types (serializable).
  */
 function strip(obj) {
     switch (obj) {

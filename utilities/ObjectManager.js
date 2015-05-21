@@ -32,6 +32,13 @@
  */
 var ObjectManager = {};
 
+
+/**
+ * Internal pool used for storing instances of the regsitered constructors.
+ *
+ * @type {Object}
+ * @private
+ */
 ObjectManager.pools = {};
 
 /**
@@ -43,6 +50,7 @@ ObjectManager.pools = {};
  *                                  allocated objects.
  * @param {Function} Constructor    Zero-argument Constructor function used for
  *                                  allocating new objects.
+ * @return {undefined} undefined
  */
 ObjectManager.register = function(type, Constructor) {
     var pool = this.pools[type] = [];
@@ -72,6 +80,7 @@ function _free(pool) {
  *
  * @param {String}  type    type as registered using
  *                          [register]{@link ObjectManager#register}.
+ * @return {undefined} undefined
  */
 ObjectManager.disposeOf = function(type) {
     var pool = this.pools[type];

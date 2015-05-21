@@ -31,7 +31,7 @@
  *
  * @method keyValuesToArrays
  *
- * @param {Object} object                   Objects where to extract keys and values
+ * @param {Object} obj                      Objects where to extract keys and values
  *                                          from.
  * @return {Object}         result
  *         {Array.<String>} result.keys     Keys of `result`, as returned by

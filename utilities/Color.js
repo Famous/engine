@@ -30,11 +30,13 @@ var Transitionable = require('../transitions/Transitionable');
  * @class Color
  * @constructor
  *
- * @param {Color|String|Array}  Optional argument for setting color using
- *                              Hex, a Color instance, color name or RGB
- * @param {Object}              Optional transition
- * @param {Function}            Callback
- * @return {undefined}          undefined
+ * @param {Color|String|Array}  [color]     Optional argument for setting color
+ *                                          using Hex, a Color instance, color
+ *                                          name or RGB.
+ * @param {Object} [transition]             Optional transition.
+ * @param {Function} [cb]                   Callback function to be called on
+ *                                          completion of the initial
+ *                                          transition.
  */
 function Color(color, transition, cb) {
     this._r = new Transitionable(0);
@@ -45,9 +47,11 @@ function Color(color, transition, cb) {
 }
 
 /**
- * Returns the definition of the Class: 'Color'
+ * Returns the definition of the Class: 'Color'.
+ *
  * @method
- * @return {String} definition
+ *
+ * @return {String} "Color"
  */
 Color.prototype.toString = function toString() {
     return 'Color';
@@ -61,9 +65,11 @@ Color.prototype.toString = function toString() {
  * set([r, g, b], transition, callback)
  *
  * @method
- * @param {Color|String|Array}  Sets color using Hex, a Color instance, color name or RGB
- * @param {Object}              Optional transition
- * @param {Function}            Callback
+ * @param {Color|String|Array}  color   Sets color using Hex, a Color instance,
+ *                                      color name or RGB.
+ * @param {Object} [transition]         Optional transition
+ * @param {Function} [cb]               Callback function to be called on
+ *                                      completion of the transition.
  * @return {Color}              this
  */
 Color.prototype.set = function set(color, transition, cb) {
@@ -80,7 +86,8 @@ Color.prototype.set = function set(color, transition, cb) {
  * Returns whether Color is still in an animating (transitioning) state.
  *
  * @method
- * @returns {Boolean} boolean
+ * @returns {Boolean} isActive      Boolean value indicating whether the there
+ *                                  is an active transition.
  */
 Color.prototype.isActive = function isActive() {
     return this._r.isActive() ||
@@ -107,10 +114,10 @@ Color.prototype.halt = function halt() {
  * Sets the color values from another Color instance.
  *
  * @method
- * @param {Color}       Color       Color instance
- * @param {Object}      transition  Optional transition
- * @param {Function}    callback    Optional
- * @return {Color}                  this
+ * @param {Color}       color           Color instance.
+ * @param {Object}      [transition]    Optional transition.
+ * @param {Function}    [cb]            Optional callback function.
+ * @return {Color}                      this
  */
 Color.prototype.changeTo = function changeTo(color, transition, cb) {
     if (Color.isColorInstance(color)) {
