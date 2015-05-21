@@ -94,13 +94,19 @@ function sort(list, registry) {
             div = floatToInt(comp(list, registry, i));
             out[++buckets[div & radixMask]] = mutator(list, registry, i, div ^= div >> 31 | 0x80000000);
         }
-        swap = out, out = list, list = swap;
+        
+        swap = out;
+        out = list;
+        list = swap;
         while (++pass < passCount) {
             for (i = 0, n = list.length, offset = pass * maxRadix, size = pass * radixBits; i < n; i++) {
                 div = floatToInt(comp(list, registry, i));
                 out[++buckets[offset + (div >>> size & radixMask)]] = list[i];
             }
-            swap = out, out = list, list = swap;
+
+            swap = out;
+            out = list;
+            list = swap;
         }
     }
 

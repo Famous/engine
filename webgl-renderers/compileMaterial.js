@@ -83,9 +83,8 @@ function _traverse(material, callback) {
 	var inputs = material.inputs;
     var len = inputs && inputs.length;
     var idx = -1;
-    var save;
 
-    while (++idx < len) save = _traverse(inputs[idx], callback);
+    while (++idx < len) _traverse(inputs[idx], callback);
 
     callback(material);
 
@@ -108,7 +107,10 @@ function _getOutputLength(node) {
 
     // Handle polymorphic output
 
-    var key = node.inputs.map(function recurse(node) { return _getOutputLength(node); }).join(',');
+    var key = node.inputs.map(function recurse(node) {
+        return _getOutputLength(node);
+    }).join(',');
+
     return output[key];
 }
 
@@ -125,8 +127,8 @@ function _processGLSL(str, inputs, textureSlot) {
 // Helper function used to create glsl definition of the
 // input material node.
 function _makeLabel (n) {
-    if (Array.isArray(n)) return arrayToVec(n);
-    if (typeof n == 'object') return 'fa_' + (n._id);
+    if (Array.isArray(n)) return _arrayToVec(n);
+    if (typeof n === 'object') return 'fa_' + (n._id);
     else return n.toFixed(6);
 }
 
