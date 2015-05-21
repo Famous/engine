@@ -1,18 +1,18 @@
 /**
  * The MIT License (MIT)
- * 
+ *
  * Copyright (c) 2015 Famous Industries Inc.
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -65,13 +65,13 @@ function GestureHandler(node, events) {
     this.pointer1 = {
         position: this.last1,
         delta: this.delta1,
-        velocity: this.velocity1,
+        velocity: this.velocity1
     };
 
     this.pointer2 = {
         position: this.last2,
         delta: this.delta2,
-        velocity: this.velocity2,
+        velocity: this.velocity2
     };
 
     this.event = {
@@ -120,7 +120,7 @@ function GestureHandler(node, events) {
  * @method
  *
  * @param {String} ev name of the event
- * @param {Object} payload data associated with the event 
+ * @param {Object} payload data associated with the event
  *
  * @return {undefined} undefined
  */

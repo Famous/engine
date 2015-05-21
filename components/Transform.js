@@ -167,12 +167,24 @@ Transform.prototype.getValue = function getValue() {
 
 Transform.prototype.setState = function setState(state) {
     if (this.toString() === state.component) {
-        state.origin && this.setOrigin(state.origin.x, state.origin.y, state.origin.z);
-        state.mountPoint && this.setMountPoint(state.mountPoint.x, state.mountPoint.y, state.mountPoint.z);
-        state.align && this.setAlign(state.align.x, state.align.y, state.align.z);
-        state.scale && this.setScale(state.scale.x, state.scale.y, state.scale.z);
-        state.position && this.setPosition(state.position.x, state.position.y, state.position.z);
-        state.rotation && this.setRotation(state.rotation.x, state.rotation.y, state.rotation.z, state.rotation.w);
+        if (state.origin) {
+            this.setOrigin(state.origin.x, state.origin.y, state.origin.z);
+        }
+        if (state.mountPoint) {
+            this.setMountPoint(state.mountPoint.x, state.mountPoint.y, state.mountPoint.z);
+        }
+        if (state.align) {
+            this.setAlign(state.align.x, state.align.y, state.align.z);
+        }
+        if (state.scale) {
+            this.setScale(state.scale.x, state.scale.y, state.scale.z);
+        }
+        if (state.position) {
+            this.setPosition(state.position.x, state.position.y, state.position.z);
+        }
+        if (state.rotation) {
+            this.setRotation(state.rotation.x, state.rotation.y, state.rotation.z, state.rotation.w);
+        }
         return true;
     }
     return false;
