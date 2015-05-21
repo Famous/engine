@@ -136,21 +136,4 @@ Texture.prototype.readBack = function readBack(x, y, width, height) {
     return pixels;
 };
 
-/*
- * Determines whether both input values are power-of-two numbers.
- *
- * @method
- * @private
- *
- * @param {Number} width    Number representing texture width.
- * @param {Number} height   Number representing texture height.
- *
- * @return {Boolean}        Boolean denoting whether the input dimensions
- *                          are both power-of-two values.
- */
-function isPowerOfTwo(width, height) {
-    return (width & width - 1) === 0
-        && (height & height - 1) === 0;
-}
-
 module.exports = Texture;
