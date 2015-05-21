@@ -45,7 +45,7 @@ function Channel() {
  *
  * Primarily used for testing.
  *
- * @method 
+ * @method
  *
  * @return {undefined} undefined
  */
@@ -63,7 +63,7 @@ Channel.prototype._enterWorkerMode = function _enterWorkerMode() {
  *
  * @type {Function}
  * @override
- * 
+ *
  * @return {undefined} undefined
  */
 Channel.prototype.onMessage = null;
@@ -78,7 +78,8 @@ Channel.prototype.onMessage = null;
 Channel.prototype.sendMessage = function sendMessage (message) {
     if (this._workerMode) {
         self.postMessage(message);
-    } else {
+    }
+    else {
         this.onmessage(message);
     }
 };

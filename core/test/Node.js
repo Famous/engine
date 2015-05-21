@@ -44,25 +44,41 @@ function createMockNode() {
         sentDrawCommands: [],
         sendDrawCommand: function(command) {},
         shown: true,
-        isShown: function() { return this.shown; },
+        isShown: function() {
+            return this.shown;
+        },
         addComponent: function() {},
         location: 'body/0',
-        getLocation: function() { return this.location; } ,
+        getLocation: function() {
+            return this.location;
+        },
         transform: IDENT,
-        getTransform: function() { return this.transform; },
+        getTransform: function() {
+            return this.transform;
+        },
         requestUpdate: function() {},
         size: [0, 0, 0],
-        getSize: function() { return this.size; },
+        getSize: function() {
+            return this.size;
+        },
         sizeMode: [0, 0, 0],
-        getSizeMode: function() { return this.sizeMode; },
+        getSizeMode: function() {
+            return this.sizeMode;
+        },
         uiEvents: [],
-        getUIEvents: function() { return this.uiEvents; },
+        getUIEvents: function() {
+            return this.uiEvents;
+        },
         opacity: 1,
-        getOpacity: function() { return this.opacity; },
+        getOpacity: function() {
+            return this.opacity;
+        },
         updater: {
             requestUpdate: function() {}
         },
-        getUpdater: function() { return this.updater; }
+        getUpdater: function() {
+            return this.updater;
+        }
     };
 }
 
@@ -262,7 +278,6 @@ test('Node', function(t) {
 
     t.test('requestUpdate method', function(t) {
         t.plan(5);
-        var context = {};
         var requesters = [];
 
         var root = new Node();
@@ -420,7 +435,7 @@ test('Node', function(t) {
                 return {
                     requestUpdate: function() {}
                 };
-            },    
+            }
         }, 'root');
         var node = root.addChild();
         t.equal(root.getChildren()[0], node);
@@ -437,7 +452,6 @@ test('Node', function(t) {
 
         var component = {
             onMount: function() {
-                events.push('onMount');
             }
         };
         var componentId = root.addComponent(component);

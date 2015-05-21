@@ -1,18 +1,18 @@
 /**
  * The MIT License (MIT)
- * 
+ *
  * Copyright (c) 2015 Famous Industries Inc.
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -42,7 +42,7 @@ var Event = require('./Event');
 function Dispatch (context) {
 
     if (!context) throw new Error('Dispatch needs to be instantiated on a node');
-    
+
     this._context = context; // A reference to the context
                              // on which the dispatcher
                              // operates
@@ -61,7 +61,7 @@ function Dispatch (context) {
  * by the path, if one exists. If not, it returns undefined.
  *
  * @param {String} location The location of the node specified by its path
- * 
+ *
  * @return {Node | undefined} The node at the requested path
  */
 Dispatch.prototype.lookupNode = function lookupNode (location) {
@@ -70,7 +70,7 @@ Dispatch.prototype.lookupNode = function lookupNode (location) {
     var path = this._queue;
 
     _splitTo(location, path);
-    
+
     if (path[0] !== this._context.getSelector()) return void 0;
 
     var children = this._context.getChildren();
@@ -138,7 +138,7 @@ Dispatch.prototype.dispatchUIEvent = function dispatchUIEvent (path, event, payl
 
     var queue = this._queue;
     var node;
-    
+
     Event.call(payload);
     payload.node = this.lookupNode(path); // After this call, the path is loaded into the queue
                                           // (lookUp node doesn't clear the queue after the lookup)
@@ -163,8 +163,10 @@ Dispatch.prototype.dispatchUIEvent = function dispatchUIEvent (path, event, payl
 function _splitTo (string, target) {
     target.length = 0; // clears the array first.
     var last = 0;
+    var i;
+    var len = string.length;
 
-    for (var i = 0, len = string.length ; i < len ; i++) {
+    for (i = 0 ; i < len ; i++) {
         if (string[i] === '/') {
             target.push(string.substring(last, i));
             last = i + 1;
@@ -177,4 +179,3 @@ function _splitTo (string, target) {
 }
 
 module.exports = Dispatch;
-
