@@ -11,34 +11,22 @@
 # This list can be generated using the git command:
 # git log --all --format='%aN <%aE>' | sort -u
 
-Adnan Wahab <mail@adnanwahab.com>
-Alexander Gugel <alex@famo.us>
-Alexander Gugel <alexander.gugel@gmail.com>
+Adnan Wahab <mail@adnanwahab.com>, <adnan@famo.us>
+Alexander Gugel <alex@famo.us>, <alexander.gugel@gmail.com>
 Arkady Pevzner <arkady@famo.us>
-Ben Rowles <rowlesben@gmail.com>
-Dan <dan@famo.us>
-Dan Miller <me@dnmllr.io>
-Daniel Miller <DnMllr@users.noreply.github.com>
-DnMllr <me@dnmllr.io>
-Farhad Ghayour <f@famo.us>
-Farhad Ghayour <farhad@famo.us>
+Ben Rowles <rowlesben@gmail.com>, <ben@famo.us>
+Dan Miller <me@dnmllr.io>, <dan@famo.us>, <DnMllr@users.noreply.github.com>
+Farhad Ghayour <f@famo.us>, <farhad@famo.us>
 Felix Tripier <ftripier@gmail.com>
 Imti <imtiazmaj@gmail.com>
-Joseph <joseph.michael.sample@gmail.com>
+Joseph <joseph.michael.sample@gmail.com>, <joseph@famo.us>
 Larry Gordon <lgordon@psyrendust.com>
 Marc Wilhite <wilhite@famo.us>
 Marianna Bezler <marianna.bezler@gmail.com>
 Marianna Bezler <marianna@famo.us>
 Matthew Trost <matthew@famo.us>
-Michael O'Brien <michael.obrien.a@gmail.com>
-Mike O'Brien <michael.obrien.a@gmail.com>
-Mike O'Brien <mike@famo.us>
+Mike O'Brien <michael.obrien.a@gmail.com>, <mike@famo.us>
 Morgan Plant <morgantheplant@gmail.com>
 Myles Borins <myles@famo.us>
 SWES <swesleyandloki@gmail.com>
 Zack Brown <z@charybrown.com>
-ben <ben@famo.us>
-felix <ftripier@gmail.com>
-joseph <joseph@famo.us>
-quack quack <adnan@famo.us>
-redwoodfavorite <joseph.michael.sample@gmail.com>

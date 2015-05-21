@@ -56,19 +56,18 @@ Note: cloning only provides the Famo.us folder with all Famo.us code, but it doe
 
 - If you would like to report a bug, please check the [issues][contributing-issues] section in our [contributing instructions][contributing].
 - Please join us on the "famous-community" slack.
-    - http://slack.famous.org/
-    - Join the discussion https://famous-community.slack.com
+    - http://slack.famous.org/signup to sign up
+    - http://slack.famous.org/ to log in
 - For contributors, read more instructions in [CONTRIBUTING.md][contributing-issues].
 
 ## Licensing information
 - The Famous rendering engine is licensed under the MIT license
-- Contact license@famo.us for further inquiries.
+- Contact licensing@famo.us for further inquiries.
 
 [famous-site]: http://famous.org
-[famous-help]: https://famous.org/help
 [famous-docs]: http://famous.org/docs
-[site-install]: http://famous.org/install
-[site-guides]: http://famous.org/guides
+[site-install]: http://famous.org/get-started.html
+[site-guides]: http://famous.org/learn
 [site-docs]: http://famous.org/docs
 [famous-organization-github]: http://github.com/Famous
 [famous-engine-seed]: http://github.com/Famous/engine-seed
