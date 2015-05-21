@@ -116,7 +116,8 @@ AABB.prototype.update = function() {
             if (vertex.z < minZ) minZ = vertex.z;
             if (vertex.z > maxZ) maxZ = vertex.z;
         }
-    } else {
+    }
+    else {
         // Particle
         maxX = maxY = maxZ = 25;
         minX = minY = minZ = -25;

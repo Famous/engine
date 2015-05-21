@@ -202,7 +202,7 @@ test('Particle', function(t) {
 
         p.setAngularVelocity(2,3,1);
         var l = I.vectorMultiply(p.angularVelocity, new Vec3());
-        var ngimpulse = new Vec3(15,6,8)
+        var ngimpulse = new Vec3(15,6,8);
         var e = p.inverseInertia.vectorMultiply(ngimpulse, new Vec3());
         p.applyAngularImpulse(ngimpulse);
         var L = p.angularMomentum;

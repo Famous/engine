@@ -26,7 +26,7 @@
 
 module.exports = {
     Particle: require('./bodies/Particle'),
-    ConvexBodyFactory: require('./bodies/ConvexBodyFactory'),
+    convexBodyFactory: require('./bodies/convexBodyFactory'),
     Box: require('./bodies/Box'),
     Sphere: require('./bodies/Sphere'),
     Wall: require('./bodies/Wall'),

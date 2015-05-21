@@ -166,7 +166,8 @@ SweepAndPrune.prototype.update = function() {
                 if (cID < sID) {
                     lowID = cID;
                     highID = sID;
-                } else {
+                }
+                else {
                     lowID = sID;
                     highID = cID;
                 }
@@ -180,7 +181,8 @@ SweepAndPrune.prototype.update = function() {
                         overlaps[index] = [_entityRegistry[lowID], _entityRegistry[highID]];
                     }
                 // // Else if, for this axis, max point of current and min point of swap
-                } else if (current.side & ~swap.side) {
+                }
+                else if (current.side & ~swap.side) {
                     // Now not overlapping on this axis -> definitely not overlapping
                     if ((row = overlapsMatrix[lowID]) && row[highID] != null) {
                         index = row[highID];

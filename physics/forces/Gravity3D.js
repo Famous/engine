@@ -81,7 +81,8 @@ Gravity3D.prototype.update = function() {
         var magnitude = strength * sourceMass * target.mass * invDistance * invDistance;
         if (magnitude < 0) {
             magnitude = magnitude < -max ? -max : magnitude;
-        } else {
+        }
+        else {
             magnitude = magnitude > max ? max : magnitude;
         }
         force.scale(magnitude * invDistance);

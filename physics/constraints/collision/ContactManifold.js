@@ -29,10 +29,10 @@ var ObjectManager = require('../../../utilities/ObjectManager');
 
 ObjectManager.register('Manifold', Manifold);
 ObjectManager.register('Contact', Contact);
-var OMRequestManifold = ObjectManager.requestManifold;
-var OMRequestContact = ObjectManager.requestContact;
-var OMFreeManifold = ObjectManager.freeManifold;
-var OMFreeContact = ObjectManager.freeContact;
+var oMRequestManifold = ObjectManager.requestManifold;
+var oMRequestContact = ObjectManager.requestContact;
+var oMFreeManifold = ObjectManager.freeManifold;
+var oMFreeContact = ObjectManager.freeContact;
 
 /**
  * Helper function to clamp a value to a given range.
@@ -92,7 +92,7 @@ ContactManifoldTable.prototype.addManifold = function addManifold(lowID, highID,
 
     var index = this._IDPool.length ? this._IDPool.pop() : this.manifolds.length;
     this.collisionMatrix[lowID][highID] = index;
-    var manifold = OMRequestManifold().reset(lowID, highID, bodyA, bodyB);
+    var manifold = oMRequestManifold().reset(lowID, highID, bodyA, bodyB);
     this.manifolds[index] = manifold;
 
     return manifold;
@@ -113,7 +113,7 @@ ContactManifoldTable.prototype.removeManifold = function removeManifold(manifold
     collisionMatrix[manifold.lowID][manifold.highID] = null;
     this._IDPool.push(index);
 
-    OMFreeManifold(manifold);
+    oMFreeManifold(manifold);
 };
 
 /**
@@ -189,7 +189,8 @@ ContactManifoldTable.prototype.registerContact = function registerContact(bodyA,
     if (bodyA._ID < bodyB._ID) {
         lowID = bodyA._ID;
         highID = bodyB._ID;
-    } else {
+    }
+    else {
         lowID = bodyB._ID;
         highID = bodyA._ID;
     }
@@ -202,7 +203,8 @@ ContactManifoldTable.prototype.registerContact = function registerContact(bodyA,
         manifold.addContact(bodyA, bodyB, collisionData);
         bodyA.events.trigger('collision:start', manifold);
         bodyB.events.trigger('collision:start', manifold);
-    } else {
+    }
+    else {
         manifold = manifolds[ collisionMatrix[lowID][highID] ];
         manifold.contains(collisionData);
         manifold.addContact(bodyA, bodyB, collisionData);
@@ -269,7 +271,7 @@ Manifold.prototype.reset = function reset(lowID, highID, bodyA, bodyB) {
 Manifold.prototype.addContact = function addContact(bodyA, bodyB, collisionData) {
     var index = this.lru;
     if (this.contacts[index]) this.removeContact(this.contacts[index], index);
-    this.contacts[index] = OMRequestContact().reset(bodyA, bodyB, collisionData);
+    this.contacts[index] = oMRequestContact().reset(bodyA, bodyB, collisionData);
     this.lru = (this.lru + 1) % 4;
     this.numContacts++;
 };
@@ -288,7 +290,7 @@ Manifold.prototype.removeContact = function removeContact(contact, index) {
 
     ObjectManager.freeCollisionData(contact.data);
     contact.data = null;
-    OMFreeContact(contact);
+    oMFreeContact(contact);
 };
 
 /**
@@ -443,7 +445,8 @@ Contact.prototype.init = function init() {
     var t1 = new Vec3();
     if (n.x >= 0.57735) {
         t1.set(n.y, -n.x, 0);
-    } else {
+    }
+    else {
         t1.set(0, n.z, -n.y);
     }
     t1.normalize();

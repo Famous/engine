@@ -212,7 +212,8 @@ PhysicsEngine.prototype.add = function add() {
                 var e = entity[i];
                 this.add(e);
             }
-        } else {
+        }
+        else {
             if (entity instanceof Particle) this.addBody(entity);
             else if (entity instanceof Constraint) this.addConstraint(entity);
             else if (entity instanceof Force) this.addForce(entity);
@@ -235,7 +236,8 @@ PhysicsEngine.prototype.remove = function remove() {
                 var e = entity[i];
                 this.add(e);
             }
-        } else {
+        }
+        else {
             if (entity instanceof Particle) this.removeBody(entity);
             else if (entity instanceof Constraint) this.removeConstraint(entity);
             else if (entity instanceof Force) this.removeForce(entity);

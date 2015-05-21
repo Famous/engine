@@ -1,18 +1,18 @@
 /**
  * The MIT License (MIT)
- * 
+ *
  * Copyright (c) 2015 Famous Industries Inc.
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -25,7 +25,7 @@
 'use strict';
 
 var test = require('tape');
-var ConvexBodyFactory = require('../../bodies/ConvexBodyFactory');
+var convexBodyFactory = require('../../bodies/convexBodyFactory');
 var Vec3 = require('../../../math/Vec3');
 
 function arraysAreApproximatelyEqual(a, b, tolerance) {
@@ -39,8 +39,8 @@ function vec3sAreEqual(a,b) {
     return Math.abs(a.x - b.x) < 0.001 && Math.abs(a.y - b.y) < 0.001 && Math.abs(a.z - b.z) < 0.001;
 }
 
-test('ConvexBodyFactory', function(t) {
-    t.assert(ConvexBodyFactory instanceof Function, 'ConvexBodyFactory should be a function');
+test('convexBodyFactory', function(t) {
+    t.assert(convexBodyFactory instanceof Function, 'convexBodyFactory should be a function');
 
     var pyramidVertices = [
         new Vec3(50,0,50),
@@ -48,7 +48,7 @@ test('ConvexBodyFactory', function(t) {
         new Vec3(0,0,-50),
         new Vec3(0,-100,0),
 
-        new Vec3(0,-25,0) // ConvexHullshould disregard this Vec3
+        new Vec3(0,-25,0) // ConvexHull should disregard this Vec3
     ];
 
     var sphereVertices = [];
@@ -78,12 +78,12 @@ test('ConvexBodyFactory', function(t) {
         new Vec3(-50,50,-50)
     ];
 
-    var CustomPyramid = ConvexBodyFactory(pyramidVertices);
-    var CustomSphere = ConvexBodyFactory(sphereVertices);
-    var CustomBox = ConvexBodyFactory(boxVertices);
+    var CustomPyramid = convexBodyFactory(pyramidVertices);
+    var CustomSphere = convexBodyFactory(sphereVertices);
+    var CustomBox = convexBodyFactory(boxVertices);
 
     t.test('custom body shape', function(t) {
-        t.assert(CustomPyramid instanceof Function, ' ConvexBodyFactory should return a constructor');
+        t.assert(CustomPyramid instanceof Function, ' convexBodyFactory should return a constructor');
 
         var pyramid = new CustomPyramid({mass: 10, size: [60,75,60]});
 
@@ -133,13 +133,12 @@ test('ConvexBodyFactory', function(t) {
     t.test('support prototypal method', function(t) {
         var box = new CustomBox({mass: 10, size: [50,75,30]});
         t.assert(box.support instanceof Function, '.support should be a function');
-        var d = new Vec3(1,0.1,0);
 
         t.assert(vec3sAreEqual(box.support(new Vec3(1,1,1)), new Vec3(25,37.5,15)) &&
                  vec3sAreEqual(box.support(new Vec3(-1,1,1)), new Vec3(-25, 37.5, 15)) &&
                  vec3sAreEqual(box.support(new Vec3(-1,-1,-1)), new Vec3(-25, -37.5, -15)), 'should provide an accurate .support method');
 
-        t.end()
+        t.end();
     });
 
     t.test('updateShape prototypal method', function(t) {

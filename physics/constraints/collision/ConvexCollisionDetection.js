@@ -28,11 +28,11 @@ var Vec3 = require('../../../math/Vec3');
 var ObjectManager = require('../../../utilities/ObjectManager');
 
 ObjectManager.register('GJK_EPASupportPoint', GJK_EPASupportPoint);
-var OMRequestGJK_EPASupportPoint = ObjectManager.requestGJK_EPASupportPoint;
-var OMRequestDynamicGeometry = ObjectManager.requestDynamicGeometry;
-var OMFreeGJK_EPASupportPoint = ObjectManager.freeGJK_EPASupportPoint;
-var OMFreeDynamicGeometry = ObjectManager.freeDynamicGeometry;
-var OMFreeDynamicGeometryFeature = ObjectManager.freeDynamicGeometryFeature;
+var oMRequestGJK_EPASupportPoint = ObjectManager.requestGJK_EPASupportPoint;
+var oMRequestDynamicGeometry = ObjectManager.requestDynamicGeometry;
+var oMFreeGJK_EPASupportPoint = ObjectManager.freeGJK_EPASupportPoint;
+var oMFreeDynamicGeometry = ObjectManager.freeDynamicGeometry;
+var oMFreeDynamicGeometryFeature = ObjectManager.freeDynamicGeometryFeature;
 
 var P_REGISTER = new Vec3();
 var V0_REGISTER = new Vec3();
@@ -87,17 +87,17 @@ function freeGJK_EPADynamicGeometry(geometry) {
     i = vertices.length;
     while (i--) {
         var v = vertices.pop();
-        if (v !== null) OMFreeGJK_EPASupportPoint(v);
+        if (v !== null) oMFreeGJK_EPASupportPoint(v);
     }
     geometry.numVertices = 0;
     var features = geometry.features;
     i = features.length;
     while (i--) {
         var f = features.pop();
-        if (f !== null) OMFreeDynamicGeometryFeature(f);
+        if (f !== null) oMFreeDynamicGeometryFeature(f);
     }
     geometry.numFeatures = 0;
-    OMFreeDynamicGeometry(geometry);
+    oMFreeDynamicGeometry(geometry);
 }
 
 /**
@@ -116,7 +116,7 @@ function minkowskiSupport(body1, body2, direction) {
     var w2 = Vec3.add(body2.support(inverseDirection), body2.position, new Vec3());
 
     // The vertex in Minkowski space as well as the original pair in world space
-    return OMRequestGJK_EPASupportPoint().reset(Vec3.subtract(w1, w2, new Vec3()), w1, w2);
+    return oMRequestGJK_EPASupportPoint().reset(Vec3.subtract(w1, w2, new Vec3()), w1, w2);
 }
 
 /**
@@ -128,11 +128,11 @@ function minkowskiSupport(body1, body2, direction) {
  * @param {Particle} body2 The other body.
  * @return {DynamicGeometry|Boolean} Result of the GJK query.
  */
-function GJK(body1, body2) {
+function gjk(body1, body2) {
     var support = minkowskiSupport;
     // Use p2 - p1 to seed the initial choice of direction
     var direction = Vec3.subtract(body2.position, body1.position, DIRECTION_REGISTER).normalize();
-    var simplex = OMRequestDynamicGeometry();
+    var simplex = oMRequestDynamicGeometry();
     simplex.addVertex(support(body1, body2, direction));
     direction.invert();
 
@@ -143,7 +143,7 @@ function GJK(body1, body2) {
         simplex.addVertex(support(body1, body2, direction));
         if (Vec3.dot(simplex.getLastVertex().vertex, direction) < 0) break;
         // If simplex contains origin, return for use in EPA
-        if (simplex.simplexContainsOrigin(direction, OMFreeGJK_EPASupportPoint)) return simplex;
+        if (simplex.simplexContainsOrigin(direction, oMFreeGJK_EPASupportPoint)) return simplex;
     }
     freeGJK_EPADynamicGeometry(simplex);
     return false;
@@ -159,7 +159,7 @@ function GJK(body1, body2) {
  * @param {DynamicGeometry} polytope The seed simplex from GJK.
  * @return {CollisionData} The collision data.
  */
-function EPA(body1, body2, polytope) {
+function epa(body1, body2, polytope) {
     var support = minkowskiSupport;
     var depthEstimate = Infinity;
 
@@ -208,10 +208,11 @@ function EPA(body1, body2, polytope) {
             var localBody2Contact = Vec3.subtract(body2Contact, body2.position, new Vec3());
 
             freeGJK_EPADynamicGeometry(polytope);
-            OMFreeGJK_EPASupportPoint(point);
+            oMFreeGJK_EPASupportPoint(point);
 
             return ObjectManager.requestCollisionData().reset(closest.distance, direction, body1Contact, body2Contact, localBody1Contact, localBody2Contact);
-        } else {
+        }
+        else {
             polytope.addVertex(point);
             polytope.reshape();
         }
@@ -219,5 +220,5 @@ function EPA(body1, body2, polytope) {
     throw new Error('EPA failed to terminate in allotted iterations.');
 }
 
-module.exports.GJK = GJK;
-module.exports.EPA = EPA;
+module.exports.gjk = gjk;
+module.exports.epa = epa;

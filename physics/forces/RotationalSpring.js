@@ -115,7 +115,8 @@ RotationalSpring.prototype.update = function update() {
 
         if (invSourceInertia !== null) {
             Mat33.add(invSourceInertia, target.inverseInertia, effInertia).inverse();
-        } else {
+        }
+        else {
             Mat33.inverse(target.inverseInertia, effInertia);
         }
 

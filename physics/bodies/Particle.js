@@ -219,8 +219,7 @@ Particle.prototype.updateLocalInertia = function updateLocalInertia() {
 Particle.prototype.updateInertia = function updateInertia() {
     var localInvI = this.localInverseInertia;
     var q = this.orientation;
-    if (localInvI[0] === localInvI[4] && localInvI[4] === localInvI[8]) return;
-    if (q.w === 1) return;
+    if ((localInvI[0] === localInvI[4] && localInvI[4] === localInvI[8]) || q.w === 1) return this;
     var R = q.toMatrix(MAT1_REGISTER);
     Mat33.multiply(R, this.inverseInertia, this.inverseInertia);
     Mat33.multiply(this.localInverseInertia, R.transpose(), this.inverseInertia);

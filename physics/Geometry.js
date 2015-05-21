@@ -30,8 +30,8 @@ var Mat33 = require('../math/Mat33');
 var ObjectManager = require('../utilities/ObjectManager');
 ObjectManager.register('DynamicGeometry', DynamicGeometry);
 ObjectManager.register('DynamicGeometryFeature', DynamicGeometryFeature);
-var OMRequestDynamicGeometryFeature = ObjectManager.requestDynamicGeometryFeature;
-var OMFreeDynamicGeometryFeature = ObjectManager.freeDynamicGeometryFeature;
+var oMRequestDynamicGeometryFeature = ObjectManager.requestDynamicGeometryFeature;
+var oMFreeDynamicGeometryFeature = ObjectManager.freeDynamicGeometryFeature;
 
 var TRIPLE_REGISTER = new Vec3();
 
@@ -206,7 +206,7 @@ DynamicGeometry.prototype.removeVertex = function(index) {
  */
 DynamicGeometry.prototype.addFeature = function(distance, normal, vertexIndices) {
     var index = this._IDPool.features.length ? this._IDPool.features.pop() : this.features.length;
-    this.features[index] = OMRequestDynamicGeometryFeature().reset(distance, normal, vertexIndices);
+    this.features[index] = oMRequestDynamicGeometryFeature().reset(distance, normal, vertexIndices);
     this.numFeatures++;
 };
 
@@ -223,7 +223,7 @@ DynamicGeometry.prototype.removeFeature = function(index) {
     this._IDPool.features.push(index);
     this.numFeatures--;
 
-    OMFreeDynamicGeometryFeature(feature);
+    oMFreeDynamicGeometryFeature(feature);
 };
 
 /**
