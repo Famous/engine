@@ -75,8 +75,8 @@ test('Texture', function(t) {
         var testImage = {};
         var returned = texture.setImage(testImage);
 
-        t.ok(testingContext.texImage2D.callCount === 2, 'should call the activeTexture method on the context');
-        t.ok(testingContext.texImage2D.history[1][5] === testImage, 'should call texImage2D with the passed in image');
+        t.ok(testingContext.texImage2D.callCount === 1, 'should call the activeTexture method on the context');
+        t.ok(testingContext.texImage2D.history[0][5] === testImage, 'should call texImage2D with the passed in image');
         t.ok(returned === texture, 'should be chainable');
 
         t.end();
