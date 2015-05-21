@@ -39,9 +39,9 @@ var TEMP_REGISTER = new Vec3();
  * @param {ConvexHull | Vec3[]} hull ConvexHull instance or Vec3 array.
  * @return {Function} The constructor for the custom convex body type.
  */
-function ConvexBodyFactory(hull) {
+function convexBodyFactory(hull) {
     if (!(hull instanceof ConvexHull)) {
-        if (!(hull instanceof Array)) throw new Error('ConvexBodyFactory requires a ConvexHull object or an array of Vec3\'s as input.');
+        if (!(hull instanceof Array)) throw new Error('convexBodyFactory requires a ConvexHull object or an array of Vec3\'s as input.');
         else hull = new ConvexHull(hull);
     }
 
@@ -250,4 +250,4 @@ function _computeInertiaProperties(T) {
     Mat33.inverse(this.localInertia, this.localInverseInertia);
 }
 
-module.exports = ConvexBodyFactory;
+module.exports = convexBodyFactory;

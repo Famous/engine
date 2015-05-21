@@ -156,10 +156,23 @@ test('PhysicsEngine', function(t) {
 
         var testBody = new Particle();
         var fu = 0;
-        var testForce = {_ID: 0, update: function() {fu++;}};
+        var testForce = {
+            _ID: 0,
+            update: function() {
+                fu++;
+            }
+        };
         var cu = 0;
         var cr = 0;
-        var testConstraint = {_ID: 0, update: function() {cu++;}, resolve: function() {cr++;}};
+        var testConstraint = {
+            _ID: 0,
+            update: function() {
+                cu++;
+            },
+            resolve: function() {
+                cr++;
+            }
+        };
 
         world.addBody(testBody);
         world.addForce(testForce);

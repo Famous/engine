@@ -25,9 +25,9 @@
 'use strict';
 
 var Vec3 = require('../../math/Vec3');
-var ConvexBodyFactory = require('./ConvexBodyFactory');
+var convexBodyFactory = require('./convexBodyFactory');
 
-var _Box = ConvexBodyFactory([
+var _Box = convexBodyFactory([
             // Order: back-left,back-right,front-left,front-right
             // Top half
             new Vec3(-100, -100, -100),
@@ -38,7 +38,7 @@ var _Box = ConvexBodyFactory([
             new Vec3(-100, 100, -100),
             new Vec3(100, 100, -100),
             new Vec3(-100, 100, 100),
-            new Vec3(100, 100, 100),
+            new Vec3(100, 100, 100)
         ]);
 
 /**

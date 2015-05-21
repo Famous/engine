@@ -30,13 +30,13 @@ var Constraint = require('./Constraint');
 var SweepAndPrune = require('./collision/SweepAndPrune');
 var BruteForce = require('./collision/BruteForce');
 var ConvexCollision = require('./collision/ConvexCollisionDetection');
-var GJK = ConvexCollision.GJK;
-var EPA = ConvexCollision.EPA;
+var gjk = ConvexCollision.gjk;
+var epa = ConvexCollision.epa;
 var ContactManifoldTable = require('./collision/ContactManifold');
 
 var ObjectManager = require('../../utilities/ObjectManager');
 ObjectManager.register('CollisionData', CollisionData);
-var OMRequestCollisionData = ObjectManager.requestCollisionData;
+var oMRequestCollisionData = ObjectManager.requestCollisionData;
 
 var VEC_REGISTER = new Vec3();
 
@@ -123,7 +123,8 @@ Collision.prototype.constructor = Collision;
  */
 Collision.prototype.init = function() {
     if (this.broadPhase) {
-        if (this.broadPhase instanceof Function) this.broadPhase = new this.broadPhase(this.targets);
+        var BroadPhase = this.broadphase;
+        if (BroadPhase instanceof Function) this.broadPhase = new BroadPhase(this.targets);
     }
     else this.broadPhase = new SweepAndPrune(this.targets);
     this.contactManifoldTable = this.contactManifoldTable || new ContactManifoldTable();
@@ -149,7 +150,8 @@ Collision.prototype.init = function() {
     var potentialCollisions = this.broadPhase.update();
     var pair;
     for (i = 0, len = potentialCollisions.length; i < len; i++) {
-        (pair = potentialCollisions[i]) && this.applyNarrowPhase(pair);
+        pair = potentialCollisions[i];
+        if (pair) this.applyNarrowPhase(pair);
     }
     this.contactManifoldTable.prepContacts(dt);
 };
@@ -239,7 +241,7 @@ Collision.prototype.applyNarrowPhase = function applyNarrowPhase(targets) {
 
             var collisionType = a.type | b.type;
 
-            dispatch[collisionType] && dispatch[collisionType](this, a, b);
+            if (dispatch[collisionType]) dispatch[collisionType](this, a, b);
         }
     }
 };
@@ -273,7 +275,7 @@ function sphereIntersectSphere(context, sphere1, sphere2) {
     var wSphere1 = Vec3.add(p1, rSphere1, new Vec3());
     var wSphere2 = Vec3.add(p2, rSphere2, new Vec3());
 
-    var collisionData = OMRequestCollisionData().reset(overlap, n, wSphere1, wSphere2, rSphere1, rSphere2);
+    var collisionData = oMRequestCollisionData().reset(overlap, n, wSphere1, wSphere2, rSphere1, rSphere2);
 
     context.contactManifoldTable.registerContact(sphere1, sphere2, collisionData);
 }
@@ -337,7 +339,7 @@ function boxIntersectSphere(context, box, sphere) {
     var wBox = Vec3.add(pb, rBox, new Vec3());
     var wSphere = Vec3.add(ps, rSphere, new Vec3());
 
-    var collisionData = OMRequestCollisionData().reset(overlap, n, wBox, wSphere, rBox, rSphere);
+    var collisionData = oMRequestCollisionData().reset(overlap, n, wBox, wSphere, rBox, rSphere);
 
     context.contactManifoldTable.registerContact(box, sphere, collisionData);
 }
@@ -352,12 +354,12 @@ function boxIntersectSphere(context, box, sphere) {
 * @return {undefined} undefined
 */
 function convexIntersectConvex(context, convex1, convex2) {
-    var glkSimplex = GJK(convex1, convex2);
+    var glkSimplex = gjk(convex1, convex2);
 
     // No simplex -> no collision
     if (!glkSimplex) return;
 
-    var collisionData = EPA(convex1, convex2, glkSimplex);
+    var collisionData = epa(convex1, convex2, glkSimplex);
     if (collisionData !== null) context.contactManifoldTable.registerContact(convex1, convex2, collisionData);
 }
 
@@ -394,7 +396,7 @@ function convexIntersectWall(context, convex, wall) {
     var wWall = Vec3.scale(n, penetration, new Vec3()).add(wConvex);
     var rWall = Vec3.subtract(wWall, wall.position, new Vec3());
 
-    var collisionData = OMRequestCollisionData().reset(penetration, invN, wConvex, wWall, rConvex, rWall);
+    var collisionData = oMRequestCollisionData().reset(penetration, invN, wConvex, wWall, rConvex, rWall);
 
     context.contactManifoldTable.registerContact(convex, wall, collisionData);
 }

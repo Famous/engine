@@ -121,7 +121,8 @@ Curve.prototype.update = function update(time, dt) {
         if (this.period === 0) {
             gamma = 0;
             beta = 1;
-        } else {
+        }
+        else {
             var c = _c * m;
             var k = _k * m;
 
