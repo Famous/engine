@@ -137,7 +137,7 @@ function format(text, options) {
 
     for (var i = 0; i < length; i++) {
         line = lines[i];
-        split = lines[i].split(' ');
+        split = lines[i].trim().split(' ');
 
         // Handle vertex positions
 
