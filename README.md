@@ -5,7 +5,10 @@ Famous Engine
 
 The Famous Engine is a free and open source JavaScript rendering engine. What makes the Famous Engine unique is its JavaScript rendering engine and 3D physics engine that gives developers the power and tools to build native quality apps and animations using pure JavaScript. It is designed to allow developers the ability to render to both DOM and WebGL in a unified API.
 
-## Getting Started
+## Getting Started    
+
+We have several [guides & tutorials on our site](http://famous.org/learn/) to help you get up and running with Famous, such as [Hello Famous](http://famous.org/learn/hello-famous.html).
+Here's a quick boilerplate example.
 
 ### Boilerplate
 
@@ -28,10 +31,11 @@ var domEl = new DOMElement(node, {
 ```
 
 In this example, we use the Famous Engine to kick off the rendering process and create a scene for our application.  From here, we can add nodes to our scene and use components to give them the ability to draw.
+For more, here are some deeper dives on [scene graph](http://famous.org/learn/scene-graph.html) and [components](http://famous.org/learn/components.html).
 
-### Famous CLI
+### Installation
 
-The Famous CLI (Command Line Interface), allows for an easy installation of the Famous seed project which will bootstrap you with a small project containing the Famous Engine.  Check out the README in the [famous-cli repository][cli-repo] on Github to learn how to install and create an account with the CLI.
+The easiest way to install and get started with Famous is with the Famous CLI (Command Line Interface), which will bootstrap you with a small project containing the Famous Engine.  Check out the [guide on our site](http://famous.org/get-started.html) or the README in the [famous-cli repository][cli-repo] on Github to learn how to install and create an account with the CLI.
 
 To get a new project, run the following commands:
 
