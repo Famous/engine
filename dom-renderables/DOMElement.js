@@ -355,7 +355,7 @@ DOMElement.prototype.onOpacityChange = function onOpacityChange(opacity) {
 
 /**
  * Method to be invoked by the node as soon as a new UIEvent is being added.
- * This results into an `ADD_EVENT_LISTENER` command being send.
+ * This results into an `ADD_EVENT_LISTENER` command being sent.
  *
  * @param {String} UIEvent UIEvent to be subscribed to (e.g. `click`)
  *

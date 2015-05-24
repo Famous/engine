@@ -28,7 +28,7 @@ var Vec3 = require('../../math/Vec3');
 var convexBodyFactory = require('./convexBodyFactory');
 
 var _Box = convexBodyFactory([
-            // Order: back-left,back-right,front-left,front-right
+            // Order: back-left, back-right, front-left, front-right
             // Top half
             new Vec3(-100, -100, -100),
             new Vec3(100, -100, -100),

@@ -1,18 +1,18 @@
 /**
  * The MIT License (MIT)
- * 
+ *
  * Copyright (c) 2015 Famous Industries Inc.
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -45,17 +45,17 @@ function Clock () {
 /**
  * Sets the scale at which the clock time is passing.
  * Useful for slow-motion or fast-forward effects.
- * 
+ *
  * `1` means no time scaling ("realtime"),
  * `2` means the clock time is passing twice as fast,
  * `0.5` means the clock time is passing two times slower than the "actual"
  * time at which the Clock is being updated via `.step`.
  *
  * Initally the clock time is not being scaled (factor `1`).
- * 
+ *
  * @method  setScale
  * @chainable
- * 
+ *
  * @param {Number} scale    The scale at which the clock time is passing.
  *
  * @return {Clock} this
@@ -67,7 +67,7 @@ Clock.prototype.setScale = function setScale (scale) {
 
 /**
  * @method  getScale
- * 
+ *
  * @return {Number} scale    The scale at which the clock time is passing.
  */
 Clock.prototype.getScale = function getScale () {
@@ -79,8 +79,8 @@ Clock.prototype.getScale = function getScale () {
  *
  * @method  step
  * @chainable
- * 
- * @param  {Number} time high resolution timstamp used for invoking the
+ *
+ * @param  {Number} time high resolution timestamp used for invoking the
  *                       `update` method on all registered objects
  * @return {Clock}       this
  */
@@ -102,8 +102,8 @@ Clock.prototype.step = function step (time) {
  * Returns the internal clock time.
  *
  * @method  now
- * 
- * @return  {Number} time high resolution timstamp used for invoking the
+ *
+ * @return  {Number} time high resolution timestamp used for invoking the
  *                       `update` method on all registered objects
  */
 Clock.prototype.now = function now () {
@@ -115,8 +115,8 @@ Clock.prototype.now = function now () {
  *
  * @method  getTime
  * @deprecated Use #now instead
- * 
- * @return  {Number} time high resolution timstamp used for invoking the
+ *
+ * @return  {Number} time high resolution timestamp used for invoking the
  *                       `update` method on all registered objects
  */
 Clock.prototype.getTime = Clock.prototype.now;
@@ -125,7 +125,7 @@ Clock.prototype.getTime = Clock.prototype.now;
  * Returns the number of frames elapsed so far.
  *
  * @method getFrame
- * 
+ *
  * @return {Number} frames
  */
 Clock.prototype.getFrame = function getFrame () {
@@ -191,7 +191,7 @@ Clock.prototype.setInterval = function setInterval(callback, delay) {
  *
  * @method clearTimer
  * @chainable
- * 
+ *
  * @param  {Function} timer  previously by `Clock#setTimeout` or
  *                              `Clock#setInterval` returned callback function
  * @return {Clock}              this

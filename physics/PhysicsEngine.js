@@ -393,7 +393,7 @@ PhysicsEngine.prototype.update = function update(time) {
  *
  * @method
  * @param {Particle} body The body to retrieve the transform of.
- * @return {Object} Position and rotation of the boy, taking into account
+ * @return {Object} Position and rotation of the body, taking into account
  * the origin and orientation of the world.
  */
 PhysicsEngine.prototype.getTransform = function getTransform(body) {

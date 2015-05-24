@@ -58,7 +58,7 @@ Channel.prototype._enterWorkerMode = function _enterWorkerMode() {
 };
 
 /**
- * Meant to be overriden by `Famous`.
+ * Meant to be overridden by `Famous`.
  * Assigned method will be invoked for every received message.
  *
  * @type {Function}
