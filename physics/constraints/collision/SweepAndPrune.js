@@ -180,7 +180,7 @@ SweepAndPrune.prototype.update = function() {
                         index = row[highID] = _IDPool.length ? _IDPool.pop() : overlaps.length;
                         overlaps[index] = [_entityRegistry[lowID], _entityRegistry[highID]];
                     }
-                // // Else if, for this axis, max point of current and min point of swap
+                // Else if, for this axis, max point of current and min point of swap
                 }
                 else if (current.side & ~swap.side) {
                     // Now not overlapping on this axis -> definitely not overlapping

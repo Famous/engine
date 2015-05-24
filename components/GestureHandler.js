@@ -178,7 +178,7 @@ GestureHandler.prototype.on = function on(ev, cb) {
 };
 
 /**
- * Trigger gestures in the order they were requested, if they occured.
+ * Trigger gestures in the order they were requested, if they occurred.
  *
  * @method
  *

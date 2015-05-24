@@ -51,10 +51,10 @@ var QUAT = [0, 0, 0, 1];
  * exactly one parent. Nodes have an arbitary number of children, which can be
  * dynamically added using @{@link addChild}.
  *
- * Each Nodes have an arbitrary number of `components`. Those components can
+ * Each Node has an arbitrary number of `components`. Those components can
  * send `draw` commands to the renderer or mutate the node itself, in which case
  * they define behavior in the most explicit way. Components that send `draw`
- * commands aare considered `renderables`. From the node's perspective, there is
+ * commands are considered `renderables`. From the node's perspective, there is
  * no distinction between nodes that send draw commands and nodes that define
  * behavior.
  *
@@ -212,7 +212,7 @@ Node.prototype.emit = function emit (event, payload) {
     return this;
 };
 
-// THIS WILL BE DEPRICATED
+// THIS WILL BE DEPRECATED
 Node.prototype.sendDrawCommand = function sendDrawCommand (message) {
     this._globalUpdater.message(message);
     return this;
@@ -355,7 +355,7 @@ Node.prototype.getUpdater = function getUpdater () {
  *
  * @method isMounted
  *
- * @return {Boolean}    Boolean indicating weather the node is mounted or not.
+ * @return {Boolean}    Boolean indicating whether the node is mounted or not.
  */
 Node.prototype.isMounted = function isMounted () {
     return this.value.showState.mounted;
@@ -366,7 +366,7 @@ Node.prototype.isMounted = function isMounted () {
  *
  * @method isShown
  *
- * @return {Boolean}    Boolean indicating weather the node is visible
+ * @return {Boolean}    Boolean indicating whether the node is visible
  *                      ("shown") or not.
  */
 Node.prototype.isShown = function isShown () {
@@ -602,7 +602,7 @@ Node.prototype.removeChild = function removeChild (child) {
  *
  * @method addComponent
  *
- * @param {Object} component    An component to be added.
+ * @param {Object} component    A component to be added.
  * @return {Number} index       The index at which the component has been
  *                              registered. Indices aren't necessarily
  *                              consecutive.
@@ -626,7 +626,7 @@ Node.prototype.addComponent = function addComponent (component) {
 /**
  * @method  getComponent
  *
- * @param  {Number} index   Index at which the component has been regsitered
+ * @param  {Number} index   Index at which the component has been registered
  *                          (using `Node#addComponent`).
  * @return {*}              The component registered at the passed in index (if
  *                          any).
@@ -640,7 +640,7 @@ Node.prototype.getComponent = function getComponent (index) {
  *
  * @method removeComponent
  *
- * @param  {Object} component   An component that has previously been added
+ * @param  {Object} component   A component that has previously been added
  *                              using @{@link addComponent}.
  *
  * @return {Node} this
@@ -1101,7 +1101,7 @@ Node.prototype.setOpacity = function setOpacity (val) {
 };
 
 /**
- * Sets the size mode being used for determining the nodes final width, height
+ * Sets the size mode being used for determining the node's final width, height
  * and depth.
  * Size modes are a way to define the way the node's size is being calculated.
  * Size modes are enums set on the @{@link Size} constructor (and aliased on
@@ -1109,7 +1109,7 @@ Node.prototype.setOpacity = function setOpacity (val) {
  *
  * @example
  * node.setSizeMode(Node.RELATIVE_SIZE, Node.ABSOLUTE_SIZE, Node.ABSOLUTE_SIZE);
- * // Instead of null, any proporional height or depth can be passed in, since
+ * // Instead of null, any proportional height or depth can be passed in, since
  * // it would be ignored in any case.
  * node.setProportionalSize(0.5, null, null);
  * node.setAbsoluteSize(null, 100, 200);
@@ -1215,7 +1215,7 @@ Node.prototype.setProportionalSize = function setProportionalSize (x, y, z) {
 };
 
 /**
- * Differential sizing can be used to add or subtract an absolute size from a
+ * Differential sizing can be used to add or subtract an absolute size from an
  * otherwise proportionally sized node.
  * E.g. a differential width of `-10` and a proportional width of `0.5` is
  * being interpreted as setting the node's size to 50% of its parent's width
@@ -1257,7 +1257,7 @@ Node.prototype.setDifferentialSize = function setDifferentialSize (x, y, z) {
 };
 
 /**
- * Sets the nodes size in pixels, independent of its parent.
+ * Sets the node's size in pixels, independent of its parent.
  *
  * @method setAbsoluteSize
  *
@@ -1354,7 +1354,7 @@ Node.prototype._sizeChanged = function _sizeChanged (size) {
 };
 
 /**
- * Method for getting the current frame. Will be depricated.
+ * Method for getting the current frame. Will be deprecated.
  *
  * @method
  *
@@ -1381,7 +1381,7 @@ Node.prototype.getComponents = function getComponents () {
  *
  * @method update
  *
- * @param  {Number} time    high-resolution timstamp, usually retrieved using
+ * @param  {Number} time    high-resolution timestamp, usually retrieved using
  *                          requestAnimationFrame
  *
  * @return {Node} this
