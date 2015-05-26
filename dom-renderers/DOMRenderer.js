@@ -104,16 +104,80 @@ function DOMRenderer (element, selector, compositor) {
  *
  * @return {undefined} undefined
  */
-DOMRenderer.prototype.subscribe = function subscribe(type, preventDefault) {
-    // TODO preventDefault should be a separate command
+DOMRenderer.prototype.subscribe = function subscribe(type) {
     this._assertTargetLoaded();
-
-    this._target.preventDefault[type] = preventDefault;
+    this._listen(type);
     this._target.subscribe[type] = true;
+};
+
+/**
+ * Unsubscribes from all events that are of the specified type.
+ *
+ * @method
+ *
+ * @param  {String} type    Event type to unsubscribe from.
+ * @return {undefined}      undefined
+ */
+DOMRenderer.prototype.unsubscribe = function unsubscribe(type) {
+    this._assertTargetLoaded();
+    this._listen(type);
+    this._target.subscribe[type] = false;
+};
+
+/**
+ * Used to preventDefault if an event of the specified type is being emitted on
+ * the currently loaded target.
+ *
+ * @method
+ *
+ * @param  {String} type    The type of events that should be prevented.
+ * @return {undefined}      undefined
+ */
+DOMRenderer.prototype.preventDefault = function preventDefault(type) {
+    this._assertTargetLoaded();
+    this._listen(type);
+    this._target.preventDefault[type] = true;
+};
+
+/**
+ * Used to undo a previous call to preventDefault. No longer `preventDefault`
+ * for this event on the loaded target.
+ *
+ * @method
+ * @private
+ *
+ * @param  {String} type    The event type that should no longer be affected by
+ *                          `preventDefault`.
+ * @return {undefined}      undefined
+ */
+DOMRenderer.prototype.allowDefault = function allowDefault(type) {
+    this._assertTargetLoaded();
+    this._listen(type);
+    this._target.preventDefault[type] = false;
+};
+
+/**
+ * Internal helper function used for adding an event listener for the the
+ * currently loaded ElementCache.
+ *
+ * If the event can be delegated as specified in the {@link EventMap}, the
+ * bound {@link _triggerEvent} function will be added as a listener on the
+ * root element. Otherwise, the listener will be added directly to the target
+ * element.
+ *
+ * @private
+ * @method
+ *
+ * @param  {String} type    The event type to listen to (e.g. click).
+ * @return {undefined}      undefined
+ */
+DOMRenderer.prototype._listen = function _listen(type) {
+    this._assertTargetLoaded();
 
     if (
         !this._target.listeners[type] && !this._root.listeners[type]
     ) {
+        // FIXME Add to content DIV if available
         var target = eventMap[type][1] ? this._root : this._target;
         target.listeners[type] = this._boundTriggerEvent;
         target.element.addEventListener(type, this._boundTriggerEvent);
@@ -143,17 +207,17 @@ DOMRenderer.prototype._triggerEvent = function _triggerEvent(ev) {
         var path = evPath[i].dataset.faPath;
         if (!path) continue;
 
+        // Optionally preventDefault. This needs forther consideration and
+        // should be optional. Eventually this should be a separate command/
+        // method.
+        if (this._elements[path].preventDefault[ev.type]) {
+            ev.preventDefault();
+        }
+
         // Stop further event propogation and path traversal as soon as the
         // first ElementCache subscribing for the emitted event has been found.
         if (this._elements[path] && this._elements[path].subscribe[ev.type]) {
             ev.stopPropagation();
-
-            // Optionally preventDefault. This needs forther consideration and
-            // should be optional. Eventually this should be a separate command/
-            // method.
-            if (this._elements[path].preventDefault[ev.type]) {
-                ev.preventDefault();
-            }
 
             var NormalizedEventConstructor = eventMap[ev.type][0];
 

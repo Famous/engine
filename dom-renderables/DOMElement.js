@@ -288,17 +288,17 @@ DOMElement.prototype.onOpacityChange = function onOpacityChange(opacity) {
  * Method to be invoked by the node as soon as a new UIEvent is being added.
  * This results into an `ADD_EVENT_LISTENER` command being sent.
  *
- * @param {String} UIEvent UIEvent to be subscribed to (e.g. `click`)
+ * @param {String} uiEvent uiEvent to be subscribed to (e.g. `click`)
  *
  * @return {undefined} undefined
  */
-DOMElement.prototype.onAddUIEvent = function onAddUIEvent(UIEvent) {
-    if (this._UIEvents.indexOf(UIEvent) === -1) {
-        this._subscribe(UIEvent);
-        this._UIEvents.push(UIEvent);
+DOMElement.prototype.onAddUIEvent = function onAddUIEvent(uiEvent) {
+    if (this._UIEvents.indexOf(uiEvent) === -1) {
+        this._subscribe(uiEvent);
+        this._UIEvents.push(uiEvent);
     }
     else if (this._inDraw) {
-        this._subscribe(UIEvent);
+        this._subscribe(uiEvent);
     }
     return this;
 };
@@ -309,13 +309,50 @@ DOMElement.prototype.onAddUIEvent = function onAddUIEvent(UIEvent) {
  * @method
  * @private
  *
- * @param {String} UIEvent Event type (e.g. `click`)
+ * @param {String} uiEvent Event type (e.g. `click`)
  *
  * @return {undefined} undefined
  */
-DOMElement.prototype._subscribe = function _subscribe (UIEvent) {
+DOMElement.prototype._subscribe = function _subscribe (uiEvent) {
     if (this._initialized) {
-        this._changeQueue.push('SUBSCRIBE', UIEvent, true);
+        this._changeQueue.push('SUBSCRIBE', uiEvent);
+    }
+    if (!this._requestingUpdate) this._requestUpdate();
+};
+
+/**
+ * When running in a worker, the browser's default action for specific events
+ * can't be prevented on a case by case basis (via `e.preventDefault()`).
+ * Instead this function should be used to register an event to be prevented by
+ * default.
+ *
+ * @method
+ *
+ * @param  {String} uiEvent     UI Event (e.g. wheel) for which to prevent the
+ *                              browser's default action (e.g. form submission,
+ *                              scrolling)
+ * @return {undefined}          undefined
+ */
+DOMElement.prototype.preventDefault = function preventDefault (uiEvent) {
+    if (this._initialized) {
+        this._changeQueue.push('PREVENT_DEFAULT', uiEvent);
+    }
+    if (!this._requestingUpdate) this._requestUpdate();
+};
+
+/**
+ * Opposite of {@link DOMElement#preventDefault}. No longer prevent the
+ * browser's default action on subsequent events of this type.
+ *
+ * @method
+ *
+ * @param  {type} uiEvent       UI Event previously registered using
+ *                              {@link DOMElement#preventDefault}.
+ * @return {undefined}          undefined
+ */
+DOMElement.prototype.allowDefault = function allowDefault (uiEvent) {
+    if (this._initialized) {
+        this._changeQueue.push('ALLOW_DEFAULT', uiEvent);
     }
     if (!this._requestingUpdate) this._requestUpdate();
 };
