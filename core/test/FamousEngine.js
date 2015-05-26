@@ -28,6 +28,7 @@ var test = require('tape');
 var FamousEngine = require('../FamousEngine');
 var Clock = require('../Clock');
 var Scene = require('../Scene');
+var Commands = require('../Commands');
 
 function onUpdateWrap(fn) {
     return {
@@ -48,7 +49,7 @@ test('FamousEngine', function(t) {
         FamousEngine.getChannel().onmessage = function(commands) {
             t.deepEqual(
                 commands,
-                ['TIME', 10],
+                [Commands.TIME, 10],
                 'FamousEngine should send the [TIME, ...] commmand when ' +
                 'running .step on it'
             );
