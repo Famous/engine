@@ -134,9 +134,14 @@ function WebGLRenderer(canvas, compositor) {
             bufferNames: ['a_pos'],
             type: 'TRIANGLE_STRIP'
         }
-    }
+    };
 
-    this.bufferRegistry.allocate(this.cutoutGeometry.spec.id, cutout.spec.bufferNames[0], cutout.spec.bufferValues[0], 3);
+    this.bufferRegistry.allocate(
+        this.cutoutGeometry.spec.id,
+        cutout.spec.bufferNames[0],
+        cutout.spec.bufferValues[0],
+        3
+    );
 }
 
 /**
