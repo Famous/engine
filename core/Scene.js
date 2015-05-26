@@ -1,18 +1,18 @@
 /**
  * The MIT License (MIT)
- * 
+ *
  * Copyright (c) 2015 Famous Industries Inc.
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -45,19 +45,29 @@ var Size = require('./Size');
  *                 the renderers and update nodes in the scene graph
  */
 function Scene (selector, updater) {
+    var _this = this;
+
     if (!selector) throw new Error('Scene needs to be created with a DOM selector');
     if (!updater) throw new Error('Scene needs to be created with a class like Famous');
 
     Node.call(this);         // Scene inherits from node
 
-    this._updater = updater; // The updater that will both
-                             // send messages to the renderers
-                             // and update dirty nodes 
+    this._originalUpdater = updater;
+
+    // The updater that will both send messages to the renderers and update
+    // dirty nodes
+    this._updater = Object.create(updater);
+
+    this._messages = [];
+    this._updater.message = function(message) {
+        _this._messages.push(message);
+        return this;
+    };
 
     this._dispatch = new Dispatch(this); // instantiates a dispatcher
                                          // to send events to the scene
                                          // graph below this context
-    
+
     this._selector = selector; // reference to the DOM selector
                                // that represents the elemnent
                                // in the dom that this context
@@ -65,8 +75,8 @@ function Scene (selector, updater) {
 
     this.onMount(this, selector); // Mount the context to itself
                                   // (it is its own parent)
-    
-    this._updater                  // message a request for the dom
+
+    updater                        // message a request for the dom
         .message('NEED_SIZE_FOR')  // size of the context so that
         .message(selector);        // the scene graph has a total size
 
@@ -122,8 +132,7 @@ Scene.prototype.onReceive = function onReceive (event, payload) {
     // and the context would receive its size the same way that any render size
     // component receives its size.
     if (event === 'CONTEXT_RESIZE') {
-        
-        if (payload.length < 2) 
+        if (payload.length < 2)
             throw new Error(
                     'CONTEXT_RESIZE\'s payload needs to be at least a pair' +
                     ' of pixel sizes'
@@ -134,8 +143,12 @@ Scene.prototype.onReceive = function onReceive (event, payload) {
                              payload[1],
                              payload[2] ? payload[2] : 0);
 
+        this._updater = this._originalUpdater;
+
+        for (var i = 0; i < this._messages.length; i++) {
+            this._updater.message(this._messages[i]);
+        }
     }
 };
 
 module.exports = Scene;
-
