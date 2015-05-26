@@ -64,10 +64,6 @@ function WebGLRenderer(canvas, compositor) {
     this.canvas = canvas;
     this.compositor = compositor;
 
-    for (var key in this.constructor.DEFAULT_STYLES) {
-        this.canvas.style[key] = this.constructor.DEFAULT_STYLES[key];
-    }
-
     var gl = this.gl = this.getWebGLContext(this.canvas);
 
     gl.clearColor(0.0, 0.0, 0.0, 0.0);
@@ -780,14 +776,16 @@ WebGLRenderer.prototype.drawBuffers = function drawBuffers(vertexBuffers, mode, 
  * @return {undefined} undefined
  */
 WebGLRenderer.prototype.updateSize = function updateSize(size) {
-    if (size) {
-        this.cachedSize[0] = size[0];
-        this.cachedSize[1] = size[1];
-        this.cachedSize[2] = (size[0] > size[1]) ? size[0] : size[1];
-    }
+    var pixelRatio = window.devicePixelRatio || 1;
+    var displayWidth = ~~(size[0] * pixelRatio);
+    var displayHeight = ~~(size[1] * pixelRatio);
+    this.canvas.width = displayWidth;
+    this.canvas.height = displayHeight;
+    this.gl.viewport(0, 0, displayWidth, displayHeight);
 
-    this.gl.viewport(0, 0, this.cachedSize[0], this.cachedSize[1]);
-
+    this.cachedSize[0] = size[0];
+    this.cachedSize[1] = size[1];
+    this.cachedSize[2] = (size[0] > size[1]) ? size[0] : size[1];
     this.resolutionValues[0] = this.cachedSize;
     this.program.setUniforms(this.resolutionName, this.resolutionValues);
 
