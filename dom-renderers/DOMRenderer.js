@@ -100,12 +100,32 @@ function DOMRenderer (element, selector, compositor) {
  *
  * @return {undefined} undefined
  */
-DOMRenderer.prototype.subscribe = function subscribe(type, preventDefault) {
-    // TODO preventDefault should be a separate command
+DOMRenderer.prototype.subscribe = function subscribe(type) {
     this._assertTargetLoaded();
-
-    this._target.preventDefault[type] = preventDefault;
+    this._listen(type);
     this._target.subscribe[type] = true;
+};
+
+DOMRenderer.prototype.unsubscribe = function unsubscribe(type) {
+    this._assertTargetLoaded();
+    this._listen(type);
+    this._target.subscribe[type] = false;
+};
+
+DOMRenderer.prototype.preventDefault = function preventDefault(type) {
+    this._assertTargetLoaded();
+    this._listen(type);
+    this._target.preventDefault[type] = true;
+};
+
+DOMRenderer.prototype.promoteDefault = function promoteDefault(type) {
+    this._assertTargetLoaded();
+    this._listen(type);
+    this._target.preventDefault[type] = false;
+};
+
+DOMRenderer.prototype._listen = function _listen(type) {
+    this._assertTargetLoaded();
 
     if (
         !this._target.listeners[type] && !this._root.listeners[type]
@@ -139,17 +159,17 @@ DOMRenderer.prototype._triggerEvent = function _triggerEvent(ev) {
         var path = evPath[i].dataset.faPath;
         if (!path) continue;
 
+        // Optionally preventDefault. This needs forther consideration and
+        // should be optional. Eventually this should be a separate command/
+        // method.
+        if (this._elements[path].preventDefault[ev.type]) {
+            ev.preventDefault();
+        }
+
         // Stop further event propogation and path traversal as soon as the
         // first ElementCache subscribing for the emitted event has been found.
         if (this._elements[path].subscribe[ev.type]) {
             ev.stopPropagation();
-
-            // Optionally preventDefault. This needs forther consideration and
-            // should be optional. Eventually this should be a separate command/
-            // method.
-            if (this._elements[path].preventDefault[ev.type]) {
-                ev.preventDefault();
-            }
 
             var NormalizedEventConstructor = eventMap[ev.type][0];
 

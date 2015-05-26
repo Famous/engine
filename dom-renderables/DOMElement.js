@@ -357,17 +357,17 @@ DOMElement.prototype.onOpacityChange = function onOpacityChange(opacity) {
  * Method to be invoked by the node as soon as a new UIEvent is being added.
  * This results into an `ADD_EVENT_LISTENER` command being send.
  *
- * @param {String} UIEvent UIEvent to be subscribed to (e.g. `click`)
+ * @param {String} uiEvent uiEvent to be subscribed to (e.g. `click`)
  *
  * @return {undefined} undefined
  */
-DOMElement.prototype.onAddUIEvent = function onAddUIEvent(UIEvent) {
-    if (this._UIEvents.indexOf(UIEvent) === -1) {
-        this._subscribe(UIEvent);
-        this._UIEvents.push(UIEvent);
+DOMElement.prototype.onAddUIEvent = function onAddUIEvent(uiEvent) {
+    if (this._UIEvents.indexOf(uiEvent) === -1) {
+        this._subscribe(uiEvent);
+        this._UIEvents.push(uiEvent);
     }
     else if (this._inDraw) {
-        this._subscribe(UIEvent);
+        this._subscribe(uiEvent);
     }
     return this;
 };
@@ -378,16 +378,27 @@ DOMElement.prototype.onAddUIEvent = function onAddUIEvent(UIEvent) {
  * @method
  * @private
  *
- * @param {String} UIEvent Event type (e.g. `click`)
+ * @param {String} uiEvent Event type (e.g. `click`)
  *
  * @return {undefined} undefined
  */
-DOMElement.prototype._subscribe = function _subscribe (UIEvent) {
+DOMElement.prototype._subscribe = function _subscribe (uiEvent) {
     if (this._initialized) {
-        this._changeQueue.push('SUBSCRIBE', UIEvent, true);
+        this._changeQueue.push('SUBSCRIBE', uiEvent);
     }
-    if (!this._requestingUpdate) {
-        this._requestUpdate();
+    if (!this._requestingUpdate) this._requestUpdate();
+};
+
+DOMElement.prototype.preventDefault = function preventDefault (uiEvent) {
+    if (this._initialized) {
+        this._changeQueue.push('PREVENT_DEFAULT', uiEvent);
+    }
+    if (!this._requestingUpdate) this._requestUpdate();
+};
+
+DOMElement.prototype.promoteDefault = function promoteDefault (uiEvent) {
+    if (this._initialized) {
+        this._changeQueue.push('PROMOTE_DEFAULT', uiEvent);
     }
     if (!this._requestingUpdate) this._requestUpdate();
 };
