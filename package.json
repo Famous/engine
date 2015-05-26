@@ -29,7 +29,7 @@
     "url": "https://github.com/Famous/engine.git"
   },
   "author": "Famous",
-  "license": "All rights reserved",
+  "license": "MIT",
   "devDependencies": {
     "browserify": "^9.0.3",
     "eslint": "^0.21.2",
