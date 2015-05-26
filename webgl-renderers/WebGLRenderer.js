@@ -26,7 +26,6 @@
 
 var Program = require('./Program');
 var BufferRegistry = require('./BufferRegistry');
-var Plane = require('../webgl-geometries/primitives/Plane');
 var sorter = require('./radixSort');
 var keyValueToArrays = require('../utilities/keyValueToArrays');
 var TextureManager = require('./TextureManager');
@@ -128,12 +127,16 @@ function WebGLRenderer(canvas, compositor) {
 
     // TODO: remove this hack
 
-    var cutout = this.cutoutGeometry = new Plane();
+    var cutout = this.cutoutGeometry = {
+        spec: {
+            id: -1,
+            bufferValues: [[-1, -1, 0, 1, -1, 0, -1, 1, 0, 1, 1, 0]],
+            bufferNames: ['a_pos'],
+            type: 'TRIANGLE_STRIP'
+        }
+    }
 
-    this.bufferRegistry.allocate(cutout.spec.id, 'a_pos', cutout.spec.bufferValues[0], 3);
-    this.bufferRegistry.allocate(cutout.spec.id, 'a_texCoord', cutout.spec.bufferValues[1], 2);
-    this.bufferRegistry.allocate(cutout.spec.id, 'a_normals', cutout.spec.bufferValues[2], 3);
-    this.bufferRegistry.allocate(cutout.spec.id, 'indices', cutout.spec.bufferValues[3], 1);
+    this.bufferRegistry.allocate(this.cutoutGeometry.spec.id, cutout.spec.bufferNames[0], cutout.spec.bufferValues[0], 3);
 }
 
 /**
@@ -587,10 +590,11 @@ WebGLRenderer.prototype.drawCutouts = function drawCutouts() {
     var buffers;
     var len = this.cutoutRegistryKeys.length;
 
-    if (len) {
-        this.gl.enable(this.gl.BLEND);
-        this.gl.depthMask(true);
-    }
+    if (!len) return;
+
+    this.gl.disable(this.gl.CULL_FACE);
+    this.gl.enable(this.gl.BLEND);
+    this.gl.depthMask(true);
 
     for (var i = 0; i < len; i++) {
         cutout = this.cutoutRegistry[this.cutoutRegistryKeys[i]];
@@ -601,6 +605,8 @@ WebGLRenderer.prototype.drawCutouts = function drawCutouts() {
         this.program.setUniforms(cutout.uniformKeys, cutout.uniformValues);
         this.drawBuffers(buffers, cutout.drawType, cutout.geometry);
     }
+
+    this.gl.enable(this.gl.CULL_FACE);
 };
 
 /**
