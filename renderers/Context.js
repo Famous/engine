@@ -51,10 +51,11 @@ require('./styles.css');
  *
  * @return {undefined} undefined
  */
-function Context(el, selector, compositor) {
-    this._rootEl = el;
-    this._selector = selector;
+function Context(selector, compositor) {
     this._compositor = compositor;
+    this._rootEl = document.querySelector(selector);
+
+    this._selector = selector;
 
     // Create DOM element to be used as root for all famous DOM
     // rendering and append element to the root element.
