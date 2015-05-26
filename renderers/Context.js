@@ -234,7 +234,22 @@ Context.prototype.receive = function receive(path, commands, iterator) {
 
             case 'SUBSCRIBE':
                 if (this.WebGLRenderer) this.WebGLRenderer.getOrSetCutout(path);
-                this.DOMRenderer.subscribe(commands[++localIterator], commands[++localIterator]);
+                this.DOMRenderer.subscribe(commands[++localIterator]);
+                break;
+
+            case 'UNSUBSCRIBE':
+                if (this.WebGLRenderer) this.WebGLRenderer.getOrSetCutout(path);
+                this.DOMRenderer.unsubscribe(commands[++localIterator]);
+                break;
+
+            case 'PREVENT_DEFAULT':
+                if (this.WebGLRenderer) this.WebGLRenderer.getOrSetCutout(path);
+                this.DOMRenderer.preventDefault(commands[++localIterator]);
+                break;
+
+            case 'PROMOTE_DEFAULT':
+                if (this.WebGLRenderer) this.WebGLRenderer.getOrSetCutout(path);
+                this.DOMRenderer.promoteDefault(commands[++localIterator]);
                 break;
 
             case 'GL_SET_DRAW_OPTIONS':
