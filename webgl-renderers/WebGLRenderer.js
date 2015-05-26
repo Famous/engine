@@ -64,10 +64,6 @@ function WebGLRenderer(canvas, compositor) {
     this.canvas = canvas;
     this.compositor = compositor;
 
-    for (var key in this.constructor.DEFAULT_STYLES) {
-        this.canvas.style[key] = this.constructor.DEFAULT_STYLES[key];
-    }
-
     var gl = this.gl = this.getWebGLContext(this.canvas);
 
     gl.clearColor(0.0, 0.0, 0.0, 0.0);
@@ -833,14 +829,6 @@ WebGLRenderer.prototype.resetOptions = function resetOptions(options) {
     if (!options) return;
     if (options.blending) gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
     if (options.side === 'back') gl.cullFace(gl.BACK);
-};
-
-WebGLRenderer.DEFAULT_STYLES = {
-    pointerEvents: 'none',
-    position: 'absolute',
-    zIndex: 1,
-    top: '0px',
-    left: '0px'
 };
 
 module.exports = WebGLRenderer;
