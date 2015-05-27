@@ -44,6 +44,8 @@ var TIME_UPDATE = ['TIME', null];
  * @constructor
  */
 function FamousEngine() {
+    var _this = this;
+
     this._updateQueue = []; // The updateQueue is a place where nodes
                             // can place themselves in order to be
                             // updated on the frame.
@@ -68,7 +70,9 @@ function FamousEngine() {
                                // graph.
 
     this._channel = new Channel();
-    this._channel.onMessage = this.handleMessage.bind(this);
+    this._channel.onMessage = function (message) {
+        _this.handleMessage(message);
+    };
 }
 
 
