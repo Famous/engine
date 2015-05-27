@@ -74,7 +74,7 @@ function Context(selector, compositor) {
     this._webGLRenderer = null;
     this._domRenderer = new DOMRenderer(this._domRendererRootEl, selector, compositor);
     this._canvasEl = null;
-
+    
     // State holders
 
     this._renderState = {
