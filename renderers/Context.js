@@ -63,9 +63,12 @@ function Context(selector, compositor) {
     var DOMLayerEl = document.createElement('div');
     this._rootEl.appendChild(DOMLayerEl);
 
+    // Instantiate renderers
+
+    this.DOMRenderer = new DOMRenderer(DOMLayerEl, selector, compositor);
     this.WebGLRenderer = null;
     this._canvasEl = null;
-
+    
     // State holders
 
     this._renderState = {
