@@ -86,6 +86,8 @@ TextureManager.prototype.update = function update(time) {
  * @return {undefined}      undefined
  */
 TextureManager.prototype.register = function register(input, slot) {
+    var _this = this;
+
     var source = input.data;
     var textureId = input.id;
     var options = input.options || {};
@@ -121,24 +123,24 @@ TextureManager.prototype.register = function register(input, slot) {
 
         else if (window && source instanceof window.HTMLVideoElement) {
             source.addEventListener('loadeddata', function() {
-                this.bindTexture(textureId);
+                _this.bindTexture(textureId);
                 texture.setImage(source);
 
                 spec.isLoaded = true;
                 spec.source = source;
-            }.bind(this));
+            });
         }
 
         // Handle image url
 
         else if (typeof source === 'string') {
             loadImage(source, function (img) {
-                this.bindTexture(textureId);
+                _this.bindTexture(textureId);
                 texture.setImage(img);
 
                 spec.isLoaded = true;
                 spec.source = img;
-            }.bind(this));
+            });
         }
     }
 

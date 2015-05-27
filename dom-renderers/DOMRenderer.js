@@ -45,6 +45,8 @@ var TRANSFORM = null;
  * @param {Compositor} compositor the compositor controlling the renderer
  */
 function DOMRenderer (element, selector, compositor) {
+    var _this = this;
+
     element.classList.add('famous-dom-renderer');
 
     TRANSFORM = TRANSFORM || vendorPrefix('transform');
@@ -70,7 +72,9 @@ function DOMRenderer (element, selector, compositor) {
                                                       // renderer is responsible
                                                       // for
 
-    this._boundTriggerEvent = this._triggerEvent.bind(this);
+    this._boundTriggerEvent = function (ev) {
+        return _this._triggerEvent(ev);
+    };
 
     this._selector = selector;
 
