@@ -77,6 +77,7 @@ function DOMElement(node, options) {
     this._id = node.addComponent(this);
 
     this._renderSize = [0, 0, 0];
+    this.onSizeModeChange.apply(this, node.getSizeMode());
 
     this._callbacks = new CallbackStore();
 
