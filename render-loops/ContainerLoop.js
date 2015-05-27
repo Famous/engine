@@ -31,8 +31,9 @@ var now = require('./now');
  * `update` method invocations to the refresh rate of the screen.
  * Does not normalize the high resolution timestamp when being consecutively
  * started and stopped.
- * 
+ *
  * @class ContainerLoop
+ * @deprecated @link{UIManager} automatically handles received window messages.
  */
 function ContainerLoop() {
     this._updates = [];
