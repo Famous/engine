@@ -104,11 +104,9 @@ test('Node', function(t) {
     });
 
     t.test('getLocation method', function(t) {
-        t.plan(2);
         var node = new Node();
         t.equal(typeof node.getLocation, 'function', 'node.getLocation should be a function');
-        node.mount(createMockNode(), 'body/1/2/3');
-        t.equal(node.getLocation(), 'body/1/2/3', 'node.getLocation() should return path');
+        t.end();
     });
 
     t.test('getId method', function(t) {

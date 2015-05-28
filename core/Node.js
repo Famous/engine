@@ -192,7 +192,7 @@ Node.prototype.getLocation = function getLocation () {
 Node.prototype.getId = Node.prototype.getLocation;
 
 /**
- * Globally dispatches the event using the Scene's Dispatch. All nodes will
+ * Globally dispatches the event using the Dispatch. All descendent nodes will
  * receive the dispatched event.
  *
  * @method emit
@@ -729,10 +729,7 @@ Node.prototype._vecOptionalSet = function _vecOptionalSet (vec, index, val) {
  */
 Node.prototype.show = function show () {
     Dispatch.show(this.getLocation());
-    return this;
-};
 
-Node.prototype.onShow = function onShow () {
     var i = 0;
     var items = this._components;
     var len = items.length;
@@ -744,6 +741,8 @@ Node.prototype.onShow = function onShow () {
         item = items[i];
         if (item && item.onShow) item.onShow();
     }
+
+    return this;
 };
 
 /**
@@ -1289,19 +1288,69 @@ Node.prototype.setAbsoluteSize = function setAbsoluteSize (x, y, z) {
  *
  * @method
  *
- * @param {Float32Array} transform The transform that has changed
+ * @param {Transform} transform The transform that has changed
  *
  * @return {undefined} undefined
  */
-Node.prototype.onTransformChange = function onTransformChange (transform) {
+Node.prototype.transformChange = function transformChange (transform) {
     var i = 0;
     var items = this._components;
     var len = items.length;
     var item;
 
+    if (this.onTransformChange) this.onTransformChange();
+
     for (; i < len ; i++) {
         item = items[i];
         if (item && item.onTransformChange) item.onTransformChange(transform);
+    }
+};
+
+/**
+ * Private method for alerting all components that this nodes
+ * local transform has changed
+ *
+ * @method
+ *
+ * @param {Float32Array} transform The local transform
+ *
+ * @return {undefined} undefined
+ */
+Node.prototype.localTransformChange = function localTransformChange (transform) {
+    var i = 0;
+    var items = this._components;
+    var len = items.length;
+    var item;
+
+    if (this.onLocalTransformChange) this.onLocalTransformChange(transform);
+
+    for (; i < len ; i++) {
+        item = items[i];
+        if (item && item.onLocalTransformChange) item.onLocalTransformChange(transform);
+    }
+};
+
+/**
+ * Private method for alerting all components that this node's
+ * world transform has changed
+ *
+ * @method
+ *
+ * @param {Float32Array} transform the world transform
+ *
+ * @return {undefined} undefined
+ */
+Node.prototype.worldTransformChange = function worldTransformChange (transform) {
+    var i = 0;
+    var items = this._components;
+    var len = items.length;
+    var item;
+
+    if (this.onWorldTransformChange) this.onWorldTransformChange(transform);
+
+    for (; i < len ; i++) {
+        item = items[i];
+        if (item && item.onWorldTransformChange) item.onWorldTransformChange(transform)
     }
 };
 
@@ -1315,24 +1364,17 @@ Node.prototype.onTransformChange = function onTransformChange (transform) {
  *
  * @return {undefined} undefined
  */
-Node.prototype._sizeChanged = function _sizeChanged (size) {
+Node.prototype.sizeChange = function sizeChange (size) {
     var i = 0;
     var items = this._components;
     var len = items.length;
     var item;
 
+    if (this.onSizeChange) this.onSizeChange(size);
+
     for (; i < len ; i++) {
         item = items[i];
         if (item && item.onSizeChange) item.onSizeChange(size);
-    }
-
-    i = 0;
-    items = this._children;
-    len = items.length;
-
-    for (; i < len ; i++) {
-        item = items[i];
-        if (item && item.onParentSizeChange) item.onParentSizeChange(size);
     }
 };
 
@@ -1375,16 +1417,14 @@ Node.prototype.update = function update (time){
     var queue = this._updateQueue;
     var item;
 
+    if (this.onUpdate) this.onUpdate();
+
     while (nextQueue.length) queue.unshift(nextQueue.pop());
 
     while (queue.length) {
         item = this._components[queue.shift()];
         if (item && item.onUpdate) item.onUpdate(time);
     }
-
-    var sizeChanged = SIZE_PROCESSOR.fromSpecWithParent(this.getParent().getSize(), this, this.getSize());
-
-    if (sizeChanged) this._sizeChanged(this.getSize());
 
     this._inUpdate = false;
     this._requestingUpdate = false;
@@ -1422,8 +1462,6 @@ Node.prototype.mount = function mount (path) {
     var len = list.length;
     var item;
 
-    TransformSystem.registerTransformAtPath(path);
-
     var parent = Dispatch.getNode(pathUtils.parent(path));
     this._parent = parent;
     this._globalUpdater = parent.getUpdater();
@@ -1432,12 +1470,14 @@ Node.prototype.mount = function mount (path) {
 
     TransformSystem.registerTransformAtPath(path);
 
+    if (this.onMount) this.onMount();
+
     for (; i < len ; i++) {
         item = list[i];
         if (item && item.onMount) item.onMount(this, i);
     }
 
-    if (!this._requestingUpdate) this._requestUpdate(true);
+    if (!this._requestingUpdate) this._requestUpdate();
     return this;
 
 };
@@ -1469,7 +1509,6 @@ Node.prototype.dismount = function dismount () {
     }
 
     if (!this._requestingUpdate) this._requestUpdate();
-
 };
 
 /**
@@ -1495,82 +1534,5 @@ Node.prototype.receive = function receive (type, ev) {
     return this;
 };
 
-
-/**
- * Private method to avoid accidentally passing arguments
- * to update events.
- *
- * @method
- *
- * @return {undefined} undefined
- */
-Node.prototype._requestUpdateWithoutArgs = function _requestUpdateWithoutArgs () {
-    if (!this._requestingUpdate) this._requestUpdate();
-};
-
-/**
- * A method to execute logic on update. Defaults to the
- * node's .update method.
- *
- * @method
- *
- * @param {Number} current time
- *
- * @return {undefined} undefined
- */
-Node.prototype.onUpdate = Node.prototype.update;
-
-/**
- * A method to execute logic when a parent node is shown. Delegates
- * to Node.show.
- *
- * @method
- *
- * @return {Node} this
- */
-Node.prototype.onParentShow = Node.prototype.show;
-
-/**
- * A method to execute logic when the parent is hidden. Delegates
- * to Node.hide.
- *
- * @method
- *
- * @return {Node} this
- */
-Node.prototype.onParentHide = Node.prototype.hide;
-
-/**
- * A method to execute logic when the parent transform changes.
- * Delegates to Node._requestUpdateWithoutArgs.
- *
- * @method
- *
- * @return {undefined} undefined
- */
-Node.prototype.onParentTransformChange = Node.prototype._requestUpdateWithoutArgs;
-
-/**
- * A method to execute logic when the parent size changes.
- * Delegates to Node._requestUpdateWIthoutArgs.
- *
- * @method
- *
- * @return {undefined} undefined
- */
-Node.prototype.onParentSizeChange = Node.prototype._requestUpdateWithoutArgs;
-
-/**
- * A method which can execute logic when this node receives
- * an event from the scene graph. Delegates to Node.receive.
- *
- * @method
- *
- * @param {String} event name
- * @param {Object} payload
- *
- * @return {undefined} undefined
- */
-Node.prototype.onReceive = Node.prototype.receive;
-
 module.exports = Node;
+
