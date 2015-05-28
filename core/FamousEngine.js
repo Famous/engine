@@ -1,18 +1,18 @@
 /**
  * The MIT License (MIT)
- * 
+ *
  * Copyright (c) 2015 Famous Industries Inc.
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -352,6 +352,45 @@ FamousEngine.prototype.createScene = function createScene (selector) {
     if (this._scenes[selector]) this._scenes[selector].dismount();
     this._scenes[selector] = new Scene(selector, this);
     return this._scenes[selector];
+};
+
+/**
+ * Introduce an already instantiated scene to the engine.
+ *
+ * @method
+ *
+ * @param {Scene} scene the scene to reintroduce to the engine
+ *
+ * @return {FamousEngine} this
+ */
+FamousEngine.prototype.addScene = function addScene (scene) {
+    var selector = scene._selector;
+
+    var current = this._scenes[selector];
+    if (current && current !== scene) current.dismount();
+    if (!scene.isMounted()) scene.mount();
+    this._scenes[selector] = scene;
+    return this;
+};
+
+/**
+ * Remove a scene.
+ *
+ * @method
+ *
+ * @param {Scene} scene the scene to remove from the engine
+ *
+ * @return {FamousEngine} this
+ */
+FamousEngine.prototype.removeScene = function removeScene (scene) {
+    var selector = scene._selector;
+
+    var current = this._scenes[selector];
+    if (current && current === scene) {
+        if (scene.isMounted()) scene.dismount();
+        delete this._scenes[selector];
+    }
+    return this;
 };
 
 /**

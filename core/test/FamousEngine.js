@@ -1,18 +1,18 @@
 /**
  * The MIT License (MIT)
- * 
+ *
  * Copyright (c) 2015 Famous Industries Inc.
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -44,7 +44,7 @@ test('FamousEngine', function(t) {
     t.test('requestUpdate method (basic)', function(t) {
         t.plan(4);
         t.equal(typeof FamousEngine.requestUpdate, 'function', 'FamousEngine.requestUpdate should be a function');
-        
+
         FamousEngine.getChannel().onmessage = function(commands) {
             t.deepEqual(
                 commands,
@@ -80,27 +80,27 @@ test('FamousEngine', function(t) {
     t.test('requestUpdate method (nested)', function(t) {
         t.plan(1);
         var executionOrder = [];
-        
+
         FamousEngine.requestUpdate(onUpdateWrap(function() {
             executionOrder.push(0);
-    
+
             FamousEngine.requestUpdate(onUpdateWrap(function() {
                 executionOrder.push(2);
-    
+
                 FamousEngine.requestUpdate(onUpdateWrap(function() {
                     executionOrder.push(3);
                 }));
             }));
         }));
-    
+
         FamousEngine.requestUpdate(onUpdateWrap(function() {
             executionOrder.push(1);
         }));
-    
+
         FamousEngine.step(0);
         FamousEngine.step(1);
         FamousEngine.step(2);
-    
+
         t.deepEqual(executionOrder, [ 0, 1, 2, 3 ]);
     });
 
@@ -112,7 +112,7 @@ test('FamousEngine', function(t) {
             FamousEngine.step(10);
         }, 'FamousEngine.requestUpdate method should not throw an error when being invoked');
     });
-    
+
     t.test('requestUpdateOnNextTick method', function(t) {
         t.equal(typeof FamousEngine.requestUpdateOnNextTick, 'function', 'FamousEngine.requestUpdateOnNextTick should be a function');
         var executionOrder = [];
@@ -125,7 +125,7 @@ test('FamousEngine', function(t) {
         FamousEngine.requestUpdateOnNextTick(onUpdateWrap(function() {
             executionOrder.push(1);
         }));
-    
+
         t.deepEqual(executionOrder, []);
         FamousEngine.step(0);
         t.deepEqual(executionOrder,  [ 0, 1 ]);
@@ -144,31 +144,61 @@ test('FamousEngine', function(t) {
         t.equal(FamousEngine.getClock().now(), 125);
         FamousEngine.getChannel().postMessage(['FRAME', 126]);
         t.equal(FamousEngine.getClock().now(), 126);
-    
+
         t.end();
     });
-    
+
     t.test('createScene method', function(t) {
         t.equal(typeof FamousEngine.createScene, 'function', 'FamousEngine.createScene should be a function');
         var scene0 = FamousEngine.createScene('.div-0');
         var scene1 = FamousEngine.createScene('.div-1');
-    
+
         t.equal(scene0.constructor, Scene, 'FamousEngine.createScene should return Scene instances');
         t.equal(scene1.constructor, Scene, 'FamousEngine.createScene should return Scene instances');
         t.notEqual(scene0, scene1, 'FamousEngine.createScene being invoked on two different selectors should return different scene instances');
-    
+
         FamousEngine.getChannel().onmessage = function() {};
         FamousEngine.step(0);
         t.end();
     });
-    
+
+    t.test('addScene method', function(t) {
+        t.equal(typeof FamousEngine.addScene, 'function', 'FamousEngine.addScene should be a function');
+        var scene0 = FamousEngine.createScene('.div-1');
+        var scene1 = new Scene('.div-1', FamousEngine);
+        scene1.dismount();
+
+        FamousEngine.addScene(scene0);
+        t.assert(scene0.isMounted(), 'FamousEngine.addScene should mount the added scene');
+        t.assert(!scene1.isMounted(), 'FamousEngine.addScene should dismount a scene if one exists at the selector');
+        t.assert(FamousEngine._scenes['.div-1'] === scene0, 'FamousEngine.addScene should track scenes correctly');
+
+        FamousEngine.getChannel().onmessage = function() {};
+        FamousEngine.step(0);
+        t.end();
+    });
+
+    t.test('removeScene method', function(t) {
+        t.equal(typeof FamousEngine.removeScene, 'function', 'FamousEngine.removeScene should be a function');
+        var scene0 = FamousEngine.createScene('.div-0');
+
+        FamousEngine.removeScene(scene0);
+
+        t.assert(!scene0.isMounted(), 'FamousEngine.removeScene should dismount the removed scene');
+        t.assert(FamousEngine._scenes['.div-0'] == null, 'FamousEngine.removeScene should remove references to the scene');
+
+        FamousEngine.getChannel().onmessage = function() {};
+        FamousEngine.step(0);
+        t.end();
+    });
+
     t.test('getClock method', function(t) {
         t.plan(3);
         t.equal(typeof FamousEngine.getClock, 'function', 'FamousEngine.getClock should be a function');
         t.equal(FamousEngine.getClock().constructor, Clock, 'FamousEngine.getClock should return clock instance');
         t.equal(FamousEngine.getClock(), FamousEngine.getClock(), 'FamousEngine.getClock should return clock singleton');
     });
-    
+
     t.test('step method', function(t) {
         t.plan(3);
         t.equal(typeof FamousEngine.step, 'function', 'FamousEngine.step should be a function');
@@ -183,17 +213,17 @@ test('FamousEngine', function(t) {
         t.equal(FamousEngine.getClock().getTime(), 3141, 'FamousEngine.step should update clock');
         FamousEngine.message(3142);
         FamousEngine.step(3143);
-    
+
         t.deepEqual(
             receivedMessages,
             [ [ 'TIME', 3141, 'm', 'and', 'ms' ], [ 'TIME', 3143, 3142 ] ]
         );
     });
-    
+
     t.test('handleFrame method', function(t) {
         t.plan(2);
         t.equal(typeof FamousEngine.handleFrame, 'function', 'FamousEngine.handleFrame should be a function');
-    
+
         // complete received command would be ['FRAME', 10]
         FamousEngine.handleFrame([10]);
         t.equal(FamousEngine.getClock().getTime(), 10, 'FamousEngine.handleFrame should update internal clock');
