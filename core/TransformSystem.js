@@ -143,8 +143,17 @@ TransformSystem.prototype.onUpdate = function onUpdate () {
         node = Dispatch.getNode(paths[i]);
         if (!node) continue;
         transform = transforms[i];
-        if (transform.from(node) && node.onTransformChange)
-            node.onTransformChange(transform);
+        if ((changed = transform.from(node))) {
+            if (node.transformChange) node.transformChange(transform);
+            if (
+                (changed & Transform.LOCAL_CHANGED) 
+                && node.localTransformChange
+            ) node.localTransformChange(transform.getLocalTransform());
+            if (
+                (changed & Transform.WORLD_CHANGED)
+                && node.onWorldTransformChange
+            ) node.worldTransformChange(transform.getWorldTransform());
+        }
     }
 };
 

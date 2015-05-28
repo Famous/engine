@@ -46,6 +46,9 @@ Transform.IDENT = [ 1, 0, 0, 0,
                     0, 0, 1, 0,
                     0, 0, 0, 1 ];
 
+Transform.WORLD_CHANGED = 1;
+Transform.LOCAL_CHANGED = 2;
+
 Transform.prototype.reset = function reset () {
     this.needsUpdate = false;
     this.parent = null;
@@ -123,7 +126,7 @@ Transform.prototype.fromNode = function fromNode (node) {
     var mySize = node.getSize();
     var spec = node.value;
     var parentSize = node.getParent().getSize();
-    var changed = false;
+    var changed = 0;
 
     var t00         = target[0];
     var t01         = target[1];
@@ -187,10 +190,10 @@ Transform.prototype.fromNode = function fromNode (node) {
                  (target[2] * originX + target[6] * originY + target[10] * originZ);
     target[15] = 1;
 
-    if (this.isBreakPoint()) changed = this.calculateWorldMatrix();
+    if (this.isBreakPoint() && this.calculateWorldMatrix())
+        changed |= Transform.WORLD_CHANGED;
 
-    return changed ||
-        t00 !== target[0] ||
+    if (t00 !== target[0] ||
         t01 !== target[1] ||
         t02 !== target[2] ||
         t10 !== target[4] ||
@@ -201,7 +204,9 @@ Transform.prototype.fromNode = function fromNode (node) {
         t22 !== target[10] ||
         t30 !== target[12] ||
         t31 !== target[13] ||
-        t32 !== target[14];
+        t32 !== target[14]) changed |= Transform.LOCAL_CHANGED;
+
+    return changed;
 };
 
 /**
@@ -305,10 +310,10 @@ Transform.prototype.fromNodeWithParent = function fromNodeWithParent (node) {
     target[14] = p02 * tx + p12 * ty + p22 * tz + p32;
     target[15] = 1;
 
-    if (this.isBreakPoint()) changed = this.calculateWorldMatrix();
+    if (this.isBreakPoint() && this.calculateWorldMatrix())
+        changed |= Transform.WORLD_CHANGED;
 
-    return changed ||
-        t00 !== target[0] ||
+    if (t00 !== target[0] ||
         t01 !== target[1] ||
         t02 !== target[2] ||
         t10 !== target[4] ||
@@ -319,7 +324,9 @@ Transform.prototype.fromNodeWithParent = function fromNodeWithParent (node) {
         t22 !== target[10] ||
         t30 !== target[12] ||
         t31 !== target[13] ||
-        t32 !== target[14];
+        t32 !== target[14]) changed |= Transform.LOCAL_CHANGED;
+
+    return changed;
 };
 
 function multiply (out, a, b) {
