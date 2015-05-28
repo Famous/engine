@@ -60,7 +60,7 @@ var animationFrame = {
      *
      * @param   {Function}  callback function to be invoked on the next frame.
      * @return  {Number}    requestId to be used to cancel the request using
-     *                      @link{cancelAnimationFrame}.
+     *                      {@link cancelAnimationFrame}.
      */
     requestAnimationFrame: rAF,
 
