@@ -1,18 +1,18 @@
 /**
  * The MIT License (MIT)
- * 
+ *
  * Copyright (c) 2015 Famous Industries Inc.
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -366,7 +366,7 @@ FamousEngine.prototype.createScene = function createScene (selector) {
  *
  * @return {FamousEngine} this
  */
-FamousEngine.prototype.startEngine = function startEngine () {
+FamousEngine.prototype.startRenderLoop = function startRenderLoop() {
     this._channel.sendMessage(ENGINE_START);
     return this;
 };
@@ -379,9 +379,37 @@ FamousEngine.prototype.startEngine = function startEngine () {
  *
  * @return {FamousEngine} this
  */
-FamousEngine.prototype.stopEngine = function stopEngine () {
+FamousEngine.prototype.stopRenderLoop = function stopRenderLoop() {
     this._channel.sendMessage(ENGINE_STOP);
     return this;
+};
+
+/**
+ * @method
+ * @deprecated Use {@link FamousEngine#startRenderLoop} instead!
+ *
+ * @return {FamousEngine} this
+ */
+FamousEngine.prototype.startEngine = function startEngine() {
+    console.warn(
+        'FamousEngine.startEngine is deprecated! Use ' +
+        'FamousEngine.startRenderLoop instead!'
+    );
+    return this.startRenderLoop();
+};
+
+/**
+ * @method
+ * @deprecated Use {@link FamousEngine#stopRenderLoop} instead!
+ *
+ * @return {FamousEngine} this
+ */
+FamousEngine.prototype.stopEngine = function stopEngine() {
+    console.warn(
+        'FamousEngine.stopEngine is deprecated! Use ' +
+        'FamousEngine.stopRenderLoop instead!'
+    );
+    return this.stopRenderLoop();
 };
 
 module.exports = new FamousEngine();
