@@ -49,7 +49,7 @@ var QUAT = [0, 0, 0, 1];
  * A Node is either mounted or unmounted. Unmounted nodes are detached from the
  * scene graph. Unmounted nodes have no parent node, while each mounted node has
  * exactly one parent. Nodes have an arbitary number of children, which can be
- * dynamically added using @{@link addChild}.
+ * dynamically added using {@link Node#addChild}.
  *
  * Each Node has an arbitrary number of `components`. Those components can
  * send `draw` commands to the renderer or mutate the node itself, in which case
@@ -250,7 +250,7 @@ Node.prototype.getValue = function getValue () {
 };
 
 /**
- * Similar to @{@link getValue}, but returns the actual "computed" value. E.g.
+ * Similar to {@link Node#getValue}, but returns the actual "computed" value. E.g.
  * a proportional size of 0.5 might resolve into a "computed" size of 200px
  * (assuming the parent has a width of 400px).
  *
@@ -298,8 +298,8 @@ Node.prototype.getParent = function getParent () {
 };
 
 /**
- * Schedules the @{@link update} function of the node to be invoked on the next
- * frame (if no update during this frame has been scheduled already).
+ * Schedules the {@link Node#update} function of the node to be invoked on the
+ * next frame (if no update during this frame has been scheduled already).
  * If the node is currently being updated (which means one of the requesters
  * invoked requestsUpdate while being updated itself), an update will be
  * scheduled on the next frame.
@@ -321,9 +321,10 @@ Node.prototype.requestUpdate = function requestUpdate (requester) {
 };
 
 /**
- * Schedules an update on the next tick. Similarily to @{@link requestUpdate},
- * `requestUpdateOnNextTick` schedules the node's `onUpdate` function to be
- * invoked on the frame after the next invocation on the node's onUpdate function.
+ * Schedules an update on the next tick. Similarily to
+ * {@link Node#requestUpdate}, `requestUpdateOnNextTick` schedules the node's
+ * `onUpdate` function to be invoked on the frame after the next invocation on
+ * the node's onUpdate function.
  *
  * @method requestUpdateOnNextTick
  *
@@ -636,12 +637,12 @@ Node.prototype.getComponent = function getComponent (index) {
 };
 
 /**
- * Removes a previously via @{@link addComponent} added component.
+ * Removes a previously via {@link Node#addComponent} added component.
  *
  * @method removeComponent
  *
- * @param  {Object} component   A component that has previously been added
- *                              using @{@link addComponent}.
+ * @param  {Object} component   An component that has previously been added
+ *                              using {@link Node#addComponent}.
  *
  * @return {Node} this
  */
@@ -1104,7 +1105,7 @@ Node.prototype.setOpacity = function setOpacity (val) {
  * Sets the size mode being used for determining the node's final width, height
  * and depth.
  * Size modes are a way to define the way the node's size is being calculated.
- * Size modes are enums set on the @{@link Size} constructor (and aliased on
+ * Size modes are enums set on the {@link Size} constructor (and aliased on
  * the Node).
  *
  * @example
