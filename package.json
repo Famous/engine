@@ -31,7 +31,7 @@
   "author": "Famous",
   "license": "All rights reserved",
   "devDependencies": {
-    "browserify": "^9.0.3",
+    "browserify": "^10.2.1",
     "eslint": "^0.21.2",
     "smokestack": "^3.2.2",
     "tap-closer": "^1.0.0",
