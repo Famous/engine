@@ -154,8 +154,15 @@ Dispatch.prototype.mount = function mount (path) {
         );
 
     var children = node.getChildren();
+    var components = node.getComponents();
 
-    for (var i = 0, len = children.length ; i < len ; i++)
+    if (node.onMount) node.onMount(path);
+    
+    for (var i = 0, len = components.length ; i < len ; i++)
+        if (components[i] && components[i].onMount)
+            components[i].onMount(path);
+
+    for (i = 0, len = children.length ; i < len ; i++)
         if (!children[i].isMounted())
             children[i].mount(path + '/' + i);
 };
