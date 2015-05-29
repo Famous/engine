@@ -69,6 +69,7 @@ function FamousEngine() {
     this._clock = new Clock(); // a clock to keep track of time for the scene
                                // graph.
 
+
     this._channel = new Channel();
     this._channel.onMessage = function (message) {
         _this.handleMessage(message);
@@ -317,7 +318,7 @@ FamousEngine.prototype.getContext = function getContext (selector) {
 };
 
 /**
- * returns the instance of clock within famous.
+ * Returns the instance of clock used by the FamousEngine.
  *
  * @method
  *
@@ -328,7 +329,7 @@ FamousEngine.prototype.getClock = function getClock () {
 };
 
 /**
- * queues a message to be transfered to the renderers.
+ * Enqueues a message to be transfered to the renderers.
  *
  * @method
  *
