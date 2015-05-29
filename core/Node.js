@@ -1455,6 +1455,7 @@ Node.prototype.update = function update (time){
 Node.prototype.mount = function mount (path) {
     if (this.isMounted())
         throw new Error('Node is already mounted at: ' + this.getLocation());
+
     Dispatch.registerNodeAtPath(path, this);
 
     var i = 0;

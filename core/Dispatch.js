@@ -153,7 +153,6 @@ Dispatch.prototype.mount = function mount (path) {
                 ' doesn\'t exist at expected path: ' + parentPath 
         );
 
-    if (node.onMount) node.onMount(parent, path);
     var children = node.getChildren();
 
     for (var i = 0, len = children.length ; i < len ; i++)
@@ -179,7 +178,6 @@ Dispatch.prototype.dismount = function dismount (path) {
                 'No node registered to path: ' + path
         );
 
-    if (node.onDismount) node.onDismount();
     var children = node.getChildren();
 
     for (var i = 0, len = children.length ; i < len ; i++)
