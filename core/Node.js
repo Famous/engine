@@ -729,19 +729,7 @@ Node.prototype._vecOptionalSet = function _vecOptionalSet (vec, index, val) {
  */
 Node.prototype.show = function show () {
     Dispatch.show(this.getLocation());
-
-    var i = 0;
-    var items = this._components;
-    var len = items.length;
-    var item;
-
     this.value.showState.shown = true;
-
-    for (; i < len ; i++) {
-        item = items[i];
-        if (item && item.onShow) item.onShow();
-    }
-
     return this;
 };
 
@@ -755,26 +743,8 @@ Node.prototype.show = function show () {
  * @return {Node} this
  */
 Node.prototype.hide = function hide () {
-    var i = 0;
-    var items = this._components;
-    var len = items.length;
-    var item;
-
+    Dispatch.hide(this.getLocation());
     this.value.showState.shown = false;
-
-    for (; i < len ; i++) {
-        item = items[i];
-        if (item && item.onHide) item.onHide();
-    }
-
-    i = 0;
-    items = this._children;
-    len = items.length;
-
-    for (; i < len ; i++) {
-        item = items[i];
-        if (item && item.onParentHide) item.onParentHide();
-    }
     return this;
 };
 
@@ -791,26 +761,7 @@ Node.prototype.hide = function hide () {
  * @return {Node} this
  */
 Node.prototype.setAlign = function setAlign (x, y, z) {
-    var vec3 = this.value.offsets.align;
-    var propogate = false;
-
-    propogate = this._vecOptionalSet(vec3, 0, x) || propogate;
-    propogate = this._vecOptionalSet(vec3, 1, y) || propogate;
-    if (z != null) propogate = this._vecOptionalSet(vec3, 2, (z - 0.5)) || propogate;
-
-    if (propogate) {
-        var i = 0;
-        var list = this._components;
-        var len = list.length;
-        var item;
-        x = vec3[0];
-        y = vec3[1];
-        z = vec3[2];
-        for (; i < len ; i++) {
-            item = list[i];
-            if (item && item.onAlignChange) item.onAlignChange(x, y, z);
-        }
-    }
+    TransformSystem.get(this.getLocation()).setAlign(x, y, z);
     return this;
 };
 
@@ -827,26 +778,7 @@ Node.prototype.setAlign = function setAlign (x, y, z) {
  * @return {Node} this
  */
 Node.prototype.setMountPoint = function setMountPoint (x, y, z) {
-    var vec3 = this.value.offsets.mountPoint;
-    var propogate = false;
-
-    propogate = this._vecOptionalSet(vec3, 0, x) || propogate;
-    propogate = this._vecOptionalSet(vec3, 1, y) || propogate;
-    if (z != null) propogate = this._vecOptionalSet(vec3, 2, (z - 0.5)) || propogate;
-
-    if (propogate) {
-        var i = 0;
-        var list = this._components;
-        var len = list.length;
-        var item;
-        x = vec3[0];
-        y = vec3[1];
-        z = vec3[2];
-        for (; i < len ; i++) {
-            item = list[i];
-            if (item && item.onMountPointChange) item.onMountPointChange(x, y, z);
-        }
-    }
+    TransformSystem.get(this.getLocation()).setMountPoint(x, y, z);
     return this;
 };
 
@@ -863,26 +795,7 @@ Node.prototype.setMountPoint = function setMountPoint (x, y, z) {
  * @return {Node} this
  */
 Node.prototype.setOrigin = function setOrigin (x, y, z) {
-    var vec3 = this.value.offsets.origin;
-    var propogate = false;
-
-    propogate = this._vecOptionalSet(vec3, 0, x) || propogate;
-    propogate = this._vecOptionalSet(vec3, 1, y) || propogate;
-    if (z != null) propogate = this._vecOptionalSet(vec3, 2, (z - 0.5)) || propogate;
-
-    if (propogate) {
-        var i = 0;
-        var list = this._components;
-        var len = list.length;
-        var item;
-        x = vec3[0];
-        y = vec3[1];
-        z = vec3[2];
-        for (; i < len ; i++) {
-            item = list[i];
-            if (item && item.onOriginChange) item.onOriginChange(x, y, z);
-        }
-    }
+    TransformSystem.get(this.getLocation()).setOrigin(x, y, z);
     return this;
 };
 
@@ -899,28 +812,7 @@ Node.prototype.setOrigin = function setOrigin (x, y, z) {
  * @return {Node} this
  */
 Node.prototype.setPosition = function setPosition (x, y, z) {
-    var vec3 = this.value.vectors.position;
-    var propogate = false;
-
-    propogate = this._vecOptionalSet(vec3, 0, x) || propogate;
-    propogate = this._vecOptionalSet(vec3, 1, y) || propogate;
-    propogate = this._vecOptionalSet(vec3, 2, z) || propogate;
-
-    if (propogate) {
-        var i = 0;
-        var list = this._components;
-        var len = list.length;
-        var item;
-        x = vec3[0];
-        y = vec3[1];
-        z = vec3[2];
-        for (; i < len ; i++) {
-            item = list[i];
-            if (item && item.onPositionChange) item.onPositionChange(x, y, z);
-        }
-        this._transformNeedsUpdate = true;
-    }
-
+    TransformSystem.get(this.getLocation()).setPosition(x, y, z);
     return this;
 };
 
@@ -940,90 +832,7 @@ Node.prototype.setPosition = function setPosition (x, y, z) {
  * @return {Node} this
  */
 Node.prototype.setRotation = function setRotation (x, y, z, w) {
-    var quat = this.value.vectors.rotation;
-    var propogate = false;
-    var qx, qy, qz, qw;
-
-    if (w != null) {
-        qx = x;
-        qy = y;
-        qz = z;
-        qw = w;
-        this._lastEulerX = null;
-        this._lastEulerY = null;
-        this._lastEulerZ = null;
-        this._lastEuler = false;
-    }
-    else {
-        if (x == null || y == null || z == null) {
-            if (this._lastEuler) {
-                x = x == null ? this._lastEulerX : x;
-                y = y == null ? this._lastEulerY : y;
-                z = z == null ? this._lastEulerZ : z;
-            }
-            else {
-                var sp = -2 * (quat[1] * quat[2] - quat[3] * quat[0]);
-
-                if (Math.abs(sp) > 0.99999) {
-                    y = y == null ? Math.PI * 0.5 * sp : y;
-                    x = x == null ? Math.atan2(-quat[0] * quat[2] + quat[3] * quat[1], 0.5 - quat[1] * quat[1] - quat[2] * quat[2]) : x;
-                    z = z == null ? 0 : z;
-                }
-                else {
-                    y = y == null ? Math.asin(sp) : y;
-                    x = x == null ? Math.atan2(quat[0] * quat[2] + quat[3] * quat[1], 0.5 - quat[0] * quat[0] - quat[1] * quat[1]) : x;
-                    z = z == null ? Math.atan2(quat[0] * quat[1] + quat[3] * quat[2], 0.5 - quat[0] * quat[0] - quat[2] * quat[2]) : z;
-                }
-            }
-        }
-
-        var hx = x * 0.5;
-        var hy = y * 0.5;
-        var hz = z * 0.5;
-
-        var sx = Math.sin(hx);
-        var sy = Math.sin(hy);
-        var sz = Math.sin(hz);
-        var cx = Math.cos(hx);
-        var cy = Math.cos(hy);
-        var cz = Math.cos(hz);
-
-        var sysz = sy * sz;
-        var cysz = cy * sz;
-        var sycz = sy * cz;
-        var cycz = cy * cz;
-
-        qx = sx * cycz + cx * sysz;
-        qy = cx * sycz - sx * cysz;
-        qz = cx * cysz + sx * sycz;
-        qw = cx * cycz - sx * sysz;
-
-        this._lastEuler = true;
-        this._lastEulerX = x;
-        this._lastEulerY = y;
-        this._lastEulerZ = z;
-    }
-
-    propogate = this._vecOptionalSet(quat, 0, qx) || propogate;
-    propogate = this._vecOptionalSet(quat, 1, qy) || propogate;
-    propogate = this._vecOptionalSet(quat, 2, qz) || propogate;
-    propogate = this._vecOptionalSet(quat, 3, qw) || propogate;
-
-    if (propogate) {
-        var i = 0;
-        var list = this._components;
-        var len = list.length;
-        var item;
-        x = quat[0];
-        y = quat[1];
-        z = quat[2];
-        w = quat[3];
-        for (; i < len ; i++) {
-            item = list[i];
-            if (item && item.onRotationChange) item.onRotationChange(x, y, z, w);
-        }
-        this._transformNeedsUpdate = true;
-    }
+    TransformSystem.get(this.getLocation()).setRotation(x, y, z, w);
     return this;
 };
 
@@ -1040,27 +849,7 @@ Node.prototype.setRotation = function setRotation (x, y, z, w) {
  * @return {Node} this
  */
 Node.prototype.setScale = function setScale (x, y, z) {
-    var vec3 = this.value.vectors.scale;
-    var propogate = false;
-
-    propogate = this._vecOptionalSet(vec3, 0, x) || propogate;
-    propogate = this._vecOptionalSet(vec3, 1, y) || propogate;
-    propogate = this._vecOptionalSet(vec3, 2, z) || propogate;
-
-    if (propogate) {
-        var i = 0;
-        var list = this._components;
-        var len = list.length;
-        var item;
-        x = vec3[0];
-        y = vec3[1];
-        z = vec3[2];
-        for (; i < len ; i++) {
-            item = list[i];
-            if (item && item.onScaleChange) item.onScaleChange(x, y, z);
-        }
-        this._transformNeedsUpdate = true;
-    }
+    TransformSystem.get(this.getLocation()).setScale(x, y, z);
     return this;
 };
 
@@ -1457,26 +1246,13 @@ Node.prototype.mount = function mount (path) {
         throw new Error('Node is already mounted at: ' + this.getLocation());
 
     Dispatch.registerNodeAtPath(path, this);
-
-    var i = 0;
-    var list = this._components;
-    var len = list.length;
-    var item;
+    TransformSystem.registerTransformAtPath(path);
 
     var parent = Dispatch.getNode(pathUtils.parent(path));
     this._parent = parent;
     this._globalUpdater = parent.getUpdater();
     this.value.location = path;
     this.value.showState.mounted = true;
-
-    TransformSystem.registerTransformAtPath(path);
-
-    if (this.onMount) this.onMount();
-
-    for (; i < len ; i++) {
-        item = list[i];
-        if (item && item.onMount) item.onMount(this, i);
-    }
 
     if (!this._requestingUpdate) this._requestUpdate();
     return this;

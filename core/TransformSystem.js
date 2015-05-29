@@ -27,6 +27,7 @@
 var PathUtils = require('./Path');
 var Transform = require('./Transform');
 var Dispatch = require('./Dispatch');
+var Layer = require('./Layer');
 
 /**
  * The transform class is responsible for calculating the transform of a particular
@@ -35,22 +36,8 @@ var Dispatch = require('./Dispatch');
  * @constructor {TransformSystem}
  */
 function TransformSystem () {
-    this._requestingUpdate = false;
-    this._transforms = [];
-    this._paths = [];
+    this.layer = new Layer();
 }
-
-/**
- * Internal method to request an update for the transform system.
- *
- * @method _requestUpdate
- * @protected
- */
-TransformSystem.prototype._requestUpdate = function _requestUpdate () {
-    if (!this._requestingUpdate) {
-        this._requestingUpdate = true;
-    }
-};
 
 /**
  * registers a new Transform for the given path. This transform will be updated
@@ -62,23 +49,11 @@ TransformSystem.prototype._requestUpdate = function _requestUpdate () {
  * @param {String} path for the transform to be registered to.
  */
 TransformSystem.prototype.registerTransformAtPath = function registerTransformAtPath (path) {
-    var paths = this._paths;
-    var index = paths.indexOf(path);
-    if (index !== -1) return;
-
-    var i = 0;
-    var targetDepth = PathUtils.depth(path);
-    var targetIndex = PathUtils.index(path);
-
-    while (
-            paths[i] &&
-            targetDepth >= PathUtils.depth(paths[i])
-    ) i++;
-    paths.splice(i, 0, path);
-    var newTransform = new Transform();
-    newTransform.setParent(this._transforms[paths.indexOf(PathUtils.parent(path))]);
-    this._transforms.splice(i, 0, newTransform);
-    if (!this._requestingUpdate) this._requestUpdate();
+    var parent = this.layer.get(PathUtils.parent(path));
+    if (!parent) throw new Error(
+            'No parent transform registered at expected path: ' + PathUtils.parent(path)
+    );
+    this.layer.insert(path, new Transform(parent));
 };
 
 /**
@@ -90,39 +65,23 @@ TransformSystem.prototype.registerTransformAtPath = function registerTransformAt
  * @param {String} path at which to register the transform
  */
 TransformSystem.prototype.deregisterTransformAtPath = function deregisterTransformAtPath (path) {
-    var paths = this._paths;
-    var index = paths.indexOf(path);
-    if (index === -1) throw new Error('No transform Registered at path: ' + path);
-
-    this._transforms.splice(index, 1)[0].reset();
-    this._paths.splice(index, 1);
+    this.layer.remove(path);
 };
 
 
 TransformSystem.prototype.makeBreakPointAt = function makeBreakPointAt (path) {
-    var paths = this._paths;
-    var index = paths.indexOf(path);
-    if (index === -1) throw new Error('No transform Registered at path: ' + path);
-
-    var transform = this._transforms[index];
+    var transform = this.layer.get(path);
+    if (!transform) throw new Error('No transform Registered at path: ' + path);
     transform.setBreakPoint();
 };
 
 
 
 TransformSystem.prototype.get = function get (path) {
-    return this._transforms[this._paths.indexOf(path)];
+    return this.layer.get(path);
 };
 
-/**
- * Notifies the transform system that the a node's information has changed.
- *
- * @method update
- * @return {void}
- */
-TransformSystem.prototype.update = function update () {
-    if (!this._requestingUpdate) this._requestUpdate();
-};
+
 
 /**
  * onUpdate is called when the transform system requires an update.
@@ -133,29 +92,125 @@ TransformSystem.prototype.update = function update () {
  * @method onUpdate
  */
 TransformSystem.prototype.onUpdate = function onUpdate () {
-    var transforms = this._transforms;
-    var paths = this._paths;
+    var transforms = this.layer.getItems();
+    var paths = this.layer.getPaths();
     var transform;
     var changed;
     var node;
+    var vectors;
+    var offsets;
+    var components;
+    var j;
+    var len2;
 
     for (var i = 0, len = transforms.length ; i < len ; i++) {
         node = Dispatch.getNode(paths[i]);
         if (!node) continue;
+        components = node.getComponent();
         transform = transforms[i];
+        vectors = transform.vectors;
+        offsets = transform.offsets;
+        if (offsets.alignChanged) alignChanged(node, components, offsets);
+        if (offsets.mountPointChanged) mountPointChanged(node, components, offsets);
+        if (offsets.originChanged) originChanged(node, components, offsets);
+        if (vectors.positionChanged) positionChanged(node, components, position);
+        if (vectors.rotationChanged) rotationChanged(node, components, rotation);
+        if (vectors.scaleChanged) scaleChanged(node, components, scale);
         if ((changed = transform.from(node))) {
-            if (node.transformChange) node.transformChange(transform);
-            if (
-                (changed & Transform.LOCAL_CHANGED) 
-                && node.localTransformChange
-            ) node.localTransformChange(transform.getLocalTransform());
-            if (
-                (changed & Transform.WORLD_CHANGED)
-                && node.onWorldTransformChange
-            ) node.worldTransformChange(transform.getWorldTransform());
+            transformChanged(node, components, transform);
+            if (changed & Transform.LOCAL_CHANGED) localTransformChanged(node, components, transform.getLocalTransform());
+            if (changed & Transform.WORLD_CHANGED) worldTransformChanged(node, components, transform.getWorldTransform());
         }
     }
 };
+
+function alignChanged (node, components, offsets) {
+    var x = offsets.align[0];
+    var y = offsets.align[1];
+    var z = offsets.align[2];
+    if (node.onAlignChange) node.onAlignChange(x, y, z);
+    for (var i = 0, len = components.length ; i < len ; i++)
+        if (components[i] && components[i].onAlignChange)
+            components[i].onAlignChange(x, y, z);
+    offsets.alignChanged = false;
+}
+
+function mountPointChanged (node, components, offsets) {
+    var x = offsets.mountPoint[0];
+    var y = offsets.mountPoint[1];
+    var z = offsets.mountPoint[2];
+    if (node.onMountPointChange) node.onMountPointChange(x, y, z);
+    for (var i = 0, len = components.length ; i < len ; i++)
+        if (components[i] && components[i].onMountPointChange)
+            components[i].onMountPointChange(x, y, z);
+    offsets.mountPointChanged = false;
+}
+
+function originChanged (node, components, offsets) {
+    var x = offsets.origin[0];
+    var y = offsets.origin[1];
+    var z = offsets.origin[2];
+    if (node.onOriginChange) node.onOriginChange(x, y, z);
+    for (var i = 0, len = components.length ; i < len ; i++)
+        if (components[i] && components[i].onOriginChange)
+            components[i].onOriginChange(x, y, z);
+    offsets.originChanged = false;
+}
+
+function positionChanged (node, components, vectors) {
+    var x = vectors.position[0];
+    var y = vectors.position[1];
+    var z = vectors.position[2];
+    if (node.onPositionChange) node.onPositionChange(x, y, z);
+    for (var i = 0, len = components.length ; i < len ; i++)
+        if (components[i] && components[i].onPositionChange)
+            components[i].onPositionChange(x, y, z);
+    vectors.positionChanged = false;
+}
+
+function rotationChanged (node, components, vectors) {
+    var x = vectors.rotation[0];
+    var y = vectors.rotation[1];
+    var z = vectors.rotation[2];
+    var w = vectors.rotation[3];
+    if (node.onRotationChange) node.onRotationChange(x, y, z, w);
+    for (var i = 0, len = components.length ; i < len ; i++)
+        if (components[i] && components[i].onRotationChange)
+            components[i] && components[i].onRotationChange(x, y, z, w);
+    vectors.rotationChanged = false;
+}
+
+function scaleChanged (node, components, vectors) {
+    var x = vectors.scale[0];
+    var y = vectors.scale[1];
+    var z = vectors.scale[2];
+    if (node.onScaleChange) node.onScaleChange(x, y, z);
+    for (var i = 0, len = components.length ; i < len ; i++)
+        if (components[i] && components[i].onScaleChange)
+            components[i].onScaleChange(x, y, z);
+    vectors.scaleChanged = false;
+}
+
+function transformChanged (node, components, transform) {
+    if (node.onTransformChange) node.onTransformChange();
+    for (var i = 0, len = components.length ; i < len ; i++)
+        if (components[i] && components[i].onTransformChange)
+            components[i].onTransformChange(transform);
+}
+
+function localTransformChanged (node, components, transform) {
+    if (node.onLocalTransformChange) node.onLocalTransformChange(transform);
+    for (var i = 0, len = components.length ; i < len ; i++)
+        if (components[i] && components[i].onLocalTransformChange)
+            components[i].onLocalTransformChange(transform);
+}
+
+function worldTransformChanged (node, components, transform) {
+    if (node.onWorldTransformChange) node.onWorldTransformChange(transform);
+    for (var i = 0, len = components.length ; i < len ; i++)
+        if (components[i] && components[i].onWorldTransformChange)
+            components[i].onWorldTransformChange(transform);
+}
 
 module.exports = new TransformSystem();
 
