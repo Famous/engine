@@ -389,10 +389,13 @@ Program.prototype.setUniforms = function (uniformNames, uniformValue) {
         // requesting a new location from the WebGL context
         // if it does not yet exist.
 
-        location = this.uniformLocations[name] || gl.getUniformLocation(this.program, name);
-        if (!location) continue;
+        location = this.uniformLocations[name];
 
-        this.uniformLocations[name] = location;
+        if (location === null) continue;
+        if (location === undefined) {
+            location = gl.getUniformLocation(this.program, name);
+            this.uniformLocations[name] = location;
+        }
 
         // Check if the value is already set for the
         // given uniform.
