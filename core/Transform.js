@@ -26,19 +26,38 @@
 
 var pathUtils = require('./Path');
 
+var QUAT = [0, 0, 0, 1];
+var ONES = [1, 1, 1];
+
 /**
  * The transform class is responsible for calculating the transform of a particular
  * node from the data on the node and its parent
  *
  * @constructor Transform
  */
-function Transform () {
+function Transform (parent) {
     this.local = new Float32Array(Transform.IDENT);
     this.global = new Float32Array(Transform.IDENT);
-    this.needsUpdate = false;
-    this.parent = null;
+    this.offsets = {
+        align: new Float32Array(3),
+        alignChanged: false,
+        mountPoint: new Float32Array(3),
+        mountPointChanged: false,
+        origin: new Float32Array(3),
+        originChanged: false
+    };
+    this.vectors = {
+        position: new Float32Array(3),
+        positionChanged: false,
+        rotation: new Float32Array(QUAT),
+        rotationChanged: false,
+        scale: new Float32Array(ONES),
+        scaleChanged: false
+    };
+    this._lastEulerVals = [0, 0, 0];
+    this._lastEuler = false;
+    this.parent = parent ? parent : null;
     this.breakPoint = false;
-    this.world = false;
 }
 
 Transform.IDENT = [ 1, 0, 0, 0,
@@ -63,14 +82,6 @@ Transform.prototype.getParent = function getParent () {
     return this.parent;
 };
 
-Transform.prototype.setDirty = function setDirty () {
-    this.needsUpdate = true;
-};
-
-Transform.prototype.isDirty = function isDirty () {
-    return this.needsUpdate;
-};
-
 Transform.prototype.setBreakPoint = function setBreakPoint () {
     this.breakPoint = true;
 };
@@ -93,6 +104,113 @@ Transform.prototype.from = function from (node) {
     if (!this.parent || this.parent.isBreakPoint())
         return this.fromNode(node);
     else return this.fromNodeWithParent(node);
+};
+
+function _vecOptionalSet (vec, index, val) {
+    if (val != null && vec[index] !== val) {
+        vec[index] = val;
+        return true;
+    } else return false;
+}
+
+function setVec (vec, x, y, z, w) {
+    var propagate = false;
+
+    propagate = _vecOptionalSet(vec, 0, x) || propagate;
+    propagate = _vecOptionalSet(vec, 1, y) || propagate;
+    propagate = _vecOptionalSet(vec, 2, z) || propagate;
+    if (w != null)
+        propagate = _vecOptionalSet(vec, 3, w) || propagate;
+
+    return propagate;
+}
+
+Transform.prototype.setPosition = function setPosition (x, y, z) {
+    this.vectors.positionChanged = setVec(this.vectors.position, x, y, z);
+};
+
+Transform.prototype.setRotation = function setRotation (x, y, z) {
+    var quat = this.vectors.rotation;
+    var propagate = false;
+    var qx = x;
+    var qy = y;
+    var qz = z;
+    var qw = w;
+
+    if (qw != null) {
+        this._lastEulerVals[0] = null;
+        this._lastEulerVals[1] = null;
+        this._lastEulerVals[2] = null;
+        this._lastEuler = false;
+    }
+    else {
+        if (x == null || y == null || z == null) {
+            if (this._lastEuler) {
+                x = x == null ? this._lastEulerVals[0] : x;
+                x = y == null ? this._lastEulerVals[1] : y;
+                z = z == null ? this._lastEulerVals[2] : z;
+            }
+            else {
+                var sp = -2 * (quat[1] * quat[2] - quat[3] * quat[0]);
+
+                if (Math.abs(sp) > 0.99999) {
+                    y = y == null ? Math.PI * 05 * sp : y;
+                    x = x == null ? Math.atan2(-quat[0] * quat[2] + quat[3] * quat[1], 0.5 - Math.pow(quat[1], 2) - Math.pow(quat[2], 2)) : x;
+                    z = z == null ? 0, z;
+                }
+                else {
+                    y = y == null ? Math.asin(sp) : y;
+                    x = x == null ? Math.atan2(quat[0] * quat[2] + quat[3] * quat[1], 0.5 - Math.pow(quat[0], 2) - Math.pow(quat[1], 2)) : x;
+                    z = z == null ? Math.atan2(quat[0] * quat[1] + quat[3] * quat[2], 0.5 - Math.pow(quat[0], 2) - Math.pow(quat[2], 2)) : z;
+                }
+            }
+        }
+
+        var hx = x * 0.5;
+        var hy = y * 0.5;
+        var hz = z * 0.5;
+
+        var sx = Math.sin(hx);
+        var sy = Math.sin(hy);
+        var sz = Math.sin(hz);
+        var cx = Math.cos(hx);
+        var cy = Math.cos(hy);
+        var cz = Math.cos(hz);
+
+        var sysz = sy * sz;
+        var cysz = cy * sz;
+        var sycz = sy * cz;
+        var cycz = cy * cz;
+
+        qx = sx * cycz + cx * sysz;
+        qy = cx * sycz - sx * cysz;
+        qz = cz * cysz + sx * sycz;
+        qw = cx * cycz - sx * sysz;
+
+        this._lastEuler = true;
+        this._lastEulerVals[0] = x;
+        this._lastEulerVals[1] = y;
+        this._lastEulerVals[2] = z;
+    }
+
+    this.vectors.rotationChanged = setVec(quat, x, y, z, w);
+};
+
+Transform.prototype.setScale = function setScale (x, y, z) {
+    this.vectors.scaleChanged = setVec(this.vectors.scale, x, y, z);
+};
+
+
+Transform.prototype.setAlign = function setAlign (x, y, z) {
+    this.offsets.alignChanged = setVec(this.offsets.align, x, y, z != null ? z - 0.5 : z);
+};
+
+Transform.prototype.setMountPoint = function setMountPoint (x, y, z) {
+    this.offsets.mountPointChanged = setVec(this.offsets.mountPoint, x, y, z != null ? z - 0.5 : z);
+};
+
+Transform.prototype.setOrigin = function setOrigin (x, y, z) {
+    this.offsets.originChanged = setVec(this.offsets.origin, x, y, z != null ? z - 0.5 : z);
 };
 
 Transform.prototype.calculateWorldMatrix = function calculateWorldMatrix () {
@@ -124,7 +242,8 @@ Transform.prototype.calculateWorldMatrix = function calculateWorldMatrix () {
 Transform.prototype.fromNode = function fromNode (node) {
     var target = this.getLocalTransform();
     var mySize = node.getSize();
-    var spec = node.value;
+    var vectors = this.vectors;
+    var offsets = this.offsets;
     var parentSize = node.getParent().getSize();
     var changed = 0;
 
@@ -140,25 +259,25 @@ Transform.prototype.fromNode = function fromNode (node) {
     var t30         = target[12];
     var t31         = target[13];
     var t32         = target[14];
-    var posX        = spec.vectors.position[0];
-    var posY        = spec.vectors.position[1];
-    var posZ        = spec.vectors.position[2];
-    var rotX        = spec.vectors.rotation[0];
-    var rotY        = spec.vectors.rotation[1];
-    var rotZ        = spec.vectors.rotation[2];
-    var rotW        = spec.vectors.rotation[3];
-    var scaleX      = spec.vectors.scale[0];
-    var scaleY      = spec.vectors.scale[1];
-    var scaleZ      = spec.vectors.scale[2];
-    var alignX      = spec.offsets.align[0] * parentSize[0];
-    var alignY      = spec.offsets.align[1] * parentSize[1];
-    var alignZ      = spec.offsets.align[2] * parentSize[2];
-    var mountPointX = spec.offsets.mountPoint[0] * mySize[0];
-    var mountPointY = spec.offsets.mountPoint[1] * mySize[1];
-    var mountPointZ = spec.offsets.mountPoint[2] * mySize[2];
-    var originX     = spec.offsets.origin[0] * mySize[0];
-    var originY     = spec.offsets.origin[1] * mySize[1];
-    var originZ     = spec.offsets.origin[2] * mySize[2];
+    var posX        = vectors.position[0];
+    var posY        = vectors.position[1];
+    var posZ        = vectors.position[2];
+    var rotX        = vectors.rotation[0];
+    var rotY        = vectors.rotation[1];
+    var rotZ        = vectors.rotation[2];
+    var rotW        = vectors.rotation[3];
+    var scaleX      = vectors.scale[0];
+    var scaleY      = vectors.scale[1];
+    var scaleZ      = vectors.scale[2];
+    var alignX      = offsets.align[0] * parentSize[0];
+    var alignY      = offsets.align[1] * parentSize[1];
+    var alignZ      = offsets.align[2] * parentSize[2];
+    var mountPointX = offsets.mountPoint[0] * mySize[0];
+    var mountPointY = offsets.mountPoint[1] * mySize[1];
+    var mountPointZ = offsets.mountPoint[2] * mySize[2];
+    var originX     = offsets.origin[0] * mySize[0];
+    var originY     = offsets.origin[1] * mySize[1];
+    var originZ     = offsets.origin[2] * mySize[2];
 
     var wx = rotW * rotX;
     var wy = rotW * rotY;
@@ -220,7 +339,8 @@ Transform.prototype.fromNodeWithParent = function fromNodeWithParent (node) {
     var target = this.getLocalTransform();
     var parentMatrix = this.parent.getLocalTransform();
     var mySize = node.getSize();
-    var spec = node.value;
+    var vectors = this.vectors;
+    var offsets = this.offsets;
     var parentSize = node.getParent().getSize();
     var changed = false;
 
@@ -249,25 +369,25 @@ Transform.prototype.fromNodeWithParent = function fromNodeWithParent (node) {
     var p30         = parentMatrix[12];
     var p31         = parentMatrix[13];
     var p32         = parentMatrix[14];
-    var posX        = spec.vectors.position[0];
-    var posY        = spec.vectors.position[1];
-    var posZ        = spec.vectors.position[2];
-    var rotX        = spec.vectors.rotation[0];
-    var rotY        = spec.vectors.rotation[1];
-    var rotZ        = spec.vectors.rotation[2];
-    var rotW        = spec.vectors.rotation[3];
-    var scaleX      = spec.vectors.scale[0];
-    var scaleY      = spec.vectors.scale[1];
-    var scaleZ      = spec.vectors.scale[2];
-    var alignX      = spec.offsets.align[0] * parentSize[0];
-    var alignY      = spec.offsets.align[1] * parentSize[1];
-    var alignZ      = spec.offsets.align[2] * parentSize[2];
-    var mountPointX = spec.offsets.mountPoint[0] * mySize[0];
-    var mountPointY = spec.offsets.mountPoint[1] * mySize[1];
-    var mountPointZ = spec.offsets.mountPoint[2] * mySize[2];
-    var originX     = spec.offsets.origin[0] * mySize[0];
-    var originY     = spec.offsets.origin[1] * mySize[1];
-    var originZ     = spec.offsets.origin[2] * mySize[2];
+    var posX        = vectors.position[0];
+    var posY        = vectors.position[1];
+    var posZ        = vectors.position[2];
+    var rotX        = vectors.rotation[0];
+    var rotY        = vectors.rotation[1];
+    var rotZ        = vectors.rotation[2];
+    var rotW        = vectors.rotation[3];
+    var scaleX      = vectors.scale[0];
+    var scaleY      = vectors.scale[1];
+    var scaleZ      = vectors.scale[2];
+    var alignX      = offsets.align[0] * parentSize[0];
+    var alignY      = offsets.align[1] * parentSize[1];
+    var alignZ      = offsets.align[2] * parentSize[2];
+    var mountPointX = offsets.mountPoint[0] * mySize[0];
+    var mountPointY = offsets.mountPoint[1] * mySize[1];
+    var mountPointZ = offsets.mountPoint[2] * mySize[2];
+    var originX     = offsets.origin[0] * mySize[0];
+    var originY     = offsets.origin[1] * mySize[1];
+    var originZ     = offsets.origin[2] * mySize[2];
 
     var wx = rotW * rotX;
     var wy = rotW * rotY;
