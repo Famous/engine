@@ -59,7 +59,7 @@ function Scene (selector, updater) {
                                          // graph below this context
     
     this._selector = selector; // reference to the DOM selector
-                               // that represents the elemnent
+                               // that represents the element
                                // in the dom that this context
                                // inhabits
 
