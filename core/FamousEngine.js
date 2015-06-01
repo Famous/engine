@@ -155,6 +155,7 @@ FamousEngine.prototype._update = function _update () {
     while (queue.length) {
         item = queue.shift();
         if (item && item.update) item.update(time);
+        if (item && item.onUpdate) item.onUpdate(time);
     }
 
     this._inUpdate = false;

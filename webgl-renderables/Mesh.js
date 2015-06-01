@@ -556,11 +556,11 @@ Mesh.prototype.onTransformChange = function onTransformChange (transform) {
  *
  * @return {undefined} undefined
  */
-Mesh.prototype.onSizeChange = function onSizeChange (size) {
+Mesh.prototype.onSizeChange = function onSizeChange (x, y, z) {
     if (this._initialized) {
         this._changeQueue.push(Commands.GL_UNIFORMS);
         this._changeQueue.push('u_size');
-        this._changeQueue.push(size);
+        this._changeQueue.push([x, y, z]);
     }
 
     this._requestUpdate();
