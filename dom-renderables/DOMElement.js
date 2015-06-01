@@ -307,6 +307,14 @@ DOMElement.prototype.onAddUIEvent = function onAddUIEvent(uiEvent) {
     return this;
 };
 
+/**
+ * Method to be invoked by the node as soon as a UIEvent is removed from
+ * the node.  This results into an `UNSUBSCRIBE` command being sent.
+ *
+ * @param {String} UIEvent UIEvent to be removed (e.g. `mousedown`)
+ *
+ * @return {undefined} undefined
+ */
 DOMElement.prototype.onRemoveUIEvent = function onRemoveUIEvent(UIEvent) {
     var index = this._UIEvents.indexOf(UIEvent);
     if (index !== -1) {
