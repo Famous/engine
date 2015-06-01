@@ -113,9 +113,9 @@ TransformSystem.prototype.onUpdate = function onUpdate () {
         if (offsets.alignChanged) alignChanged(node, components, offsets);
         if (offsets.mountPointChanged) mountPointChanged(node, components, offsets);
         if (offsets.originChanged) originChanged(node, components, offsets);
-        if (vectors.positionChanged) positionChanged(node, components, position);
-        if (vectors.rotationChanged) rotationChanged(node, components, rotation);
-        if (vectors.scaleChanged) scaleChanged(node, components, scale);
+        if (vectors.positionChanged) positionChanged(node, components, vectors);
+        if (vectors.rotationChanged) rotationChanged(node, components, vectors);
+        if (vectors.scaleChanged) scaleChanged(node, components, vectors);
         if ((changed = transform.from(node))) {
             transformChanged(node, components, transform);
             if (changed & Transform.LOCAL_CHANGED) localTransformChanged(node, components, transform.getLocalTransform());
