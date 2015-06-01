@@ -116,6 +116,16 @@ DOMRenderer.prototype.subscribe = function subscribe(type, preventDefault) {
     }
 };
 
+/**
+ * Removes an EventListener of given type from the element on which it was
+ * registered.
+ *
+ * @method
+ *
+ * @param {String} type DOM event type (e.g. click, mouseover).
+ *
+ * @return {undefined} undefined
+ */
 DOMRenderer.prototype.unsubscribe = function unsubscribe(type) {
     this._assertTargetLoaded();
     this._target.subscribe[type] = false;
