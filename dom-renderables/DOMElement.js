@@ -341,6 +341,7 @@ DOMElement.prototype._subscribe = function _subscribe (uiEvent) {
     if (this._initialized) {
         this._changeQueue.push('SUBSCRIBE', uiEvent);
     }
+<<<<<<< HEAD
     if (!this._requestingUpdate) this._requestUpdate();
 };
 
@@ -378,6 +379,7 @@ DOMElement.prototype.allowDefault = function allowDefault (uiEvent) {
     if (this._initialized) {
         this._changeQueue.push('ALLOW_DEFAULT', uiEvent);
     }
+
     if (!this._requestingUpdate) this._requestUpdate();
 };
 
@@ -395,9 +397,7 @@ DOMElement.prototype._unsubscribe = function _unsubscribe (UIEvent) {
     if (this._initialized) {
         this._changeQueue.push('UNSUBSCRIBE', UIEvent);
     }
-    if (!this._requestingUpdate) {
-        this._requestUpdate();
-    }
+    
     if (!this._requestingUpdate) this._requestUpdate();
 };
 
