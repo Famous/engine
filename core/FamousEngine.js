@@ -32,6 +32,7 @@ var UIManager = require('../renderers/UIManager');
 var Compositor = require('../renderers/Compositor');
 var RequestAnimationFrameLoop = require('../render-loops/RequestAnimationFrameLoop');
 var TransformSystem = require('./TransformSystem');
+var SizeSystem = require('./SizeSystem');
 var Commands = require('./Commands');
 
 var ENGINE_START = [Commands.ENGINE, Commands.START];
@@ -146,14 +147,15 @@ FamousEngine.prototype._update = function _update () {
 
     this._messages[1] = time;
 
+    SizeSystem.update();
+    TransformSystem.onUpdate();
+
     while (nextQueue.length) queue.unshift(nextQueue.pop());
 
     while (queue.length) {
         item = queue.shift();
-        if (item && item.onUpdate) item.onUpdate(time);
+        if (item && item.update) item.update(time);
     }
-
-    TransformSystem.onUpdate();
 
     this._inUpdate = false;
 };

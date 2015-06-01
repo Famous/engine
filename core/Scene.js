@@ -27,10 +27,10 @@
 'use strict';
 
 var Node = require('./Node');
-var Size = require('./Size');
 var Dispatch = require('./Dispatch');
 var Commands = require('./Commands');
 var TransformSystem = require('./TransformSystem');
+var SizeSystem = require('./SizeSystem');
 
 /**
  * Scene is the bottom of the scene graph. It is its own
@@ -130,7 +130,7 @@ Scene.prototype.onReceive = function onReceive (event, payload) {
                     ' of pixel sizes'
             );
 
-        this.setSizeMode(Size.ABSOLUTE, Size.ABSOLUTE, Size.ABSOLUTE);
+        this.setSizeMode('absolute', 'absolute', 'absolute');
         this.setAbsoluteSize(payload[0],
                              payload[1],
                              payload[2] ? payload[2] : 0);
@@ -147,6 +147,7 @@ Scene.prototype.mount = function mount (path) {
     this.value.showState.mounted = true;
     this._parent = this;
     TransformSystem.registerTransformAtPath(path);
+    SizeSystem.registerSizeAtPath(path);
 };
 
 module.exports = Scene;

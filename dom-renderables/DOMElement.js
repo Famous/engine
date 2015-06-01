@@ -261,14 +261,14 @@ DOMElement.prototype.onTransformChange = function onTransformChange (transform) 
  *
  * @return {DOMElement} this
  */
-DOMElement.prototype.onSizeChange = function onSizeChange(size) {
+DOMElement.prototype.onSizeChange = function onSizeChange(x, y) {
     var sizeMode = this._node.getSizeMode();
     var sizedX = sizeMode[0] !== RENDER_SIZE;
     var sizedY = sizeMode[1] !== RENDER_SIZE;
     if (this._initialized)
         this._changeQueue.push(Commands.CHANGE_SIZE,
-            sizedX ? size[0] : sizedX,
-            sizedY ? size[1] : sizedY);
+            sizedX ? x : sizedX,
+            sizedY ? y : sizedY);
 
     if (!this._requestingUpdate) this._requestUpdate();
     return this;
@@ -341,7 +341,8 @@ DOMElement.prototype.onSizeModeChange = function onSizeModeChange(x, y, z) {
         this._renderSized = true;
         this._requestRenderSize = true;
     }
-    this.onSizeChange(this._node.getSize());
+    var size = this._node.getSize();
+    this.onSizeChange(size[0], size[1]);
 };
 
 /**
