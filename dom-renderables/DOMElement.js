@@ -385,7 +385,7 @@ DOMElement.prototype.onRemoveUIEvent = function onRemoveUIEvent(UIEvent) {
 };
 
 /**
- * Appends an `ADD_EVENT_LISTENER` command to the command queue.
+ * Appends an `SUBSCRIBE` command to the command queue.
  *
  * @method
  * @private
@@ -404,6 +404,16 @@ DOMElement.prototype._subscribe = function _subscribe (UIEvent) {
     if (!this._requestingUpdate) this._requestUpdate();
 };
 
+/**
+ * Appends an `UNSUBSCRIBE` command to the command queue.
+ *
+ * @method
+ * @private
+ *
+ * @param {String} UIEvent Event type (e.g. `click`)
+ *
+ * @return {undefined} undefined
+ */
 DOMElement.prototype._unsubscribe = function _unsubscribe (UIEvent) {
     if (this._initialized) {
         this._changeQueue.push('UNSUBSCRIBE', UIEvent);
