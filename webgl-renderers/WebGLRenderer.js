@@ -158,7 +158,7 @@ WebGLRenderer.prototype.handleClick = function handleClicke(ev) {
     var rect = ev.target.getBoundingClientRect();
     if (rect.left <= x && x < rect.right && rect.top <= y && y < rect.bottom) {
         x = x - rect.left, y = rect.bottom - y;
-        this.check(x, y);
+        this.check(x * devicePixelRatio, y * devicePixelRatio);
     }
 
     return this;
