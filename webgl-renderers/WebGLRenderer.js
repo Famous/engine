@@ -137,6 +137,22 @@ function WebGLRenderer(canvas, compositor) {
 }
 
 /**
+ * Attaches an EventListener to the element associated with the passed in path.
+ *
+ * @method
+ *
+ * @param {String} path Path for the given Mesh.
+ * @param {String} type event type (e.g. click).
+ *
+ * @return {undefined} undefined
+ */
+WebGLRenderer.prototype.subscribe = function subscribe(path, type) {
+    var mesh = this.meshRegistry[path];
+    this.listeners[mesh.id] = mesh;
+    return this;
+};
+
+/**
  * Attempts to retreive the WebGLRenderer context using several
  * accessors. For browser compatability. Throws on error.
  *

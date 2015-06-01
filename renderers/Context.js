@@ -232,6 +232,12 @@ Context.prototype.receive = function receive(path, commands, iterator) {
                 this.WebGLRenderer.setMeshOptions(path, commands[++localIterator]);
                 break;
 
+            case 'GL_SUBSCRIBE':
+                if (!this.WebGLRenderer) this.initWebGL();
+                debugger
+                this.WebGLRenderer.subscribe(commands[++localIterator], commands[++localIterator]);
+                break;
+
             case 'GL_AMBIENT_LIGHT':
                 if (!this.WebGLRenderer) this.initWebGL();
                 this.WebGLRenderer.setAmbientLightColor(
