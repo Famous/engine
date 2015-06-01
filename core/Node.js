@@ -948,7 +948,7 @@ Node.prototype.setPosition = function setPosition (x, y, z) {
  * @param {Number} z Either the rotation around the z axis or the magnitude in z of the axis of rotation.
  * @param {Number|undefined} w the amount of rotation around the axis of rotation, if a quaternion is specified.
  *
- * @return {undefined} undefined
+ * @return {Node} this
  */
 Node.prototype.setRotation = function setRotation (x, y, z, w) {
     var quat = this.value.vectors.rotation;
