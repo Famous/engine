@@ -70,9 +70,11 @@ Size.prototype.fromSpecWithParent = function fromSpecWithParent (parentSize, nod
                 break;
             case Size.RENDER:
                 var candidate;
+                var component;
                 for (j = 0; j < len ; j++) {
-                    if (components[j] && components[j].getRenderSize) {
-                        candidate = components[j].getRenderSize()[i];
+                    component = components[j];
+                    if (component && component.getRenderSize) {
+                        candidate = component.getRenderSize()[i];
                         prev = target[i];
                         target[i] = target[i] < candidate || target[i] === 0 ? candidate : target[i];
                     }
