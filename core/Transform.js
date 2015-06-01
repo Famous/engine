@@ -129,7 +129,7 @@ Transform.prototype.setPosition = function setPosition (x, y, z) {
     this.vectors.positionChanged = setVec(this.vectors.position, x, y, z);
 };
 
-Transform.prototype.setRotation = function setRotation (x, y, z) {
+Transform.prototype.setRotation = function setRotation (x, y, z, w) {
     var quat = this.vectors.rotation;
     var propagate = false;
     var qx = x;
@@ -154,9 +154,9 @@ Transform.prototype.setRotation = function setRotation (x, y, z) {
                 var sp = -2 * (quat[1] * quat[2] - quat[3] * quat[0]);
 
                 if (Math.abs(sp) > 0.99999) {
-                    y = y == null ? Math.PI * 05 * sp : y;
+                    y = y == null ? Math.PI * 0.5 * sp : y;
                     x = x == null ? Math.atan2(-quat[0] * quat[2] + quat[3] * quat[1], 0.5 - Math.pow(quat[1], 2) - Math.pow(quat[2], 2)) : x;
-                    z = z == null ? 0, z;
+                    z = z == null ? 0 : z;
                 }
                 else {
                     y = y == null ? Math.asin(sp) : y;
