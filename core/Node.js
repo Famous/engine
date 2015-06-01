@@ -661,6 +661,20 @@ Node.prototype.removeComponent = function removeComponent (component) {
     return component;
 };
 
+Node.prototype.removeUIEvent = function removeUIEvent (eventName) {
+    var UIEvents = this.getUIEvents();
+    var components = this._components;
+    var component;
+
+    var index = UIEvents.indexOf(eventName);
+    if (index !== -1) {
+        UIEvents.splice(index, 1);
+        for (var i = 0, len = components.length ; i < len ; i++) {
+            component = components[i];
+            if (component && component.onRemoveUIEvent) component.onRemoveUIEvent(eventName);
+        }
+    }
+};
 /**
  * Subscribes a node to a UI Event. All components on the node
  * will have the opportunity to begin listening to that event
