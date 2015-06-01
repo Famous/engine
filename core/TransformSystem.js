@@ -176,7 +176,7 @@ function rotationChanged (node, components, vectors) {
     if (node.onRotationChange) node.onRotationChange(x, y, z, w);
     for (var i = 0, len = components.length ; i < len ; i++)
         if (components[i] && components[i].onRotationChange)
-            components[i] && components[i].onRotationChange(x, y, z, w);
+            components[i].onRotationChange(x, y, z, w);
     vectors.rotationChanged = false;
 }
 
