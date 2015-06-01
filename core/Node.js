@@ -26,12 +26,10 @@
 
 'use strict';
 
-var Size = require('./Size');
+var SizeSystem = require('./SizeSystem');
 var Dispatch = require('./Dispatch');
 var TransformSystem = require('./TransformSystem');
 var pathUtils = require('./Path');
-
-var SIZE_PROCESSOR = new Size();
 
 var IDENT = [
     1, 0, 0, 0,
@@ -110,10 +108,10 @@ function Node () {
     this.value = new Node.Spec();
 }
 
-Node.RELATIVE_SIZE = Size.RELATIVE;
-Node.ABSOLUTE_SIZE = Size.ABSOLUTE;
-Node.RENDER_SIZE = Size.RENDER;
-Node.DEFAULT_SIZE = Size.DEFAULT;
+Node.RELATIVE_SIZE = 0;
+Node.ABSOLUTE_SIZE = 1;
+Node.RENDER_SIZE = 2;
+Node.DEFAULT_SIZE = 0;
 
 /**
  * A Node spec holds the "data" associated with a Node.
@@ -159,7 +157,7 @@ Node.Spec = function Spec () {
         scale: new Float32Array(ONES)
     };
     this.size = {
-        sizeMode: new Float32Array([Size.RELATIVE, Size.RELATIVE, Size.RELATIVE]),
+        sizeMode: new Float32Array(3),
         proportional: new Float32Array(ONES),
         differential: new Float32Array(3),
         absolute: new Float32Array(3),
@@ -457,7 +455,7 @@ Node.prototype.getScale = function getScale () {
  * @return {Float32Array} an array of numbers showing the current size mode
  */
 Node.prototype.getSizeMode = function getSizeMode () {
-    return this.value.size.sizeMode;
+    return SizeSystem.get(this.getLocation()).getSizeMode();
 };
 
 /**
@@ -468,7 +466,7 @@ Node.prototype.getSizeMode = function getSizeMode () {
  * @return {Float32Array} a vector 3 showing the current proportional size
  */
 Node.prototype.getProportionalSize = function getProportionalSize () {
-    return this.value.size.proportional;
+    return SizeSystem.get(this.getLocation()).getProportional();
 };
 
 /**
@@ -479,7 +477,7 @@ Node.prototype.getProportionalSize = function getProportionalSize () {
  * @return {Float32Array} a vector 3 showing the current differential size
  */
 Node.prototype.getDifferentialSize = function getDifferentialSize () {
-    return this.value.size.differential;
+    return SizeSystem.get(this.getLocation()).getDifferential();
 };
 
 /**
@@ -490,7 +488,7 @@ Node.prototype.getDifferentialSize = function getDifferentialSize () {
  * @return {Float32Array} a vector 3 showing the current absolute size of the node
  */
 Node.prototype.getAbsoluteSize = function getAbsoluteSize () {
-    return this.value.size.absolute;
+    return SizeSystem.get(this.getLocation()).getAbsolute();
 };
 
 /**
@@ -503,7 +501,7 @@ Node.prototype.getAbsoluteSize = function getAbsoluteSize () {
  * @return {Float32Array} a vector 3 showing the current render size
  */
 Node.prototype.getRenderSize = function getRenderSize () {
-    return this.value.size.render;
+    return SizeSystem.get(this.getLocation()).getRender();
 };
 
 /**
@@ -514,7 +512,7 @@ Node.prototype.getRenderSize = function getRenderSize () {
  * @return {Float32Array} a vector 3 of the final calculated side of the node
  */
 Node.prototype.getSize = function getSize () {
-    return this._calculatedValues.size;
+    return SizeSystem.get(this.getLocation()).get();
 };
 
 /**
@@ -906,55 +904,8 @@ Node.prototype.setOpacity = function setOpacity (val) {
  * @return {Node} this
  */
 Node.prototype.setSizeMode = function setSizeMode (x, y, z) {
-    var vec3 = this.value.size.sizeMode;
-    var propogate = false;
-
-    if (x != null) propogate = this._resolveSizeMode(vec3, 0, x) || propogate;
-    if (y != null) propogate = this._resolveSizeMode(vec3, 1, y) || propogate;
-    if (z != null) propogate = this._resolveSizeMode(vec3, 2, z) || propogate;
-
-    if (propogate) {
-        var i = 0;
-        var list = this._components;
-        var len = list.length;
-        var item;
-        x = vec3[0];
-        y = vec3[1];
-        z = vec3[2];
-        for (; i < len ; i++) {
-            item = list[i];
-            if (item && item.onSizeModeChange) item.onSizeModeChange(x, y, z);
-        }
-    }
+    SizeSystem.get(this.getLocation()).setSizeMode(x, y, z);
     return this;
-};
-
-/**
- * A protected method that resolves string representations of size mode
- * to numeric values and applies them.
- *
- * @method
- *
- * @param {Array} vec the array to write size mode to
- * @param {Number} index the index to write to in the array
- * @param {String|Number} val the value to write
- *
- * @return {Bool} whether or not the sizemode has been changed for this index.
- */
-Node.prototype._resolveSizeMode = function _resolveSizeMode (vec, index, val) {
-    if (val.constructor === String) {
-        switch (val.toLowerCase()) {
-            case 'relative':
-            case 'default':
-                return this._vecOptionalSet(vec, index, 0);
-            case 'absolute':
-                return this._vecOptionalSet(vec, index, 1);
-            case 'render':
-                return this._vecOptionalSet(vec, index, 2);
-            default: throw new Error('unknown size mode: ' + val);
-        }
-    }
-    else return this._vecOptionalSet(vec, index, val);
 };
 
 /**
@@ -971,26 +922,7 @@ Node.prototype._resolveSizeMode = function _resolveSizeMode (vec, index, val) {
  * @return {Node} this
  */
 Node.prototype.setProportionalSize = function setProportionalSize (x, y, z) {
-    var vec3 = this.value.size.proportional;
-    var propogate = false;
-
-    propogate = this._vecOptionalSet(vec3, 0, x) || propogate;
-    propogate = this._vecOptionalSet(vec3, 1, y) || propogate;
-    propogate = this._vecOptionalSet(vec3, 2, z) || propogate;
-
-    if (propogate) {
-        var i = 0;
-        var list = this._components;
-        var len = list.length;
-        var item;
-        x = vec3[0];
-        y = vec3[1];
-        z = vec3[2];
-        for (; i < len ; i++) {
-            item = list[i];
-            if (item && item.onProportionalSizeChange) item.onProportionalSizeChange(x, y, z);
-        }
-    }
+    SizeSystem.get(this.getLocation()).setProportional(x, y, z);
     return this;
 };
 
@@ -1013,26 +945,7 @@ Node.prototype.setProportionalSize = function setProportionalSize (x, y, z) {
  * @return {Node} this
  */
 Node.prototype.setDifferentialSize = function setDifferentialSize (x, y, z) {
-    var vec3 = this.value.size.differential;
-    var propogate = false;
-
-    propogate = this._vecOptionalSet(vec3, 0, x) || propogate;
-    propogate = this._vecOptionalSet(vec3, 1, y) || propogate;
-    propogate = this._vecOptionalSet(vec3, 2, z) || propogate;
-
-    if (propogate) {
-        var i = 0;
-        var list = this._components;
-        var len = list.length;
-        var item;
-        x = vec3[0];
-        y = vec3[1];
-        z = vec3[2];
-        for (; i < len ; i++) {
-            item = list[i];
-            if (item && item.onDifferentialSizeChange) item.onDifferentialSizeChange(x, y, z);
-        }
-    }
+    SizeSystem.get(this.getLocation()).setDifferential(x, y, z);
     return this;
 };
 
@@ -1048,127 +961,12 @@ Node.prototype.setDifferentialSize = function setDifferentialSize (x, y, z) {
  * @return {Node} this
  */
 Node.prototype.setAbsoluteSize = function setAbsoluteSize (x, y, z) {
-    var vec3 = this.value.size.absolute;
-    var propogate = false;
-
-    propogate = this._vecOptionalSet(vec3, 0, x) || propogate;
-    propogate = this._vecOptionalSet(vec3, 1, y) || propogate;
-    propogate = this._vecOptionalSet(vec3, 2, z) || propogate;
-
-    if (propogate) {
-        var i = 0;
-        var list = this._components;
-        var len = list.length;
-        var item;
-        x = vec3[0];
-        y = vec3[1];
-        z = vec3[2];
-        for (; i < len ; i++) {
-            item = list[i];
-            if (item && item.onAbsoluteSizeChange) item.onAbsoluteSizeChange(x, y, z);
-        }
-    }
+    SizeSystem.get(this.getLocation()).setAbsolute(x, y, z);
     return this;
 };
 
 /**
- * Private method for alerting all components and children that
- * this node's transform has changed.
- *
- * @method
- *
- * @param {Transform} transform The transform that has changed
- *
- * @return {undefined} undefined
- */
-Node.prototype.transformChange = function transformChange (transform) {
-    var i = 0;
-    var items = this._components;
-    var len = items.length;
-    var item;
-
-    if (this.onTransformChange) this.onTransformChange();
-
-    for (; i < len ; i++) {
-        item = items[i];
-        if (item && item.onTransformChange) item.onTransformChange(transform);
-    }
-};
-
-/**
- * Private method for alerting all components that this nodes
- * local transform has changed
- *
- * @method
- *
- * @param {Float32Array} transform The local transform
- *
- * @return {undefined} undefined
- */
-Node.prototype.localTransformChange = function localTransformChange (transform) {
-    var i = 0;
-    var items = this._components;
-    var len = items.length;
-    var item;
-
-    if (this.onLocalTransformChange) this.onLocalTransformChange(transform);
-
-    for (; i < len ; i++) {
-        item = items[i];
-        if (item && item.onLocalTransformChange) item.onLocalTransformChange(transform);
-    }
-};
-
-/**
- * Private method for alerting all components that this node's
- * world transform has changed
- *
- * @method
- *
- * @param {Float32Array} transform the world transform
- *
- * @return {undefined} undefined
- */
-Node.prototype.worldTransformChange = function worldTransformChange (transform) {
-    var i = 0;
-    var items = this._components;
-    var len = items.length;
-    var item;
-
-    if (this.onWorldTransformChange) this.onWorldTransformChange(transform);
-
-    for (; i < len ; i++) {
-        item = items[i];
-        if (item && item.onWorldTransformChange) item.onWorldTransformChange(transform)
-    }
-};
-
-/**
- * Private method for alerting all components and children that
- * this node's size has changed.
- *
- * @method
- *
- * @param {Float32Array} size the size that has changed
- *
- * @return {undefined} undefined
- */
-Node.prototype.sizeChange = function sizeChange (size) {
-    var i = 0;
-    var items = this._components;
-    var len = items.length;
-    var item;
-
-    if (this.onSizeChange) this.onSizeChange(size);
-
-    for (; i < len ; i++) {
-        item = items[i];
-        if (item && item.onSizeChange) item.onSizeChange(size);
-    }
-};
-
-/**
- * Method for getting the current frame. Will be deprecated.
+ * Method for getting the current frame. Will be depricated.
  *
  * @method
  *
@@ -1247,6 +1045,7 @@ Node.prototype.mount = function mount (path) {
 
     Dispatch.registerNodeAtPath(path, this);
     TransformSystem.registerTransformAtPath(path);
+    SizeSystem.registerSizeAtPath(path);
 
     var parent = Dispatch.getNode(pathUtils.parent(path));
     this._parent = parent;
@@ -1272,6 +1071,8 @@ Node.prototype.dismount = function dismount () {
         throw new Error('Node is not mounted');
 
     Dispatch.deregisterNodeAtPath(this.getLocation(), this);
+    TransformSystem.deregisterTransformAtPath(path);
+    SizeSystem.deregisterSizeAtPath(path);
 
     var i = 0;
     var list = this._components;
