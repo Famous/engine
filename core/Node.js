@@ -661,6 +661,17 @@ Node.prototype.removeComponent = function removeComponent (component) {
     return component;
 };
 
+/**
+ * Removes a node's subscription to a particular UIEvent. All components 
+ * on the node will have the opportunity to remove all listeners depending
+ * on this event.
+ *
+ * @method
+ *
+ * @param {String} eventName the name of the event
+ *
+ * @return {undefined} undefined
+ */
 Node.prototype.removeUIEvent = function removeUIEvent (eventName) {
     var UIEvents = this.getUIEvents();
     var components = this._components;
@@ -675,6 +686,7 @@ Node.prototype.removeUIEvent = function removeUIEvent (eventName) {
         }
     }
 };
+
 /**
  * Subscribes a node to a UI Event. All components on the node
  * will have the opportunity to begin listening to that event
