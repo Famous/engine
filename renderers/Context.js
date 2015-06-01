@@ -184,7 +184,6 @@ Context.prototype.receive = function receive(path, commands, iterator) {
     this.DOMRenderer.loadPath(path);
     this.DOMRenderer.findTarget();
     while (command) {
-
         switch (command) {
             case 'INIT_DOM':
                 this.DOMRenderer.insertEl(commands[++localIterator]);
@@ -259,6 +258,11 @@ Context.prototype.receive = function receive(path, commands, iterator) {
             case 'ALLOW_DEFAULT':
                 if (this.WebGLRenderer) this.WebGLRenderer.getOrSetCutout(path);
                 this.DOMRenderer.allowDefault(commands[++localIterator]);
+                break;
+
+            case 'UNSUBSCRIBE':
+                if (this.WebGLRenderer) this.WebGLRenderer.getOrSetCutout(path);
+                this.DOMRenderer.unsubscribe(commands[++localIterator]);
                 break;
 
             case 'GL_SET_DRAW_OPTIONS':
