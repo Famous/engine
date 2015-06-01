@@ -186,8 +186,14 @@ WebGLRenderer.prototype.check = function check(x, y) {
 
     this.program.setUniforms(['u_clicked'], [0.0]);
     this.drawMeshes();
-    console.log(pixels[3]);
-    return this.listeners[pixels[3]];
+
+    var picked = this.listeners[pixels[3]];
+
+    if (picked) {
+        this.compositor.sendEvent(picked.path, 'click', {});
+    }
+
+    return picked;
 };
 
 /**
