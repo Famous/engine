@@ -372,6 +372,18 @@ DOMElement.prototype.onAddUIEvent = function onAddUIEvent(UIEvent) {
     return this;
 };
 
+DOMElement.prototype.onRemoveUIEvent = function onRemoveUIEvent(UIEvent) {
+    var index = this._UIEvents.indexOf(UIEvent);
+    if (index !== -1) {
+        this._unsubscribe(UIEvent);
+        this._UIEvents.splice(index, 1);
+    }
+    else if (this._inDraw) {
+        this._unsubscribe(UIEvent);
+    }
+    return this;
+};
+
 /**
  * Appends an `ADD_EVENT_LISTENER` command to the command queue.
  *
@@ -385,6 +397,16 @@ DOMElement.prototype.onAddUIEvent = function onAddUIEvent(UIEvent) {
 DOMElement.prototype._subscribe = function _subscribe (UIEvent) {
     if (this._initialized) {
         this._changeQueue.push('SUBSCRIBE', UIEvent, true);
+    }
+    if (!this._requestingUpdate) {
+        this._requestUpdate();
+    }
+    if (!this._requestingUpdate) this._requestUpdate();
+};
+
+DOMElement.prototype._unsubscribe = function _unsubscribe (UIEvent) {
+    if (this._initialized) {
+        this._changeQueue.push('UNSUBSCRIBE', UIEvent);
     }
     if (!this._requestingUpdate) {
         this._requestUpdate();
