@@ -645,6 +645,22 @@ Mesh.prototype.onReceive = function onReceive(event, payload) {
 };
 
 /**
+ * Subscribes to a Mesh using
+ *
+ * @method on
+ *
+ * @param {String} event       The event type (e.g. `click`).
+ * @param {Function} listener  Handler function for the specified event type
+ *                              in which the payload event object will be
+ *                              passed into.
+ *
+ * @return {Function} A function to call if you want to remove the callback
+ */
+Mesh.prototype.on = function on(event, listener) {
+    return this._callbacks.on(event, listener);
+};
+
+/**
  * Queues instance to be updated.
  *
  * @method
