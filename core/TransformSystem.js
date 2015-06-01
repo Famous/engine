@@ -49,7 +49,10 @@ function TransformSystem () {
  * @param {String} path for the transform to be registered to.
  */
 TransformSystem.prototype.registerTransformAtPath = function registerTransformAtPath (path) {
+    if (!PathUtils.depth(path)) return this.layer.insert(path, new Transform());
+
     var parent = this.layer.get(PathUtils.parent(path));
+
     if (!parent) throw new Error(
             'No parent transform registered at expected path: ' + PathUtils.parent(path)
     );
@@ -100,13 +103,11 @@ TransformSystem.prototype.onUpdate = function onUpdate () {
     var vectors;
     var offsets;
     var components;
-    var j;
-    var len2;
 
     for (var i = 0, len = transforms.length ; i < len ; i++) {
         node = Dispatch.getNode(paths[i]);
         if (!node) continue;
-        components = node.getComponent();
+        components = node.getComponents();
         transform = transforms[i];
         vectors = transform.vectors;
         offsets = transform.offsets;

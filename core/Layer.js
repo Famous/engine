@@ -30,7 +30,7 @@ Layer.prototype.insert = function insert (path, item) {
     ) i++;
 
     paths.splice(i, 0, path);
-    this.items.splice(i, 0, path);
+    this.items.splice(i, 0, item);
 
     this.memo[path] = i;
 

@@ -131,37 +131,38 @@ Transform.prototype.setPosition = function setPosition (x, y, z) {
 
 Transform.prototype.setRotation = function setRotation (x, y, z, w) {
     var quat = this.vectors.rotation;
-    var propagate = false;
-    var qx = x;
-    var qy = y;
-    var qz = z;
-    var qw = w;
+    var propogate = false;
+    var qx, qy, qz, qw;
 
-    if (qw != null) {
-        this._lastEulerVals[0] = null;
-        this._lastEulerVals[1] = null;
-        this._lastEulerVals[2] = null;
+    if (w != null) {
+        qx = x;
+        qy = y;
+        qz = z;
+        qw = w;
+        this._lastEuler[0] = null;
+        this._lastEuler[1] = null;
+        this._lastEuler[2] = null;
         this._lastEuler = false;
     }
     else {
         if (x == null || y == null || z == null) {
             if (this._lastEuler) {
-                x = x == null ? this._lastEulerVals[0] : x;
-                x = y == null ? this._lastEulerVals[1] : y;
-                z = z == null ? this._lastEulerVals[2] : z;
+                x = x == null ? this._lastEuler[0] : x;
+                y = y == null ? this._lastEuler[1] : y;
+                z = z == null ? this._lastEuler[2] : z;
             }
             else {
                 var sp = -2 * (quat[1] * quat[2] - quat[3] * quat[0]);
 
                 if (Math.abs(sp) > 0.99999) {
                     y = y == null ? Math.PI * 0.5 * sp : y;
-                    x = x == null ? Math.atan2(-quat[0] * quat[2] + quat[3] * quat[1], 0.5 - Math.pow(quat[1], 2) - Math.pow(quat[2], 2)) : x;
+                    x = x == null ? Math.atan2(-quat[0] * quat[2] + quat[3] * quat[1], 0.5 - quat[1] * quat[1] - quat[2] * quat[2]) : x;
                     z = z == null ? 0 : z;
                 }
                 else {
                     y = y == null ? Math.asin(sp) : y;
-                    x = x == null ? Math.atan2(quat[0] * quat[2] + quat[3] * quat[1], 0.5 - Math.pow(quat[0], 2) - Math.pow(quat[1], 2)) : x;
-                    z = z == null ? Math.atan2(quat[0] * quat[1] + quat[3] * quat[2], 0.5 - Math.pow(quat[0], 2) - Math.pow(quat[2], 2)) : z;
+                    x = x == null ? Math.atan2(quat[0] * quat[2] + quat[3] * quat[1], 0.5 - quat[0] * quat[0] - quat[1] * quat[1]) : x;
+                    z = z == null ? Math.atan2(quat[0] * quat[1] + quat[3] * quat[2], 0.5 - quat[0] * quat[0] - quat[2] * quat[2]) : z;
                 }
             }
         }
@@ -184,16 +185,16 @@ Transform.prototype.setRotation = function setRotation (x, y, z, w) {
 
         qx = sx * cycz + cx * sysz;
         qy = cx * sycz - sx * cysz;
-        qz = cz * cysz + sx * sycz;
+        qz = cx * cysz + sx * sycz;
         qw = cx * cycz - sx * sysz;
 
         this._lastEuler = true;
-        this._lastEulerVals[0] = x;
-        this._lastEulerVals[1] = y;
-        this._lastEulerVals[2] = z;
+        this._lastEuler[0] = x;
+        this._lastEuler[1] = y;
+        this._lastEuler[2] = z;
     }
 
-    this.vectors.rotationChanged = setVec(quat, x, y, z, w);
+    this.vectors.rotationChanged = setVec(quat, qx, qy, qz, qw);
 };
 
 Transform.prototype.setScale = function setScale (x, y, z) {
