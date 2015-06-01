@@ -140,7 +140,7 @@ function WebGLRenderer(canvas, compositor) {
      */
     this.listeners = [];
     this.meshIds = 0;
-    this.canvas.onmousedown = this.handleClick;
+    this.canvas.onmousedown = this.handleClick.bind(this);
 }
 
 /**
@@ -153,15 +153,41 @@ function WebGLRenderer(canvas, compositor) {
  * @return {undefined} undefined
  */
 WebGLRenderer.prototype.handleClick = function handleClicke(ev) {
-    var _this = this;
-
     var x = ev.clientX, y = ev.clientY;
+    var pixelRatio = window.devicePixelRatio || 1;
     var rect = ev.target.getBoundingClientRect();
     if (rect.left <= x && x < rect.right && rect.top <= y && y < rect.bottom) {
         x = x - rect.left, y = rect.bottom - y;
+        this.check(x, y);
     }
 
     return this;
+};
+
+/**
+ * Determine the alpha channel, given an x and y coordinate for the WebGL canvas.
+ *
+ * @method
+ *
+ * @param {Number} x X coordinate
+ * @param {Number} y Y coordinate
+ *
+ * @return {undefined} undefined
+ */
+WebGLRenderer.prototype.check = function check(x, y) {
+    var gl = this.gl;
+
+    gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
+    this.program.setUniforms(['u_clicked'], [1.0]);
+    this.drawMeshes();
+
+    var pixels = new Uint8Array(4);
+    gl.readPixels(x, y, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
+
+    this.program.setUniforms(['u_clicked'], [0.0]);
+    this.drawMeshes();
+    console.log(pixels[3]);
+    return this.listeners[pixels[3]];
 };
 
 /**
@@ -238,6 +264,7 @@ WebGLRenderer.prototype.createLight = function createLight(path) {
  */
 WebGLRenderer.prototype.createMesh = function createMesh(path) {
     this.meshRegistryKeys.push(path);
+    var meshIdColor = ++this.meshIds;
 
     var uniforms = keyValueToArrays({
         u_opacity: 1,
@@ -247,7 +274,8 @@ WebGLRenderer.prototype.createMesh = function createMesh(path) {
         u_positionOffset: [0, 0, 0],
         u_normals: [0, 0, 0],
         u_flatShading: 0,
-        u_glossiness: [0, 0, 0, 0]
+        u_glossiness: [0, 0, 0, 0],
+        u_meshIdColor: [0.0, 0.0, 0.0, meshIdColor/255]
     });
     this.meshRegistry[path] = {
         depth: null,
@@ -257,7 +285,9 @@ WebGLRenderer.prototype.createMesh = function createMesh(path) {
         geometry: null,
         drawType: null,
         textures: [],
-        visible: true
+        visible: true,
+        path: path,
+        id: meshIdColor
     };
     return this.meshRegistry[path];
 };
