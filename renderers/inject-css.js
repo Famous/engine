@@ -59,6 +59,8 @@ var css = '.famous-dom-renderer {' +
     'z-index:1;' +
     'top:0;' +
     'left:0;' +
+    'width:100%;' +
+    'height:100%;' +
 '}';
 
 var INJECTED = typeof document === 'undefined';
