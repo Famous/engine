@@ -389,7 +389,7 @@ Node.prototype.getOpacity = function getOpacity () {
  * @return {Float32Array}   An array representing the mount point.
  */
 Node.prototype.getMountPoint = function getMountPoint () {
-    return this.value.offsets.mountPoint;
+    return TransformSystem.get(this.getLocation()).getMountPoint();
 };
 
 /**
@@ -400,7 +400,7 @@ Node.prototype.getMountPoint = function getMountPoint () {
  * @return {Float32Array}   An array representing the align.
  */
 Node.prototype.getAlign = function getAlign () {
-    return this.value.offsets.align;
+    return TransformSystem.get(this.getLocation()).getAlign();
 };
 
 /**
@@ -411,7 +411,7 @@ Node.prototype.getAlign = function getAlign () {
  * @return {Float32Array}   An array representing the origin.
  */
 Node.prototype.getOrigin = function getOrigin () {
-    return this.value.offsets.origin;
+    return TransformSystem.get(this.getLocation()).getOrigin();
 };
 
 /**
@@ -422,7 +422,7 @@ Node.prototype.getOrigin = function getOrigin () {
  * @return {Float32Array}   An array representing the position.
  */
 Node.prototype.getPosition = function getPosition () {
-    return this.value.vectors.position;
+    return TransformSystem.get(this.getLocation()).getPosition();
 };
 
 /**
@@ -433,7 +433,7 @@ Node.prototype.getPosition = function getPosition () {
  * @return {Float32Array} an array of four values, showing the rotation as a quaternion
  */
 Node.prototype.getRotation = function getRotation () {
-    return this.value.vectors.rotation;
+    return TransformSystem.get(this.getLocation()).getRotation();
 };
 
 /**
@@ -444,7 +444,7 @@ Node.prototype.getRotation = function getRotation () {
  * @return {Float32Array} an array showing the current scale vector
  */
 Node.prototype.getScale = function getScale () {
-    return this.value.vectors.scale;
+    return TransformSystem.get(this.getLocation()).getScale();
 };
 
 /**
