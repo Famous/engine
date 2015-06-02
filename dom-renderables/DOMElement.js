@@ -216,19 +216,20 @@ DOMElement.prototype.onHide = function onHide() {
 
 /**
  * Enables or disables WebGL 'cutout' for this element, which affects
- * how the element is layered with WebGL objects in the scene.  This is designed
- * mainly as a way to acheive
+ * how the element is layered with WebGL objects in the scene.
  *
  * @method
  *
  * @param {Boolean} usesCutout  The presence of a WebGL 'cutout' for this element.
  *
- * @return {undefined} undefined
+ * @return {DOMElement} this
  */
 DOMElement.prototype.setCutoutState = function setCutoutState(usesCutout) {
-    this._changeQueue.push('GL_CUTOUT_STATE', usesCutout);
+    if (this._initialized)
+        this._changeQueue.push('GL_CUTOUT_STATE', usesCutout);
 
-    if (this._initialized) this._requestUpdate();
+    if (!this._requestingUpdate) this._requestUpdate();
+    return this;
 };
 
 /**
