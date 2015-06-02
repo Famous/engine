@@ -74,7 +74,7 @@ function DOMElement(node, options) {
     this._content = '';
 
     this._tagName = options && options.tagName ? options.tagName : 'div';
-    this._id = node ? node.addComponent(this) : null;
+    this._id = node.addComponent(this);
 
     this._renderSize = [0, 0, 0];
 
