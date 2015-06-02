@@ -50,4 +50,4 @@ If you'd like to contribute a fix for a bug, first read up on [how to report a b
 [4]: https://github.com/signup/free
 [5]: https://github.com/Famous/engine/fork
 [6]: http://famous.org/cla
-[7]: #how-to-report-a-bug
+[7]: #reporting-bugs-and-other-issues
