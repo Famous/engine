@@ -55,8 +55,6 @@ function DOMElement(node, options) {
     if (!node) throw new Error('DOMElement must be instantiated on a node');
 
     this._node = node;
-    this._parent = null;
-    this._children = [];
 
     this._requestingUpdate = false;
     this._renderSized = false;
@@ -81,7 +79,6 @@ function DOMElement(node, options) {
     this._renderSize = [0, 0, 0];
 
     this._callbacks = new CallbackStore();
-
 
     if (!options) return;
 
@@ -153,72 +150,6 @@ DOMElement.prototype.onUpdate = function onUpdate() {
     }
 
     this._requestingUpdate = false;
-};
-
-/**
- * Private method which sets the parent of the element in the DOM
- * hierarchy.
- *
- * @method _setParent
- * @private
- *
- * @param {String} path of the parent
- *
- * @return {undefined} undefined
- */
-DOMElement.prototype._setParent = function _setParent(path) {
-    if (this._node) {
-        var location = this._node.getLocation();
-        if (location === path || location.indexOf(path) === -1)
-            throw new Error('The given path isn\'t an ancestor');
-        this._parent = path;
-    } else throw new Error('_setParent called on an Element that isn\'t in the scene graph');
-};
-
-/**
- * Private method which adds a child of the element in the DOM
- * hierarchy.
- *
- * @method
- * @private
- *
- * @param {String} path of the child
- *
- * @return {undefined} undefined
- */
-DOMElement.prototype._addChild = function _addChild(path) {
-    if (this._node) {
-        var location = this._node.getLocation();
-        if (path === location || path.indexOf(location) === -1)
-            throw new Error('The given path isn\'t a descendent');
-        if (this._children.indexOf(path) === -1) this._children.push(path);
-        else throw new Error('The given path is already a child of this element');
-    } else throw new Error('_addChild called on an Element that isn\'t in the scene graph');
-};
-
-/**
- * Private method which returns the path of the parent of this element
- *
- * @method
- * @private
- *
- * @return {String} path of the parent element
- */
-DOMElement.prototype._getParent = function _getParent() {
-    return this._parent;
-};
-
-/**
- * Private method which returns an array of paths of the children elements
- * of this element
- *
- * @method
- * @private
- *
- * @return {Array} an array of the paths of the child element
- */
-DOMElement.prototype._getChildren = function _getChildren() {
-    return this._children;
 };
 
 /**
