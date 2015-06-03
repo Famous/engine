@@ -35,6 +35,8 @@
   "devDependencies": {
     "browserify": "^10.2.1",
     "eslint": "^0.21.2",
+    "rewire": "^2.3.3",
+    "sinon": "^1.14.1",
     "smokestack": "^3.2.2",
     "tap-closer": "^1.0.0",
     "tape": "^4.0.0",
