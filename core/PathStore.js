@@ -40,7 +40,6 @@ function PathStore () {
     this.items = [];
     this.paths = [];
     this.memo = {};
-    this.iterator = 0;
 }
 
 /**
@@ -142,24 +141,29 @@ PathStore.prototype.get = function get (path) {
     return this.items[index];
 };
 
+/**
+ * Returns an array of the items currently stored in this
+ * PathStore.
+ *
+ * @method
+ *
+ * @return {Array} items currently stored
+ */
 PathStore.prototype.getItems = function getItems () {
     return this.items;
 };
 
+/**
+ * Returns an array of the paths currently stored in this
+ * PathStore.
+ *
+ * @method
+ *
+ * @return {Array} paths currently stored
+ */
 PathStore.prototype.getPaths = function getPaths () {
     return this.paths;
 };
 
-PathStore.prototype.next = function next () {
-    return this.paths[this.iterator++];
-};
-
-PathStore.prototype.resetIterator = function resetIterator () {
-    this.iterator = 0;
-};
-
-PathStore.prototype.getIterator = function getIterator () {
-    return this.iterator;
-};
-
 module.exports = PathStore;
+
