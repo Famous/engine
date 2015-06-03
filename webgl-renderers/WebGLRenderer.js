@@ -266,6 +266,7 @@ WebGLRenderer.prototype.createLight = function createLight(path) {
  * @method
  *
  * @param {Number} meshId Mesh ID number
+ * @param {Number} base Base for conversion
  *
  * @returns {Array} Encoded value
  */
@@ -290,7 +291,8 @@ WebGLRenderer.prototype.encodedMeshIdColor = function encodedMeshIdColor(meshId,
  *
  * @method
  *
- * @param {Array} pixelsBuffer Pixel buffer from the WebGL shader
+ * @param {Buffer} pixelsBuffer Pixel buffer from the WebGL shader
+ * @param {Number} base Base for conversion
  *
  * @returns {Number} Mesh ID
  */
