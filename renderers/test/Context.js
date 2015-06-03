@@ -26,7 +26,6 @@
 
 var test = require('tape');
 var Context = require('../Context');
-var Compositor = require('../Compositor');
 
 var noop = function() {};
 
@@ -40,7 +39,7 @@ test('Context', function(t) {
             'Context should b a constructor function'
         );
 
-        var context = new Context('body', {
+        new Context('body', {
             sendResize: function(selector, size) {
                 t.equal(selector, 'body', 'Context should sendResize with selector');
                 t.ok(size instanceof Array && size.length === 3, 'Context should send size as an array with three elements');
