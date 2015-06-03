@@ -24,38 +24,38 @@
 
 'use strict';
 
-var Layer = require('./layer');
+var PathStore = require('./PathStore');
 var Size = require('./Size');
 var Dispatch = require('./Dispatch');
 var PathUtils = require('./Path');
 
 function SizeSystem () {
-    this.layer = new Layer();
+    this.pathStore = new PathStore();
 }
 
 SizeSystem.prototype.registerSizeAtPath = function registerSizeAtPath (path) {
-    if (!PathUtils.depth(path)) return this.layer.insert(path, new Size());
+    if (!PathUtils.depth(path)) return this.pathStore.insert(path, new Size());
 
-    var parent = this.layer.get(PathUtils.parent(path));
+    var parent = this.pathStore.get(PathUtils.parent(path));
 
     if (!parent) throw new Error(
             'No parent size registered at expected path: ' + PathUtils.parent(path)
     );
 
-    this.layer.insert(path, new Size(parent));
+    this.pathStore.insert(path, new Size(parent));
 };
 
 SizeSystem.prototype.deregisterSizeAtPath = function deregisterSizeAtPath(path) {
-    this.layer.remove(path);
+    this.pathStore.remove(path);
 };
 
 SizeSystem.prototype.get = function get (path) {
-    return this.layer.get(path);
+    return this.pathStore.get(path);
 };
 
 SizeSystem.prototype.update = function update () {
-    var sizes = this.layer.getItems();
-    var paths = this.layer.getPaths();
+    var sizes = this.pathStore.getItems();
+    var paths = this.pathStore.getPaths();
     var node;
     var size;
     var i;
