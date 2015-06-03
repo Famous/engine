@@ -290,7 +290,7 @@ WebGLRenderer.prototype.encodedMeshIdColor = function encodedMeshIdColor(meshId,
  *
  * @method
  *
- * @param {Buffer} pixelsBuffer Pixel buffer from the WebGL shader
+ * @param {Array} pixelsBuffer Pixel buffer from the WebGL shader
  *
  * @returns {Number} Mesh ID
  */
@@ -298,7 +298,8 @@ WebGLRenderer.prototype.decodeMeshIdColor = function decodeMeshIdColor(pixelsBuf
     var result = 0;
     var baseColumn = 0;
 
-    for(var i = pixelsBuffer.length - 1; i >= 0; i--) {
+    var len = pixelsBuffer.length - 1;
+    for(var i = len; i >= 0; i--) {
         result += pixelsBuffer[i] * Math.pow(base, baseColumn++);
     }
 
@@ -668,7 +669,8 @@ WebGLRenderer.prototype.drawMeshes = function drawMeshes() {
     var buffers;
     var mesh;
 
-    for(var i = 0; i < this.meshRegistryKeys.length; i++) {
+    var len = this.meshRegistryKeys.length;
+    for(var i = 0; i < len; i++) {
         mesh = this.meshRegistry[this.meshRegistryKeys[i]];
         buffers = this.bufferRegistry.registry[mesh.geometry];
 
