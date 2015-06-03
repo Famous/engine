@@ -408,7 +408,7 @@ DOMRenderer.prototype.loadPath = function loadPath (path) {
  */
 DOMRenderer.prototype.insertEl = function insertEl (tagName) {
     if (!this._target ||
-         this._target.element.tagName.toLowerCase() === tagName.toLowerCase()) {
+        this._target.element.tagName.toLowerCase() !== tagName.toLowerCase()) {
 
         this.findParent();
         this.findChildren();
