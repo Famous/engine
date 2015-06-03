@@ -24,13 +24,38 @@
 
 'use strict';
 
+/**
+ * A collection of utilities for handling paths.
+ *
+ * @class
+ */
 function PathUtils () {
 }
 
+/**
+ * determines if the passed in path has a trailing slash. Paths of the form
+ * 'body/0/1/' return true, while paths of the form 'body/0/1' return false.
+ *
+ * @method
+ *
+ * @param {String} path the path
+ *
+ * @return {Boolean} whether or not the path has a trailing slash
+ */
 PathUtils.prototype.hasTrailingSlash = function hasTrailingSlash (path) {
     return path[path.length - 1] === '/';
 };
 
+/**
+ * Returns the depth in the tree this path represents. Essentially counts
+ * the slashes ignoring a trailing slash.
+ *
+ * @method
+ *
+ * @param {String} path the path
+ *
+ * @return {Number} the depth in the tree that this path represents
+ */
 PathUtils.prototype.depth = function depth (path) {
     var count = 0;
     var length = path.length;
@@ -40,6 +65,15 @@ PathUtils.prototype.depth = function depth (path) {
     return count;
 };
 
+/**
+ * Gets the position of this path in relation to its siblings.
+ *
+ * @method
+ *
+ * @param {String} path the path
+ *
+ * @return {Number} the index of this path in relation to its siblings.
+ */
 PathUtils.prototype.index = function index (path) {
     var length = path.length;
     var len = this.hasTrailingSlash(path) ? length - 1 : length;
@@ -48,6 +82,17 @@ PathUtils.prototype.index = function index (path) {
     return isNaN(result) ? 0 : result;
 };
 
+/**
+ * Gets the position of the path at a particular breadth in relationship
+ * to its siblings
+ *
+ * @method
+ *
+ * @param {String} path the path
+ * @param {Number} depth the breadth at which to find the index
+ *
+ * @return {Number} index at the particular depth
+ */
 PathUtils.prototype.indexAtDepth = function indexAtDepth (path, depth) {
     var i = 0;
     var len = path.length;
@@ -62,20 +107,59 @@ PathUtils.prototype.indexAtDepth = function indexAtDepth (path, depth) {
     }
 };
 
+/**
+ * returns the path of the passed in path's parent.
+ *
+ * @method
+ *
+ * @param {String} path the path
+ *
+ * @return {String} the path of the passed in path's parent
+ */
 PathUtils.prototype.parent = function parent (path) {
     return path.substring(0, path.lastIndexOf('/', path.length - 2));
 };
 
+/**
+ * Determines whether or not the first argument path is the direct child
+ * of the second argument path.
+ *
+ * @method
+ *
+ * @param {String} child the path that may be a child
+ * @param {String} parent the path that may be a parent
+ *
+ * @return {Boolean} whether or not the first argument path is a child of the second argument path
+ */
 PathUtils.prototype.isChildOf = function isChildOf (child, parent) {
     return this.isDescendentOf(child, parent) && this.depth(child) === this.depth(parent) + 1;
 };
 
+/**
+ * Returns true if the first argument path is a descendent of the second argument path.
+ *
+ * @method
+ *
+ * @param {String} child potential descendent path
+ * @param {String} parent potential ancestor path
+ *
+ * @return {Boolean} whether or not the path is a descendent
+ */
 PathUtils.prototype.isDescendentOf = function isDescendentOf(child, parent) {
     child = this.hasTrailingSlash(child) ? child : child + '/';
     parent = this.hasTrailingSlash(parent) ? parent : parent + '/';
     return child.indexOf(parent) === 0;
 };
 
+/**
+ * returns the selector portion of the path.
+ *
+ * @method
+ *
+ * @param {String} path the path
+ *
+ * @return {String} the selector portion of the path.
+ */
 PathUtils.prototype.getSelector = function getSelector(path) {
     var index = path.indexOf('/');
     return index === -1 ? path : path.substring(0, index);
