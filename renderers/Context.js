@@ -125,7 +125,15 @@ Context.prototype.draw = function draw() {
     if (this._renderState.viewDirty) this._renderState.viewDirty = false;
 };
 
-
+/**
+ * Initializes the DOMRenderer by creating a root DIV element and appending it
+ * to the context.
+ *
+ * @method
+ * @private
+ *
+ * @return {undefined} undefined
+ */
 Context.prototype._initDOMRenderer = function _initDOMRenderer() {
     this._domRendererRootEl = document.createElement('div');
     this._rootEl.appendChild(this._domRendererRootEl);
@@ -148,6 +156,7 @@ Context.prototype._initDOMRenderer = function _initDOMRenderer() {
  * 3. The size of the WebGLRenderer is being updated.
  *
  * @method
+ * @private
  *
  * @return {undefined} undefined
  */
