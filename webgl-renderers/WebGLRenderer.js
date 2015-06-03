@@ -64,10 +64,6 @@ function WebGLRenderer(canvas, compositor) {
     this.canvas = canvas;
     this.compositor = compositor;
 
-    for (var key in this.constructor.DEFAULT_STYLES) {
-        this.canvas.style[key] = this.constructor.DEFAULT_STYLES[key];
-    }
-
     var gl = this.gl = this.getWebGLContext(this.canvas);
 
     gl.clearColor(0.0, 0.0, 0.0, 0.0);
@@ -138,7 +134,84 @@ function WebGLRenderer(canvas, compositor) {
     this.bufferRegistry.allocate(cutout.spec.id, 'a_texCoord', cutout.spec.bufferValues[1], 2);
     this.bufferRegistry.allocate(cutout.spec.id, 'a_normals', cutout.spec.bufferValues[2], 3);
     this.bufferRegistry.allocate(cutout.spec.id, 'indices', cutout.spec.bufferValues[3], 1);
+
+    /**
+     * WebGL Picking for hit testing
+     */
+    this.listeners = [];
+    this.meshIds = 0;
+    this.canvas.onmousedown = this.handleClick.bind(this);
 }
+
+/**
+ * Handle mousedown clicks on Canvas for determining the position of the cursor, in order to do WebGL picking.
+ *
+ * @method
+ *
+ * @param {Object} ev Event object
+ *
+ * @return {undefined} undefined
+ */
+WebGLRenderer.prototype.handleClick = function handleClicke(ev) {
+    var x = ev.clientX, y = ev.clientY;
+    var pixelRatio = window.devicePixelRatio || 1;
+    var rect = ev.target.getBoundingClientRect();
+    if (rect.left <= x && x < rect.right && rect.top <= y && y < rect.bottom) {
+        x = x - rect.left, y = rect.bottom - y;
+        this.check(x * devicePixelRatio, y * devicePixelRatio);
+    }
+
+    return this;
+};
+
+/**
+ * Determine the alpha channel, given an x and y coordinate for the WebGL canvas.
+ *
+ * @method
+ *
+ * @param {Number} x X coordinate
+ * @param {Number} y Y coordinate
+ *
+ * @return {undefined} undefined
+ */
+WebGLRenderer.prototype.check = function check(x, y) {
+    var gl = this.gl;
+
+    gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
+    this.program.setUniforms(['u_clicked'], [1.0]);
+    this.drawMeshes();
+
+    var pixels = new Uint8Array(4);
+    gl.readPixels(x, y, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
+
+    this.program.setUniforms(['u_clicked'], [0.0]);
+    this.drawMeshes();
+
+    var meshId = this.decodeMeshIdColor(pixels, 255);
+    var picked = this.listeners[meshId];
+
+    if (picked) {
+        this.compositor.sendEvent(picked.path, 'click', {});
+    }
+
+    return picked;
+};
+
+/**
+ * Attaches an EventListener to the element associated with the passed in path.
+ *
+ * @method
+ *
+ * @param {String} path Path for the given Mesh.
+ * @param {String} type event type (e.g. click).
+ *
+ * @return {undefined} undefined
+ */
+WebGLRenderer.prototype.subscribe = function subscribe(path, type) {
+    var mesh = this.meshRegistry[path];
+    this.listeners[mesh.id] = mesh;
+    return this;
+};
 
 /**
  * Attempts to retreive the WebGLRenderer context using several
@@ -188,6 +261,51 @@ WebGLRenderer.prototype.createLight = function createLight(path) {
 };
 
 /**
+ * Algorithm for encoding an ID to the normalized RGBA hash in base 255.
+ *
+ * @method
+ *
+ * @param {Number} meshId Mesh ID number
+ *
+ * @returns {Array} Encoded value
+ */
+WebGLRenderer.prototype.encodedMeshIdColor = function encodedMeshIdColor(meshId, base) {
+    var result = [];
+
+    while (meshId) {
+        var normalizedRemainder = (meshId%base) / 255;
+        result.unshift(normalizedRemainder);
+        meshId = (meshId / base) | 0;
+    }
+
+    while (result.length !== 4) {
+        result.unshift(0);
+    }
+
+    return result;
+};
+
+/**
+ * Algorithm for decoding the mesh ID from the WebGL shader.
+ *
+ * @method
+ *
+ * @param {Buffer} pixelsBuffer Pixel buffer from the WebGL shader
+ *
+ * @returns {Number} Mesh ID
+ */
+WebGLRenderer.prototype.decodeMeshIdColor = function decodeMeshIdColor(pixelsBuffer, base) {
+    var result = 0;
+    var baseColumn = 0;
+
+    for(var i = pixelsBuffer.length - 1; i >= 0; i--) {
+        result += pixelsBuffer[i] * Math.pow(base, baseColumn++);
+    }
+
+    return result;
+};
+
+/**
  * Adds a new base spec to the mesh registry at a given path.
  *
  * @method
@@ -207,7 +325,8 @@ WebGLRenderer.prototype.createMesh = function createMesh(path) {
         u_positionOffset: [0, 0, 0],
         u_normals: [0, 0, 0],
         u_flatShading: 0,
-        u_glossiness: [0, 0, 0, 0]
+        u_glossiness: [0, 0, 0, 0],
+        u_meshIdColor: this.encodedMeshIdColor(++this.meshIds, 255)
     });
     this.meshRegistry[path] = {
         depth: null,
@@ -217,7 +336,9 @@ WebGLRenderer.prototype.createMesh = function createMesh(path) {
         geometry: null,
         drawType: null,
         textures: [],
-        visible: true
+        visible: true,
+        path: path,
+        id: this.meshIds
     };
     return this.meshRegistry[path];
 };
@@ -781,14 +902,19 @@ WebGLRenderer.prototype.drawBuffers = function drawBuffers(vertexBuffers, mode, 
  */
 WebGLRenderer.prototype.updateSize = function updateSize(size) {
     if (size) {
+        var pixelRatio = window.devicePixelRatio || 1;
+        var displayWidth = ~~(size[0] * pixelRatio);
+        var displayHeight = ~~(size[1] * pixelRatio);
+        this.canvas.width = displayWidth;
+        this.canvas.height = displayHeight;
+        this.gl.viewport(0, 0, displayWidth, displayHeight);
+
         this.cachedSize[0] = size[0];
         this.cachedSize[1] = size[1];
         this.cachedSize[2] = (size[0] > size[1]) ? size[0] : size[1];
+        this.resolutionValues[0] = this.cachedSize;
     }
 
-    this.gl.viewport(0, 0, this.cachedSize[0], this.cachedSize[1]);
-
-    this.resolutionValues[0] = this.cachedSize;
     this.program.setUniforms(this.resolutionName, this.resolutionValues);
 
     return this;
