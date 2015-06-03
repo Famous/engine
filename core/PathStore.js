@@ -1,14 +1,14 @@
 
 var PathUtils = require('./Path');
 
-function Layer () {
+function PathStore () {
     this.items = [];
     this.paths = [];
     this.memo = {};
     this.iterator = 0;
 }
 
-Layer.prototype.insert = function insert (path, item) {
+PathStore.prototype.insert = function insert (path, item) {
     var paths = this.paths;
     var index = paths.indexOf(path);
     if (index !== -1)
@@ -39,7 +39,7 @@ Layer.prototype.insert = function insert (path, item) {
 
 };
 
-Layer.prototype.remove = function remove (path) {
+PathStore.prototype.remove = function remove (path) {
     var paths = this.paths;
     var index = paths.indexOf(path);
     if (index === -1)
@@ -54,7 +54,7 @@ Layer.prototype.remove = function remove (path) {
         this.memo[this.paths[i]] = null;
 };
 
-Layer.prototype.get = function get (path) {
+PathStore.prototype.get = function get (path) {
     if (this.memo[path]) return this.items[this.memo[path]];
 
     var index = this.paths.indexOf(path);
@@ -66,24 +66,24 @@ Layer.prototype.get = function get (path) {
     return this.items[index];
 };
 
-Layer.prototype.getItems = function getItems () {
+PathStore.prototype.getItems = function getItems () {
     return this.items;
 };
 
-Layer.prototype.getPaths = function getPaths () {
+PathStore.prototype.getPaths = function getPaths () {
     return this.paths;
 };
 
-Layer.prototype.next = function next () {
+PathStore.prototype.next = function next () {
     return this.paths[this.iterator++];
 };
 
-Layer.prototype.resetIterator = function resetIterator () {
+PathStore.prototype.resetIterator = function resetIterator () {
     this.iterator = 0;
 };
 
-Layer.prototype.getIterator = function getIterator () {
+PathStore.prototype.getIterator = function getIterator () {
     return this.iterator;
 };
 
-module.exports = Layer;
+module.exports = PathStore;

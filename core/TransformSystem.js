@@ -27,7 +27,7 @@
 var PathUtils = require('./Path');
 var Transform = require('./Transform');
 var Dispatch = require('./Dispatch');
-var Layer = require('./Layer');
+var PathStore = require('./PathStore');
 
 /**
  * The transform class is responsible for calculating the transform of a particular
@@ -36,7 +36,7 @@ var Layer = require('./Layer');
  * @constructor {TransformSystem}
  */
 function TransformSystem () {
-    this.layer = new Layer();
+    this.pathStore = new PathStore();
 }
 
 /**
@@ -49,14 +49,14 @@ function TransformSystem () {
  * @param {String} path for the transform to be registered to.
  */
 TransformSystem.prototype.registerTransformAtPath = function registerTransformAtPath (path) {
-    if (!PathUtils.depth(path)) return this.layer.insert(path, new Transform());
+    if (!PathUtils.depth(path)) return this.pathStore.insert(path, new Transform());
 
-    var parent = this.layer.get(PathUtils.parent(path));
+    var parent = this.pathStore.get(PathUtils.parent(path));
 
     if (!parent) throw new Error(
             'No parent transform registered at expected path: ' + PathUtils.parent(path)
     );
-    this.layer.insert(path, new Transform(parent));
+    this.pathStore.insert(path, new Transform(parent));
 };
 
 /**
@@ -68,12 +68,12 @@ TransformSystem.prototype.registerTransformAtPath = function registerTransformAt
  * @param {String} path at which to register the transform
  */
 TransformSystem.prototype.deregisterTransformAtPath = function deregisterTransformAtPath (path) {
-    this.layer.remove(path);
+    this.pathStore.remove(path);
 };
 
 
 TransformSystem.prototype.makeBreakPointAt = function makeBreakPointAt (path) {
-    var transform = this.layer.get(path);
+    var transform = this.pathStore.get(path);
     if (!transform) throw new Error('No transform Registered at path: ' + path);
     transform.setBreakPoint();
 };
@@ -81,7 +81,7 @@ TransformSystem.prototype.makeBreakPointAt = function makeBreakPointAt (path) {
 
 
 TransformSystem.prototype.get = function get (path) {
-    return this.layer.get(path);
+    return this.pathStore.get(path);
 };
 
 
@@ -95,8 +95,8 @@ TransformSystem.prototype.get = function get (path) {
  * @method onUpdate
  */
 TransformSystem.prototype.onUpdate = function onUpdate () {
-    var transforms = this.layer.getItems();
-    var paths = this.layer.getPaths();
+    var transforms = this.pathStore.getItems();
+    var paths = this.pathStore.getPaths();
     var transform;
     var changed;
     var node;
