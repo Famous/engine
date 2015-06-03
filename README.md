@@ -95,3 +95,5 @@ Note: cloning only provides the Famo.us folder with all Famo.us code, but it doe
 [contributing-issues]: https://github.com/Famous/engine/blob/master/CONTRIBUTING.md#issues
 [browserify]: http://browserify.org/
 [npm]: http://npmjs.org
+
+[![Analytics](https://ga-beacon.appspot.com/UA-63145313-2/famous/engine/README.md?pixel)](https://github.com/igrigorik/ga-beacon)
