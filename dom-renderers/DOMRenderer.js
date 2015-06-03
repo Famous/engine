@@ -86,6 +86,8 @@ function DOMRenderer (element, selector, compositor) {
     this._VPtransform = new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
 
     this._size = [null, null];
+
+    this._lastEv = null;
 }
 
 
@@ -132,6 +134,8 @@ DOMRenderer.prototype.subscribe = function subscribe(type, preventDefault) {
  * @return {undefined} undefined
  */
 DOMRenderer.prototype._triggerEvent = function _triggerEvent(ev) {
+    if (this._lastEv === ev) return;
+
     // Use ev.path, which is an array of Elements (polyfilled if needed).
     var evPath = ev.path ? ev.path : _getPath(ev);
     // First element in the path is the element on which the event has actually
@@ -146,7 +150,7 @@ DOMRenderer.prototype._triggerEvent = function _triggerEvent(ev) {
         // Stop further event propogation and path traversal as soon as the
         // first ElementCache subscribing for the emitted event has been found.
         if (this._elements[path] && this._elements[path].subscribe[ev.type]) {
-            ev.stopPropagation();
+            this._lastEv = ev;
 
             // Optionally preventDefault. This needs forther consideration and
             // should be optional. Eventually this should be a separate command/

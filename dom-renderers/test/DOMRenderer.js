@@ -266,4 +266,64 @@ test('DOMRenderer', function(t) {
 
         t.end();
     });
+
+    t.test('_triggerEvent method', function(t) {
+        var element = document.createElement('div');
+        var selector = 'selector';
+        var sentEvents = [];
+
+        var compositor = {
+            sendEvent: function (path, ev, payload) {
+                sentEvents.push([path, ev, payload]);
+            }
+        };
+
+        var domRenderer = new DOMRenderer(element, selector, compositor);
+
+        domRenderer.loadPath(selector + '/' + 0);
+        domRenderer.findTarget();
+        domRenderer.insertEl('div');
+
+        domRenderer.loadPath(selector + '/' + 0 + '/' + 1);
+        domRenderer.findTarget();
+        domRenderer.insertEl('div');
+
+        domRenderer.subscribe('click');
+
+        domRenderer.loadPath(selector + '/' + 0 + '/' + 1 + '/' + 0);
+        domRenderer.findTarget();
+        domRenderer.insertEl('div');
+
+        domRenderer.subscribe('click');
+
+        var ev1 = {
+            type: 'click',
+            target: {},
+            path: [
+                { dataset: { faPath: selector + '/' + 0 + '/' + 1 + '/' + 0 } },
+                { dataset: { faPath: selector + '/' + 0 + '/' + 1 } },
+                { dataset: { faPath: selector + '/' + 0 } }
+            ],
+            stopPropagation: function() {
+                t.fail('domRenderer._triggerEvent should not stopPropagation of DOM event');
+            }
+        };
+
+        domRenderer._triggerEvent(ev1);
+
+        t.deepEqual(
+            sentEvents[0].slice(0, 2),
+            [ selector + '/' + 0 + '/' + 1 + '/' + 0, ev1.type ],
+            'domRenderer._triggerEvent should emit correct event on leaf node'
+        );
+
+        sentEvents.length = 0;
+
+        domRenderer._triggerEvent(ev1);
+
+        t.equal(sentEvents.length, 0, 'domRenderer._triggerEvent should not emit same event multiple times in a row');
+
+        t.end();
+    });
+
 });
