@@ -66,10 +66,6 @@ function Scene (selector, updater) {
     this.onMount(this, selector); // Mount the context to itself
                                   // (it is its own parent)
 
-    this._updater                  // message a request for the dom
-        .message('NEED_SIZE_FOR')  // size of the context so that
-        .message(selector);        // the scene graph has a total size
-
     this.show(); // the context begins shown (it's already present in the dom)
 }
 

@@ -165,24 +165,6 @@ Compositor.prototype.getContext = function getContext(selector) {
 };
 
 /**
- * Internal helper method used by `drawCommands`.
- *
- * @method
- * @private
- *
- * @param  {Number} iterator position index within the command queue
- * @param  {Array} commands remaining message queue received, used to
- * shift single messages
- *
- * @return {undefined} undefined
- */
-Compositor.prototype.giveSizeFor = function giveSizeFor(iterator, commands) {
-    var selector = commands[iterator];
-    var size = this.getOrSetContext(selector).getRootSize();
-    this.sendResize(selector, size);
-};
-
-/**
  * Processes the previously via `receiveCommands` updated incoming "in"
  * command queue.
  * Called by UIManager on a frame by frame basis.
@@ -202,9 +184,6 @@ Compositor.prototype.drawCommands = function drawCommands() {
                 break;
             case 'WITH':
                 localIterator = this.handleWith(++localIterator, commands);
-                break;
-            case 'NEED_SIZE_FOR':
-                this.giveSizeFor(++localIterator, commands);
                 break;
         }
         command = commands[++localIterator];

@@ -164,7 +164,6 @@ Context.prototype._initWebGLRenderer = function _initWebGLRenderer() {
     this._webGLRenderer.updateSize(this._size);
 };
 
-
 /**
  * Gets the size of the parent element of the DOMRenderer for this context.
  *
