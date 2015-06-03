@@ -187,7 +187,8 @@ WebGLRenderer.prototype.check = function check(x, y) {
     this.program.setUniforms(['u_clicked'], [0.0]);
     this.drawMeshes();
 
-    var picked = this.listeners[pixels[3]];
+    var meshId = this.decodeMeshIdColor(pixels, 255);
+    var picked = this.listeners[meshId];
 
     if (picked) {
         this.compositor.sendEvent(picked.path, 'click', {});
@@ -260,6 +261,51 @@ WebGLRenderer.prototype.createLight = function createLight(path) {
 };
 
 /**
+ * Algorithm for encoding an ID to the normalized RGBA hash in base 255.
+ *
+ * @method
+ *
+ * @param {Number} meshId Mesh ID number
+ *
+ * @returns {Array} Encoded value
+ */
+WebGLRenderer.prototype.encodedMeshIdColor = function encodedMeshIdColor(meshId, base) {
+    var result = [];
+
+    while (meshId) {
+        var normalizedRemainder = (meshId%base) / 255;
+        result.unshift(normalizedRemainder);
+        meshId = (meshId / base) | 0;
+    }
+
+    while (result.length !== 4) {
+        result.unshift(0);
+    }
+
+    return result;
+};
+
+/**
+ * Algorithm for decoding the mesh ID from the WebGL shader.
+ *
+ * @method
+ *
+ * @param {Buffer} pixelsBuffer Pixel buffer from the WebGL shader
+ *
+ * @returns {Number} Mesh ID
+ */
+WebGLRenderer.prototype.decodeMeshIdColor = function decodeMeshIdColor(pixelsBuffer, base) {
+    var result = 0;
+    var baseColumn = 0;
+
+    for(var i = pixelsBuffer.length - 1; i >= 0; i--) {
+        result += pixelsBuffer[i] * Math.pow(base, baseColumn++);
+    }
+
+    return result;
+};
+
+/**
  * Adds a new base spec to the mesh registry at a given path.
  *
  * @method
@@ -270,7 +316,6 @@ WebGLRenderer.prototype.createLight = function createLight(path) {
  */
 WebGLRenderer.prototype.createMesh = function createMesh(path) {
     this.meshRegistryKeys.push(path);
-    var meshIdColor = ++this.meshIds;
 
     var uniforms = keyValueToArrays({
         u_opacity: 1,
@@ -281,7 +326,7 @@ WebGLRenderer.prototype.createMesh = function createMesh(path) {
         u_normals: [0, 0, 0],
         u_flatShading: 0,
         u_glossiness: [0, 0, 0, 0],
-        u_meshIdColor: [0.0, 0.0, 0.0, meshIdColor/255]
+        u_meshIdColor: this.encodedMeshIdColor(++this.meshIds, 255)
     });
     this.meshRegistry[path] = {
         depth: null,
@@ -293,7 +338,7 @@ WebGLRenderer.prototype.createMesh = function createMesh(path) {
         textures: [],
         visible: true,
         path: path,
-        id: meshIdColor
+        id: this.meshIds
     };
     return this.meshRegistry[path];
 };
