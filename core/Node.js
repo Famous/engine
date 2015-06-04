@@ -582,7 +582,7 @@ Node.prototype.removeChild = function removeChild (child) {
         this._freedChildIndicies.push(index);
 
         this._children[index] = null;
- 
+
         child.dismount();
 
         return true;
@@ -992,7 +992,7 @@ Node.prototype.setAbsoluteSize = function setAbsoluteSize (x, y, z) {
 };
 
 /**
- * Method for getting the current frame. Will be depricated.
+ * Method for getting the current frame. Will be deprecated.
  *
  * @method
  *
@@ -1093,7 +1093,7 @@ Node.prototype.mount = function mount (path) {
  * @return {Node} this
  */
 Node.prototype.dismount = function dismount () {
-    if (!this.isMounted()) 
+    if (!this.isMounted())
         throw new Error('Node is not mounted');
 
     Dispatch.deregisterNodeAtPath(this.getLocation(), this);
@@ -1139,4 +1139,3 @@ Node.prototype.receive = function receive (type, ev) {
 };
 
 module.exports = Node;
-
