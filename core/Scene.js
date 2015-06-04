@@ -71,7 +71,6 @@ function Scene (selector, updater) {
         .message(selector);        // the scene graph has a total size
 
     this.show(); // the context begins shown (it's already present in the dom)
-
 }
 
 // Scene inherits from node
@@ -122,7 +121,6 @@ Scene.prototype.onReceive = function onReceive (event, payload) {
     // and the context would receive its size the same way that any render size
     // component receives its size.
     if (event === 'CONTEXT_RESIZE') {
-
         if (payload.length < 2)
             throw new Error(
                     'CONTEXT_RESIZE\'s payload needs to be at least a pair' +
@@ -134,8 +132,8 @@ Scene.prototype.onReceive = function onReceive (event, payload) {
                              payload[1],
                              payload[2] ? payload[2] : 0);
 
+         this._updater.message('WITH').message(this._selector).message('READY');
     }
 };
 
 module.exports = Scene;
-
