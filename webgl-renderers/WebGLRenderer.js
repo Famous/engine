@@ -134,7 +134,25 @@ function WebGLRenderer(canvas, compositor) {
     this.bufferRegistry.allocate(cutout.spec.id, 'a_texCoord', cutout.spec.bufferValues[1], 2);
     this.bufferRegistry.allocate(cutout.spec.id, 'a_normals', cutout.spec.bufferValues[2], 3);
     this.bufferRegistry.allocate(cutout.spec.id, 'indices', cutout.spec.bufferValues[3], 1);
+
+    this.listeners = [];
 }
+
+/**
+ * Attaches an EventListener to the element associated with the passed in path.
+ *
+ * @method
+ *
+ * @param {String} path Path for the given Mesh.
+ * @param {String} type event type (e.g. click).
+ *
+ * @return {undefined} undefined
+ */
+WebGLRenderer.prototype.subscribe = function subscribe(path, type) {
+    var mesh = this.meshRegistry[path];
+    this.listeners[mesh.id] = mesh;
+    return this;
+};
 
 /**
  * Attempts to retreive the WebGLRenderer context using several
@@ -837,6 +855,14 @@ WebGLRenderer.prototype.resetOptions = function resetOptions(options) {
     if (!options) return;
     if (options.blending) gl.disable(gl.BLEND);
     if (options.side === 'back') gl.cullFace(gl.BACK);
+};
+
+WebGLRenderer.DEFAULT_STYLES = {
+    pointerEvents: 'none',
+    position: 'absolute',
+    zIndex: 1,
+    top: '0px',
+    left: '0px'
 };
 
 module.exports = WebGLRenderer;
