@@ -24,6 +24,7 @@
 
 'use strict';
 var Geometry = require('../webgl-geometries');
+var CallbackStore = require('../utilities/CallbackStore');
 
 /**
  * The Mesh class is responsible for providing the API for how
@@ -42,9 +43,13 @@ var Geometry = require('../webgl-geometries');
 function Mesh (node, options) {
     this._node = node;
     this._changeQueue = [];
+    this._UIEvents = [];
+    this._callbacks = new CallbackStore();
+
     this._initialized = false;
     this._requestingUpdate = false;
     this._inDraw = false;
+
     this.value = {
         drawOptions: {},
         color: null,
@@ -57,6 +62,7 @@ function Mesh (node, options) {
     };
 
     if (options) this.setDrawOptions(options);
+
     this._id = node.addComponent(this);
 }
 
@@ -581,16 +587,113 @@ Mesh.prototype.onOpacityChange = function onOpacityChange (opacity) {
 };
 
 /**
- * Adds functionality for UI events (TODO)
+ * Method to be invoked by the node as soon as a new UIEvent is being added.
+ * This results into an `SUBSCRIBE` command being sent.
  *
- * @method
- *
- * @param {String} UIEvent UI Event
+ * @param {String} UIEvent UIEvent to be subscribed to (`click`)
  *
  * @return {undefined} undefined
  */
 Mesh.prototype.onAddUIEvent = function onAddUIEvent (UIEvent) {
-    //TODO
+    if (this._UIEvents.indexOf(UIEvent) === -1) {
+        this._subscribe(UIEvent);
+        this._UIEvents.push(UIEvent);
+    }
+    else if (this._inDraw) {
+        this._subscribe(UIEvent);
+    }
+    return this;
+};
+
+/**
+ * Method to be invoked by the node as soon as a UIEvent is removed from
+ * the node. This results into an `UNSUBSCRIBE` command being sent.
+ *
+ * @param {String} UIEvent UIEvent to be removed (`click`)
+ *
+ * @return {undefined} undefined
+ */
+Mesh.prototype.onRemoveUIEvent = function onRemoveUIEvent(UIEvent) {
+    var index = this._UIEvents.indexOf(UIEvent);
+    if (index !== -1) {
+        this._unsubscribe(UIEvent);
+        this._UIEvents.splice(index, 1);
+    }
+    else if (this._inDraw) {
+        this._unsubscribe(UIEvent);
+    }
+    return this;
+};
+
+/**
+ * Appends an `SUBSCRIBE` command to the command queue.
+ *
+ * @method
+ * @private
+ *
+ * @param {String} UIEvent Event type (`click`)
+ *
+ * @return {undefined} undefined
+ */
+Mesh.prototype._subscribe = function _subscribe(UIEvent) {
+    if (this._initialized) {
+        this._changeQueue.push('GL_SUBSCRIBE', UIEvent);
+    }
+
+    if (!this._requestingUpdate) this._requestUpdate();
+};
+
+/**
+ * Appends an `UNSUBSCRIBE` command to the command queue.
+ *
+ * @method
+ * @private
+ *
+ * @param {String} UIEvent Event type (`click`)
+ *
+ * @return {undefined} undefined
+ */
+Mesh.prototype._unsubscribe = function _unsubscribe (UIEvent) {
+    if (this._initialized) {
+        this._changeQueue.push('GL_UNSUBSCRIBE', UIEvent);
+    }
+
+    if (!this._requestingUpdate) this._requestUpdate();
+};
+
+/**
+ * Function to be invoked by the Node whenever an event is being received.
+ * There are two different ways to subscribe for those events:
+ *
+ * 1. By overriding the onReceive method (and possibly using `switch` in order
+ *     to differentiate between the different event types).
+ * 2. By using Mesh and using the built-in CallbackStore.
+ *
+ * @method
+ *
+ * @param {String} event Event type (e.g. `click`)
+ * @param {Object} payload Event object.
+ *
+ * @return {undefined} undefined
+ */
+Mesh.prototype.onReceive = function onReceive(event, payload) {
+    this._callbacks.trigger(event, payload);
+};
+
+/**
+ * Subscribes to a Mesh using
+ *
+ * @method on
+ *
+ * @param {String} event       The event type (e.g. `click`).
+ * @param {Function} listener  Handler function for the specified event type
+ *                              in which the payload event object will be
+ *                              passed into.
+ *
+ * @return {Function} A function to call if you want to remove the callback
+ */
+Mesh.prototype.on = function on(event, listener) {
+    return this._callbacks.on(event, listener);
 };
 
 /**
