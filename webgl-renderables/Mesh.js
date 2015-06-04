@@ -603,6 +603,26 @@ Mesh.prototype.onAddUIEvent = function onAddUIEvent (UIEvent) {
 };
 
 /**
+ * Appends an `ADD_EVENT_LISTENER` command to the command queue.
+ *
+ * @method
+ * @private
+ *
+ * @param {String} UIEvent Event type (e.g. `click`)
+ *
+ * @return {undefined} undefined
+ */
+Mesh.prototype._subscribe = function _subscribe(UIEvent) {
+    if (this._initialized) {
+        this._changeQueue.push('GL_SUBSCRIBE', UIEvent);
+    }
+    if (!this._requestingUpdate) {
+        this._requestUpdate();
+    }
+    if (!this._requestingUpdate) this._requestUpdate();
+};
+
+/**
  * Queues instance to be updated.
  *
  * @method
