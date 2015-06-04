@@ -587,11 +587,10 @@ Mesh.prototype.onOpacityChange = function onOpacityChange (opacity) {
 };
 
 /**
- * Adds functionality for UI events
+ * Method to be invoked by the node as soon as a new UIEvent is being added.
+ * This results into an `SUBSCRIBE` command being sent.
  *
- * @method
- *
- * @param {String} UIEvent UI Event
+ * @param {String} UIEvent UIEvent to be subscribed to (`click`)
  *
  * @return {undefined} undefined
  */
@@ -607,12 +606,32 @@ Mesh.prototype.onAddUIEvent = function onAddUIEvent (UIEvent) {
 };
 
 /**
- * Appends an `ADD_EVENT_LISTENER` command to the command queue.
+ * Method to be invoked by the node as soon as a UIEvent is removed from
+ * the node. This results into an `UNSUBSCRIBE` command being sent.
+ *
+ * @param {String} UIEvent UIEvent to be removed (`click`)
+ *
+ * @return {undefined} undefined
+ */
+Mesh.prototype.onRemoveUIEvent = function onRemoveUIEvent(UIEvent) {
+    var index = this._UIEvents.indexOf(UIEvent);
+    if (index !== -1) {
+        this._unsubscribe(UIEvent);
+        this._UIEvents.splice(index, 1);
+    }
+    else if (this._inDraw) {
+        this._unsubscribe(UIEvent);
+    }
+    return this;
+};
+
+/**
+ * Appends an `SUBSCRIBE` command to the command queue.
  *
  * @method
  * @private
  *
- * @param {String} UIEvent Event type (e.g. `click`)
+ * @param {String} UIEvent Event type (`click`)
  *
  * @return {undefined} undefined
  */
@@ -620,9 +639,25 @@ Mesh.prototype._subscribe = function _subscribe(UIEvent) {
     if (this._initialized) {
         this._changeQueue.push('GL_SUBSCRIBE', UIEvent);
     }
-    if (!this._requestingUpdate) {
-        this._requestUpdate();
+
+    if (!this._requestingUpdate) this._requestUpdate();
+};
+
+/**
+ * Appends an `UNSUBSCRIBE` command to the command queue.
+ *
+ * @method
+ * @private
+ *
+ * @param {String} UIEvent Event type (`click`)
+ *
+ * @return {undefined} undefined
+ */
+Mesh.prototype._unsubscribe = function _unsubscribe (UIEvent) {
+    if (this._initialized) {
+        this._changeQueue.push('GL_UNSUBSCRIBE', UIEvent);
     }
+
     if (!this._requestingUpdate) this._requestUpdate();
 };
 
