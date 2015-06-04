@@ -80,7 +80,9 @@ var uniforms = keyValueToArrays({
     u_lightColor: identityMatrix,
     u_ambientLight: [0, 0, 0],
     u_flatShading: 0,
-    u_numLights: 0
+    u_numLights: 0,
+    u_clicked: 0,
+    u_meshIdColor: [-1, -1, -1, -1]
 });
 
 /**
