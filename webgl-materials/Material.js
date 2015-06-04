@@ -74,7 +74,6 @@ var snippets = {
 
     smoothstep: {glsl: 'smoothstep(%1);', output: { '1,1,1':1, '2,2,2':2, '3,3,3':3, '4,4,4':4 }},
 
-
     /* fragCoord - The fragCoord function returns the fragment's position in screenspace. */
 
     fragCoord: {glsl: 'gl_FragColor;', output: 4 },
@@ -178,6 +177,12 @@ function Material(name, chunk, inputs, options) {
     this.varyings = options.varyings;
     this.attributes = options.attributes;
 
+    this.meshes = [];
+
+    var self = this;
+
+    this.nodes = [];
+
     if (options.texture) {
         this.texture = options.texture.__isATexture__ ? options.texture : TextureRegistry.register(null, options.texture);
     }
@@ -194,6 +199,10 @@ Material.prototype.setUniform = function setUniform(name, value) {
     this.uniforms[name] = value;
 
     this.invalidations.push(name);
+
+    this.meshes.forEach(function (mesh) {
+        mesh._requestUpdate();
+    });
 };
 
 module.exports = expressions;
