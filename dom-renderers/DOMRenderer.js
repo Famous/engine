@@ -145,7 +145,7 @@ DOMRenderer.prototype._triggerEvent = function _triggerEvent(ev) {
 
         // Stop further event propogation and path traversal as soon as the
         // first ElementCache subscribing for the emitted event has been found.
-        if (this._elements[path].subscribe[ev.type]) {
+        if (this._elements[path] && this._elements[path].subscribe[ev.type]) {
             ev.stopPropagation();
 
             // Optionally preventDefault. This needs forther consideration and
