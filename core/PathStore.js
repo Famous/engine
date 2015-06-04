@@ -67,16 +67,16 @@ PathStore.prototype.insert = function insert (path, item) {
     // such that it is within its own breadth in the tree
     // that the paths represent
     while (
-            paths[i] &&
-            targetDepth >= PathUtils.depth(paths[i])
+        paths[i] &&
+        targetDepth >= PathUtils.depth(paths[i])
     ) i++;
 
     // The item will be sorted within its breadth by index
     // in regard to its siblings.
     while (
-            paths[i] &&
-            targetDepth === PathUtils.depth(paths[i]) &&
-            targetIndex < PathUtils.index(paths[i])
+        paths[i] &&
+        targetDepth === PathUtils.depth(paths[i]) &&
+        targetIndex < PathUtils.index(paths[i])
     ) i++;
 
     // insert the items in the path
@@ -91,7 +91,6 @@ PathStore.prototype.insert = function insert (path, item) {
     // these items.
     for (var len = this.paths.length ; i < len ; i++)
         this.memo[this.paths[i]] = null;
-
 };
 
 /**
@@ -110,13 +109,13 @@ PathStore.prototype.remove = function remove (path) {
     if (index === -1)
         throw new Error('Cannot remove. No item exists at path: ' + path);
 
-    paths.splice(i, 1);
-    this.items.splice(i, 1);
+    paths.splice(index, 1);
+    this.items.splice(index, 1);
 
     this.memo[path] = null;
 
-    for (var len = this.paths.length ; i < len ; i++)
-        this.memo[this.paths[i]] = null;
+    for (var len = this.paths.length ; index < len ; index++)
+        this.memo[this.paths[index]] = null;
 };
 
 /**
@@ -166,4 +165,3 @@ PathStore.prototype.getPaths = function getPaths () {
 };
 
 module.exports = PathStore;
-
