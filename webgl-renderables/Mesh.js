@@ -43,7 +43,6 @@ var CallbackStore = require('../utilities/CallbackStore');
 function Mesh (node, options) {
     this._node = node;
     this._changeQueue = [];
-    this._UIEvents = [];
     this._callbacks = new CallbackStore();
 
     this._initialized = false;
@@ -643,6 +642,22 @@ Mesh.prototype._subscribe = function _subscribe(UIEvent) {
  */
 Mesh.prototype.onReceive = function onReceive(event, payload) {
     this._callbacks.trigger(event, payload);
+};
+
+/**
+ * Subscribes to a Mesh using
+ *
+ * @method on
+ *
+ * @param {String} event       The event type (e.g. `click`).
+ * @param {Function} listener  Handler function for the specified event type
+ *                              in which the payload event object will be
+ *                              passed into.
+ *
+ * @return {Function} A function to call if you want to remove the callback
+ */
+Mesh.prototype.on = function on(event, listener) {
+    return this._callbacks.on(event, listener);
 };
 
 /**
