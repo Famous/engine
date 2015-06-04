@@ -209,13 +209,32 @@ WebGLRenderer.prototype.check = function check(x, y) {
  * @method
  *
  * @param {String} path Path for the given Mesh.
- * @param {String} type event type (e.g. click).
+ * @param {String} type Event type ('click').
  *
  * @return {undefined} undefined
  */
 WebGLRenderer.prototype.subscribe = function subscribe(path, type) {
+    if (type !== 'click') return false;
     var mesh = this.meshRegistry[path];
     this.listeners[mesh.id] = mesh;
+    return this;
+};
+
+/**
+ * Removes an EventListener of given type from the element on which it was
+ * registered.
+ *
+ * @method
+ *
+ * @param {String} path Path for the given Mesh.
+ * @param {String} type Event type ('click').
+ *
+ * @return {undefined} undefined
+ */
+WebGLRenderer.prototype.unsubscribe = function unsubscribe(path, type) {
+    if (type !== 'click') return false;
+    var mesh = this.meshRegistry[path];
+    this.listeners.splice(mesh.id, 1);
     return this;
 };
 

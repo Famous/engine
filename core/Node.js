@@ -641,8 +641,8 @@ Node.prototype.getComponent = function getComponent (index) {
  *
  * @method removeComponent
  *
- * @param  {Object} component   An component that has previously been added
- *                              using {@link Node#addComponent}.
+ * @param  {Object} component   A component that has previously been added
+ *                              using @{@link addComponent}.
  *
  * @return {Node} this
  */
@@ -659,6 +659,32 @@ Node.prototype.removeComponent = function removeComponent (component) {
         this._components[index] = null;
     }
     return component;
+};
+
+/**
+* Removes a node's subscription to a particular UIEvent. All components
+* on the node will have the opportunity to remove all listeners depending
+* on this event.
+*
+* @method
+*
+* @param {String} eventName the name of the event
+*
+* @return {undefined} undefined
+*/
+Node.prototype.removeUIEvent = function removeUIEvent (eventName) {
+   var UIEvents = this.getUIEvents();
+   var components = this._components;
+   var component;
+
+   var index = UIEvents.indexOf(eventName);
+   if (index !== -1) {
+       UIEvents.splice(index, 1);
+       for (var i = 0, len = components.length ; i < len ; i++) {
+           component = components[i];
+           if (component && component.onRemoveUIEvent) component.onRemoveUIEvent(eventName);
+       }
+   }
 };
 
 /**
@@ -1105,7 +1131,7 @@ Node.prototype.setOpacity = function setOpacity (val) {
  * Sets the size mode being used for determining the node's final width, height
  * and depth.
  * Size modes are a way to define the way the node's size is being calculated.
- * Size modes are enums set on the {@link Size} constructor (and aliased on
+ * Size modes are enums set on the @{@link Size} constructor (and aliased on
  * the Node).
  *
  * @example
