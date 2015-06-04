@@ -43,6 +43,7 @@ var CallbackStore = require('../utilities/CallbackStore');
 function Mesh (node, options) {
     this._node = node;
     this._changeQueue = [];
+    this._UIEvents = [];
     this._callbacks = new CallbackStore();
 
     this._initialized = false;
