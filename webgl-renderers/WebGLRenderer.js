@@ -295,7 +295,7 @@ WebGLRenderer.prototype.createLight = function createLight(path) {
  *
  * @returns {Array} Encoded value
  */
-WebGLRenderer.prototype.encodedMeshIdColor = function encodedMeshIdColor(meshId, base) {
+WebGLRenderer.prototype.encodeMeshIdColor = function encodeMeshIdColor(meshId, base) {
     var result = [];
 
     while (meshId) {
@@ -354,7 +354,7 @@ WebGLRenderer.prototype.createMesh = function createMesh(path) {
         u_normals: [0, 0, 0],
         u_flatShading: 0,
         u_glossiness: [0, 0, 0, 0],
-        u_meshIdColor: this.encodedMeshIdColor(++this.meshIds, 255)
+        u_meshIdColor: this.encodeMeshIdColor(++this.meshIds, 255)
     });
     this.meshRegistry[path] = {
         depth: null,
