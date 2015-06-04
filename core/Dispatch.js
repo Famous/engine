@@ -142,23 +142,26 @@ Dispatch.prototype.mount = function mount (path) {
 
     // scenes are their own parents
     var parent = !parentPath ? node : this._nodes[parentPath];
- 
+
     if (!node)
         throw new Error(
                 'No node registered to path: ' + path
         );
     if (!parent)
         throw new Error(
-                'Parent to path: ' + path + 
-                ' doesn\'t exist at expected path: ' + parentPath 
+                'Parent to path: ' + path +
+                ' doesn\'t exist at expected path: ' + parentPath
         );
 
     var children = node.getChildren();
     var components = node.getComponents();
 
     if (node.onMount) node.onMount(path);
-    
-    for (var i = 0, len = components.length ; i < len ; i++)
+
+    var i;
+    var len;
+
+    for (i = 0, len = components.length ; i < len ; i++)
         if (components[i] && components[i].onMount)
             components[i].onMount(path);
 
@@ -305,7 +308,7 @@ Dispatch.prototype.dispatch = function dispatch (path, event, payload) {
     this.addChildrenToQueue(node);
     var child;
 
-    while ((child = this.breadthFirstNext())) 
+    while ((child = this.breadthFirstNext()))
         if (child.onReceive)
             child.onReceive(event, payload);
 
@@ -334,7 +337,7 @@ Dispatch.prototype.dispatchUIEvent = function dispatchUIEvent (path, event, payl
     if (node) {
         var parent;
 
-        payload.node = node; 
+        payload.node = node;
 
         while (node) {
             if (node.onReceive) node.onReceive(event, payload);
@@ -375,4 +378,3 @@ function _splitTo (string, target) {
 }
 
 module.exports = new Dispatch();
-
