@@ -129,14 +129,6 @@ DOMRenderer.prototype.subscribe = function subscribe(type, preventDefault) {
 DOMRenderer.prototype.unsubscribe = function unsubscribe(type) {
     this._assertTargetLoaded();
     this._target.subscribe[type] = false;
-
-    if (
-        this._target.listeners[type] || this._root.listeners[type]
-    ) {
-        var target = eventMap[type][1] ? this._root : this._target;
-        target.listeners[type] = null;
-        target.element.removeEventListener(type, this._boundTriggerEvent);
-    }
 };
 
 /**
