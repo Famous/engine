@@ -39,6 +39,9 @@ var Geometry = require('../webgl-geometries');
  *
  * @return {undefined} undefined
  */
+
+var inputs = ['baseColor', 'normals', 'glossiness', 'positionOffset'];
+
 function Mesh (node, options) {
     this._node = node;
     this._changeQueue = [];
@@ -656,9 +659,19 @@ Mesh.prototype.draw = function draw () {
     this._inDraw = false;
 };
 
-function addMeshToMaterial(mesh, material, name) {
-    var previous = mesh.value.expressions[name];
 
+function addMeshToMaterial(mesh, material, name) {
+    var expressions = mesh.value.expressions;
+    var previous = expressions[name];
+    var shouldRemove = true;
+
+    for (var i = 0; i < inputs.length; i++) {
+        if (name !== inputs[i] && previous !== expressions[inputs[i]])
+            shouldRemove = false;
+    }
+
+    if (shouldRemove) material.meshes.splice(material.meshes.indexOf(previous), 1);
+        
     if (material.meshes.indexOf(mesh) === -1)
         material.meshes.push(mesh);
 }
