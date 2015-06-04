@@ -777,14 +777,19 @@ WebGLRenderer.prototype.drawBuffers = function drawBuffers(vertexBuffers, mode, 
  */
 WebGLRenderer.prototype.updateSize = function updateSize(size) {
     if (size) {
+        var pixelRatio = window.devicePixelRatio || 1;
+        var displayWidth = ~~(size[0] * pixelRatio);
+        var displayHeight = ~~(size[1] * pixelRatio);
+        this.canvas.width = displayWidth;
+        this.canvas.height = displayHeight;
+        this.gl.viewport(0, 0, displayWidth, displayHeight);
+
         this.cachedSize[0] = size[0];
         this.cachedSize[1] = size[1];
         this.cachedSize[2] = (size[0] > size[1]) ? size[0] : size[1];
+        this.resolutionValues[0] = this.cachedSize;
     }
 
-    this.gl.viewport(0, 0, this.cachedSize[0], this.cachedSize[1]);
-
-    this.resolutionValues[0] = this.cachedSize;
     this.program.setUniforms(this.resolutionName, this.resolutionValues);
 
     return this;
