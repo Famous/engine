@@ -61,6 +61,7 @@ var globalUniforms = keyValueToArrays({
 function WebGLRenderer(canvas, compositor) {
     canvas.classList.add('famous-webgl-renderer');
 
+    var _this = this;
     this.canvas = canvas;
     this.compositor = compositor;
 
@@ -140,7 +141,9 @@ function WebGLRenderer(canvas, compositor) {
      */
     this.listeners = [];
     this.meshIds = 0;
-    this.canvas.onmousedown = this.handleClick.bind(this);
+    canvas.onmousedown = function(ev) {
+        _this.handleClick(ev);
+    };
 }
 
 /**
@@ -152,7 +155,7 @@ function WebGLRenderer(canvas, compositor) {
  *
  * @return {undefined} undefined
  */
-WebGLRenderer.prototype.handleClick = function handleClicke(ev) {
+WebGLRenderer.prototype.handleClick = function handleClick(ev) {
     var x = ev.clientX;
     var y = ev.clientY;
 
