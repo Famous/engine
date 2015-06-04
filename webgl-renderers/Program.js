@@ -80,7 +80,9 @@ var uniforms = keyValueToArrays({
     u_lightColor: identityMatrix,
     u_ambientLight: [0, 0, 0],
     u_flatShading: 0,
-    u_numLights: 0
+    u_numLights: 0,
+    u_clicked: 0,
+    u_meshIdColor: [-1, -1, -1, -1]
 });
 
 /**
@@ -389,13 +391,10 @@ Program.prototype.setUniforms = function (uniformNames, uniformValue) {
         // requesting a new location from the WebGL context
         // if it does not yet exist.
 
-        location = this.uniformLocations[name];
+        location = this.uniformLocations[name] || gl.getUniformLocation(this.program, name);
+        if (!location) continue;
 
-        if (location === null) continue;
-        if (location === undefined) {
-            location = gl.getUniformLocation(this.program, name);
-            this.uniformLocations[name] = location;
-        }
+        this.uniformLocations[name] = location;
 
         // Check if the value is already set for the
         // given uniform.
