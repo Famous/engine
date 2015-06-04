@@ -24,10 +24,28 @@
 
 'use strict';
 
-module.exports = {
-    DOMRenderer: require('./DOMRenderer'),
-    ElementCache: require('./ElementCache'),
-    Events: require('./events'),
-    Math: require('./Math'),
-    VoidElements: require('./VoidElements')
+/**
+ * Map of void elements as defined by the
+ * [HTML5 spec](http://www.w3.org/TR/html5/syntax.html#elements-0).
+ *
+ * @type {Object}
+ */
+var VoidElements = {
+    area  : true,
+    base  : true,
+    br    : true,
+    col   : true,
+    embed : true,
+    hr    : true,
+    img   : true,
+    input : true,
+    keygen: true,
+    link  : true,
+    meta  : true,
+    param : true,
+    source: true,
+    track : true,
+    wbr   : true
 };
+
+module.exports = VoidElements;
