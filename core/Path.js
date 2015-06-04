@@ -97,13 +97,13 @@ PathUtils.prototype.indexAtDepth = function indexAtDepth (path, depth) {
     var i = 0;
     var len = path.length;
     for (; i < len ; i++) {
-        depth -= path[i] === '/' ? 1 : 0;
         if (!depth) {
             var index = path.indexOf(i, '/');
             var result = index === -1 ? path.substring(i) : path.substring(i, index);
             var num = parseInt(result);
             return isNaN(num) ? result : num;
         }
+        depth -= path[i] === '/' ? 1 : 0;
     }
 };
 
@@ -146,6 +146,7 @@ PathUtils.prototype.isChildOf = function isChildOf (child, parent) {
  * @return {Boolean} whether or not the path is a descendent
  */
 PathUtils.prototype.isDescendentOf = function isDescendentOf(child, parent) {
+    if (child === parent) return false;
     child = this.hasTrailingSlash(child) ? child : child + '/';
     parent = this.hasTrailingSlash(parent) ? parent : parent + '/';
     return child.indexOf(parent) === 0;
