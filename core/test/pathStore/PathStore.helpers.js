@@ -2,11 +2,19 @@
 
 var helpers = {};
 
+var pathStub = null;
+
+helpers.setPathStub = function setPathStub (stub) {
+    pathStub = stub;
+};
 
 helpers.InsertTester = function InsertTester (depth, index, path) {
     this.depth = depth;
     this.index = index;
     this.path = path;
+
+    pathStub.depth.withArgs(path).returns(this.depth);
+    pathStub.index.withArgs(path).returns(this.index);
 };
 
 helpers.InsertTester.prototype.isDeeperThan = function isDeeperThan (otherTester) {
@@ -28,12 +36,6 @@ helpers.InsertTester.prototype.isAfter = function isAfter (otherTester) {
              this.hasAGreaterIndexThan(otherTester))
        ) return true;
     else return false;
-};
-
-helpers.InsertTester.prototype.insertInto = function insertInto (store, PathUtilsStub) {
-    PathUtilsStub.depth.returns(this.depth);
-    PathUtilsStub.index.returns(this.index);
-    store.insert(this.path, this);
 };
 
 module.exports = helpers;
