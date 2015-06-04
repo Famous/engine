@@ -49,6 +49,13 @@ var ident = [
 function ElementCache (element, path) {
     this.tagName = element.tagName.toLowerCase();
     this.void = VoidElements[this.tagName];
+
+    var constructor = element.constructor;
+
+    this.formElement = constructor === HTMLInputElement ||
+        constructor === HTMLTextAreaElement ||
+        constructor === HTMLSelectElement;
+
     this.element = element;
     this.path = path;
     this.content = null;

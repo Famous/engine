@@ -632,15 +632,21 @@ DOMRenderer.prototype.setContent = function setContent(content) {
     this._assertTargetLoaded();
     this.findChildren();
 
-    if (!this._target.content) {
-        this._target.content = document.createElement('div');
-        this._target.content.classList.add('famous-dom-element-content');
-        this._target.element.insertBefore(
-            this._target.content,
-            this._target.element.firstChild
-        );
+    if (this._target.formElement) {
+        this._target.element.value = content;
     }
-    this._target.content.innerHTML = content;
+    else {
+        if (!this._target.content) {
+            this._target.content = document.createElement('div');
+            this._target.content.classList.add('famous-dom-element-content');
+            this._target.element.insertBefore(
+                this._target.content,
+                this._target.element.firstChild
+            );
+        }
+        this._target.content.innerHTML = content;
+    }
+
 
     this.setSize(
         this._target.explicitWidth ? false : this._target.size[0],
