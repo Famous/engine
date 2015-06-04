@@ -488,6 +488,12 @@ DOMRenderer.prototype.insertEl = function insertEl (tagName) {
         this._assertParentLoaded();
         this._assertChildrenLoaded();
 
+        if (this._parent.void)
+            throw new Error(
+                this._parent.path + ' is a void element. ' +
+                'Void elements are not allowed to have children.'
+            );
+
         if (this._target) this._parent.element.removeChild(this._target.element);
 
         this._target = new ElementCache(document.createElement(tagName), this._path);
