@@ -6,6 +6,7 @@ var PathUtilsStub = require('../path/Path.stub');
 var helpers = require('./PathStore.helpers');
 
 PathStore.__set__('PathUtils', PathUtilsStub);
+helpers.setPathStub(PathUtilsStub);
 
 test('PathStore class', function (t) {
 
@@ -35,29 +36,47 @@ test('PathStore class', function (t) {
 
         var a = new helpers.InsertTester(1, 0, 'a');
 
-        // a should be before b which should be before c
-        
-        a.insertInto(pathStore, PathUtilsStub);
+        t.doesNotThrow(function () {
+            pathStore.insert('a', a);
+        }, 'insert should be able to be called with a string and any other argument');
         
         t.equal(
             pathStore.get('a'), a,
-            'insert should insert the given item at the given path such that the path can be used to look it up with the get method'
+            'insert should insert the given item at the given path' + 
+            ' such that the path can be used to look it up with the get method'
         );
 
         t.ok(
             pathStore.getItems().indexOf(a) > -1,
-            'insert should insert the given item into the store such that it can be found in the array returned by the getItems method'
+            'insert should insert the given item into the store such' +
+            ' that it can be found in the array returned by the getItems method'
         );
 
-        new helpers.InsertTester(2, 0, 'b').insertInto(pathStore, PathUtilsStub);
-        new helpers.InsertTester(2, 1, 'c').insertInto(pathStore, PathUtilsStub);
-        new helpers.InsertTester(2, 2, 'd').insertInto(pathStore, PathUtilsStub);
-        new helpers.InsertTester(3, 6, 'e').insertInto(pathStore, PathUtilsStub);
-        new helpers.InsertTester(1, 4, 'f').insertInto(pathStore, PathUtilsStub);
-        new helpers.InsertTester(2, 4, 'g').insertInto(pathStore, PathUtilsStub);
-        new helpers.InsertTester(6, 0, 'h').insertInto(pathStore, PathUtilsStub);
+        [
+            [2, 0, 'b'],
+            [2, 1, 'c'],
+            [2, 2, 'd'],
+            [3, 6, 'e'],
+            [1, 4, 'f'],
+            [2, 4, 'g'],
+            [6, 0, 'h']
+        ].forEach(function (triple) {
+            pathStore.insert(triple[2], new helpers.InsertTester(triple[0], triple[1], triple[2]));
+        });
 
         var res = pathStore.getItems().forEach(function (item, i, items) {
+            t.equal(
+                pathStore.get(item.path), item,
+                'insert should insert the given item at the given path' +
+                ' such that the path can be used to look it up with the get method'
+            );
+
+            t.ok(
+                pathStore.getItems().indexOf(item) > -1,
+                'insert should insert the given item into the store' +
+                ' such that it can be found in the array returned by the getItems method'
+            );
+
             if (items[i + 1]) {
                 t.ok(
                     items[i + 1].isAfter(items[i]),
@@ -66,6 +85,34 @@ test('PathStore class', function (t) {
             }
         });
         
+        t.end();
+    });
+
+    t.test('.remove method', function (t) {
+        var pathStore = new PathStore();
+
+        Array.apply(null, Array(10)).map(function (_, i) {
+            return new helpers.InsertTester(i, 0, String.fromCharCode(97 + i));
+        }).forEach(function (it) {
+            pathStore.insert(it.path, it);
+        });
+
+        // sanity check
+        if (pathStore.getItems().length !== 10) throw new Error('PathStore.insert is broken');
+
+        var b = pathStore.get('b');
+
+        t.doesNotThrow(function () {
+            pathStore.remove('b');
+        }, 'remove should be able to be called and remove an item by key');
+
+        t.equal(pathStore.get('b'), undefined, '.remove should remove the item at the path');
+
+        t.equal(
+            pathStore.getItems().indexOf(b), -1,
+            'removed items should not be available in the array returned by getItems'
+        );
+
         t.end();
     });
 
