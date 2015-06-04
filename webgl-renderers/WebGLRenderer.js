@@ -153,12 +153,18 @@ function WebGLRenderer(canvas, compositor) {
  * @return {undefined} undefined
  */
 WebGLRenderer.prototype.handleClick = function handleClicke(ev) {
-    var x = ev.clientX, y = ev.clientY;
-    var pixelRatio = window.devicePixelRatio || 1;
+    var x = ev.clientX;
+    var y = ev.clientY;
+
+    this.pixelRatio = window.devicePixelRatio || 1;
     var rect = ev.target.getBoundingClientRect();
-    if (rect.left <= x && x < rect.right && rect.top <= y && y < rect.bottom) {
-        x = x - rect.left, y = rect.bottom - y;
-        this.check(x * devicePixelRatio, y * devicePixelRatio);
+
+    if (rect.left <= x && x < rect.right &&
+        rect.top <= y && y < rect.bottom) {
+
+        var canvasX = (x - rect.left) * this.pixelRatio;
+        var canvasY = (rect.bottom - y) * this.pixelRatio;
+        this.check(canvasX, canvasY);
     }
 
     return this;
@@ -906,9 +912,9 @@ WebGLRenderer.prototype.drawBuffers = function drawBuffers(vertexBuffers, mode, 
  */
 WebGLRenderer.prototype.updateSize = function updateSize(size) {
     if (size) {
-        var pixelRatio = window.devicePixelRatio || 1;
-        var displayWidth = ~~(size[0] * pixelRatio);
-        var displayHeight = ~~(size[1] * pixelRatio);
+        this.pixelRatio = window.devicePixelRatio || 1;
+        var displayWidth = ~~(size[0] * this.pixelRatio);
+        var displayHeight = ~~(size[1] * this.pixelRatio);
         this.canvas.width = displayWidth;
         this.canvas.height = displayHeight;
         this.gl.viewport(0, 0, displayWidth, displayHeight);
