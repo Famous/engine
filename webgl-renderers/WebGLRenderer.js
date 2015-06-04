@@ -153,12 +153,18 @@ function WebGLRenderer(canvas, compositor) {
  * @return {undefined} undefined
  */
 WebGLRenderer.prototype.handleClick = function handleClicke(ev) {
-    var x = ev.clientX, y = ev.clientY;
-    var pixelRatio = window.devicePixelRatio || 1;
+    var x = ev.clientX;
+    var y = ev.clientY;
+
+    this.pixelRatio = window.devicePixelRatio || 1;
     var rect = ev.target.getBoundingClientRect();
-    if (rect.left <= x && x < rect.right && rect.top <= y && y < rect.bottom) {
-        x = x - rect.left, y = rect.bottom - y;
-        this.check(x * pixelRatio, y * pixelRatio);
+
+    if (rect.left <= x && x < rect.right &&
+        rect.top <= y && y < rect.bottom) {
+
+        var canvasX = (x - rect.left) * this.pixelRatio;
+        var canvasY = (rect.bottom - y) * this.pixelRatio;
+        this.check(canvasX, canvasY);
     }
 
     return this;
@@ -187,7 +193,14 @@ WebGLRenderer.prototype.check = function check(x, y) {
     this.program.setUniforms(['u_clicked'], [0.0]);
     this.drawMeshes();
 
-    return this.listeners[pixels[3]];
+    var meshId = this.decodeMeshIdColor(pixels, 255);
+    var picked = this.listeners[meshId];
+
+    if (picked) {
+        this.compositor.sendEvent(picked.path, 'click', {});
+    }
+
+    return picked;
 };
 
 /**
@@ -254,6 +267,54 @@ WebGLRenderer.prototype.createLight = function createLight(path) {
 };
 
 /**
+ * Algorithm for encoding an ID to the normalized RGBA hash in base 255.
+ *
+ * @method
+ *
+ * @param {Number} meshId Mesh ID number
+ * @param {Number} base Base for conversion
+ *
+ * @returns {Array} Encoded value
+ */
+WebGLRenderer.prototype.encodedMeshIdColor = function encodedMeshIdColor(meshId, base) {
+    var result = [];
+
+    while (meshId) {
+        var normalizedRemainder = (meshId%base) / 255;
+        result.unshift(normalizedRemainder);
+        meshId = (meshId / base) | 0;
+    }
+
+    while (result.length !== 4) {
+        result.unshift(0);
+    }
+
+    return result;
+};
+
+/**
+ * Algorithm for decoding the mesh ID from the WebGL shader.
+ *
+ * @method
+ *
+ * @param {Buffer} pixelsBuffer Pixel buffer from the WebGL shader
+ * @param {Number} base Base for conversion
+ *
+ * @returns {Number} Mesh ID
+ */
+WebGLRenderer.prototype.decodeMeshIdColor = function decodeMeshIdColor(pixelsBuffer, base) {
+    var result = 0;
+    var baseColumn = 0;
+
+    var len = pixelsBuffer.length - 1;
+    for(var i = len; i >= 0; i--) {
+        result += pixelsBuffer[i] * Math.pow(base, baseColumn++);
+    }
+
+    return result;
+};
+
+/**
  * Adds a new base spec to the mesh registry at a given path.
  *
  * @method
@@ -264,7 +325,6 @@ WebGLRenderer.prototype.createLight = function createLight(path) {
  */
 WebGLRenderer.prototype.createMesh = function createMesh(path) {
     this.meshRegistryKeys.push(path);
-    var meshIdColor = ++this.meshIds;
 
     var uniforms = keyValueToArrays({
         u_opacity: 1,
@@ -275,7 +335,7 @@ WebGLRenderer.prototype.createMesh = function createMesh(path) {
         u_normals: [0, 0, 0],
         u_flatShading: 0,
         u_glossiness: [0, 0, 0, 0],
-        u_meshIdColor: [0.0, 0.0, 0.0, meshIdColor/255]
+        u_meshIdColor: this.encodedMeshIdColor(++this.meshIds, 255)
     });
     this.meshRegistry[path] = {
         depth: null,
@@ -287,7 +347,7 @@ WebGLRenderer.prototype.createMesh = function createMesh(path) {
         textures: [],
         visible: true,
         path: path,
-        id: meshIdColor
+        id: this.meshIds
     };
     return this.meshRegistry[path];
 };
@@ -617,7 +677,8 @@ WebGLRenderer.prototype.drawMeshes = function drawMeshes() {
     var buffers;
     var mesh;
 
-    for(var i = 0; i < this.meshRegistryKeys.length; i++) {
+    var len = this.meshRegistryKeys.length;
+    for(var i = 0; i < len; i++) {
         mesh = this.meshRegistry[this.meshRegistryKeys[i]];
         buffers = this.bufferRegistry.registry[mesh.geometry];
 
@@ -851,9 +912,9 @@ WebGLRenderer.prototype.drawBuffers = function drawBuffers(vertexBuffers, mode, 
  */
 WebGLRenderer.prototype.updateSize = function updateSize(size) {
     if (size) {
-        var pixelRatio = window.devicePixelRatio || 1;
-        var displayWidth = ~~(size[0] * pixelRatio);
-        var displayHeight = ~~(size[1] * pixelRatio);
+        this.pixelRatio = window.devicePixelRatio || 1;
+        var displayWidth = ~~(size[0] * this.pixelRatio);
+        var displayHeight = ~~(size[1] * this.pixelRatio);
         this.canvas.width = displayWidth;
         this.canvas.height = displayHeight;
         this.gl.viewport(0, 0, displayWidth, displayHeight);
