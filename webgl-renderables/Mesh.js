@@ -620,9 +620,7 @@ Mesh.prototype._subscribe = function _subscribe(UIEvent) {
     if (this._initialized) {
         this._changeQueue.push('GL_SUBSCRIBE', UIEvent);
     }
-    if (!this._requestingUpdate) {
-        this._requestUpdate();
-    }
+
     if (!this._requestingUpdate) this._requestUpdate();
 };
 
