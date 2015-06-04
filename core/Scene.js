@@ -26,9 +26,11 @@
 
 'use strict';
 
-var Dispatch = require('./Dispatch');
 var Node = require('./Node');
-var Size = require('./Size');
+var Dispatch = require('./Dispatch');
+var Commands = require('./Commands');
+var TransformSystem = require('./TransformSystem');
+var SizeSystem = require('./SizeSystem');
 
 /**
  * Scene is the bottom of the scene graph. It is its own
@@ -50,24 +52,21 @@ function Scene (selector, updater) {
 
     Node.call(this);         // Scene inherits from node
 
-    this._updater = updater; // The updater that will both
+    this._updater = updater;
+    this._globalUpdater = updater; // The updater that will both
                              // send messages to the renderers
                              // and update dirty nodes
-
-    this._dispatch = new Dispatch(this); // instantiates a dispatcher
-                                         // to send events to the scene
-                                         // graph below this context
 
     this._selector = selector; // reference to the DOM selector
                                // that represents the element
                                // in the dom that this context
                                // inhabits
 
-    this.onMount(this, selector); // Mount the context to itself
-                                  // (it is its own parent)
+    this.mount(selector); // Mount the context to itself
+                          // (it is its own parent)
 
-    this._updater                  // message a request for the dom
-        .message('NEED_SIZE_FOR')  // size of the context so that
+    this._globalUpdater                  // message a request for the dom
+        .message(Commands.NEED_SIZE_FOR)  // size of the context so that
         .message(selector);        // the scene graph has a total size
 
     this.show(); // the context begins shown (it's already present in the dom)
@@ -101,9 +100,11 @@ Scene.prototype.getSelector = function getSelector () {
  * to the nodes in the scene graph.
  *
  * @return {Dispatch} the Scene's Dispatch
+ * @deprecated
  */
 Scene.prototype.getDispatch = function getDispatch () {
-    return this._dispatch;
+    console.warn('Scene#getDispatch is deprecated, require the dispatch directly');
+    return Dispatch;
 };
 
 /**
@@ -129,7 +130,7 @@ Scene.prototype.onReceive = function onReceive (event, payload) {
                     ' of pixel sizes'
             );
 
-        this.setSizeMode(Size.ABSOLUTE, Size.ABSOLUTE, Size.ABSOLUTE);
+        this.setSizeMode('absolute', 'absolute', 'absolute');
         this.setAbsoluteSize(payload[0],
                              payload[1],
                              payload[2] ? payload[2] : 0);
@@ -137,5 +138,16 @@ Scene.prototype.onReceive = function onReceive (event, payload) {
     }
 };
 
-module.exports = Scene;
 
+Scene.prototype.mount = function mount (path) {
+    if (this.isMounted())
+        throw new Error('Scene is already mounted at: ' + this.getLocation());
+    Dispatch.registerNodeAtPath(path, this);
+    this.value.location = path;
+    this.value.showState.mounted = true;
+    this._parent = this;
+    TransformSystem.registerTransformAtPath(path);
+    SizeSystem.registerSizeAtPath(path);
+};
+
+module.exports = Scene;

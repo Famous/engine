@@ -26,18 +26,10 @@
 
 'use strict';
 
-var Transform = require('./Transform');
-var Size = require('./Size');
-
-var TRANSFORM_PROCESSOR = new Transform();
-var SIZE_PROCESSOR = new Size();
-
-var IDENT = [
-    1, 0, 0, 0,
-    0, 1, 0, 0,
-    0, 0, 1, 0,
-    0, 0, 0, 1
-];
+var SizeSystem = require('./SizeSystem');
+var Dispatch = require('./Dispatch');
+var TransformSystem = require('./TransformSystem');
+var pathUtils = require('./Path');
 
 var ONES = [1, 1, 1];
 var QUAT = [0, 0, 0, 1];
@@ -82,12 +74,12 @@ var QUAT = [0, 0, 0, 1];
  */
 function Node () {
     this._calculatedValues = {
-        transform: new Float32Array(IDENT),
         size: new Float32Array(3)
     };
 
     this._requestingUpdate = false;
     this._inUpdate = false;
+    this._transformNeedsUpdate = false;
 
     this._updateQueue = [];
     this._nextUpdateQueue = [];
@@ -109,10 +101,10 @@ function Node () {
     this.value = new Node.Spec();
 }
 
-Node.RELATIVE_SIZE = Size.RELATIVE;
-Node.ABSOLUTE_SIZE = Size.ABSOLUTE;
-Node.RENDER_SIZE = Size.RENDER;
-Node.DEFAULT_SIZE = Size.DEFAULT;
+Node.RELATIVE_SIZE = 0;
+Node.ABSOLUTE_SIZE = 1;
+Node.RENDER_SIZE = 2;
+Node.DEFAULT_SIZE = 0;
 
 /**
  * A Node spec holds the "data" associated with a Node.
@@ -158,7 +150,7 @@ Node.Spec = function Spec () {
         scale: new Float32Array(ONES)
     };
     this.size = {
-        sizeMode: new Float32Array([Size.RELATIVE, Size.RELATIVE, Size.RELATIVE]),
+        sizeMode: new Float32Array(3),
         proportional: new Float32Array(ONES),
         differential: new Float32Array(3),
         absolute: new Float32Array(3),
@@ -191,7 +183,7 @@ Node.prototype.getLocation = function getLocation () {
 Node.prototype.getId = Node.prototype.getLocation;
 
 /**
- * Globally dispatches the event using the Scene's Dispatch. All nodes will
+ * Globally dispatches the event using the Dispatch. All descendent nodes will
  * receive the dispatched event.
  *
  * @method emit
@@ -202,13 +194,7 @@ Node.prototype.getId = Node.prototype.getLocation;
  * @return {Node} this
  */
 Node.prototype.emit = function emit (event, payload) {
-    var current = this;
-
-    while (current !== current.getParent()) {
-        current = current.getParent();
-    }
-
-    current.getDispatch().dispatch(event, payload);
+    Dispatch.dispatch(this.getLocation(), event, payload);
     return this;
 };
 
@@ -396,7 +382,7 @@ Node.prototype.getOpacity = function getOpacity () {
  * @return {Float32Array}   An array representing the mount point.
  */
 Node.prototype.getMountPoint = function getMountPoint () {
-    return this.value.offsets.mountPoint;
+    return TransformSystem.get(this.getLocation()).getMountPoint();
 };
 
 /**
@@ -407,7 +393,7 @@ Node.prototype.getMountPoint = function getMountPoint () {
  * @return {Float32Array}   An array representing the align.
  */
 Node.prototype.getAlign = function getAlign () {
-    return this.value.offsets.align;
+    return TransformSystem.get(this.getLocation()).getAlign();
 };
 
 /**
@@ -418,7 +404,7 @@ Node.prototype.getAlign = function getAlign () {
  * @return {Float32Array}   An array representing the origin.
  */
 Node.prototype.getOrigin = function getOrigin () {
-    return this.value.offsets.origin;
+    return TransformSystem.get(this.getLocation()).getOrigin();
 };
 
 /**
@@ -429,7 +415,7 @@ Node.prototype.getOrigin = function getOrigin () {
  * @return {Float32Array}   An array representing the position.
  */
 Node.prototype.getPosition = function getPosition () {
-    return this.value.vectors.position;
+    return TransformSystem.get(this.getLocation()).getPosition();
 };
 
 /**
@@ -440,7 +426,7 @@ Node.prototype.getPosition = function getPosition () {
  * @return {Float32Array} an array of four values, showing the rotation as a quaternion
  */
 Node.prototype.getRotation = function getRotation () {
-    return this.value.vectors.rotation;
+    return TransformSystem.get(this.getLocation()).getRotation();
 };
 
 /**
@@ -451,7 +437,7 @@ Node.prototype.getRotation = function getRotation () {
  * @return {Float32Array} an array showing the current scale vector
  */
 Node.prototype.getScale = function getScale () {
-    return this.value.vectors.scale;
+    return TransformSystem.get(this.getLocation()).getScale();
 };
 
 /**
@@ -462,7 +448,7 @@ Node.prototype.getScale = function getScale () {
  * @return {Float32Array} an array of numbers showing the current size mode
  */
 Node.prototype.getSizeMode = function getSizeMode () {
-    return this.value.size.sizeMode;
+    return SizeSystem.get(this.getLocation()).getSizeMode();
 };
 
 /**
@@ -473,7 +459,7 @@ Node.prototype.getSizeMode = function getSizeMode () {
  * @return {Float32Array} a vector 3 showing the current proportional size
  */
 Node.prototype.getProportionalSize = function getProportionalSize () {
-    return this.value.size.proportional;
+    return SizeSystem.get(this.getLocation()).getProportional();
 };
 
 /**
@@ -484,7 +470,7 @@ Node.prototype.getProportionalSize = function getProportionalSize () {
  * @return {Float32Array} a vector 3 showing the current differential size
  */
 Node.prototype.getDifferentialSize = function getDifferentialSize () {
-    return this.value.size.differential;
+    return SizeSystem.get(this.getLocation()).getDifferential();
 };
 
 /**
@@ -495,7 +481,7 @@ Node.prototype.getDifferentialSize = function getDifferentialSize () {
  * @return {Float32Array} a vector 3 showing the current absolute size of the node
  */
 Node.prototype.getAbsoluteSize = function getAbsoluteSize () {
-    return this.value.size.absolute;
+    return SizeSystem.get(this.getLocation()).getAbsolute();
 };
 
 /**
@@ -508,7 +494,7 @@ Node.prototype.getAbsoluteSize = function getAbsoluteSize () {
  * @return {Float32Array} a vector 3 showing the current render size
  */
 Node.prototype.getRenderSize = function getRenderSize () {
-    return this.value.size.render;
+    return SizeSystem.get(this.getLocation()).getRender();
 };
 
 /**
@@ -519,7 +505,7 @@ Node.prototype.getRenderSize = function getRenderSize () {
  * @return {Float32Array} a vector 3 of the final calculated side of the node
  */
 Node.prototype.getSize = function getSize () {
-    return this._calculatedValues.size;
+    return SizeSystem.get(this.getLocation()).get();
 };
 
 /**
@@ -530,7 +516,7 @@ Node.prototype.getSize = function getSize () {
  * @return {Float32Array} a 16 value transform
  */
 Node.prototype.getTransform = function getTransform () {
-    return this._calculatedValues.transform;
+    return TransformSystem.get(this.getLocation());
 };
 
 /**
@@ -560,16 +546,14 @@ Node.prototype.addChild = function addChild (child) {
     child = child ? child : new Node();
 
     if (index === -1) {
-        index = this._freedChildIndicies.length ? this._freedChildIndicies.pop() : this._children.length;
+        index = this._freedChildIndicies.length ?
+                this._freedChildIndicies.pop() : this._children.length;
+
         this._children[index] = child;
-
-        if (this.isMounted() && child.onMount) {
-            var myId = this.getId();
-            var childId = myId + '/' + index;
-            child.onMount(this, childId);
-        }
-
     }
+
+    if (this.isMounted())
+        child.mount(this.getLocation() + '/' + index);
 
     return child;
 };
@@ -586,16 +570,16 @@ Node.prototype.addChild = function addChild (child) {
  */
 Node.prototype.removeChild = function removeChild (child) {
     var index = this._children.indexOf(child);
-    var added = index !== -1;
-    if (added) {
+
+    if (index > - 1) {
         this._freedChildIndicies.push(index);
 
         this._children[index] = null;
 
-        if (this.isMounted() && child.onDismount)
-            child.onDismount();
-    }
-    return added;
+        child.dismount();
+
+        return true;
+    } else throw new Error('Node is not a child of this node');
 };
 
 /**
@@ -735,26 +719,8 @@ Node.prototype._vecOptionalSet = function _vecOptionalSet (vec, index, val) {
  * @return {Node} this
  */
 Node.prototype.show = function show () {
-    var i = 0;
-    var items = this._components;
-    var len = items.length;
-    var item;
-
+    Dispatch.show(this.getLocation());
     this.value.showState.shown = true;
-
-    for (; i < len ; i++) {
-        item = items[i];
-        if (item && item.onShow) item.onShow();
-    }
-
-    i = 0;
-    items = this._children;
-    len = items.length;
-
-    for (; i < len ; i++) {
-        item = items[i];
-        if (item && item.onParentShow) item.onParentShow();
-    }
     return this;
 };
 
@@ -768,26 +734,8 @@ Node.prototype.show = function show () {
  * @return {Node} this
  */
 Node.prototype.hide = function hide () {
-    var i = 0;
-    var items = this._components;
-    var len = items.length;
-    var item;
-
+    Dispatch.hide(this.getLocation());
     this.value.showState.shown = false;
-
-    for (; i < len ; i++) {
-        item = items[i];
-        if (item && item.onHide) item.onHide();
-    }
-
-    i = 0;
-    items = this._children;
-    len = items.length;
-
-    for (; i < len ; i++) {
-        item = items[i];
-        if (item && item.onParentHide) item.onParentHide();
-    }
     return this;
 };
 
@@ -804,26 +752,7 @@ Node.prototype.hide = function hide () {
  * @return {Node} this
  */
 Node.prototype.setAlign = function setAlign (x, y, z) {
-    var vec3 = this.value.offsets.align;
-    var propogate = false;
-
-    propogate = this._vecOptionalSet(vec3, 0, x) || propogate;
-    propogate = this._vecOptionalSet(vec3, 1, y) || propogate;
-    if (z != null) propogate = this._vecOptionalSet(vec3, 2, (z - 0.5)) || propogate;
-
-    if (propogate) {
-        var i = 0;
-        var list = this._components;
-        var len = list.length;
-        var item;
-        x = vec3[0];
-        y = vec3[1];
-        z = vec3[2];
-        for (; i < len ; i++) {
-            item = list[i];
-            if (item && item.onAlignChange) item.onAlignChange(x, y, z);
-        }
-    }
+    TransformSystem.get(this.getLocation()).setAlign(x, y, z);
     return this;
 };
 
@@ -840,26 +769,7 @@ Node.prototype.setAlign = function setAlign (x, y, z) {
  * @return {Node} this
  */
 Node.prototype.setMountPoint = function setMountPoint (x, y, z) {
-    var vec3 = this.value.offsets.mountPoint;
-    var propogate = false;
-
-    propogate = this._vecOptionalSet(vec3, 0, x) || propogate;
-    propogate = this._vecOptionalSet(vec3, 1, y) || propogate;
-    if (z != null) propogate = this._vecOptionalSet(vec3, 2, (z - 0.5)) || propogate;
-
-    if (propogate) {
-        var i = 0;
-        var list = this._components;
-        var len = list.length;
-        var item;
-        x = vec3[0];
-        y = vec3[1];
-        z = vec3[2];
-        for (; i < len ; i++) {
-            item = list[i];
-            if (item && item.onMountPointChange) item.onMountPointChange(x, y, z);
-        }
-    }
+    TransformSystem.get(this.getLocation()).setMountPoint(x, y, z);
     return this;
 };
 
@@ -876,26 +786,7 @@ Node.prototype.setMountPoint = function setMountPoint (x, y, z) {
  * @return {Node} this
  */
 Node.prototype.setOrigin = function setOrigin (x, y, z) {
-    var vec3 = this.value.offsets.origin;
-    var propogate = false;
-
-    propogate = this._vecOptionalSet(vec3, 0, x) || propogate;
-    propogate = this._vecOptionalSet(vec3, 1, y) || propogate;
-    if (z != null) propogate = this._vecOptionalSet(vec3, 2, (z - 0.5)) || propogate;
-
-    if (propogate) {
-        var i = 0;
-        var list = this._components;
-        var len = list.length;
-        var item;
-        x = vec3[0];
-        y = vec3[1];
-        z = vec3[2];
-        for (; i < len ; i++) {
-            item = list[i];
-            if (item && item.onOriginChange) item.onOriginChange(x, y, z);
-        }
-    }
+    TransformSystem.get(this.getLocation()).setOrigin(x, y, z);
     return this;
 };
 
@@ -912,27 +803,7 @@ Node.prototype.setOrigin = function setOrigin (x, y, z) {
  * @return {Node} this
  */
 Node.prototype.setPosition = function setPosition (x, y, z) {
-    var vec3 = this.value.vectors.position;
-    var propogate = false;
-
-    propogate = this._vecOptionalSet(vec3, 0, x) || propogate;
-    propogate = this._vecOptionalSet(vec3, 1, y) || propogate;
-    propogate = this._vecOptionalSet(vec3, 2, z) || propogate;
-
-    if (propogate) {
-        var i = 0;
-        var list = this._components;
-        var len = list.length;
-        var item;
-        x = vec3[0];
-        y = vec3[1];
-        z = vec3[2];
-        for (; i < len ; i++) {
-            item = list[i];
-            if (item && item.onPositionChange) item.onPositionChange(x, y, z);
-        }
-    }
-
+    TransformSystem.get(this.getLocation()).setPosition(x, y, z);
     return this;
 };
 
@@ -952,89 +823,7 @@ Node.prototype.setPosition = function setPosition (x, y, z) {
  * @return {Node} this
  */
 Node.prototype.setRotation = function setRotation (x, y, z, w) {
-    var quat = this.value.vectors.rotation;
-    var propogate = false;
-    var qx, qy, qz, qw;
-
-    if (w != null) {
-        qx = x;
-        qy = y;
-        qz = z;
-        qw = w;
-        this._lastEulerX = null;
-        this._lastEulerY = null;
-        this._lastEulerZ = null;
-        this._lastEuler = false;
-    }
-    else {
-        if (x == null || y == null || z == null) {
-            if (this._lastEuler) {
-                x = x == null ? this._lastEulerX : x;
-                y = y == null ? this._lastEulerY : y;
-                z = z == null ? this._lastEulerZ : z;
-            }
-            else {
-                var sp = -2 * (quat[1] * quat[2] - quat[3] * quat[0]);
-
-                if (Math.abs(sp) > 0.99999) {
-                    y = y == null ? Math.PI * 0.5 * sp : y;
-                    x = x == null ? Math.atan2(-quat[0] * quat[2] + quat[3] * quat[1], 0.5 - quat[1] * quat[1] - quat[2] * quat[2]) : x;
-                    z = z == null ? 0 : z;
-                }
-                else {
-                    y = y == null ? Math.asin(sp) : y;
-                    x = x == null ? Math.atan2(quat[0] * quat[2] + quat[3] * quat[1], 0.5 - quat[0] * quat[0] - quat[1] * quat[1]) : x;
-                    z = z == null ? Math.atan2(quat[0] * quat[1] + quat[3] * quat[2], 0.5 - quat[0] * quat[0] - quat[2] * quat[2]) : z;
-                }
-            }
-        }
-
-        var hx = x * 0.5;
-        var hy = y * 0.5;
-        var hz = z * 0.5;
-
-        var sx = Math.sin(hx);
-        var sy = Math.sin(hy);
-        var sz = Math.sin(hz);
-        var cx = Math.cos(hx);
-        var cy = Math.cos(hy);
-        var cz = Math.cos(hz);
-
-        var sysz = sy * sz;
-        var cysz = cy * sz;
-        var sycz = sy * cz;
-        var cycz = cy * cz;
-
-        qx = sx * cycz + cx * sysz;
-        qy = cx * sycz - sx * cysz;
-        qz = cx * cysz + sx * sycz;
-        qw = cx * cycz - sx * sysz;
-
-        this._lastEuler = true;
-        this._lastEulerX = x;
-        this._lastEulerY = y;
-        this._lastEulerZ = z;
-    }
-
-    propogate = this._vecOptionalSet(quat, 0, qx) || propogate;
-    propogate = this._vecOptionalSet(quat, 1, qy) || propogate;
-    propogate = this._vecOptionalSet(quat, 2, qz) || propogate;
-    propogate = this._vecOptionalSet(quat, 3, qw) || propogate;
-
-    if (propogate) {
-        var i = 0;
-        var list = this._components;
-        var len = list.length;
-        var item;
-        x = quat[0];
-        y = quat[1];
-        z = quat[2];
-        w = quat[3];
-        for (; i < len ; i++) {
-            item = list[i];
-            if (item && item.onRotationChange) item.onRotationChange(x, y, z, w);
-        }
-    }
+    TransformSystem.get(this.getLocation()).setRotation(x, y, z, w);
     return this;
 };
 
@@ -1051,26 +840,7 @@ Node.prototype.setRotation = function setRotation (x, y, z, w) {
  * @return {Node} this
  */
 Node.prototype.setScale = function setScale (x, y, z) {
-    var vec3 = this.value.vectors.scale;
-    var propogate = false;
-
-    propogate = this._vecOptionalSet(vec3, 0, x) || propogate;
-    propogate = this._vecOptionalSet(vec3, 1, y) || propogate;
-    propogate = this._vecOptionalSet(vec3, 2, z) || propogate;
-
-    if (propogate) {
-        var i = 0;
-        var list = this._components;
-        var len = list.length;
-        var item;
-        x = vec3[0];
-        y = vec3[1];
-        z = vec3[2];
-        for (; i < len ; i++) {
-            item = list[i];
-            if (item && item.onScaleChange) item.onScaleChange(x, y, z);
-        }
-    }
+    TransformSystem.get(this.getLocation()).setScale(x, y, z);
     return this;
 };
 
@@ -1127,55 +897,8 @@ Node.prototype.setOpacity = function setOpacity (val) {
  * @return {Node} this
  */
 Node.prototype.setSizeMode = function setSizeMode (x, y, z) {
-    var vec3 = this.value.size.sizeMode;
-    var propogate = false;
-
-    if (x != null) propogate = this._resolveSizeMode(vec3, 0, x) || propogate;
-    if (y != null) propogate = this._resolveSizeMode(vec3, 1, y) || propogate;
-    if (z != null) propogate = this._resolveSizeMode(vec3, 2, z) || propogate;
-
-    if (propogate) {
-        var i = 0;
-        var list = this._components;
-        var len = list.length;
-        var item;
-        x = vec3[0];
-        y = vec3[1];
-        z = vec3[2];
-        for (; i < len ; i++) {
-            item = list[i];
-            if (item && item.onSizeModeChange) item.onSizeModeChange(x, y, z);
-        }
-    }
+    SizeSystem.get(this.getLocation()).setSizeMode(x, y, z);
     return this;
-};
-
-/**
- * A protected method that resolves string representations of size mode
- * to numeric values and applies them.
- *
- * @method
- *
- * @param {Array} vec the array to write size mode to
- * @param {Number} index the index to write to in the array
- * @param {String|Number} val the value to write
- *
- * @return {Bool} whether or not the sizemode has been changed for this index.
- */
-Node.prototype._resolveSizeMode = function _resolveSizeMode (vec, index, val) {
-    if (val.constructor === String) {
-        switch (val.toLowerCase()) {
-            case 'relative':
-            case 'default':
-                return this._vecOptionalSet(vec, index, 0);
-            case 'absolute':
-                return this._vecOptionalSet(vec, index, 1);
-            case 'render':
-                return this._vecOptionalSet(vec, index, 2);
-            default: throw new Error('unknown size mode: ' + val);
-        }
-    }
-    else return this._vecOptionalSet(vec, index, val);
 };
 
 /**
@@ -1192,26 +915,7 @@ Node.prototype._resolveSizeMode = function _resolveSizeMode (vec, index, val) {
  * @return {Node} this
  */
 Node.prototype.setProportionalSize = function setProportionalSize (x, y, z) {
-    var vec3 = this.value.size.proportional;
-    var propogate = false;
-
-    propogate = this._vecOptionalSet(vec3, 0, x) || propogate;
-    propogate = this._vecOptionalSet(vec3, 1, y) || propogate;
-    propogate = this._vecOptionalSet(vec3, 2, z) || propogate;
-
-    if (propogate) {
-        var i = 0;
-        var list = this._components;
-        var len = list.length;
-        var item;
-        x = vec3[0];
-        y = vec3[1];
-        z = vec3[2];
-        for (; i < len ; i++) {
-            item = list[i];
-            if (item && item.onProportionalSizeChange) item.onProportionalSizeChange(x, y, z);
-        }
-    }
+    SizeSystem.get(this.getLocation()).setProportional(x, y, z);
     return this;
 };
 
@@ -1234,26 +938,7 @@ Node.prototype.setProportionalSize = function setProportionalSize (x, y, z) {
  * @return {Node} this
  */
 Node.prototype.setDifferentialSize = function setDifferentialSize (x, y, z) {
-    var vec3 = this.value.size.differential;
-    var propogate = false;
-
-    propogate = this._vecOptionalSet(vec3, 0, x) || propogate;
-    propogate = this._vecOptionalSet(vec3, 1, y) || propogate;
-    propogate = this._vecOptionalSet(vec3, 2, z) || propogate;
-
-    if (propogate) {
-        var i = 0;
-        var list = this._components;
-        var len = list.length;
-        var item;
-        x = vec3[0];
-        y = vec3[1];
-        z = vec3[2];
-        for (; i < len ; i++) {
-            item = list[i];
-            if (item && item.onDifferentialSizeChange) item.onDifferentialSizeChange(x, y, z);
-        }
-    }
+    SizeSystem.get(this.getLocation()).setDifferential(x, y, z);
     return this;
 };
 
@@ -1269,89 +954,8 @@ Node.prototype.setDifferentialSize = function setDifferentialSize (x, y, z) {
  * @return {Node} this
  */
 Node.prototype.setAbsoluteSize = function setAbsoluteSize (x, y, z) {
-    var vec3 = this.value.size.absolute;
-    var propogate = false;
-
-    propogate = this._vecOptionalSet(vec3, 0, x) || propogate;
-    propogate = this._vecOptionalSet(vec3, 1, y) || propogate;
-    propogate = this._vecOptionalSet(vec3, 2, z) || propogate;
-
-    if (propogate) {
-        var i = 0;
-        var list = this._components;
-        var len = list.length;
-        var item;
-        x = vec3[0];
-        y = vec3[1];
-        z = vec3[2];
-        for (; i < len ; i++) {
-            item = list[i];
-            if (item && item.onAbsoluteSizeChange) item.onAbsoluteSizeChange(x, y, z);
-        }
-    }
+    SizeSystem.get(this.getLocation()).setAbsolute(x, y, z);
     return this;
-};
-
-/**
- * Private method for alerting all components and children that
- * this node's transform has changed.
- *
- * @method
- *
- * @param {Float32Array} transform The transform that has changed
- *
- * @return {undefined} undefined
- */
-Node.prototype._transformChanged = function _transformChanged (transform) {
-    var i = 0;
-    var items = this._components;
-    var len = items.length;
-    var item;
-
-    for (; i < len ; i++) {
-        item = items[i];
-        if (item && item.onTransformChange) item.onTransformChange(transform);
-    }
-
-    i = 0;
-    items = this._children;
-    len = items.length;
-
-    for (; i < len ; i++) {
-        item = items[i];
-        if (item && item.onParentTransformChange) item.onParentTransformChange(transform);
-    }
-};
-
-/**
- * Private method for alerting all components and children that
- * this node's size has changed.
- *
- * @method
- *
- * @param {Float32Array} size the size that has changed
- *
- * @return {undefined} undefined
- */
-Node.prototype._sizeChanged = function _sizeChanged (size) {
-    var i = 0;
-    var items = this._components;
-    var len = items.length;
-    var item;
-
-    for (; i < len ; i++) {
-        item = items[i];
-        if (item && item.onSizeChange) item.onSizeChange(size);
-    }
-
-    i = 0;
-    items = this._children;
-    len = items.length;
-
-    for (; i < len ; i++) {
-        item = items[i];
-        if (item && item.onParentSizeChange) item.onParentSizeChange(size);
-    }
 };
 
 /**
@@ -1393,23 +997,14 @@ Node.prototype.update = function update (time){
     var queue = this._updateQueue;
     var item;
 
+    if (this.onUpdate) this.onUpdate();
+
     while (nextQueue.length) queue.unshift(nextQueue.pop());
 
     while (queue.length) {
         item = this._components[queue.shift()];
         if (item && item.onUpdate) item.onUpdate(time);
     }
-
-    var mySize = this.getSize();
-    var myTransform = this.getTransform();
-    var parent = this.getParent();
-    var parentSize = parent.getSize();
-    var parentTransform = parent.getTransform();
-    var sizeChanged = SIZE_PROCESSOR.fromSpecWithParent(parentSize, this, mySize);
-
-    var transformChanged = TRANSFORM_PROCESSOR.fromSpecWithParent(parentTransform, this.value, mySize, parentSize, myTransform);
-    if (transformChanged) this._transformChanged(myTransform);
-    if (sizeChanged) this._sizeChanged(mySize);
 
     this._inUpdate = false;
     this._requestingUpdate = false;
@@ -1433,38 +1028,27 @@ Node.prototype.update = function update (time){
  *
  * @method mount
  *
- * @param  {Node} parent    parent node
  * @param  {String} myId    path to node (e.g. `body/0/1`)
  *
  * @return {Node} this
  */
-Node.prototype.mount = function mount (parent, myId) {
-    if (this.isMounted()) return this;
-    var i = 0;
-    var list = this._components;
-    var len = list.length;
-    var item;
+Node.prototype.mount = function mount (path) {
+    if (this.isMounted())
+        throw new Error('Node is already mounted at: ' + this.getLocation());
 
+    Dispatch.registerNodeAtPath(path, this);
+    TransformSystem.registerTransformAtPath(path);
+    SizeSystem.registerSizeAtPath(path);
+
+    var parent = Dispatch.getNode(pathUtils.parent(path));
     this._parent = parent;
     this._globalUpdater = parent.getUpdater();
-    this.value.location = myId;
+    this.value.location = path;
     this.value.showState.mounted = true;
 
-    for (; i < len ; i++) {
-        item = list[i];
-        if (item && item.onMount) item.onMount(this, i);
-    }
-
-    i = 0;
-    list = this._children;
-    len = list.length;
-    for (; i < len ; i++) {
-        item = list[i];
-        if (item && item.onParentMount) item.onParentMount(this, myId, i);
-    }
-
-    if (!this._requestingUpdate) this._requestUpdate(true);
+    if (!this._requestingUpdate) this._requestUpdate();
     return this;
+
 };
 
 /**
@@ -1476,7 +1060,15 @@ Node.prototype.mount = function mount (parent, myId) {
  * @return {Node} this
  */
 Node.prototype.dismount = function dismount () {
-    if (!this.isMounted()) return this;
+    if (!this.isMounted())
+        throw new Error('Node is not mounted');
+
+    var path = this.getLocation();
+
+    Dispatch.deregisterNodeAtPath(path, this);
+    TransformSystem.deregisterTransformAtPath(path);
+    SizeSystem.deregisterSizeAtPath(path);
+
     var i = 0;
     var list = this._components;
     var len = list.length;
@@ -1484,51 +1076,12 @@ Node.prototype.dismount = function dismount () {
 
     this.value.showState.mounted = false;
 
-    this._parent.removeChild(this);
-
     for (; i < len ; i++) {
         item = list[i];
         if (item && item.onDismount) item.onDismount();
     }
 
-    i = 0;
-    list = this._children;
-    len = list.length;
-    for (; i < len ; i++) {
-        item = list[i];
-        if (item && item.onParentDismount) item.onParentDismount();
-    }
-
     if (!this._requestingUpdate) this._requestUpdate();
-    return this;
-};
-
-/**
- * Function to be invoked by the parent as soon as the parent is
- * being mounted.
- *
- * @method onParentMount
- *
- * @param  {Node} parent        The parent node.
- * @param  {String} parentId    The parent id (path to parent).
- * @param  {Number} index       Id the node should be mounted to.
- *
- * @return {Node} this
- */
-Node.prototype.onParentMount = function onParentMount (parent, parentId, index) {
-    return this.mount(parent, parentId + '/' + index);
-};
-
-/**
- * Function to be invoked by the parent as soon as the parent is being
- * unmounted.
- *
- * @method onParentDismount
- *
- * @return {Node} this
- */
-Node.prototype.onParentDismount = function onParentDismount () {
-    return this.dismount();
 };
 
 /**
@@ -1553,123 +1106,5 @@ Node.prototype.receive = function receive (type, ev) {
     }
     return this;
 };
-
-
-/**
- * Private method to avoid accidentally passing arguments
- * to update events.
- *
- * @method
- *
- * @return {undefined} undefined
- */
-Node.prototype._requestUpdateWithoutArgs = function _requestUpdateWithoutArgs () {
-    if (!this._requestingUpdate) this._requestUpdate();
-};
-
-/**
- * A method to execute logic on update. Defaults to the
- * node's .update method.
- *
- * @method
- *
- * @param {Number} current time
- *
- * @return {undefined} undefined
- */
-Node.prototype.onUpdate = Node.prototype.update;
-
-/**
- * A method to execute logic when a parent node is shown. Delegates
- * to Node.show.
- *
- * @method
- *
- * @return {Node} this
- */
-Node.prototype.onParentShow = Node.prototype.show;
-
-/**
- * A method to execute logic when the parent is hidden. Delegates
- * to Node.hide.
- *
- * @method
- *
- * @return {Node} this
- */
-Node.prototype.onParentHide = Node.prototype.hide;
-
-/**
- * A method to execute logic when the parent transform changes.
- * Delegates to Node._requestUpdateWithoutArgs.
- *
- * @method
- *
- * @return {undefined} undefined
- */
-Node.prototype.onParentTransformChange = Node.prototype._requestUpdateWithoutArgs;
-
-/**
- * A method to execute logic when the parent size changes.
- * Delegates to Node._requestUpdateWIthoutArgs.
- *
- * @method
- *
- * @return {undefined} undefined
- */
-Node.prototype.onParentSizeChange = Node.prototype._requestUpdateWithoutArgs;
-
-/**
- * A method to execute logic when the node something wants
- * to show the node. Delegates to Node.show.
- *
- * @method
- *
- * @return {Node} this
- */
-Node.prototype.onShow = Node.prototype.show;
-
-/**
- * A method to execute logic when something wants to hide this
- * node. Delegates to Node.hide.
- *
- * @method
- *
- * @return {Node} this
- */
-Node.prototype.onHide = Node.prototype.hide;
-
-/**
- * A method which can execute logic when this node is added to
- * to the scene graph. Delegates to mount.
- *
- * @method
- *
- * @return {Node} this
- */
-Node.prototype.onMount = Node.prototype.mount;
-
-/**
- * A method which can execute logic when this node is removed from
- * the scene graph. Delegates to Node.dismount.
- *
- * @method
- *
- * @return {Node} this
- */
-Node.prototype.onDismount = Node.prototype.dismount;
-
-/**
- * A method which can execute logic when this node receives
- * an event from the scene graph. Delegates to Node.receive.
- *
- * @method
- *
- * @param {String} event name
- * @param {Object} payload
- *
- * @return {undefined} undefined
- */
-Node.prototype.onReceive = Node.prototype.receive;
 
 module.exports = Node;

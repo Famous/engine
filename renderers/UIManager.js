@@ -24,6 +24,8 @@
 
 'use strict';
 
+var Commands = require('../core/Commands');
+
 /**
  * The UIManager is being updated by an Engine by consecutively calling its
  * `update` method. It can either manage a real Web-Worker or the global
@@ -62,13 +64,13 @@ function UIManager (thread, compositor, renderLoop) {
     var _this = this;
     this._thread.onmessage = function (ev) {
         var message = ev.data ? ev.data : ev;
-        if (message[0] === 'ENGINE') {
+        if (message[0] === Commands.ENGINE) {
             switch (message[1]) {
-                case 'START':
-                    _this._renderLoop.start();
+                case Commands.START:
+                    _this._engine.start();
                     break;
-                case 'STOP':
-                    _this._renderLoop.stop();
+                case Commands.STOP:
+                    _this._engine.stop();
                     break;
                 default:
                     console.error(
@@ -132,7 +134,7 @@ UIManager.prototype.getEngine = function getEngine() {
  * @return {undefined} undefined
  */
 UIManager.prototype.update = function update (time) {
-    this._thread.postMessage(['FRAME', time]);
+    this._thread.postMessage([Commands.FRAME, time]);
     var threadMessages = this._compositor.drawCommands();
     this._thread.postMessage(threadMessages);
     this._compositor.clearCommands();

@@ -25,6 +25,8 @@
 'use strict';
 
 var CallbackStore = require('../utilities/CallbackStore');
+var TransformSystem = require('../core/TransformSystem');
+var Commands = require('../core/Commands');
 
 var RENDER_SIZE = 2;
 
@@ -55,30 +57,28 @@ function DOMElement(node, options) {
     if (!node) throw new Error('DOMElement must be instantiated on a node');
 
     this._node = node;
+    this._changeQueue = [];
 
     this._requestingUpdate = false;
     this._renderSized = false;
     this._requestRenderSize = false;
-
-    this._changeQueue = [];
 
     this._UIEvents = node.getUIEvents().slice(0);
     this._classes = ['famous-dom-element'];
     this._requestingEventListeners = [];
     this._styles = {};
 
-    this.setProperty('display', node.isShown() ? 'none' : 'block');
-    this.onOpacityChange(node.getOpacity());
-
     this._attributes = {};
     this._content = '';
 
     this._tagName = options && options.tagName ? options.tagName : 'div';
-    this._id = node.addComponent(this);
-
     this._renderSize = [0, 0, 0];
 
     this._callbacks = new CallbackStore();
+
+    this._id = node ? node.addComponent(this) : null;
+    this.setProperty('display', node.isShown() ? 'none' : 'block');
+    this.onOpacityChange(node.getOpacity());
 
     if (!options) return;
 
@@ -131,18 +131,18 @@ DOMElement.prototype.getValue = function getValue() {
  *
  * @return {undefined} undefined
  */
-DOMElement.prototype.onUpdate = function onUpdate() {
+DOMElement.prototype.onUpdate = function onUpdate () {
     var node = this._node;
     var queue = this._changeQueue;
     var len = queue.length;
 
     if (len && node) {
-        node.sendDrawCommand('WITH');
+        node.sendDrawCommand(Commands.WITH);
         node.sendDrawCommand(node.getLocation());
 
         while (len--) node.sendDrawCommand(queue.shift());
         if (this._requestRenderSize) {
-            node.sendDrawCommand('DOM_RENDER_SIZE');
+            node.sendDrawCommand(Commands.DOM_RENDER_SIZE);
             node.sendDrawCommand(node.getLocation());
             this._requestRenderSize = false;
         }
@@ -169,6 +169,7 @@ DOMElement.prototype.onMount = function onMount(node, id) {
     this._node = node;
     this._id = id;
     this._UIEvents = node.getUIEvents().slice(0);
+    TransformSystem.makeBreakPointAt(node.getLocation());
     this.draw();
     this.setAttribute('data-fa-path', node.getLocation());
 };
@@ -224,8 +225,8 @@ DOMElement.prototype.onHide = function onHide() {
  *
  * @return {undefined} undefined
  */
-DOMElement.prototype.setCutoutState = function setCutoutState(usesCutout) {
-    this._changeQueue.push('GL_CUTOUT_STATE', usesCutout);
+DOMElement.prototype.setCutoutState = function setCutoutState (usesCutout) {
+    this._changeQueue.push(Commands.GL_CUTOUT_STATE, usesCutout);
 
     if (this._initialized) this._requestUpdate();
 };
@@ -242,11 +243,13 @@ DOMElement.prototype.setCutoutState = function setCutoutState(usesCutout) {
  * @return {undefined} undefined
  */
 DOMElement.prototype.onTransformChange = function onTransformChange (transform) {
-    this._changeQueue.push('CHANGE_TRANSFORM');
+    this._changeQueue.push(Commands.CHANGE_TRANSFORM);
+    transform = transform.getLocalTransform();
+
     for (var i = 0, len = transform.length ; i < len ; i++)
         this._changeQueue.push(transform[i]);
 
-    this.onUpdate();
+    if (!this._requestingUpdate) this._requestUpdate();
 };
 
 /**
@@ -258,14 +261,14 @@ DOMElement.prototype.onTransformChange = function onTransformChange (transform) 
  *
  * @return {DOMElement} this
  */
-DOMElement.prototype.onSizeChange = function onSizeChange(size) {
+DOMElement.prototype.onSizeChange = function onSizeChange(x, y) {
     var sizeMode = this._node.getSizeMode();
     var sizedX = sizeMode[0] !== RENDER_SIZE;
     var sizedY = sizeMode[1] !== RENDER_SIZE;
     if (this._initialized)
-        this._changeQueue.push('CHANGE_SIZE',
-            sizedX ? size[0] : sizedX,
-            sizedY ? size[1] : sizedY);
+        this._changeQueue.push(Commands.CHANGE_SIZE,
+            sizedX ? x : sizedX,
+            sizedY ? y : sizedY);
 
     if (!this._requestingUpdate) this._requestUpdate();
     return this;
@@ -315,7 +318,7 @@ DOMElement.prototype.onAddUIEvent = function onAddUIEvent(UIEvent) {
  */
 DOMElement.prototype._subscribe = function _subscribe (UIEvent) {
     if (this._initialized) {
-        this._changeQueue.push('SUBSCRIBE', UIEvent, true);
+        this._changeQueue.push(Commands.SUBSCRIBE, UIEvent, true);
     }
     if (!this._requestingUpdate) this._requestUpdate();
 };
@@ -338,7 +341,8 @@ DOMElement.prototype.onSizeModeChange = function onSizeModeChange(x, y, z) {
         this._renderSized = true;
         this._requestRenderSize = true;
     }
-    this.onSizeChange(this._node.getSize());
+    var size = this._node.getSize();
+    this.onSizeChange(size[0], size[1]);
 };
 
 /**
@@ -376,10 +380,10 @@ DOMElement.prototype._requestUpdate = function _requestUpdate() {
  *
  * @return {undefined} undefined
  */
-DOMElement.prototype.init = function init() {
-    this._changeQueue.push('INIT_DOM', this._tagName);
+DOMElement.prototype.init = function init () {
+    this._changeQueue.push(Commands.INIT_DOM, this._tagName);
     this._initialized = true;
-    this.onTransformChange(this._node.getTransform());
+    this.onTransformChange(TransformSystem.get(this._node.getLocation()));
     this.onSizeChange(this._node.getSize());
     if (!this._requestingUpdate) this._requestUpdate();
 };
@@ -410,7 +414,7 @@ DOMElement.prototype.setId = function setId (id) {
  */
 DOMElement.prototype.addClass = function addClass (value) {
     if (this._classes.indexOf(value) < 0) {
-        if (this._initialized) this._changeQueue.push('ADD_CLASS', value);
+        if (this._initialized) this._changeQueue.push(Commands.ADD_CLASS, value);
         this._classes.push(value);
         if (!this._requestingUpdate) this._requestUpdate();
         if (this._renderSized) this._requestRenderSize = true;
@@ -418,7 +422,7 @@ DOMElement.prototype.addClass = function addClass (value) {
     }
 
     if (this._inDraw) {
-        if (this._initialized) this._changeQueue.push('ADD_CLASS', value);
+        if (this._initialized) this._changeQueue.push(Commands.ADD_CLASS, value);
         if (!this._requestingUpdate) this._requestUpdate();
     }
     return this;
@@ -438,7 +442,7 @@ DOMElement.prototype.removeClass = function removeClass (value) {
 
     if (index < 0) return this;
 
-    this._changeQueue.push('REMOVE_CLASS', value);
+    this._changeQueue.push(Commands.REMOVE_CLASS, value);
 
     this._classes.splice(index, 1);
 
@@ -473,7 +477,7 @@ DOMElement.prototype.hasClass = function hasClass (value) {
 DOMElement.prototype.setAttribute = function setAttribute (name, value) {
     if (this._attributes[name] !== value || this._inDraw) {
         this._attributes[name] = value;
-        if (this._initialized) this._changeQueue.push('CHANGE_ATTRIBUTE', name, value);
+        if (this._initialized) this._changeQueue.push(Commands.CHANGE_ATTRIBUTE, name, value);
         if (!this._requestUpdate) this._requestUpdate();
     }
 
@@ -493,7 +497,7 @@ DOMElement.prototype.setAttribute = function setAttribute (name, value) {
 DOMElement.prototype.setProperty = function setProperty (name, value) {
     if (this._styles[name] !== value || this._inDraw) {
         this._styles[name] = value;
-        if (this._initialized) this._changeQueue.push('CHANGE_PROPERTY', name, value);
+        if (this._initialized) this._changeQueue.push(Commands.CHANGE_PROPERTY, name, value);
         if (!this._requestingUpdate) this._requestUpdate();
         if (this._renderSized) this._requestRenderSize = true;
     }
@@ -514,7 +518,7 @@ DOMElement.prototype.setProperty = function setProperty (name, value) {
 DOMElement.prototype.setContent = function setContent (content) {
     if (this._content !== content || this._inDraw) {
         this._content = content;
-        if (this._initialized) this._changeQueue.push('CHANGE_CONTENT', content);
+        if (this._initialized) this._changeQueue.push(Commands.CHANGE_CONTENT, content);
         if (!this._requestingUpdate) this._requestUpdate();
         if (this._renderSized) this._requestRenderSize = true;
     }
