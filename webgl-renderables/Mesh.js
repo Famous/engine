@@ -167,6 +167,7 @@ Mesh.prototype.setBaseColor = function setBaseColor (color) {
         this.value.color = null;
         this.value.expressions.baseColor = color;
         uniformValue = color;
+        addMeshToMaterial(this, color);
     }
     else if (isColor) {
         this.value.expressions.baseColor = null;
@@ -259,6 +260,7 @@ Mesh.prototype.setNormals = function setNormals (materialExpression) {
 
     if (isMaterial) {
         this.value.expressions.normals = materialExpression;
+        addMeshToMaterial(this, materialExpression);
     }
 
     if (this._initialized) {
@@ -303,6 +305,7 @@ Mesh.prototype.setGlossiness = function setGlossiness(glossiness, strength) {
     if (isMaterial) {
         this.value.glossiness = [null, null];
         this.value.expressions.glossiness = glossiness;
+        addMeshToMaterial(this, glossiness);
     }
     else if (isColor) {
         this.value.expressions.glossiness = null;
@@ -349,6 +352,7 @@ Mesh.prototype.setPositionOffset = function positionOffset(materialExpression) {
     if (isMaterial) {
         this.value.expressions.positionOffset = materialExpression;
         uniformValue = materialExpression;
+        addMeshToMaterial(this, materialExpression);
     }
     else {
         this.value.expressions.positionOffset = null;
@@ -460,6 +464,8 @@ Mesh.prototype.onUpdate = function onUpdate() {
         // If any invalidations exist, push them into the queue
         this._pushInvalidations('baseColor');
         this._pushInvalidations('positionOffset');
+        this._pushInvalidations('normals');
+        this._pushInvalidations('glossiness');
 
         for (var i = 0; i < queue.length; i++) {
             node.sendDrawCommand(queue[i]);
@@ -662,3 +668,20 @@ Mesh.prototype.draw = function draw () {
 };
 
 module.exports = Mesh;
+
+function addMeshToMaterial(mesh, material) {
+    if (material.meshes.indexOf(mesh) == -1)
+        material.meshes.push(mesh);
+}
+
+function _traverse(material, callback) {
+	var inputs = material.inputs;
+    var len = inputs && inputs.length;
+    var idx = -1;
+
+    while (++idx < len) _traverse(inputs[idx], callback);
+
+    callback(material);
+
+    return material;
+}
