@@ -64,7 +64,7 @@ function Scene (selector, updater) {
 
     this.mount(selector); // Mount the context to itself
                           // (it is its own parent)
-    
+
     this._globalUpdater                  // message a request for the dom
         .message(Commands.NEED_SIZE_FOR)  // size of the context so that
         .message(selector);        // the scene graph has a total size
@@ -100,10 +100,10 @@ Scene.prototype.getSelector = function getSelector () {
  * to the nodes in the scene graph.
  *
  * @return {Dispatch} the Scene's Dispatch
- * @DEPRICATED
+ * @deprecated
  */
 Scene.prototype.getDispatch = function getDispatch () {
-    console.warn('Scene.getDispatch is depricated, require the dispatch directly');
+    console.warn('Scene#getDispatch is deprecated, require the dispatch directly');
     return Dispatch;
 };
 
@@ -151,4 +151,3 @@ Scene.prototype.mount = function mount (path) {
 };
 
 module.exports = Scene;
-
