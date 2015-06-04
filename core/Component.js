@@ -116,4 +116,23 @@ Component.prototype.onUpdate = function onUpdate () {
     this._requestingUpdate = false;
 };
 
+/**
+ * @method
+ *
+ * @return {Node}       Node to which the component has been added.
+ */
+Component.prototype.getNode = function getNode() {
+    return this._node;
+};
+
+/**
+ * @method
+ *
+ * @return {Number}     Id assigned by the Node when the component has been
+ *                      added.
+ */
+Component.prototype.getId = function getId() {
+    return this._id;
+};
+
 module.exports = Component;
