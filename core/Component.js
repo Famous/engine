@@ -31,22 +31,61 @@
  * @constructor
  * @abstract
  *
- * @param {Node} node Node to which the component should be added.
+ * @param {Node} [node] Node to which the component should be added.
  */
 function Component(node) {
-    if (!node) throw new Error(
-        'Component must be instantiated on a Node'
-    );
+    /** @protected */
+    this._node = null;
 
     /** @protected */
-    this._node = node;
-
-    /** @protected */
-    this._id = this._node.addComponent(this);
+    this._id = null;
 
     /** @protected */
     this._requestingUpdate = false;
+
+    if (node) this.onAdd(node, node.addComponent(this));
 }
+
+/**
+ * Method that will be called by the node after the component has been added
+ * to it.
+ *
+ * @method
+ * @private
+ *
+ * @param  {Node} node      Node to which the component has been added.
+ * @param  {Number} id      The id under which the component has been
+ *                          registered.
+ * @return {undefined}      undefined
+ */
+Component.prototype.onAdd = function onAdd(node, id) {
+    // Safety check needed for now to ensure backwards compatibility.
+    if (this._node === node && this._id === id) return;
+
+    if (this._node) throw new Error(
+        'Can not add component to multiple nodes.'
+    );
+
+    this._node = node;
+    this._id = id;
+};
+
+/**
+ * Method that will be called by the node after the component has been added
+ * to it.
+ *
+ * @method
+ * @private
+ *
+ * @param  {Node} node      Node from which the component has been removed.
+ * @param  {Number} id      The under which the component has previously been
+ *                          registered before being removed.
+ * @return {undefined}      undefined
+ */
+Component.prototype.onRemove = function onRemove(node, id) {
+    this._node = null;
+    this._id = null;
+};
 
 /**
  * Requests a new update from the Node. This results into the component's

@@ -57,6 +57,10 @@ var RENDER_SIZE = 2;
  *                                      for DOM and WebGL layering.  On by default.
  */
 function DOMElement(node, options) {
+    if (!node) throw new Error(
+        'DOMElement must be instantiated on a Node'
+    );
+
     Component.call(this, node);
 
     this._changeQueue = [];
