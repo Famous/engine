@@ -661,6 +661,32 @@ Node.prototype.removeComponent = function removeComponent (component) {
 };
 
 /**
+ * Removes a node's subscription to a particular UIEvent. All components 
+ * on the node will have the opportunity to remove all listeners depending
+ * on this event.
+ *
+ * @method
+ *
+ * @param {String} eventName the name of the event
+ *
+ * @return {undefined} undefined
+ */
+Node.prototype.removeUIEvent = function removeUIEvent (eventName) {
+    var UIEvents = this.getUIEvents();
+    var components = this._components;
+    var component;
+
+    var index = UIEvents.indexOf(eventName);
+    if (index !== -1) {
+        UIEvents.splice(index, 1);
+        for (var i = 0, len = components.length ; i < len ; i++) {
+            component = components[i];
+            if (component && component.onRemoveUIEvent) component.onRemoveUIEvent(eventName);
+        }
+    }
+};
+
+/**
  * Subscribes a node to a UI Event. All components on the node
  * will have the opportunity to begin listening to that event
  * and alerting the scene graph.

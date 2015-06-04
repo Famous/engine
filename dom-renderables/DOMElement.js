@@ -355,7 +355,7 @@ DOMElement.prototype.onOpacityChange = function onOpacityChange(opacity) {
 
 /**
  * Method to be invoked by the node as soon as a new UIEvent is being added.
- * This results into an `ADD_EVENT_LISTENER` command being send.
+ * This results into an `SUBSCRIBE` command being sent.
  *
  * @param {String} UIEvent UIEvent to be subscribed to (e.g. `click`)
  *
@@ -373,7 +373,27 @@ DOMElement.prototype.onAddUIEvent = function onAddUIEvent(UIEvent) {
 };
 
 /**
- * Appends an `ADD_EVENT_LISTENER` command to the command queue.
+ * Method to be invoked by the node as soon as a UIEvent is removed from
+ * the node.  This results into an `UNSUBSCRIBE` command being sent.
+ *
+ * @param {String} UIEvent UIEvent to be removed (e.g. `mousedown`)
+ *
+ * @return {undefined} undefined
+ */
+DOMElement.prototype.onRemoveUIEvent = function onRemoveUIEvent(UIEvent) {
+    var index = this._UIEvents.indexOf(UIEvent);
+    if (index !== -1) {
+        this._unsubscribe(UIEvent);
+        this._UIEvents.splice(index, 1);
+    }
+    else if (this._inDraw) {
+        this._unsubscribe(UIEvent);
+    }
+    return this;
+};
+
+/**
+ * Appends an `SUBSCRIBE` command to the command queue.
  *
  * @method
  * @private
@@ -386,9 +406,25 @@ DOMElement.prototype._subscribe = function _subscribe (UIEvent) {
     if (this._initialized) {
         this._changeQueue.push('SUBSCRIBE', UIEvent, true);
     }
-    if (!this._requestingUpdate) {
-        this._requestUpdate();
+
+    if (!this._requestingUpdate) this._requestUpdate();
+};
+
+/**
+ * Appends an `UNSUBSCRIBE` command to the command queue.
+ *
+ * @method
+ * @private
+ *
+ * @param {String} UIEvent Event type (e.g. `click`)
+ *
+ * @return {undefined} undefined
+ */
+DOMElement.prototype._unsubscribe = function _unsubscribe (UIEvent) {
+    if (this._initialized) {
+        this._changeQueue.push('UNSUBSCRIBE', UIEvent);
     }
+    
     if (!this._requestingUpdate) this._requestUpdate();
 };
 
