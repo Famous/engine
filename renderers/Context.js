@@ -227,6 +227,11 @@ Context.prototype.receive = function receive(path, commands, iterator) {
                 this.DOMRenderer.subscribe(commands[++localIterator], commands[++localIterator]);
                 break;
 
+            case 'GL_SUBSCRIBE':
+                if (!this.WebGLRenderer) this.initWebGL();
+                this.WebGLRenderer.subscribe(path, commands[++localIterator]);
+                break;
+
             case 'GL_SET_DRAW_OPTIONS':
                 if (!this.WebGLRenderer) this.initWebGL();
                 this.WebGLRenderer.setMeshOptions(path, commands[++localIterator]);
