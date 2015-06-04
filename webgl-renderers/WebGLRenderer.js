@@ -135,8 +135,34 @@ function WebGLRenderer(canvas, compositor) {
     this.bufferRegistry.allocate(cutout.spec.id, 'a_normals', cutout.spec.bufferValues[2], 3);
     this.bufferRegistry.allocate(cutout.spec.id, 'indices', cutout.spec.bufferValues[3], 1);
 
+    /**
+     * WebGL Picking for hit testing
+     */
     this.listeners = [];
+    this.meshIds = 0;
+    this.canvas.onmousedown = this.handleClick.bind(this);
 }
+
+/**
+ * Handle mousedown clicks on Canvas for determining the position of the cursor, in order to do WebGL picking.
+ *
+ * @method
+ *
+ * @param {Object} ev Event object
+ *
+ * @return {undefined} undefined
+ */
+WebGLRenderer.prototype.handleClick = function handleClicke(ev) {
+    var _this = this;
+
+    var x = ev.clientX, y = ev.clientY;
+    var rect = ev.target.getBoundingClientRect();
+    if (rect.left <= x && x < rect.right && rect.top <= y && y < rect.bottom) {
+        x = x - rect.left, y = rect.bottom - y;
+    }
+
+    return this;
+};
 
 /**
  * Attaches an EventListener to the element associated with the passed in path.
