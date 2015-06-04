@@ -100,18 +100,42 @@ test('PathStore class', function (t) {
         // sanity check
         if (pathStore.getItems().length !== 10) throw new Error('PathStore.insert is broken');
 
-        var b = pathStore.get('b');
 
-        t.doesNotThrow(function () {
-            pathStore.remove('b');
-        }, 'remove should be able to be called and remove an item by key');
+        function removeItem (i) {
+            var ch = String.fromCharCode(i + 97);
+            var b = pathStore.get(ch);
 
-        t.equal(pathStore.get('b'), undefined, '.remove should remove the item at the path');
+            if (b) {
+                t.doesNotThrow(function () {
+                    pathStore.remove(ch);
+                }, 'remove should be able to be called and remove an item by key');
 
-        t.equal(
-            pathStore.getItems().indexOf(b), -1,
-            'removed items should not be available in the array returned by getItems'
-        );
+                t.equal(pathStore.get(ch), undefined, '.remove should remove the item at the path');
+
+                t.equal(
+                    pathStore.getItems().indexOf(b), -1,
+                    'removed items should not be available in the array returned by getItems'
+                );
+                return true;
+            }
+            return false;
+        }
+
+        function checkOrder () {
+            pathStore.getItems().forEach(function (item, i, items) {
+                if (items[i + 1]) {
+                    t.ok(
+                        items[i + 1].isAfter(items[i]),
+                        'remove should preserve the sort of the items in PathStore'
+                    );
+                }
+            });
+        }
+
+        while (pathStore.getItems().length) {
+            index = (Math.random() * 11)|0;
+            if (removeItem(index)) checkOrder();
+        }
 
         t.end();
     });
