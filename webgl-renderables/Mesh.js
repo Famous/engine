@@ -164,10 +164,10 @@ Mesh.prototype.setBaseColor = function setBaseColor (color) {
     var isColor = !!color.getNormalizedRGBA;
 
     if (isMaterial) {
+        addMeshToMaterial(this, color, 'baseColor');
         this.value.color = null;
         this.value.expressions.baseColor = color;
         uniformValue = color;
-        addMeshToMaterial(this, color);
     }
     else if (isColor) {
         this.value.expressions.baseColor = null;
@@ -259,8 +259,8 @@ Mesh.prototype.setNormals = function setNormals (materialExpression) {
     var isMaterial = materialExpression.__isAMaterial__;
 
     if (isMaterial) {
+        addMeshToMaterial(this, materialExpression, 'normals');
         this.value.expressions.normals = materialExpression;
-        addMeshToMaterial(this, materialExpression);
     }
 
     if (this._initialized) {
@@ -303,9 +303,9 @@ Mesh.prototype.setGlossiness = function setGlossiness(glossiness, strength) {
     var isColor = !!glossiness.getNormalizedRGB;
 
     if (isMaterial) {
+        addMeshToMaterial(this, glossiness, 'glossiness');
         this.value.glossiness = [null, null];
         this.value.expressions.glossiness = glossiness;
-        addMeshToMaterial(this, glossiness);
     }
     else if (isColor) {
         this.value.expressions.glossiness = null;
@@ -350,9 +350,9 @@ Mesh.prototype.setPositionOffset = function positionOffset(materialExpression) {
     var isMaterial = materialExpression.__isAMaterial__;
 
     if (isMaterial) {
+        addMeshToMaterial(this, materialExpression, 'positionOffset');
         this.value.expressions.positionOffset = materialExpression;
         uniformValue = materialExpression;
-        addMeshToMaterial(this, materialExpression);
     }
     else {
         this.value.expressions.positionOffset = null;
@@ -667,21 +667,12 @@ Mesh.prototype.draw = function draw () {
     this._inDraw = false;
 };
 
-module.exports = Mesh;
+function addMeshToMaterial(mesh, material, name) {
+    var previous = mesh.value.expressions[name];
 
-function addMeshToMaterial(mesh, material) {
-    if (material.meshes.indexOf(mesh) == -1)
+    if (material.meshes.indexOf(mesh) === -1)
         material.meshes.push(mesh);
 }
 
-function _traverse(material, callback) {
-	var inputs = material.inputs;
-    var len = inputs && inputs.length;
-    var idx = -1;
+module.exports = Mesh;
 
-    while (++idx < len) _traverse(inputs[idx], callback);
-
-    callback(material);
-
-    return material;
-}

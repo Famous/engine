@@ -179,10 +179,6 @@ function Material(name, chunk, inputs, options) {
 
     this.meshes = [];
 
-    var self = this;
-
-    this.nodes = [];
-
     if (options.texture) {
         this.texture = options.texture.__isATexture__ ? options.texture : TextureRegistry.register(null, options.texture);
     }
@@ -200,9 +196,7 @@ Material.prototype.setUniform = function setUniform(name, value) {
 
     this.invalidations.push(name);
 
-    this.meshes.forEach(function (mesh) {
-        mesh._requestUpdate();
-    });
+    for(var i = 0; i < this.meshes.length; i++) this.meshes[i]._requestUpdate();
 };
 
 module.exports = expressions;
