@@ -55,10 +55,11 @@ var globalUniforms = keyValueToArrays({
  *
  * @param {Element} canvas The DOM element that GL will paint itself onto.
  * @param {Compositor} compositor Compositor used for querying the time from.
+ * @param {Element} eventDiv The main DOM element that is used for capturing events.
  *
  * @return {undefined} undefined
  */
-function WebGLRenderer(canvas, compositor) {
+function WebGLRenderer(canvas, compositor, eventDiv) {
     canvas.classList.add('famous-webgl-renderer');
 
     var _this = this;
@@ -138,13 +139,22 @@ function WebGLRenderer(canvas, compositor) {
     this.bufferRegistry.allocate(cutout.spec.id, 'indices', cutout.spec.bufferValues[3], 1);
 
     /**
-     * WebGL Picking for hit testing
+     * WebGL Picking by caputing hit testing ('clicks') using the
+     * main famous HTML element for capturing events.
      */
-    this.listeners = [];
+    this.listeners = {};
     this.meshIds = 0;
-    canvas.onmousedown = function(ev) {
-        _this.handleClick(ev);
-    };
+    this.eventsMap = ['click'];
+    var ev;
+
+    var len = this.eventsMap.length;
+    for(var i = 0; i < len; i++) {
+        ev = this.eventsMap[i];
+        this.listeners[ev] = [];
+        eventDiv.addEventListener(ev, function(e) {
+            _this.handleEvent(e);
+        });
+    }
 }
 
 /**
@@ -156,18 +166,20 @@ function WebGLRenderer(canvas, compositor) {
  *
  * @return {undefined} undefined
  */
-WebGLRenderer.prototype.handleClick = function handleClick(ev) {
+WebGLRenderer.prototype.handleEvent = function handleEvent(ev) {
     var x = ev.clientX;
     var y = ev.clientY;
+    var canvasX;
+    var canvasY;
 
     var rect = ev.target.getBoundingClientRect();
 
     if (rect.left <= x && x < rect.right &&
         rect.top <= y && y < rect.bottom) {
 
-        var canvasX = (x - rect.left) * this.pixelRatio;
-        var canvasY = (rect.bottom - y) * this.pixelRatio;
-        this.check(canvasX, canvasY);
+        canvasX = (x - rect.left) * this.pixelRatio;
+        canvasY = (rect.bottom - y) * this.pixelRatio;
+        this.checkEvent(canvasX, canvasY, ev.type);
     }
 
     return this;
@@ -180,24 +192,25 @@ WebGLRenderer.prototype.handleClick = function handleClick(ev) {
  *
  * @param {Number} x X coordinate
  * @param {Number} y Y coordinate
+ * @param {String} type Event type
  *
  * @return {undefined} undefined
  */
-WebGLRenderer.prototype.check = function check(x, y) {
+WebGLRenderer.prototype.checkEvent = function checkEvent(x, y, type) {
     var gl = this.gl;
 
     gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
-    this.program.setUniforms(['u_clicked'], [1.0]);
+    this.program.setUniforms(['u_pickingMode'], [1.0]);
     this.drawMeshes();
 
     var pixels = new Uint8Array(4);
     gl.readPixels(x, y, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
 
-    this.program.setUniforms(['u_clicked'], [0.0]);
+    this.program.setUniforms(['u_pickingMode'], [0.0]);
     this.drawMeshes();
 
     var meshId = this.decodeMeshIdColor(pixels, 255);
-    var picked = this.listeners[meshId];
+    var picked = this.listeners[type][meshId];
 
     if (picked) {
         this.compositor.sendEvent(picked.path, 'click', {});
@@ -212,14 +225,16 @@ WebGLRenderer.prototype.check = function check(x, y) {
  * @method
  *
  * @param {String} path Path for the given Mesh.
- * @param {String} type Event type ('click').
+ * @param {String} type Event type (e.g. 'click').
  *
  * @return {undefined} undefined
  */
 WebGLRenderer.prototype.subscribe = function subscribe(path, type) {
-    if (type !== 'click') return false;
+    if (this.eventsMap.indexOf(type) === -1) {
+        return false;
+    }
     var mesh = this.meshRegistry[path];
-    this.listeners[mesh.id] = mesh;
+    this.listeners[type][mesh.id] = mesh;
     return this;
 };
 
@@ -230,14 +245,16 @@ WebGLRenderer.prototype.subscribe = function subscribe(path, type) {
  * @method
  *
  * @param {String} path Path for the given Mesh.
- * @param {String} type Event type ('click').
+ * @param {String} type Event type (e.g. 'click').
  *
  * @return {undefined} undefined
  */
 WebGLRenderer.prototype.unsubscribe = function unsubscribe(path, type) {
-    if (type !== 'click') return false;
+    if (this.eventsMap.indexOf(type) === -1) {
+        return false;
+    }
     var mesh = this.meshRegistry[path];
-    this.listeners.splice(mesh.id, 1);
+    this.listeners[type].splice(mesh.id, 1);
     return this;
 };
 
@@ -302,9 +319,10 @@ WebGLRenderer.prototype.createLight = function createLight(path) {
  */
 WebGLRenderer.prototype.encodeMeshIdColor = function encodeMeshIdColor(meshId, base) {
     var result = [];
+    var normalizedRemainder;
 
     while (meshId) {
-        var normalizedRemainder = (meshId%base) / 255;
+        normalizedRemainder = (meshId%base) / 255;
         result.unshift(normalizedRemainder);
         meshId = (meshId / base) | 0;
     }
