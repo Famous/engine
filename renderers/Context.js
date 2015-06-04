@@ -58,12 +58,12 @@ function Context(selector, compositor) {
     // Create DOM element to be used as root for all famous DOM
     // rendering and append element to the root element.
 
-    var DOMLayerEl = document.createElement('div');
-    this._rootEl.appendChild(DOMLayerEl);
+    this.DOMLayerEl = document.createElement('div');
+    this._rootEl.appendChild(this.DOMLayerEl);
 
     // Instantiate renderers
 
-    this.DOMRenderer = new DOMRenderer(DOMLayerEl, selector, compositor);
+    this.DOMRenderer = new DOMRenderer(this.DOMLayerEl, selector, compositor);
     this.WebGLRenderer = null;
     this.canvas = null;
 
@@ -141,7 +141,7 @@ Context.prototype.getRootSize = function getRootSize() {
 Context.prototype.initWebGL = function initWebGL() {
     this.canvas = document.createElement('canvas');
     this._rootEl.appendChild(this.canvas);
-    this.WebGLRenderer = new WebGLRenderer(this.canvas, this._compositor);
+    this.WebGLRenderer = new WebGLRenderer(this.canvas, this._compositor, this.DOMLayerEl);
     this.updateSize();
 };
 
