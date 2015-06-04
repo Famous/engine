@@ -68,32 +68,85 @@ Transform.IDENT = [ 1, 0, 0, 0,
 Transform.WORLD_CHANGED = 1;
 Transform.LOCAL_CHANGED = 2;
 
+/**
+ * resets the transform state such that it no longer has a parent
+ * and is not a breakpoint.
+ *
+ * @method
+ *
+ * @return {undefined} undefined
+ */
 Transform.prototype.reset = function reset () {
-    this.needsUpdate = false;
     this.parent = null;
     this.breakPoint = false;
 };
 
+/**
+ * sets the parent of this transform.
+ *
+ * @method
+ *
+ * @param {Transform} parent The transform class that parents this class
+ *
+ * @return {undefined} undefined
+ */
 Transform.prototype.setParent = function setParent (parent) {
     this.parent = parent;
 };
 
+/**
+ * returns the parent of this transform
+ *
+ * @method
+ *
+ * @return {Transform | null} the parent of this transform if one exists
+ */
 Transform.prototype.getParent = function getParent () {
     return this.parent;
 };
 
+/**
+ * Makes this transform a breakpoint. This will cause it to calculate
+ * both a local (relative to the nearest ancestor breakpoint) and a world
+ * matrix (relative to the scene).
+ *
+ * @method
+ *
+ * @return {undefined} undefined
+ */
 Transform.prototype.setBreakPoint = function setBreakPoint () {
     this.breakPoint = true;
 };
 
+/**
+ * returns whether or not this transform is a breakpoint.
+ *
+ * @method
+ *
+ * @return {Boolean} true if this transform is a breakpoint
+ */
 Transform.prototype.isBreakPoint = function isBreakPoint () {
     return this.breakPoint;
 };
 
+/**
+ * returns the local transform
+ *
+ * @method
+ *
+ * @return {Float32Array} local transform
+ */
 Transform.prototype.getLocalTransform = function getLocalTransform () {
     return this.local;
 };
 
+/**
+ * returns the world transform. Requires that this transform is a breakpoint.
+ *
+ * @method
+ *
+ * @return {Float32Array} world transform.
+ */
 Transform.prototype.getWorldTransform = function getWorldTransform () {
     if (!this.isBreakPoint())
         throw new Error('This transform is not calculating world transforms');
