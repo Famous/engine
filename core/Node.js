@@ -31,13 +31,6 @@ var Dispatch = require('./Dispatch');
 var TransformSystem = require('./TransformSystem');
 var pathUtils = require('./Path');
 
-var IDENT = [
-    1, 0, 0, 0,
-    0, 1, 0, 0,
-    0, 0, 1, 0,
-    0, 0, 0, 1
-];
-
 var ONES = [1, 1, 1];
 var QUAT = [0, 0, 0, 1];
 
@@ -1070,7 +1063,9 @@ Node.prototype.dismount = function dismount () {
     if (!this.isMounted())
         throw new Error('Node is not mounted');
 
-    Dispatch.deregisterNodeAtPath(this.getLocation(), this);
+    var path = this.getLocation();
+
+    Dispatch.deregisterNodeAtPath(path, this);
     TransformSystem.deregisterTransformAtPath(path);
     SizeSystem.deregisterSizeAtPath(path);
 
