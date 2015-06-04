@@ -36,6 +36,10 @@
  */
 void main() {
 
+    /**
+     * Writes the encoded Mesh IDs into the color channels,
+     * when the WebGL canvas has been clicked.
+     */
     if (u_clicked > 0.0) {
         gl_FragColor = u_meshIdColor;
     }
