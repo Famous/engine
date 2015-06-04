@@ -58,7 +58,7 @@ var globalUniforms = keyValueToArrays({
  *
  * @return {undefined} undefined
  */
-function WebGLRenderer(canvas, compositor) {
+function WebGLRenderer(canvas, compositor, eventDiv) {
     canvas.classList.add('famous-webgl-renderer');
 
     var _this = this;
@@ -138,13 +138,14 @@ function WebGLRenderer(canvas, compositor) {
     this.bufferRegistry.allocate(cutout.spec.id, 'indices', cutout.spec.bufferValues[3], 1);
 
     /**
-     * WebGL Picking for hit testing
+     * WebGL Picking by caputing hit testing ('clicks') using the
+     * main famous HTML element for capturing events.
      */
     this.listeners = [];
     this.meshIds = 0;
-    canvas.onmousedown = function(ev) {
+    eventDiv.addEventListener('click', function(ev) {
         _this.handleClick(ev);
-    };
+    });
 }
 
 /**
