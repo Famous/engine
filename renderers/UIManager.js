@@ -24,6 +24,9 @@
 
 'use strict';
 
+
+var WORKER_SUPPORTED = typeof Worker === 'function';
+
 /**
  * The UIManager is being updated by an Engine by consecutively calling its
  * `update` method. It can either manage a real Web-Worker or the global
@@ -58,6 +61,8 @@ function UIManager (thread, compositor, renderLoop) {
     this._renderLoop = renderLoop;
 
     this._renderLoop.update(this);
+
+    this._workerMode = WORKER_SUPPORTED && this._thread.constructor === Worker;
 
     var _this = this;
     this._thread.onmessage = function (ev) {
@@ -134,6 +139,10 @@ UIManager.prototype.getEngine = function getEngine() {
 UIManager.prototype.update = function update (time) {
     this._thread.postMessage(['FRAME', time]);
     var threadMessages = this._compositor.drawCommands();
+
+    if (this._workerMode)
+        this.stripNonCloneableOutCommands();
+
     this._thread.postMessage(threadMessages);
     this._compositor.clearCommands();
 };

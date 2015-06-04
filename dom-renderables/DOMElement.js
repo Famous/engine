@@ -73,6 +73,8 @@ function DOMElement(node, options) {
     this._attributes = {};
     this._content = '';
 
+    this._el = null;
+
     this._tagName = options && options.tagName ? options.tagName : 'div';
     this._id = node.addComponent(this);
 
@@ -554,12 +556,32 @@ DOMElement.prototype.on = function on (event, listener) {
  * @return {undefined} undefined
  */
 DOMElement.prototype.onReceive = function onReceive (event, payload) {
-    if (event === 'resize') {
-        this._renderSize[0] = payload.val[0];
-        this._renderSize[1] = payload.val[1];
-        if (!this._requestingUpdate) this._requestUpdate();
+    switch (event) {
+        case 'resize':
+            this._renderSize[0] = payload.val[0];
+            this._renderSize[1] = payload.val[1];
+            if (!this._requestingUpdate) this._requestUpdate();
+            break;
+        case 'insertEl':
+            this._el = payload.el;
+            break;
     }
     this._callbacks.trigger(event, payload);
+};
+
+/**
+ * Provides access to the native Element associated with the DOMElement.
+ * The DOMElement returns `null` when the Element has not been created yet or
+ * when running in a Web Worker, in which case access to native Elements is
+ * technically not possinble.
+ *
+ * @method
+ *
+ * @return {Element|null} el    The native Element associated with the virtual
+ *                              DOMElement.
+ */
+DOMElement.prototype.getEl = function getEl () {
+    return this._el;
 };
 
 /**

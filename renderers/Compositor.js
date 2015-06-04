@@ -47,6 +47,8 @@ function Compositor() {
     this._inCommands = [];
     this._time = null;
 
+    this._nonCloneableOutCommands = [];
+
     this._resized = false;
 
     var _this = this;
@@ -54,6 +56,37 @@ function Compositor() {
         _this._resized = true;
     });
 }
+
+/**
+ * Adds a command to the outgoing command queue.
+ *
+ * @method
+ *
+ * @param  {*} command              An object to be pushed onto the outgoing
+ *                                  command queue.
+ * @param  {Boolean} nonCloneable   Boolean value indicating if the passed in
+ *                                  command can be cloned using the structured
+ *                                  cloning algorithm.
+ * @return {Compositor}             this
+ */
+Compositor.prototype.message = function message(command, nonCloneable) {
+    var index = this._outCommands.push(command) - 1;
+    if (nonCloneable) this._nonCloneableOutCommands.push(index);
+    return this;
+};
+
+/**
+ * Removes all non cloneable commands from the outgoing command queue
+ * (destructive).
+ *
+ * @method
+ *
+ * @return {undefined} undefined
+ */
+Compositor.prototype.stripNonCloneableOutCommands = function stripNonCloneableOutCommands() {
+    for (var i = 0, len = this._nonCloneableOutCommands.length; i < len; i++)
+        this._outCommands[this._nonCloneableOutCommands[i]] = null;
+};
 
 /**
  * Retrieves the time being used by the internal clock managed by
@@ -83,11 +116,15 @@ Compositor.prototype.getTime = function getTime() {
  * @param  {String} ev Event type
  * @param  {Object} payload Event object (serializable using structured cloning
  * algorithm)
+ * @param  {Boolean} nonCloneable   Boolean value indicating if the passed in
+ *                                  payload can be cloned using the structured
+ *                                  cloning algorithm.
  *
  * @return {undefined} undefined
  */
-Compositor.prototype.sendEvent = function sendEvent(path, ev, payload) {
-    this._outCommands.push('WITH', path, 'TRIGGER', ev, payload);
+Compositor.prototype.sendEvent = function sendEvent(path, ev, payload, nonCloneable) {
+    var payloadIndex = this._outCommands.push('WITH', path, 'TRIGGER', ev, payload) - 1;
+    if (nonCloneable) this._nonCloneableOutCommands.push(payloadIndex);
 };
 
 /**
@@ -256,6 +293,7 @@ Compositor.prototype.receiveCommands = function receiveCommands(commands) {
 Compositor.prototype.clearCommands = function clearCommands() {
     this._inCommands.length = 0;
     this._outCommands.length = 0;
+    this._nonCloneableOutCommands.length = 0;
     this._resized = false;
 };
 
