@@ -24,16 +24,8 @@
 
 'use strict';
 
-module.exports = {
-    assert: require('./assert'),
-    CallbackStore: require('./CallbackStore'),
-    clamp: require('./clamp'),
-    clone: require('./clone'),
-    Color: require('./Color'),
-    KeyCodes: require('./KeyCodes'),
-    keyValueToArrays: require('./keyValueToArrays'),
-    loadURL: require('./loadURL'),
-    ObjectManager: require('./ObjectManager'),
-    strip: require('./strip'),
-    vendorPrefix: require('./vendorPrefix')
-};
+function assert(value, errorMsg) {
+    if (!value) throw new Error('Failed assertion! ' + errorMsg);
+}
+
+module.exports = assert;
