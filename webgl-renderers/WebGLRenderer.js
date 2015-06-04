@@ -64,6 +64,7 @@ function WebGLRenderer(canvas, compositor) {
     var _this = this;
     this.canvas = canvas;
     this.compositor = compositor;
+    this.pixelRatio = window.devicePixelRatio || 1;
 
     var gl = this.gl = this.getWebGLContext(this.canvas);
 
@@ -159,7 +160,6 @@ WebGLRenderer.prototype.handleClick = function handleClick(ev) {
     var x = ev.clientX;
     var y = ev.clientY;
 
-    this.pixelRatio = window.devicePixelRatio || 1;
     var rect = ev.target.getBoundingClientRect();
 
     if (rect.left <= x && x < rect.right &&
