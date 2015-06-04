@@ -95,19 +95,9 @@ Context.prototype.updateSize = function () {
     var newSize = this.DOMRenderer.getSize();
     this._compositor.sendResize(this._selector, newSize);
 
-    var width = newSize[0];
-    var height = newSize[1];
-
-    this._size[0] = width;
-    this._size[1] = height;
-    this._size[2] = (width > height) ? width : height;
-
-    if (this.canvas) {
-        this.canvas.width  = width;
-        this.canvas.height = height;
+    if (this.canvas && this.WebGLRenderer) {
+        this.WebGLRenderer.updateSize(newSize);
     }
-
-    if (this.WebGLRenderer) this.WebGLRenderer.updateSize(this._size);
 
     return this;
 };
