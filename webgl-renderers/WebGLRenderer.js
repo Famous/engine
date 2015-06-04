@@ -996,12 +996,4 @@ WebGLRenderer.prototype.resetOptions = function resetOptions(options) {
     if (options.side === 'back') gl.cullFace(gl.BACK);
 };
 
-WebGLRenderer.DEFAULT_STYLES = {
-    pointerEvents: 'none',
-    position: 'absolute',
-    zIndex: 1,
-    top: '0px',
-    left: '0px'
-};
-
 module.exports = WebGLRenderer;
