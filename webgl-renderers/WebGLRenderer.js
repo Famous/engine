@@ -161,15 +161,17 @@ function WebGLRenderer(canvas, compositor, eventDiv) {
 WebGLRenderer.prototype.handleClick = function handleClick(ev) {
     var x = ev.clientX;
     var y = ev.clientY;
+    var canvasX;
+    var canvasY;
 
     var rect = ev.target.getBoundingClientRect();
 
     if (rect.left <= x && x < rect.right &&
         rect.top <= y && y < rect.bottom) {
 
-        var canvasX = (x - rect.left) * this.pixelRatio;
-        var canvasY = (rect.bottom - y) * this.pixelRatio;
-        this.check(canvasX, canvasY);
+        canvasX = (x - rect.left) * this.pixelRatio;
+        canvasY = (rect.bottom - y) * this.pixelRatio;
+        this.checkClick(canvasX, canvasY);
     }
 
     return this;
@@ -185,17 +187,17 @@ WebGLRenderer.prototype.handleClick = function handleClick(ev) {
  *
  * @return {undefined} undefined
  */
-WebGLRenderer.prototype.check = function check(x, y) {
+WebGLRenderer.prototype.checkClick = function checkClick(x, y) {
     var gl = this.gl;
 
     gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
-    this.program.setUniforms(['u_clicked'], [1.0]);
+    this.program.setUniforms(['u_pickingMode'], [1.0]);
     this.drawMeshes();
 
     var pixels = new Uint8Array(4);
     gl.readPixels(x, y, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
 
-    this.program.setUniforms(['u_clicked'], [0.0]);
+    this.program.setUniforms(['u_pickingMode'], [0.0]);
     this.drawMeshes();
 
     var meshId = this.decodeMeshIdColor(pixels, 255);
@@ -302,9 +304,10 @@ WebGLRenderer.prototype.createLight = function createLight(path) {
  */
 WebGLRenderer.prototype.encodeMeshIdColor = function encodeMeshIdColor(meshId, base) {
     var result = [];
+    var normalizedRemainder;
 
     while (meshId) {
-        var normalizedRemainder = (meshId%base) / 255;
+        normalizedRemainder = (meshId%base) / 255;
         result.unshift(normalizedRemainder);
         meshId = (meshId / base) | 0;
     }
