@@ -633,7 +633,7 @@ Mesh.prototype.onRemoveUIEvent = function onRemoveUIEvent(UIEvent) {
  * @method
  * @private
  *
- * @param {String} UIEvent Event type (`click`)
+ * @param {String} UIEvent Event type (e.g. `click`)
  *
  * @return {undefined} undefined
  */
@@ -651,7 +651,7 @@ Mesh.prototype._subscribe = function _subscribe(UIEvent) {
  * @method
  * @private
  *
- * @param {String} UIEvent Event type (`click`)
+ * @param {String} UIEvent Event type (e.g. `click`)
  *
  * @return {undefined} undefined
  */
