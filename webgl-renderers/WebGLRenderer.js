@@ -55,6 +55,7 @@ var globalUniforms = keyValueToArrays({
  *
  * @param {Element} canvas The DOM element that GL will paint itself onto.
  * @param {Compositor} compositor Compositor used for querying the time from.
+ * @param {Element} eventDiv The main DOM element that is used for capturing events.
  *
  * @return {undefined} undefined
  */
