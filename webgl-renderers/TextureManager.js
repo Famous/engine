@@ -121,7 +121,7 @@ TextureManager.prototype.register = function register(input, slot) {
 
         // Handle video
 
-        else if (window && source instanceof window.HTMLVideoElement) {
+        else if (source instanceof HTMLVideoElement) {
             source.addEventListener('loadeddata', function() {
                 _this.bindTexture(textureId);
                 texture.setImage(source);
