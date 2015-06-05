@@ -145,7 +145,7 @@ function WebGLRenderer(canvas, compositor, eventDiv) {
     this.listeners = [];
     this.meshIds = 0;
     eventDiv.addEventListener('click', function(ev) {
-        _this.handleClick(ev);
+        _this.handleEvent(ev);
     });
 }
 
@@ -158,7 +158,7 @@ function WebGLRenderer(canvas, compositor, eventDiv) {
  *
  * @return {undefined} undefined
  */
-WebGLRenderer.prototype.handleClick = function handleClick(ev) {
+WebGLRenderer.prototype.handleEvent = function handleEvent(ev) {
     var x = ev.clientX;
     var y = ev.clientY;
     var canvasX;
@@ -171,7 +171,7 @@ WebGLRenderer.prototype.handleClick = function handleClick(ev) {
 
         canvasX = (x - rect.left) * this.pixelRatio;
         canvasY = (rect.bottom - y) * this.pixelRatio;
-        this.checkClick(canvasX, canvasY);
+        this.checkEvent(canvasX, canvasY, ev.type);
     }
 
     return this;
@@ -184,10 +184,11 @@ WebGLRenderer.prototype.handleClick = function handleClick(ev) {
  *
  * @param {Number} x X coordinate
  * @param {Number} y Y coordinate
+ * @param {String} type Event type
  *
  * @return {undefined} undefined
  */
-WebGLRenderer.prototype.checkClick = function checkClick(x, y) {
+WebGLRenderer.prototype.checkEvent = function checkEvent(x, y, type) {
     var gl = this.gl;
 
     gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);

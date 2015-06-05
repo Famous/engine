@@ -592,7 +592,7 @@ Mesh.prototype.onOpacityChange = function onOpacityChange (opacity) {
  * Method to be invoked by the node as soon as a new UIEvent is being added.
  * This results into an `SUBSCRIBE` command being sent.
  *
- * @param {String} UIEvent UIEvent to be subscribed to (`click`)
+ * @param {String} UIEvent UIEvent to be subscribed to (e.g. `click`)
  *
  * @return {undefined} undefined
  */
@@ -611,7 +611,7 @@ Mesh.prototype.onAddUIEvent = function onAddUIEvent (UIEvent) {
  * Method to be invoked by the node as soon as a UIEvent is removed from
  * the node. This results into an `UNSUBSCRIBE` command being sent.
  *
- * @param {String} UIEvent UIEvent to be removed (`click`)
+ * @param {String} UIEvent UIEvent to be removed (e.g. `click`)
  *
  * @return {undefined} undefined
  */
