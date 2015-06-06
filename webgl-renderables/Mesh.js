@@ -596,7 +596,7 @@ Mesh.prototype.onOpacityChange = function onOpacityChange (opacity) {
  *
  * @return {undefined} undefined
  */
-Mesh.prototype.onAddUIEvent = function onAddUIEvent (UIEvent) {
+Mesh.prototype.onAddUIEvent = function onAddUIEvent(UIEvent) {
     if (this._UIEvents.indexOf(UIEvent) === -1) {
         this._subscribe(UIEvent);
         this._UIEvents.push(UIEvent);

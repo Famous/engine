@@ -139,13 +139,15 @@ function WebGLRenderer(canvas, compositor, eventDiv) {
     this.bufferRegistry.allocate(cutout.spec.id, 'indices', cutout.spec.bufferValues[3], 1);
 
     /**
-     * WebGL Picking by caputing hit testing ('clicks') using the
+     * WebGL Picking by caputing events (e.g. 'click') using the
      * main famous HTML element for capturing events.
      */
+    var ev;
     this.listeners = {};
     this.meshIds = 0;
-    this.eventsMap = ['click'];
-    var ev;
+    this.eventsMap = ['click', 'dblclick', 'mousewheel', 'touchstart',
+                      'keyup', 'keydown', 'mousedown', 'mouseup',
+                      'scroll', 'select', 'touchend', 'wheel'];
 
     var len = this.eventsMap.length;
     for(var i = 0; i < len; i++) {
@@ -213,7 +215,7 @@ WebGLRenderer.prototype.checkEvent = function checkEvent(x, y, type) {
     var picked = this.listeners[type][meshId];
 
     if (picked) {
-        this.compositor.sendEvent(picked.path, 'click', {});
+        this.compositor.sendEvent(picked.path, type, {});
     }
 
     return picked;
