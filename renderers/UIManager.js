@@ -71,7 +71,7 @@ function UIManager (thread, compositor, renderLoop) {
         if (message[0] === Commands.ENGINE) {
             if (!_this._renderLoop) {
                 console.error(
-                    'Can not process ENGINE commands since no orender loop' +
+                    'Can not process ENGINE commands since no render loop' +
                     'is available.'
                 );
                 return;
@@ -229,8 +229,11 @@ UIManager.prototype.exitContainerMode = function exitContainerMode () {
  */
 UIManager.prototype._handleWindowMessage = function _handleWindowMessage (message) {
     var windowCommands = message.data;
-    if (windowCommands && windowCommands.constructor === Array) {
+    if (windowCommands && windowCommands.constructor === Array && windowCommands[0] === Commands.FAMOUS) {
         this.enterContainerMode();
+
+        // Remove FAMOUS prefix command
+        windowCommands.shift();
 
         this._thread.postMessage(windowCommands);
         this._sendDrawCommands();
