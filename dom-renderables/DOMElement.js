@@ -184,6 +184,8 @@ DOMElement.prototype.onMount = function onMount(node, id) {
 DOMElement.prototype.onDismount = function onDismount() {
     this.setProperty('display', 'none');
     this.setAttribute('data-fa-path', '');
+    this.setCutoutState(false);
+
     this._initialized = false;
 };
 
