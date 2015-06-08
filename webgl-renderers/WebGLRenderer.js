@@ -141,17 +141,29 @@ function WebGLRenderer(canvas, compositor, eventDiv) {
     /**
      * WebGL Picking by caputing events (e.g. 'click') using the
      * main famous HTML element for capturing events.
+     *
+     * TODO: Famous config file should contain these options for flexibility.
      */
-    var ev;
     this.listeners = {};
     this.meshIds = 0;
-    this.eventsMap = ['click', 'dblclick', 'mousewheel', 'touchstart',
-                      'keyup', 'keydown', 'mousedown', 'mouseup',
-                      'scroll', 'select', 'touchend', 'wheel'];
+    this.eventsMap = {
+        click: true,
+        dblclick: true,
+        mousewheel: true,
+        touchstart: true,
+        keyup: true,
+        keydown: true,
+        mousedown: false,
+        mouseup: false,
+        scroll: true,
+        select: false,
+        touchend: false,
+        wheel: true
+    };
 
-    var len = this.eventsMap.length;
-    for(var i = 0; i < len; i++) {
-        ev = this.eventsMap[i];
+    // If event is tracked, set the listener
+    for(var ev in this.eventsMap) {
+        if (!this.eventsMap[ev]) continue;
         this.listeners[ev] = [];
         eventDiv.addEventListener(ev, function(e) {
             _this.handleEvent(e);
@@ -232,12 +244,10 @@ WebGLRenderer.prototype.checkEvent = function checkEvent(x, y, type) {
  * @return {undefined} undefined
  */
 WebGLRenderer.prototype.subscribe = function subscribe(path, type) {
-    if (this.eventsMap.indexOf(type) === -1) {
-        return false;
+    if (this.eventsMap[type]) {
+        var mesh = this.meshRegistry[path];
+        this.listeners[type][mesh.id] = mesh;
     }
-    var mesh = this.meshRegistry[path];
-    this.listeners[type][mesh.id] = mesh;
-    return this;
 };
 
 /**
@@ -252,12 +262,10 @@ WebGLRenderer.prototype.subscribe = function subscribe(path, type) {
  * @return {undefined} undefined
  */
 WebGLRenderer.prototype.unsubscribe = function unsubscribe(path, type) {
-    if (this.eventsMap.indexOf(type) === -1) {
-        return false;
+    if (this.eventsMap[type]) {
+        var mesh = this.meshRegistry[path];
+        this.listeners[type].splice(mesh.id, 1);
     }
-    var mesh = this.meshRegistry[path];
-    this.listeners[type].splice(mesh.id, 1);
-    return this;
 };
 
 /**
