@@ -71,20 +71,38 @@ TransformSystem.prototype.deregisterTransformAtPath = function deregisterTransfo
     this.pathStore.remove(path);
 };
 
-
+/**
+ * Method which will make the transform currently stored at the given path a breakpoint.
+ * A transform being a breakpoint means that both a local and world transform will be calculated
+ * for that point. The local transform being the concatinated transform of all ancestor transforms up
+ * until the nearest breakpoint, and the world being the concatinated transform of all ancestor transforms.
+ * This method throws if no transform is at the provided path.
+ *
+ * @method
+ *
+ * @param {String} path The path at which to turn the transform into a breakpoint
+ *
+ * @return {undefined} undefined
+ */
 TransformSystem.prototype.makeBreakPointAt = function makeBreakPointAt (path) {
     var transform = this.pathStore.get(path);
     if (!transform) throw new Error('No transform Registered at path: ' + path);
     transform.setBreakPoint();
 };
 
-
-
+/**
+ * Returns the instance of the transform class associated with the given path,
+ * or undefined if no transform is associated.
+ *
+ * @method
+ * 
+ * @param {String} path The path to lookup
+ *
+ * @return {Transform | undefined} the transform at that path is available, else undefined.
+ */
 TransformSystem.prototype.get = function get (path) {
     return this.pathStore.get(path);
 };
-
-
 
 /**
  * onUpdate is called when the transform system requires an update.
@@ -125,6 +143,21 @@ TransformSystem.prototype.onUpdate = function onUpdate () {
     }
 };
 
+// private methods
+
+/**
+ * Private method to call when align changes. Triggers 'onAlignChange' methods
+ * on the node and all of the node's components
+ *
+ * @method
+ * @private
+ *
+ * @param {Node} node the node on which to call onAlignChange if necessary
+ * @param {Array} components the components on which to call onAlignChange if necessary
+ * @param {Object} offsets the set of offsets from the transform
+ *
+ * @return {undefined} undefined
+ */
 function alignChanged (node, components, offsets) {
     var x = offsets.align[0];
     var y = offsets.align[1];
@@ -136,6 +169,19 @@ function alignChanged (node, components, offsets) {
     offsets.alignChanged = false;
 }
 
+/**
+ * Private method to call when MountPoint changes. Triggers 'onMountPointChange' methods
+ * on the node and all of the node's components
+ *
+ * @method
+ * @private
+ *
+ * @param {Node} node the node on which to trigger a change event if necessary
+ * @param {Array} components the components on which to trigger a change event if necessary
+ * @param {Object} offsets the set of offsets from the transform
+ *
+ * @return {undefined} undefined
+ */
 function mountPointChanged (node, components, offsets) {
     var x = offsets.mountPoint[0];
     var y = offsets.mountPoint[1];
@@ -147,6 +193,19 @@ function mountPointChanged (node, components, offsets) {
     offsets.mountPointChanged = false;
 }
 
+/**
+ * Private method to call when Origin changes. Triggers 'onOriginChange' methods
+ * on the node and all of the node's components
+ *
+ * @method
+ * @private
+ *
+ * @param {Node} node the node on which to trigger a change event if necessary
+ * @param {Array} components the components on which to trigger a change event if necessary
+ * @param {Object} offsets the set of offsets from the transform
+ *
+ * @return {undefined} undefined
+ */
 function originChanged (node, components, offsets) {
     var x = offsets.origin[0];
     var y = offsets.origin[1];
@@ -158,6 +217,19 @@ function originChanged (node, components, offsets) {
     offsets.originChanged = false;
 }
 
+/**
+ * Private method to call when Position changes. Triggers 'onPositionChange' methods
+ * on the node and all of the node's components
+ *
+ * @method
+ * @private
+ *
+ * @param {Node} node the node on which to trigger a change event if necessary
+ * @param {Array} components the components on which to trigger a change event if necessary
+ * @param {Object} vectors the set of vectors from the transform
+ *
+ * @return {undefined} undefined
+ */
 function positionChanged (node, components, vectors) {
     var x = vectors.position[0];
     var y = vectors.position[1];
@@ -169,6 +241,19 @@ function positionChanged (node, components, vectors) {
     vectors.positionChanged = false;
 }
 
+/**
+ * Private method to call when Rotation changes. Triggers 'onRotationChange' methods
+ * on the node and all of the node's components
+ *
+ * @method
+ * @private
+ *
+ * @param {Node} node the node on which to trigger a change event if necessary
+ * @param {Array} components the components on which to trigger a change event if necessary
+ * @param {Object} vectors the set of vectors from the transform
+ *
+ * @return {undefined} undefined
+ */
 function rotationChanged (node, components, vectors) {
     var x = vectors.rotation[0];
     var y = vectors.rotation[1];
@@ -181,6 +266,19 @@ function rotationChanged (node, components, vectors) {
     vectors.rotationChanged = false;
 }
 
+/**
+ * Private method to call when Scale changes. Triggers 'onScaleChange' methods
+ * on the node and all of the node's components
+ *
+ * @method
+ * @private
+ *
+ * @param {Node} node the node on which to trigger a change event if necessary
+ * @param {Array} components the components on which to trigger a change event if necessary
+ * @param {Object} vectors the set of vectors from the transform
+ *
+ * @return {undefined} undefined
+ */
 function scaleChanged (node, components, vectors) {
     var x = vectors.scale[0];
     var y = vectors.scale[1];
@@ -192,13 +290,39 @@ function scaleChanged (node, components, vectors) {
     vectors.scaleChanged = false;
 }
 
+/**
+ * Private method to call when either the Local or World Transform changes.
+ * Triggers 'onTransformChange' methods on the node and all of the node's components
+ *
+ * @method
+ * @private
+ *
+ * @param {Node} node the node on which to trigger a change event if necessary
+ * @param {Array} components the components on which to trigger a change event if necessary
+ * @param {Transform} transform the transform class that changed
+ *
+ * @return {undefined} undefined
+ */
 function transformChanged (node, components, transform) {
-    if (node.onTransformChange) node.onTransformChange();
+    if (node.onTransformChange) node.onTransformChange(transform);
     for (var i = 0, len = components.length ; i < len ; i++)
         if (components[i] && components[i].onTransformChange)
             components[i].onTransformChange(transform);
 }
 
+/**
+ * Private method to call when the local transform changes. Triggers 'onLocalTransformChange' methods
+ * on the node and all of the node's components
+ *
+ * @method
+ * @private
+ *
+ * @param {Node} node the node on which to trigger a change event if necessary
+ * @param {Array} components the components on which to trigger a change event if necessary
+ * @param {Array} transform the local transform
+ *
+ * @return {undefined} undefined
+ */
 function localTransformChanged (node, components, transform) {
     if (node.onLocalTransformChange) node.onLocalTransformChange(transform);
     for (var i = 0, len = components.length ; i < len ; i++)
@@ -206,6 +330,19 @@ function localTransformChanged (node, components, transform) {
             components[i].onLocalTransformChange(transform);
 }
 
+/**
+ * Private method to call when the world transform changes. Triggers 'onWorldTransformChange' methods
+ * on the node and all of the node's components
+ *
+ * @method
+ * @private
+ *
+ * @param {Node} node the node on which to trigger a change event if necessary
+ * @param {Array} components the components on which to trigger a change event if necessary
+ * @param {Array} transform the world transform
+ *
+ * @return {undefined} undefined
+ */
 function worldTransformChanged (node, components, transform) {
     if (node.onWorldTransformChange) node.onWorldTransformChange(transform);
     for (var i = 0, len = components.length ; i < len ; i++)
