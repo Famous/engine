@@ -469,6 +469,9 @@ DOMRenderer.prototype.insertEl = function insertEl (tagName) {
         this._parent.element.appendChild(this._target.element);
         this._elements[this._path] = this._target;
     }
+    else {
+        this._target.reset();
+    }
 };
 
 

@@ -53,54 +53,41 @@ var Size = require('../core/Size');
  *                                      for DOM and WebGL layering.  On by default.
  */
 function DOMElement(node, options) {
-    if (!node) throw new Error('DOMElement must be instantiated on a node');
-
-    this._changeQueue = [];
+    this._node = null;
+    this._id = null;
 
     this._requestingUpdate = false;
     this._renderSized = false;
-    this._requestRenderSize = false;
+    this._requestingRenderSize = false;
 
-    this._UIEvents = node.getUIEvents().slice(0);
-    this._classes = ['famous-dom-element'];
-    this._requestingEventListeners = [];
-    this._styles = {};
+    this._changeQueue = [];
 
-    this._attributes = {};
-    this._content = '';
+    this._callbackStore = new CallbackStore();
 
-    this._tagName = options && options.tagName ? options.tagName : 'div';
-    this._renderSize = [0, 0, 0];
+    this.value = new DOMElement.Spec(options);
 
-    this._id = node ? node.addComponent(this) : null;
-    this._node = node;
+    this._UIEvents = [];
 
-    this._callbacks = new CallbackStore();
-
-    this.setProperty('display', node.isShown() ? 'block' : 'none');
-    this.onOpacityChange(node.getOpacity());
-
-    if (!options) return;
-
-    var i;
-    var key;
-
-    if (options.classes)
-        for (i = 0; i < options.classes.length; i++)
-            this.addClass(options.classes[i]);
-
-    if (options.attributes)
-        for (key in options.attributes)
-            this.setAttribute(key, options.attributes[key]);
-
-    if (options.properties)
-        for (key in options.properties)
-            this.setProperty(key, options.properties[key]);
-
-    if (options.id) this.setId(options.id);
-    if (options.content) this.setContent(options.content);
-    if (options.cutout === false) this.setCutoutState(options.cutout);
+    if (node) node.addComponent(this);
 }
+
+DOMElement.Spec = function Spec(options) {
+    options = options || {};
+
+    this.tagName = options.tagName ? options.tagName.toUpperCase() : 'DIV';
+    this.renderSize = new Int32Array(2);
+    this.classes = options.classes || {};
+    this.attributes = options.attributes || {};
+    this.properties = options.properties || {};
+    this.content = options.content || '';
+    this.cutout = options.cutout != null ? options.cutout : true;
+
+    this.classes['famous-dom-element'] = true;
+
+    // DEPRECATE
+    if (options.id)
+        this.attributes.id = options.id;
+};
 
 /**
  * Serializes the state of the DOMElement.
@@ -111,12 +98,17 @@ function DOMElement(node, options) {
  */
 DOMElement.prototype.getValue = function getValue() {
     return {
-        classes: this._classes,
-        styles: this._styles,
-        attributes: this._attributes,
-        content: this._content,
-        id: this._attributes.id,
-        tagName: this._tagName
+        tagName: this.value.tagName,
+        renderSize: this.value.renderSize,
+        classes: Object.keys(this.value.classes),
+        attributes: this.value.attributes,
+        properties: this.value.properties,
+        content: this.value.content,
+        cutout: this.value.cutout,
+
+        // DEPRECATE
+        styles: this.value.properties,
+        id: this.value.attributes.id
     };
 };
 
@@ -135,6 +127,7 @@ DOMElement.prototype.onUpdate = function onUpdate () {
     var node = this._node;
     var queue = this._changeQueue;
     var len = queue.length;
+    var location = node.getLocation();
 
     if (len && node) {
         node.sendDrawCommand(Commands.WITH);
@@ -146,7 +139,6 @@ DOMElement.prototype.onUpdate = function onUpdate () {
             node.sendDrawCommand(node.getLocation());
             this._requestRenderSize = false;
         }
-
     }
 
     this._requestingUpdate = false;
@@ -168,11 +160,22 @@ DOMElement.prototype.onUpdate = function onUpdate () {
 DOMElement.prototype.onMount = function onMount(node, id) {
     this._node = node;
     this._id = id;
-    this._UIEvents = node.getUIEvents().slice(0);
     TransformSystem.makeBreakPointAt(node.getLocation());
+
     this.onSizeModeChange.apply(this, node.getSizeMode());
-    this.draw();
+
     this.setAttribute('data-fa-path', node.getLocation());
+    this.setProperty('display', 'block');
+
+    var sizeMode = node.getSizeMode();
+    this.onSizeModeChange(sizeMode[0], sizeMode[1], sizeMode[2]);
+    this.onOpacityChange(node.getOpacity());
+    this.onTransformChange(TransformSystem.get(this._node.getLocation()));
+
+    var size = this._node.getSize();
+    this.onSizeChange(size[0], size[1]);
+
+    this._inDraw = false;
 };
 
 /**
@@ -184,12 +187,36 @@ DOMElement.prototype.onMount = function onMount(node, id) {
  * @return {undefined} undefined
  */
 DOMElement.prototype.onDismount = function onDismount() {
+    this.reset();
     this.setProperty('display', 'none');
-    this.setAttribute('data-fa-path', '');
-    this.setCutoutState(false);
 
     this.onUpdate();
     this._initialized = false;
+};
+
+/**
+ * Resets the DOMElement by removing all its classes, resetting its properties,
+ * attributes, content and cutout state.
+ *
+ * @method
+ * @private
+ *
+ * @return {undefined} undefined
+ */
+DOMElement.prototype.reset = function reset() {
+    for (var className in this.value.classes)
+        this._changeQueue.push(Commands.REMOVE_CLASS, className);
+
+    for (var property in this.value.properties)
+        this._changeQueue.push(Commands.CHANGE_PROPERTY, property, '');
+
+    for (var attribute in this.value.attributes)
+        this._changeQueue.push(Commands.CHANGE_ATTRIBUTE, attribute, '');
+
+    if (this.value.content)
+        this._changeQueue.push(Commands.CHANGE_CONTENT, '');
+
+    this._changeQueue.push(Commands.GL_CUTOUT_STATE, false);
 };
 
 /**
@@ -228,11 +255,14 @@ DOMElement.prototype.onHide = function onHide() {
  *
  * @return {DOMElement} this
  */
-DOMElement.prototype.setCutoutState = function setCutoutState (usesCutout) {
-    if (this._initialized)
-        this._changeQueue.push(Commands.GL_CUTOUT_STATE, usesCutout);
+DOMElement.prototype.setCutoutState = function setCutoutState(usesCutout) {
+    if (this.value.cutout !== usesCutout || this._inDraw) {
+        this.value.cutout = usesCutout;
+        if (this._initialized)
+            this._changeQueue.push(Commands.GL_CUTOUT_STATE, usesCutout);
+        if (this._requestingUpdate) this._requestUpdate();
+    }
 
-    if (!this._requestingUpdate) this._requestUpdate();
     return this;
 };
 
@@ -267,14 +297,17 @@ DOMElement.prototype.onTransformChange = function onTransformChange (transform) 
  *
  * @return {DOMElement} this
  */
-DOMElement.prototype.onSizeChange = function onSizeChange(x, y) {
-    var sizeMode = this._node.getSizeMode();
-    var sizedX = sizeMode[0] !== Size.RENDER;
-    var sizedY = sizeMode[1] !== Size.RENDER;
-    if (this._initialized)
-        this._changeQueue.push(Commands.CHANGE_SIZE,
-            sizedX ? x : sizedX,
-            sizedY ? y : sizedY);
+DOMElement.prototype.onSizeChange = function onSizeChange(width, height) {
+    if (this._initialized) {
+        var sizeMode = this._node.getSizeMode();
+        var sizedX = sizeMode[0] !== Size.RENDER;
+        var sizedY = sizeMode[1] !== Size.RENDER;
+        this._changeQueue.push(
+            Commands.CHANGE_SIZE,
+            sizedX ? width : sizedX,
+            sizedY ? height : sizedY
+        );
+    }
 
     if (!this._requestingUpdate) this._requestUpdate();
     return this;
@@ -297,18 +330,12 @@ DOMElement.prototype.onOpacityChange = function onOpacityChange(opacity) {
  * Method to be invoked by the node as soon as a new UIEvent is being added.
  * This results into an `ADD_EVENT_LISTENER` command being sent.
  *
- * @param {String} uiEvent uiEvent to be subscribed to (e.g. `click`)
+ * @param {String} uiEvent UIEvent to be subscribed to (e.g. `click`)
  *
  * @return {undefined} undefined
  */
 DOMElement.prototype.onAddUIEvent = function onAddUIEvent(uiEvent) {
-    if (this._UIEvents.indexOf(uiEvent) === -1) {
-        this._subscribe(uiEvent);
-        this._UIEvents.push(uiEvent);
-    }
-    else if (this._inDraw) {
-        this._subscribe(uiEvent);
-    }
+    this._subscribe(uiEvent);
     return this;
 };
 
@@ -343,10 +370,8 @@ DOMElement.prototype.onRemoveUIEvent = function onRemoveUIEvent(UIEvent) {
  * @return {undefined} undefined
  */
 DOMElement.prototype._subscribe = function _subscribe (uiEvent) {
-    if (this._initialized) {
+    if (this._initialized)
         this._changeQueue.push(Commands.SUBSCRIBE, uiEvent);
-    }
-
     if (!this._requestingUpdate) this._requestUpdate();
 };
 
@@ -364,9 +389,8 @@ DOMElement.prototype._subscribe = function _subscribe (uiEvent) {
  * @return {undefined}          undefined
  */
 DOMElement.prototype.preventDefault = function preventDefault (uiEvent) {
-    if (this._initialized) {
+    if (this._initialized)
         this._changeQueue.push(Commands.PREVENT_DEFAULT, uiEvent);
-    }
     if (!this._requestingUpdate) this._requestUpdate();
 };
 
@@ -381,10 +405,8 @@ DOMElement.prototype.preventDefault = function preventDefault (uiEvent) {
  * @return {undefined}          undefined
  */
 DOMElement.prototype.allowDefault = function allowDefault (uiEvent) {
-    if (this._initialized) {
+    if (this._initialized)
         this._changeQueue.push(Commands.ALLOW_DEFAULT, uiEvent);
-    }
-
     if (!this._requestingUpdate) this._requestUpdate();
 };
 
@@ -402,7 +424,18 @@ DOMElement.prototype._unsubscribe = function _unsubscribe (UIEvent) {
     if (this._initialized) {
         this._changeQueue.push(Commands.UNSUBSCRIBE, UIEvent);
     }
+    if (!this._requestingUpdate) this._requestUpdate();
+};
 
+/*
+ * Appends an `UNSUBSCRIBE` command to the command queue.
+ * @param {String} uiEvent Event type (e.g. `click`)
+ *
+ * @return {undefined} undefined
+ */
+DOMElement.prototype._subscribe = function _subscribe (uiEvent) {
+    if (this._initialized)
+        this._changeQueue.push(Commands.SUBSCRIBE, uiEvent);
     if (!this._requestingUpdate) this._requestUpdate();
 };
 
@@ -420,12 +453,9 @@ DOMElement.prototype._unsubscribe = function _unsubscribe (UIEvent) {
  * @return {undefined} undefined
  */
 DOMElement.prototype.onSizeModeChange = function onSizeModeChange(x, y, z) {
-    if (x === Size.RENDER || y === Size.RENDER || z === Size.RENDER) {
-        this._renderSized = true;
-        this._requestRenderSize = true;
-    }
     var size = this._node.getSize();
     this.onSizeChange(size[0], size[1]);
+    return this;
 };
 
 /**
@@ -437,7 +467,7 @@ DOMElement.prototype.onSizeModeChange = function onSizeModeChange(x, y, z) {
  * @return {Array} size of the rendered DOM element in pixels
  */
 DOMElement.prototype.getRenderSize = function getRenderSize() {
-    return this._renderSize;
+    return this.value.renderSize;
 };
 
 /**
@@ -449,27 +479,10 @@ DOMElement.prototype.getRenderSize = function getRenderSize() {
  * @return {undefined} undefined
  */
 DOMElement.prototype._requestUpdate = function _requestUpdate() {
-    if (!this._requestingUpdate) {
+    if (!this._requestingUpdate && this._node) {
         this._node.requestUpdate(this._id);
         this._requestingUpdate = true;
     }
-};
-
-/**
- * Initializes the DOMElement by sending the `INIT_DOM` command. This creates
- * or reallocates a new Element in the actual DOM hierarchy.
- *
- * @method
- *
- * @return {undefined} undefined
- */
-DOMElement.prototype.init = function init () {
-    this._changeQueue.push(Commands.INIT_DOM, this._tagName);
-    this._initialized = true;
-    this.onTransformChange(TransformSystem.get(this._node.getLocation()));
-    var size = this._node.getSize();
-    this.onSizeChange(size[0], size[1]);
-    if (!this._requestingUpdate) this._requestUpdate();
 };
 
 /**
@@ -487,6 +500,17 @@ DOMElement.prototype.setId = function setId (id) {
 };
 
 /**
+ * Retrieves the id previously set via {@link DOMElement#setId}.
+ *
+ * @method
+ *
+ * @return {String} The current id of the DOMElement.
+ */
+DOMElement.prototype.getId = function getId () {
+    return this.value.attributes.id;
+};
+
+/**
  * Adds a new class to the internal class list of the underlying Element in the
  * DOM.
  *
@@ -497,18 +521,13 @@ DOMElement.prototype.setId = function setId (id) {
  * @return {DOMElement} this
  */
 DOMElement.prototype.addClass = function addClass (value) {
-    if (this._classes.indexOf(value) < 0) {
-        if (this._initialized) this._changeQueue.push(Commands.ADD_CLASS, value);
-        this._classes.push(value);
+    if (!this.value.classes[value] || this._inDraw) {
+        this.value.classes[value] = true;
+        if (this._initialized)
+            this._changeQueue.push(Commands.ADD_CLASS, value);
         if (!this._requestingUpdate) this._requestUpdate();
-        if (this._renderSized) this._requestRenderSize = true;
-        return this;
     }
 
-    if (this._inDraw) {
-        if (this._initialized) this._changeQueue.push(Commands.ADD_CLASS, value);
-        if (!this._requestingUpdate) this._requestUpdate();
-    }
     return this;
 };
 
@@ -522,18 +541,19 @@ DOMElement.prototype.addClass = function addClass (value) {
  * @return {DOMElement} this
  */
 DOMElement.prototype.removeClass = function removeClass (value) {
-    var index = this._classes.indexOf(value);
+    if (this.value.classes[value] || this._inDraw) {
+        this.value.classes[value] = true;
+        if (this._initialized)
+            this._changeQueue.push(Commands.REMOVE_CLASS, value);
+        if (!this._requestingUpdate) this._requestUpdate();
+    }
 
-    if (index < 0) return this;
-
-    this._changeQueue.push(Commands.REMOVE_CLASS, value);
-
-    this._classes.splice(index, 1);
-
-    if (!this._requestingUpdate) this._requestUpdate();
     return this;
 };
 
+DOMElement.prototype.getClasses = function getClasses () {
+    return Object.keys(this.value.classes);
+};
 
 /**
  * Checks if the DOMElement has the passed in class.
@@ -545,7 +565,7 @@ DOMElement.prototype.removeClass = function removeClass (value) {
  * @return {Boolean} Boolean value indicating whether the passed in class name is in the DOMElement's class list.
  */
 DOMElement.prototype.hasClass = function hasClass (value) {
-    return this._classes.indexOf(value) !== -1;
+    return !!this.value.classes[value];
 };
 
 /**
@@ -559,13 +579,26 @@ DOMElement.prototype.hasClass = function hasClass (value) {
  * @return {DOMElement} this
  */
 DOMElement.prototype.setAttribute = function setAttribute (name, value) {
-    if (this._attributes[name] !== value || this._inDraw) {
-        this._attributes[name] = value;
-        if (this._initialized) this._changeQueue.push(Commands.CHANGE_ATTRIBUTE, name, value);
-        if (!this._requestUpdate) this._requestUpdate();
+    if (this.value.attributes[name] !== value || this._inDraw) {
+        this.value.attributes[name] = value;
+        if (this._initialized)
+            this._changeQueue.push(Commands.CHANGE_ATTRIBUTE, name, value);
+        if (!this._requestingUpdate) this._requestUpdate();
     }
 
     return this;
+};
+
+/**
+ * Retrieves the value of a previously set attribute.
+ *
+ * @method
+ *
+ * @param  {String} name    Attribtue key.
+ * @return {String}         Value of the attribute.
+ */
+DOMElement.prototype.getAttribute = function getAttribute (name) {
+    return this.value.attributes[name];
 };
 
 /**
@@ -579,14 +612,25 @@ DOMElement.prototype.setAttribute = function setAttribute (name, value) {
  * @return {DOMElement} this
  */
 DOMElement.prototype.setProperty = function setProperty (name, value) {
-    if (this._styles[name] !== value || this._inDraw) {
-        this._styles[name] = value;
-        if (this._initialized) this._changeQueue.push(Commands.CHANGE_PROPERTY, name, value);
+    if (this.value.properties[name] !== value || this._inDraw) {
+        this.value.properties[name] = value;
+        if (this._initialized)
+            this._changeQueue.push(Commands.CHANGE_PROPERTY, name, value);
+        if (this._renderSized) this._requestingRenderSize = true;
         if (!this._requestingUpdate) this._requestUpdate();
-        if (this._renderSized) this._requestRenderSize = true;
     }
 
     return this;
+};
+
+/**
+ * Retrieves the value of a previously set CSS property.
+ *
+ * @param  {String} name The CSS property name.
+ * @return {String}      The value of the property.
+ */
+DOMElement.prototype.getProperty = function getProperty (name) {
+    return this.value.properties[name];
 };
 
 /**
@@ -600,18 +644,22 @@ DOMElement.prototype.setProperty = function setProperty (name, value) {
  * @return {DOMElement} this
  */
 DOMElement.prototype.setContent = function setContent (content) {
-    if (this._content !== content || this._inDraw) {
-        this._content = content;
+    if (this.value.content !== content || this._inDraw) {
+        this.value.content = content;
         if (this._initialized) this._changeQueue.push(Commands.CHANGE_CONTENT, content);
+        if (this._renderSized) this._requestingRenderSize = true;
         if (!this._requestingUpdate) this._requestUpdate();
-        if (this._renderSized) this._requestRenderSize = true;
     }
 
     return this;
 };
 
+DOMElement.prototype.getContent = function getContent () {
+    return this.value.content;
+};
+
 /**
- * Subscribes to a DOMElement using.
+ * Subscribes to the events received by the DOMElement.
  *
  * @method on
  *
@@ -623,7 +671,7 @@ DOMElement.prototype.setContent = function setContent (content) {
  * @return {Function} A function to call if you want to remove the callback
  */
 DOMElement.prototype.on = function on (event, listener) {
-    return this._callbacks.on(event, listener);
+    return this._callbackStore.on(event, listener);
 };
 
 /**
@@ -643,48 +691,12 @@ DOMElement.prototype.on = function on (event, listener) {
  */
 DOMElement.prototype.onReceive = function onReceive (event, payload) {
     if (event === 'resize') {
-        this._renderSize[0] = payload.val[0];
-        this._renderSize[1] = payload.val[1];
+        this.value.renderSize[0] = payload.val[0];
+        this.value.renderSize[1] = payload.val[1];
+
         if (!this._requestingUpdate) this._requestUpdate();
     }
-    this._callbacks.trigger(event, payload);
-};
-
-/**
- * The draw function is being used in order to allow mutating the DOMElement
- * before actually mounting the corresponding node.
- *
- * @method
- * @private
- *
- * @return {undefined} undefined
- */
-DOMElement.prototype.draw = function draw() {
-    var key;
-    var i;
-    var len;
-
-    this._inDraw = true;
-
-    this.init();
-
-    for (i = 0, len = this._classes.length ; i < len ; i++)
-        this.addClass(this._classes[i]);
-
-    if (this._content) this.setContent(this._content);
-
-    for (key in this._styles)
-        if (this._styles[key] != null)
-            this.setProperty(key, this._styles[key]);
-
-    for (key in this._attributes)
-        if (this._attributes[key] != null)
-            this.setAttribute(key, this._attributes[key]);
-
-    for (i = 0, len = this._UIEvents.length ; i < len ; i++)
-        this.onAddUIEvent(this._UIEvents[i]);
-
-    this._inDraw = false;
+    this._callbackStore.trigger(event, payload);
 };
 
 module.exports = DOMElement;
