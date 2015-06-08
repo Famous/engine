@@ -594,7 +594,7 @@ Mesh.prototype.onOpacityChange = function onOpacityChange (opacity) {
  *
  * @param {String} UIEvent UIEvent to be subscribed to (e.g. `click`)
  *
- * @return {undefined} undefined
+ * @return {Mesh} this
  */
 Mesh.prototype.onAddUIEvent = function onAddUIEvent(UIEvent) {
     if (this._UIEvents.indexOf(UIEvent) === -1) {
@@ -613,7 +613,7 @@ Mesh.prototype.onAddUIEvent = function onAddUIEvent(UIEvent) {
  *
  * @param {String} UIEvent UIEvent to be removed (e.g. `click`)
  *
- * @return {undefined} undefined
+ * @return {Mesh} this
  */
 Mesh.prototype.onRemoveUIEvent = function onRemoveUIEvent(UIEvent) {
     var index = this._UIEvents.indexOf(UIEvent);
