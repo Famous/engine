@@ -148,20 +148,21 @@ function WebGLRenderer(canvas, compositor) {
  */
 WebGLRenderer.prototype.getWebGLContext = function getWebGLContext(canvas) {
     var names = ['webgl', 'experimental-webgl', 'webkit-3d', 'moz-webgl'];
-    var context = null;
-    for (var i = 0; i < names.length; i++) {
+    var context = false;
+
+    for (var i = 0, len = names.length; i < len; i++) {
         try {
             context = canvas.getContext(names[i]);
         }
         catch (error) {
-            var msg = 'Error creating WebGL context: ' + error.prototype.toString();
-            console.error(msg);
+            throw 'Error creating WebGL context: ' + error.prototype.toString();;
         }
-        if (context) {
-            break;
-        }
+        if (context) return context;
     }
-    return context ? context : false;
+
+    if (!context) {
+        throw 'Could not retrieve WebGL context. Please refer to https://www.khronos.org/webgl/ for requirements';
+    }
 };
 
 /**
