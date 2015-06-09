@@ -31,9 +31,6 @@ var Dispatch = require('./Dispatch');
 var TransformSystem = require('./TransformSystem');
 var pathUtils = require('./Path');
 
-var ONES = [1, 1, 1];
-var QUAT = [0, 0, 0, 1];
-
 /**
  * Nodes define hierarchy and geometrical transformations. They can be moved
  * (translated), scaled and rotated.
@@ -75,6 +72,10 @@ var QUAT = [0, 0, 0, 1];
 function Node () {
     this._requestingUpdate = false;
     this._inUpdate = false;
+    this._mounted = false;
+    this._shown = false;
+    this._opacity = 1;
+    this._UIEvents = [];
 
     this._updateQueue = [];
     this._nextUpdateQueue = [];
@@ -153,21 +154,67 @@ Node.prototype.getValue = function getValue () {
     var numberOfChildren = this._children.length;
     var numberOfComponents = this._components.length;
     var i = 0;
-
+ 
     var value = {
-        location: this.value.location,
-        spec: this.value,
-        components: new Array(numberOfComponents),
-        children: new Array(numberOfChildren)
+        location: this.getId(),
+        spec: {
+            location: this.getId(),
+            showState: {
+                mounted: this.isMounted(),
+                shown: this.isShown(),
+                opacity: this.getOpacity() || null
+            },
+            offsets: {
+                mountPoint: [0, 0, 0],
+                align: [0, 0, 0],
+                origin: [0, 0, 0]
+            },
+            vectors: {
+                position: [0, 0, 0],
+                rotation: [0, 0, 0, 1],
+                scale: [1, 1, 1]
+            },
+            size: {
+                sizeMode: [0, 0, 0],
+                proportional: [1, 1, 1],
+                differential: [0, 0, 0],
+                absolute: [0, 0, 0],
+                render: [0, 0, 0]
+            }
+        },
+        UIEvents: this._UIEvents,
+        components: [],
+        children: []
     };
+    
+    if (value.location) {
+        var transform = TransformSystem.get(this.getId());
+        var size = SizeSystem.get(this.getId());
+
+        for (i = 0 ; i < 3 ; i++) {
+            value.offsets.mountPoint[i] = transform.offsets.mountPoint[i];
+            value.offsets.align[i] = transform.offsets.align[i];
+            value.offsets.origin[i] = transform.offsets.origin[i];
+            value.vectors.position[i] = transform.vectors.position[i];
+            value.vectors.rotation[i] = transform.vectors.rotation[i];
+            value.vectors.scale[i] = transform.vectors.scale[i];
+            value.size.sizeMode[i] = size.sizeMode[i];
+            value.size.proportional[i] = size.proportionalSize[i];
+            value.size.differential[i] = size.differentialSize[i];
+            value.size.absolute[i] = size.absoluteSize[i];
+            value.size.render[i] = size.renderSize[i];
+        }
+
+        value.vectors.rotation[3] = transform.vectors.rotation[3];
+    }
 
     for (; i < numberOfChildren ; i++)
         if (this._children[i] && this._children[i].getValue)
-            value.children[i] = this._children[i].getValue();
+            value.children.push(this._children[i].getValue());
 
     for (i = 0 ; i < numberOfComponents ; i++)
         if (this._components[i] && this._components[i].getValue)
-            value.components[i] = this._components[i].getValue();
+            value.components.push(this._components[i].getValue());
 
     return value;
 };
@@ -183,16 +230,21 @@ Node.prototype.getValue = function getValue () {
  *                      children, excluding components.
  */
 Node.prototype.getComputedValue = function getComputedValue () {
+    console.warn('Node.getComputedValue is depricated. Use Node.getValue instead');
     var numberOfChildren = this._children.length;
 
     var value = {
-        location: this.value.location,
-        computedValues: this._calculatedValues,
-        children: new Array(numberOfChildren)
+        location: this.getId(),
+        computedValues: {
+            transform: this.isMounted() ? TransformSystem.get(this.getLocation()).getLocalTransform() : null,
+            size: this.isMounted() ? SizeSystem.get(this.getLocation()).get() : null
+        },
+        children: []
     };
 
     for (var i = 0 ; i < numberOfChildren ; i++)
-        value.children[i] = this._children[i].getComputedValue();
+        if (this._children[i] && this._children[i].getComputedValue)
+            value.children.push(this._children[i].getComputedValue());
 
     return value;
 };
@@ -282,7 +334,7 @@ Node.prototype.getUpdater = function getUpdater () {
  * @return {Boolean}    Boolean indicating whether the node is mounted or not.
  */
 Node.prototype.isMounted = function isMounted () {
-    return this.value.showState.mounted;
+    return this._mounted;
 };
 
 /**
@@ -294,7 +346,7 @@ Node.prototype.isMounted = function isMounted () {
  *                      ("shown") or not.
  */
 Node.prototype.isShown = function isShown () {
-    return this.value.showState.shown;
+    return this._shown;
 };
 
 /**
@@ -308,7 +360,7 @@ Node.prototype.isShown = function isShown () {
  * @return {Number}         Relative opacity of the node.
  */
 Node.prototype.getOpacity = function getOpacity () {
-    return this.value.showState.opacity;
+    return this._opacity;
 };
 
 /**
@@ -464,7 +516,7 @@ Node.prototype.getTransform = function getTransform () {
  * @return {Array} an array of strings representing the current subscribed UI event of this node
  */
 Node.prototype.getUIEvents = function getUIEvents () {
-    return this.value.UIEvents;
+    return this._UIEvents;
 };
 
 /**
@@ -657,7 +709,7 @@ Node.prototype._vecOptionalSet = function _vecOptionalSet (vec, index, val) {
  */
 Node.prototype.show = function show () {
     Dispatch.show(this.getLocation());
-    this.value.showState.shown = true;
+    this._shown = true;
     return this;
 };
 
@@ -672,7 +724,7 @@ Node.prototype.show = function show () {
  */
 Node.prototype.hide = function hide () {
     Dispatch.hide(this.getLocation());
-    this.value.showState.shown = false;
+    this._shown = false;
     return this;
 };
 
@@ -792,8 +844,8 @@ Node.prototype.setScale = function setScale (x, y, z) {
  * @return {Node} this
  */
 Node.prototype.setOpacity = function setOpacity (val) {
-    if (val !== this.value.showState.opacity) {
-        this.value.showState.opacity = val;
+    if (val !== this._opacity) {
+        this._opacity = val;
         if (!this._requestingUpdate) this._requestUpdate();
 
         var i = 0;
@@ -949,7 +1001,7 @@ Node.prototype.update = function update (time){
     if (!this.isMounted()) {
         // last update
         this._parent = null;
-        this.value.location = null;
+        this._id = null;
         this._globalUpdater = null;
     }
     else if (this._nextUpdateQueue.length) {
@@ -980,8 +1032,8 @@ Node.prototype.mount = function mount (path) {
     var parent = Dispatch.getNode(pathUtils.parent(path));
     this._parent = parent;
     this._globalUpdater = parent.getUpdater();
-    this.value.location = path;
-    this.value.showState.mounted = true;
+    this._id = path;
+    this._mounted = true;
 
     if (!this._requestingUpdate) this._requestUpdate();
     return this;
@@ -1006,17 +1058,7 @@ Node.prototype.dismount = function dismount () {
     TransformSystem.deregisterTransformAtPath(path);
     SizeSystem.deregisterSizeAtPath(path);
 
-    var i = 0;
-    var list = this._components;
-    var len = list.length;
-    var item;
-
-    this.value.showState.mounted = false;
-
-    for (; i < len ; i++) {
-        item = list[i];
-        if (item && item.onDismount) item.onDismount();
-    }
+    this._mounted = false;
 
     if (!this._requestingUpdate) this._requestUpdate();
 };

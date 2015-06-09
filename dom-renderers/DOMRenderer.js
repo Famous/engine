@@ -26,6 +26,7 @@
 
 var ElementCache = require('./ElementCache');
 var math = require('./Math');
+var PathUtils = require('../core/Path');
 var vendorPrefix = require('../utilities/vendorPrefix');
 var eventMap = require('./events/EventMap');
 
@@ -419,16 +420,16 @@ DOMRenderer.prototype.resolveChildren = function resolveChildren (element, paren
     var childPath;
 
     while ((childNode = parent.childNodes[i])) {
-        if (!childNode.dataSet) {
+        if (!childNode.dataset) {
             i++;
             continue;
         }
-        childPath = childNode.dataSet.faPath;
+        childPath = childNode.dataset.faPath;
         if (!childPath) {
             i++;
             continue;
         }
-        if (PathUtils.isDescendentOf(childPath, parent)) element.appendChild(childNode);
+        if (PathUtils.isDescendentOf(childPath, path)) element.appendChild(childNode);
         else i++;
     }
 };

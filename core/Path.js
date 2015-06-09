@@ -149,7 +149,7 @@ PathUtils.prototype.isDescendentOf = function isDescendentOf(child, parent) {
     if (child === parent) return false;
     child = this.hasTrailingSlash(child) ? child : child + '/';
     parent = this.hasTrailingSlash(parent) ? parent : parent + '/';
-    return child.indexOf(parent) === 0;
+    return this.depth(parent) < this.depth(child) && child.indexOf(parent) === 0;
 };
 
 /**
