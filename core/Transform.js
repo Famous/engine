@@ -153,12 +153,36 @@ Transform.prototype.getWorldTransform = function getWorldTransform () {
     return this.global;
 };
 
+/**
+ * Takes a node and calculates the proper transform from it.
+ *
+ * @method
+ *
+ * @param {Node} node the node to calculate the transform from
+ *
+ * @return {undefined} undefined
+ */
 Transform.prototype.from = function from (node) {
     if (!this.parent || this.parent.isBreakPoint())
         return this.fromNode(node);
     else return this.fromNodeWithParent(node);
 };
 
+/**
+ * A private method to potentially set a value within an
+ * array. Will set the value if a value was given
+ * for the third argument and if that value is different
+ * than the value that is currently in the array at the given index.
+ * Returns true if a value was set and false if not.
+ *
+ * @method
+ *
+ * @param {Array} vec The array to set the value within
+ * @param {Number} index The index at which to set the value
+ * @param {Any} val The value to potentially set in the array
+ *
+ * @return {Boolean} whether or not a value was set
+ */
 function _vecOptionalSet (vec, index, val) {
     if (val != null && vec[index] !== val) {
         vec[index] = val;
@@ -166,6 +190,20 @@ function _vecOptionalSet (vec, index, val) {
     } else return false;
 }
 
+/**
+ * private method to set values within an array.
+ * Returns whether or not the array has been changed.
+ *
+ * @method
+ *
+ * @param {Array} vec The vector to be operated upon
+ * @param {Number | null | undefined} x The x value of the vector
+ * @param {Number | null | undefined} y The y value of the vector
+ * @param {Number | null | undefined} z The z value of the vector
+ * @param {Number | null | undefined} w the w value of the vector
+ *
+ * @return {Boolean} whether or not the array was changed
+ */
 function setVec (vec, x, y, z, w) {
     var propagate = false;
 
@@ -178,10 +216,34 @@ function setVec (vec, x, y, z, w) {
     return propagate;
 }
 
+/**
+ * Sets the position component of the transform.
+ *
+ * @method
+ *
+ * @param {Number} x The x dimension of the position
+ * @param {Number} y The y dimension of the position
+ * @param {Number} z The z dimension of the position
+ *
+ * @return {undefined} undefined
+ */
 Transform.prototype.setPosition = function setPosition (x, y, z) {
     this.vectors.positionChanged = setVec(this.vectors.position, x, y, z);
 };
 
+/**
+ * Sets the rotation component of the transform. Can take either Euler
+ * angles or a quaternion.
+ *
+ * @method
+ *
+ * @param {Number} x The rotation about the x axis or the extent in the x dimension
+ * @param {Number} y The rotation about the y axis or the extent in the y dimension
+ * @param {Number} z The rotation about the z axis or the extent in the z dimension
+ * @param {Number} w The rotation about the proceeding vector
+ *
+ * @return {undefined} undefined
+ */
 Transform.prototype.setRotation = function setRotation (x, y, z, w) {
     var quat = this.vectors.rotation;
     var propogate = false;
@@ -250,30 +312,80 @@ Transform.prototype.setRotation = function setRotation (x, y, z, w) {
     this.vectors.rotationChanged = setVec(quat, qx, qy, qz, qw);
 };
 
+/**
+ * Sets the scale component of the transform.
+ *
+ * @method
+ *
+ * @param {Number | null | undefined} x The x dimension of the scale
+ * @param {Number | null | undefined} y The y dimension of the scale
+ * @param {Number | null | undefined} z The z dimension of the scale
+ *
+ * @return {undefined} undefined
+ */
 Transform.prototype.setScale = function setScale (x, y, z) {
     this.vectors.scaleChanged = setVec(this.vectors.scale, x, y, z);
 };
 
-
+/**
+ * Sets the align value of the transform.
+ *
+ * @method
+ *
+ * @param {Number | null | undefined} x The x dimension of the align
+ * @param {Number | null | undefined} y The y dimension of the align
+ * @param {Number | null | undefined} z The z dimension of the align
+ *
+ * @return {undefined} undefined
+ */
 Transform.prototype.setAlign = function setAlign (x, y, z) {
     this.offsets.alignChanged = setVec(this.offsets.align, x, y, z != null ? z - 0.5 : z);
 };
 
+/**
+ * Sets the mount point value of the transform.
+ *
+ * @method
+ *
+ * @param {Number | null | undefined} x the x dimension of the mount point
+ * @param {Number | null | undefined} y the y dimension of the mount point
+ * @param {Number | null | undefined} z the z dimension of the mount point
+ *
+ * @return {undefined} undefined
+ */
 Transform.prototype.setMountPoint = function setMountPoint (x, y, z) {
     this.offsets.mountPointChanged = setVec(this.offsets.mountPoint, x, y, z != null ? z - 0.5 : z);
 };
 
+/**
+ * Sets the origin of the transform.
+ *
+ * @method
+ *
+ * @param {Number | null | undefined} x the x dimension of the origin
+ * @param {Number | null | undefined} y the y dimension of the origin
+ * @param {Number | null | undefined} z the z dimension of the origin
+ *
+ * @return {undefined} undefined
+ */
 Transform.prototype.setOrigin = function setOrigin (x, y, z) {
     this.offsets.originChanged = setVec(this.offsets.origin, x, y, z != null ? z - 0.5 : z);
 };
 
+/**
+ * Calculates the world for this particular transform.
+ *
+ * @method
+ *
+ * @return {undefined} undefined
+ */
 Transform.prototype.calculateWorldMatrix = function calculateWorldMatrix () {
     var nearestBreakPoint = this.parent;
 
     while (nearestBreakPoint && !nearestBreakPoint.isBreakPoint())
         nearestBreakPoint = nearestBreakPoint.parent;
 
-    if (nearestBreakPoint) return multiply(this.global, nearestBreakPoint, this.local);
+    if (nearestBreakPoint) return multiply(this.global, nearestBreakPoint.getWorldTransform(), this.local);
     else {
         for (var i = 0; i < 16 ; i++) this.global[i] = this.local[i];
         return false;
@@ -503,6 +615,17 @@ Transform.prototype.fromNodeWithParent = function fromNodeWithParent (node) {
     return changed;
 };
 
+/**
+ * private method to multiply two transforms.
+ *
+ * @method
+ *
+ * @param {Array} out The array to write the result to
+ * @param {Array} a the left hand transform
+ * @param {Array} b the right hand transform
+ *
+ * @return {undefined} undefined
+ */
 function multiply (out, a, b) {
     var a00 = a[0], a01 = a[1], a02 = a[2],
         a10 = a[4], a11 = a[5], a12 = a[6],
