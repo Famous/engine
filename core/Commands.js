@@ -24,6 +24,9 @@
 
 'use strict';
 
+/**
+ * An enumeration of the commands in our command queue.
+ */
 var Commands = {
     INIT_DOM: 0,
     DOM_RENDER_SIZE: 1,
