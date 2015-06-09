@@ -810,13 +810,14 @@ WebGLRenderer.prototype.handleOptions = function handleOptions(options, mesh) {
     var gl = this.gl;
     if (!options) return;
 
+    if (options.blending) gl.enable(gl.BLEND);
+
     if (options.side === 'double') {
         this.gl.cullFace(this.gl.FRONT);
         this.drawBuffers(this.bufferRegistry.registry[mesh.geometry], mesh.drawType, mesh.geometry);
         this.gl.cullFace(this.gl.BACK);
     }
 
-    if (options.blending) gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
     if (options.side === 'back') gl.cullFace(gl.FRONT);
 };
 
@@ -832,7 +833,7 @@ WebGLRenderer.prototype.handleOptions = function handleOptions(options, mesh) {
 WebGLRenderer.prototype.resetOptions = function resetOptions(options) {
     var gl = this.gl;
     if (!options) return;
-    if (options.blending) gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+    if (options.blending) gl.disable(gl.BLEND);
     if (options.side === 'back') gl.cullFace(gl.BACK);
 };
 
