@@ -141,8 +141,8 @@ Scene.prototype.mount = function mount (path) {
     if (this.isMounted())
         throw new Error('Scene is already mounted at: ' + this.getLocation());
     Dispatch.registerNodeAtPath(path, this);
-    this.value.location = path;
-    this.value.showState.mounted = true;
+    this._id = path;
+    this._mounted = true;
     this._parent = this;
     TransformSystem.registerTransformAtPath(path);
     SizeSystem.registerSizeAtPath(path);

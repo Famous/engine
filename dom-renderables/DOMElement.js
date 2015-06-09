@@ -465,7 +465,8 @@ DOMElement.prototype.init = function init () {
     this._changeQueue.push(Commands.INIT_DOM, this._tagName);
     this._initialized = true;
     this.onTransformChange(TransformSystem.get(this._node.getLocation()));
-    this.onSizeChange(this._node.getSize());
+    var size = this._node.getSize();
+    this.onSizeChange(size[0], size[1]);
     if (!this._requestingUpdate) this._requestUpdate();
 };
 
