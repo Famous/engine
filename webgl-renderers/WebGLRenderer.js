@@ -144,11 +144,11 @@ function WebGLRenderer(canvas, compositor) {
  *
  * @param {Object} canvas Canvas element from which the context is retreived
  *
- * @return {Object} WebGLContext of canvas element
+ * @return {Object|Boolean} WebGLContext Returns either the WebGL context or false (error)
  */
 WebGLRenderer.prototype.getWebGLContext = function getWebGLContext(canvas) {
     var names = ['webgl', 'experimental-webgl', 'webkit-3d', 'moz-webgl'];
-    var context = false;
+    var context;
 
     for (var i = 0, len = names.length; i < len; i++) {
         try {
@@ -162,6 +162,7 @@ WebGLRenderer.prototype.getWebGLContext = function getWebGLContext(canvas) {
 
     if (!context) {
         throw 'Could not retrieve WebGL context. Please refer to https://www.khronos.org/webgl/ for requirements';
+        return false;
     }
 };
 
