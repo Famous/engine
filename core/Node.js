@@ -73,13 +73,8 @@ var QUAT = [0, 0, 0, 1];
  * @constructor
  */
 function Node () {
-    this._calculatedValues = {
-        size: new Float32Array(3)
-    };
-
     this._requestingUpdate = false;
     this._inUpdate = false;
-    this._transformNeedsUpdate = false;
 
     this._updateQueue = [];
     this._nextUpdateQueue = [];
@@ -93,71 +88,13 @@ function Node () {
     this._parent = null;
     this._globalUpdater = null;
 
-    this._lastEulerX = 0;
-    this._lastEulerY = 0;
-    this._lastEulerZ = 0;
-    this._lastEuler = false;
-
-    this.value = new Node.Spec();
+    this._id = null;
 }
 
 Node.RELATIVE_SIZE = 0;
 Node.ABSOLUTE_SIZE = 1;
 Node.RENDER_SIZE = 2;
 Node.DEFAULT_SIZE = 0;
-
-/**
- * A Node spec holds the "data" associated with a Node.
- *
- * @class Spec
- * @constructor
- *
- * @property {String} location path to the node (e.g. "body/0/1")
- * @property {Object} showState
- * @property {Boolean} showState.mounted
- * @property {Boolean} showState.shown
- * @property {Number} showState.opacity
- * @property {Object} offsets
- * @property {Float32Array.<Number>} offsets.mountPoint
- * @property {Float32Array.<Number>} offsets.align
- * @property {Float32Array.<Number>} offsets.origin
- * @property {Object} vectors
- * @property {Float32Array.<Number>} vectors.position
- * @property {Float32Array.<Number>} vectors.rotation
- * @property {Float32Array.<Number>} vectors.scale
- * @property {Object} size
- * @property {Float32Array.<Number>} size.sizeMode
- * @property {Float32Array.<Number>} size.proportional
- * @property {Float32Array.<Number>} size.differential
- * @property {Float32Array.<Number>} size.absolute
- * @property {Float32Array.<Number>} size.render
- */
-Node.Spec = function Spec () {
-    this.location = null;
-    this.showState = {
-        mounted: false,
-        shown: false,
-        opacity: 1
-    };
-    this.offsets = {
-        mountPoint: new Float32Array(3),
-        align: new Float32Array(3),
-        origin: new Float32Array(3)
-    };
-    this.vectors = {
-        position: new Float32Array(3),
-        rotation: new Float32Array(QUAT),
-        scale: new Float32Array(ONES)
-    };
-    this.size = {
-        sizeMode: new Float32Array(3),
-        proportional: new Float32Array(ONES),
-        differential: new Float32Array(3),
-        absolute: new Float32Array(3),
-        render: new Float32Array(3)
-    };
-    this.UIEvents = [];
-};
 
 /**
  * Determine the node's location in the scene graph hierarchy.
@@ -172,7 +109,7 @@ Node.Spec = function Spec () {
  * @return {String} location (path), e.g. `body/0/1`
  */
 Node.prototype.getLocation = function getLocation () {
-    return this.value.location;
+    return this._id;
 };
 
 /**
