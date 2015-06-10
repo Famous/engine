@@ -1,0 +1,55 @@
+'use strict';
+
+var test = require('tape');
+var path = require('path');
+
+var characterStack = [];
+var messageStack = [];
+
+function log (message) {
+    console.log(characterStack.join(' ') + message);
+}
+
+function logCharacterStack () {
+    console.log(characterStack.join(' '));
+}
+
+function handleAssertion (row) {
+    log(row.operator);
+}
+
+test.createStream({objectMode: true}).on('data', function (row) {
+        if (!row.ok) {
+            switch (row.type) {
+                case 'test':
+                    messageStack.push(row.name);
+                    break;
+                case 'end':
+                    messageStack.pop();
+                    break;
+                case 'assert':
+                    messageStack.unshift(row.file);
+                    while (characterStack.length < messageStack.length) {
+                        log(messageStack[characterStack.length]);
+                        characterStack.push('|');
+                        logCharacterStack();
+                    }
+                    while (characterStack.length > messageStack.length)
+                        characterStack.pop();
+                    characterStack.push('-');
+                    log(' ' + row.name);
+                    characterStack.push('- ');
+                    handleAssertion(row);
+                    characterStack.pop();
+                    characterStack.pop();
+                    logCharacterStack();
+                    messageStack.shift();
+                    break;
+            }
+        }
+});
+
+process.argv.slice(2).forEach(function (file) {
+    require(path.resolve(file));
+});
+
