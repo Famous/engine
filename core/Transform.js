@@ -160,10 +160,10 @@ Transform.prototype.getWorldTransform = function getWorldTransform () {
  *
  * @return {undefined} undefined
  */
-Transform.prototype.from = function from (node) {
+Transform.prototype.calculate = function calculate (node) {
     if (!this.parent || this.parent.isBreakPoint())
-        return this.fromNode(node);
-    else return this.fromNodeWithParent(node);
+        return fromNode(node, this);
+    else return fromNodeWithParent(node, this);
 };
 
 /**
@@ -458,9 +458,7 @@ Transform.prototype.calculateWorldMatrix = function calculateWorldMatrix () {
 
 
 /**
- * Creates a transformation matrix from a Node's spec.
- *
- * @method fromSpec
+ * Private function. Creates a transformation matrix from a Node's spec.
  *
  * @param {Node.Spec} spec of the node
  * @param {Array} size of the node
@@ -469,11 +467,11 @@ Transform.prototype.calculateWorldMatrix = function calculateWorldMatrix () {
  *
  * @return {Boolean} whether or not the target array was changed
  */
-Transform.prototype.fromNode = function fromNode (node) {
-    var target = this.getLocalTransform();
+function fromNode (node, transform) {
+    var target = transform.getLocalTransform();
     var mySize = node.getSize();
-    var vectors = this.vectors;
-    var offsets = this.offsets;
+    var vectors = transform.vectors;
+    var offsets = transform.offsets;
     var parentSize = node.getParent().getSize();
     var changed = 0;
 
@@ -539,7 +537,7 @@ Transform.prototype.fromNode = function fromNode (node) {
                  (target[2] * originX + target[6] * originY + target[10] * originZ);
     target[15] = 1;
 
-    if (this.isBreakPoint() && this.calculateWorldMatrix())
+    if (transform.isBreakPoint() && transform.calculateWorldMatrix())
         changed |= Transform.WORLD_CHANGED;
 
     if (t00 !== target[0] ||
@@ -559,18 +557,19 @@ Transform.prototype.fromNode = function fromNode (node) {
 };
 
 /**
- * Uses the parent transform, the node's spec, the node's size, and the parent's size
+ * Private function. Uses the parent transform, the node's spec, the node's size, and the parent's size
  * to calculate a final transform for the node. Returns true if the transform has changed.
  *
+ * @private
  *
  * @return {Boolean} whether or not the transform changed
  */
-Transform.prototype.fromNodeWithParent = function fromNodeWithParent (node) {
-    var target = this.getLocalTransform();
-    var parentMatrix = this.parent.getLocalTransform();
+function fromNodeWithParent (node, transform) {
+    var target = transform.getLocalTransform();
+    var parentMatrix = transform.parent.getLocalTransform();
     var mySize = node.getSize();
-    var vectors = this.vectors;
-    var offsets = this.offsets;
+    var vectors = transform.vectors;
+    var offsets = transform.offsets;
     var parentSize = node.getParent().getSize();
     var changed = false;
 
@@ -660,7 +659,7 @@ Transform.prototype.fromNodeWithParent = function fromNodeWithParent (node) {
     target[14] = p02 * tx + p12 * ty + p22 * tz + p32;
     target[15] = 1;
 
-    if (this.isBreakPoint() && this.calculateWorldMatrix())
+    if (transform.isBreakPoint() && transform.calculateWorldMatrix())
         changed |= Transform.WORLD_CHANGED;
 
     if (t00 !== target[0] ||

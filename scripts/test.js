@@ -37,9 +37,11 @@ function handleAssertion (row) {
     log('operator is "' + row.operator + '"');
     switch (row.operator) {
         case 'equal': log('expected ' + row.expected + ' but received ' + row.actual); break;
-        case 'notOk': log('expected ' + row.expected + ' to be falsy'); break;
-        case 'ok': log('expected ' + row.expected + ' to be truthy'); break;
+        case 'notOk': log('expected ' + row.actual + ' to be falsy'); break;
+        case 'ok': log('expected ' + row.actual + ' to be truthy'); break;
         case 'notEqual': log('expected ' + row.expected + ' to not be equal to ' + row.actual); break;
+        case 'throws': log(row.actual); break;
+        case 'doesNotThrow': log(row.actual); break;
         default: throw new Error('operator: ' + row.operator + ' unknown');
     }
 }
