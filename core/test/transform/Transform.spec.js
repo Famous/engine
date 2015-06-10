@@ -5,6 +5,14 @@ var TransformStub = require('./Transform.stub');
 var NodeStub = require('../node/Node.stub');
 var sinon = require('sinon');
 
+
+function createTestNode () {
+    var node = new NodeStub();
+    node.getSize.returns([100, 100, 100]);
+    node.getParent.returns({ getSize: sinon.stub().returns([200, 200, 200]) });
+    return node;
+}
+
 test('Transform class', function (t) {
 
     t.test('Transform constructor' , function (t) {
@@ -175,7 +183,7 @@ test('Transform class', function (t) {
         transform.setBreakPoint();
 
         t.doesNotThrow(function () {
-            t.deepEqual(transform.getLocalTransform(), [1, 0, 0, 0,
+            t.deepEqual(transform.getWorldTransform(), [1, 0, 0, 0,
                                                         0, 1, 0, 0,
                                                         0, 0, 1, 0,
                                                         0, 0, 0, 1], 'transform.getWorldTransform should return' +
@@ -185,49 +193,88 @@ test('Transform class', function (t) {
         t.end();
     });
 
-    t.test('from method', function (t) {
+    t.test('calculate method', function (t) {
         var transform = new Transform();
 
-        transform.fromNode = sinon.spy();
-        transform.fromNodeWithParent = sinon.spy();
-
         t.doesNotThrow(function () {
-            transform.from( new NodeStub() );
-            t.notOk(transform.fromNodeWithParent.callCount, 'if transform doesn\'t have a parent then ' +
-                                                            'fromNodeWithParent should not be called');
-            t.ok(transform.fromNode.callCount, 'if transform doesn\'t have a parent then ' +
-                                               'fromNode should be called');
-        }, '.from should be callable');
-
-        transform.setParent(new TransformStub());
-
-        transform.from( new NodeStub() );
-
-        t.equal(transform.fromNodeWithParent.callCount, 1, 'if transform has a parent and that parent is not a breakpoint ' +
-                                                           ' fromNodeWithParent should be called');
-
-        t.equal(transform.fromNode.callCount, 1, 'if transform has a parent and that parent is not a breakpoint ' +
-                                                 'fromNode should not be called');
-
-        transform.getParent().isBreakPoint.returns(true);
-
-        transform.from( new NodeStub() );
-
-        t.equal(transform.fromNodeWithParent.callCount, 1, 'if transform has a parent and that parent is a breakpoint' +
-                                                           ' fromNodeWithParent should not be called');
-
-        t.equal(transform.fromNode.callCount, 2, 'if transform has a parent and that parent is a breakpoint ' +
-                                                 'fromNode should be called');
+            transform.calculate(createTestNode());
+            t.deepEqual(transform.getLocalTransform(), [1, 0, 0, 0,
+                                                        0, 1, 0, 0,
+                                                        0, 0, 1, 0,
+                                                        0, 0, 0, 1], 'transform.getLocalTransform should return' +
+                                                                     ' identity matrix with no vectors changed');
+        }, '.calculate should be callable');
 
         t.end();
     });
 
     t.test('setPosition method', function (t) {
+        var transform = new Transform();
+
+        t.doesNotThrow( function () {
+            transform.setPosition(0);
+            t.deepEqual(transform.getPosition(), [0, 0, 0], 'transform should not change from zero when a dimension is passed ' +
+                                                            'null, undefined, or zero');
+            transform.setPosition(0, 0);
+            t.deepEqual(transform.getPosition(), [0, 0, 0], 'transform should not change from zero when a dimension is passed ' +
+                                                            'null, undefined, or zero');
+            transform.setPosition(0, 0, 0);
+            t.deepEqual(transform.getPosition(), [0, 0, 0], 'transform should not change from zero when a dimension is passed ' +
+                                                            'null, undefined, or zero');
+            transform.setPosition(null, 0, 0);
+            t.deepEqual(transform.getPosition(), [0, 0, 0], 'transform should not change from zero when a dimension is passed ' +
+                                                            'null, undefined, or zero');
+            transform.setPosition(null, null, 0);
+            t.deepEqual(transform.getPosition(), [0, 0, 0], 'transform should not change from zero when a dimension is passed ' +
+                                                            'null, undefined, or zero');
+            transform.setPosition(null, null, null);
+            t.deepEqual(transform.getPosition(), [0, 0, 0], 'transform should not change from zero when a dimension is passed ' +
+                                                            'null, undefined, or zero');
+            transform.setPosition(null, 0);
+            t.deepEqual(transform.getPosition(), [0, 0, 0], 'transform should not change from zero when a dimension is passed ' +
+                                                            'null, undefined, or zero');
+
+            transform.setPosition(0, 1);
+
+            t.deepEqual(transform.getPosition(), [0, 1, 0], 'transform should set the value properly for the given dimension');
+
+        }, 'transform should be callable with any number of arguments');
+
+        transform.setPosition(1, 2, 3);
+
+        t.deepEqual(transform.getPosition(), [1, 2, 3], 'transform should set the values returned by getPosition');
+
+        transform.setPosition();
+
+        t.deepEqual(transform.getPosition(), [1,2,3], 'undefined arguments should not change the values stored');
+
+        transform.setPosition(null, null, null);
+
+        t.deepEqual(transform.getPosition(), [1,2,3], 'null arguments should not change the values stored');
+
+        transform.setPosition(0, 0, 0);
+
+        t.deepEqual(transform.getPosition(), [0, 0, 0], 'zero should successfully set the position back to zero');
+
+        var node = createTestNode();
+
+        transform.setPosition(3, 3, 3);
+
+        transform.calculate(node);
+
+        t.deepEqual(transform.getLocalTransform(), [1, 0, 0, 0,
+                                                    0, 1, 0, 0,
+                                                    0, 0, 1, 0,
+                                                    3, 3, 3, 1], 'position should change the ' +
+                                                                 'result of the calculated matrix');
+
 
         t.end();
     });
 
     t.test('setRotation method', function (t) {
+        
+        // todo
 
         t.end();
     });
@@ -253,16 +300,6 @@ test('Transform class', function (t) {
     });
 
     t.test('calculateWorldMatrix', function (t) {
-
-        t.end();
-    });
-
-    t.test('fromNode method', function (t) {
-
-        t.end();
-    });
-
-    t.test('fromNodeWithParent method', function (t) {
 
         t.end();
     });

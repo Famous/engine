@@ -6,7 +6,7 @@ module.exports = [
     'isBreakPoint',
     'getLocalTransform',
     'getWorldTransform',
-    'from',
+    'calculate',
     'getPosition',
     'setPosition',
     'getRotation',
@@ -19,7 +19,5 @@ module.exports = [
     'setMountPoint',
     'getOrigin',
     'setOrigin',
-    'calculateWorldMatrix',
-    'fromNode',
-    'fromNodeWithParent'
+    'calculateWorldMatrix'
 ];
