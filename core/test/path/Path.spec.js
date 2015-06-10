@@ -107,9 +107,10 @@ test('PathUtils', function (t) {
             });
         }).forEach(function (listOfIndecies) {
             var path = helpers.generateSelector() + '/' + listOfIndecies.join('/');
-            listOfIndecies.forEach(function (index, i) {
+            path.split('/').forEach(function (index, i) {
+                var result = PathUtils.indexAtDepth(path, i);
                 t.equal(
-                    PathUtils.indexAtDepth(path, i), index, 
+                    result, result.constructor === String ? index : parseInt(index), 
                     'the index of ' + path + ' at depth ' + i + ' should be ' + index
                 );
             });

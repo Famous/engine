@@ -96,14 +96,16 @@ PathUtils.prototype.index = function index (path) {
 PathUtils.prototype.indexAtDepth = function indexAtDepth (path, depth) {
     var i = 0;
     var len = path.length;
+    var index = 0;
     for (; i < len ; i++) {
-        if (!depth) {
-            var index = path.indexOf(i, '/');
-            var result = index === -1 ? path.substring(i) : path.substring(i, index);
-            var num = parseInt(result);
-            return isNaN(num) ? result : num;
+        if (path[i] === '/') index++;
+        if (index === depth) {
+            path = path.substring(i ? i + 1 : i);
+            index = path.indexOf('/');
+            path = index === -1 ? path : path.substring(0, index);
+            index = parseInt(path);
+            return isNaN(index) ? path : index;
         }
-        depth -= path[i] === '/' ? 1 : 0;
     }
 };
 
