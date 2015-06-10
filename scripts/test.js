@@ -23,6 +23,7 @@ function handleAssertion (row) {
     switch (row.operator) {
         case 'equal': log('expected ' + row.expected + ' but received ' + row.actual); break;
         case 'notOk': log('expected ' + row.expected + ' to be falsy'); break;
+        case 'ok': log('expected ' + row.expected + ' to be truthy'); break;
         default: throw new Error('operator: ' + row.operator + ' unknown');
     }
 }
@@ -86,8 +87,9 @@ test.createStream({objectMode: true}).on('data', function (row) {
 
                     logCharacterStack();
 
-                    loggedStack.pop();
-                    loggedStack.push(true);
+                    loggedStack = loggedStack.map(function () {
+                        return true;
+                    });
 
                     break;
             }
