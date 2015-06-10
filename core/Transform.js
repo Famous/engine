@@ -24,8 +24,6 @@
 
 'use strict';
 
-var pathUtils = require('./Path');
-
 var QUAT = [0, 0, 0, 1];
 var ONES = [1, 1, 1];
 
