@@ -215,6 +215,17 @@ function setVec (vec, x, y, z, w) {
 }
 
 /**
+ * Gets the position component of the transform
+ *
+ * @method
+ *
+ * @return {Float32Array} the position component of the transform
+ */
+Transform.prototype.getPosition = function getPosition () {
+    return this.vectors.position;
+};
+
+/**
  * Sets the position component of the transform.
  *
  * @method
@@ -227,6 +238,17 @@ function setVec (vec, x, y, z, w) {
  */
 Transform.prototype.setPosition = function setPosition (x, y, z) {
     this.vectors.positionChanged = setVec(this.vectors.position, x, y, z);
+};
+
+/**
+ * Gets the rotation component of the transform. Will return a quaternion.
+ *
+ * @method
+ *
+ * @return {Float32Array} the quaternion representation of the transform's rotation
+ */
+Transform.prototype.getRotation = function getRotation () {
+    return this.vectors.rotation;
 };
 
 /**
@@ -311,6 +333,17 @@ Transform.prototype.setRotation = function setRotation (x, y, z, w) {
 };
 
 /**
+ * Gets the scale component of the transform
+ *
+ * @method
+ *
+ * @return {Float32Array} the scale component of the transform
+ */
+Transform.prototype.getScale = function getScale () {
+    return this.vectors.scale;
+};
+
+/**
  * Sets the scale component of the transform.
  *
  * @method
@@ -323,6 +356,17 @@ Transform.prototype.setRotation = function setRotation (x, y, z, w) {
  */
 Transform.prototype.setScale = function setScale (x, y, z) {
     this.vectors.scaleChanged = setVec(this.vectors.scale, x, y, z);
+};
+
+/**
+ * Gets the align value of the transform
+ *
+ * @method
+ *
+ * @return {Float32Array} the align value of the transform
+ */
+Transform.prototype.getAlign = function getAlign () {
+    return this.offsets.align;
 };
 
 /**
@@ -341,6 +385,17 @@ Transform.prototype.setAlign = function setAlign (x, y, z) {
 };
 
 /**
+ * Gets the mount point value of the transform.
+ *
+ * @method
+ *
+ * @return {Float32Array} the mount point of the transform
+ */
+Transform.prototype.getMountPoint = function getMountPoint () {
+    return this.offsets.mountPoint;
+};
+
+/**
  * Sets the mount point value of the transform.
  *
  * @method
@@ -353,6 +408,17 @@ Transform.prototype.setAlign = function setAlign (x, y, z) {
  */
 Transform.prototype.setMountPoint = function setMountPoint (x, y, z) {
     this.offsets.mountPointChanged = setVec(this.offsets.mountPoint, x, y, z != null ? z - 0.5 : z);
+};
+
+/**
+ * Gets the origin of the transform.
+ *
+ * @method
+ *
+ * @return {Float32Array} the origin
+ */
+Transform.prototype.getOrigin = function getOrigin () {
+    return this.offsets.origin;
 };
 
 /**
