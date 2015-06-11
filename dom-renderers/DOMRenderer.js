@@ -85,7 +85,7 @@ function DOMRenderer (element, selector, compositor) {
     this.perspectiveTransform = new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
     this._VPtransform = new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
 
-    this._size = [null, null];
+    this._lastEv = null;
 }
 
 
@@ -104,16 +104,80 @@ function DOMRenderer (element, selector, compositor) {
  *
  * @return {undefined} undefined
  */
-DOMRenderer.prototype.subscribe = function subscribe(type, preventDefault) {
-    // TODO preventDefault should be a separate command
+DOMRenderer.prototype.subscribe = function subscribe(type) {
     this._assertTargetLoaded();
-
-    this._target.preventDefault[type] = preventDefault;
+    this._listen(type);
     this._target.subscribe[type] = true;
+};
+
+/**
+ * Unsubscribes from all events that are of the specified type.
+ *
+ * @method
+ *
+ * @param  {String} type    Event type to unsubscribe from.
+ * @return {undefined}      undefined
+ */
+DOMRenderer.prototype.unsubscribe = function unsubscribe(type) {
+    this._assertTargetLoaded();
+    this._listen(type);
+    this._target.subscribe[type] = false;
+};
+
+/**
+ * Used to preventDefault if an event of the specified type is being emitted on
+ * the currently loaded target.
+ *
+ * @method
+ *
+ * @param  {String} type    The type of events that should be prevented.
+ * @return {undefined}      undefined
+ */
+DOMRenderer.prototype.preventDefault = function preventDefault(type) {
+    this._assertTargetLoaded();
+    this._listen(type);
+    this._target.preventDefault[type] = true;
+};
+
+/**
+ * Used to undo a previous call to preventDefault. No longer `preventDefault`
+ * for this event on the loaded target.
+ *
+ * @method
+ * @private
+ *
+ * @param  {String} type    The event type that should no longer be affected by
+ *                          `preventDefault`.
+ * @return {undefined}      undefined
+ */
+DOMRenderer.prototype.allowDefault = function allowDefault(type) {
+    this._assertTargetLoaded();
+    this._listen(type);
+    this._target.preventDefault[type] = false;
+};
+
+/**
+ * Internal helper function used for adding an event listener for the the
+ * currently loaded ElementCache.
+ *
+ * If the event can be delegated as specified in the {@link EventMap}, the
+ * bound {@link _triggerEvent} function will be added as a listener on the
+ * root element. Otherwise, the listener will be added directly to the target
+ * element.
+ *
+ * @private
+ * @method
+ *
+ * @param  {String} type    The event type to listen to (e.g. click).
+ * @return {undefined}      undefined
+ */
+DOMRenderer.prototype._listen = function _listen(type) {
+    this._assertTargetLoaded();
 
     if (
         !this._target.listeners[type] && !this._root.listeners[type]
     ) {
+        // FIXME Add to content DIV if available
         var target = eventMap[type][1] ? this._root : this._target;
         target.listeners[type] = this._boundTriggerEvent;
         target.element.addEventListener(type, this._boundTriggerEvent);
@@ -132,6 +196,8 @@ DOMRenderer.prototype.subscribe = function subscribe(type, preventDefault) {
  * @return {undefined} undefined
  */
 DOMRenderer.prototype._triggerEvent = function _triggerEvent(ev) {
+    if (this._lastEv === ev) return;
+
     // Use ev.path, which is an array of Elements (polyfilled if needed).
     var evPath = ev.path ? ev.path : _getPath(ev);
     // First element in the path is the element on which the event has actually
@@ -143,17 +209,17 @@ DOMRenderer.prototype._triggerEvent = function _triggerEvent(ev) {
         var path = evPath[i].dataset.faPath;
         if (!path) continue;
 
+        // Optionally preventDefault. This needs forther consideration and
+        // should be optional. Eventually this should be a separate command/
+        // method.
+        if (this._elements[path].preventDefault[ev.type]) {
+            ev.preventDefault();
+        }
+
         // Stop further event propogation and path traversal as soon as the
         // first ElementCache subscribing for the emitted event has been found.
         if (this._elements[path] && this._elements[path].subscribe[ev.type]) {
-            ev.stopPropagation();
-
-            // Optionally preventDefault. This needs forther consideration and
-            // should be optional. Eventually this should be a separate command/
-            // method.
-            if (this._elements[path].preventDefault[ev.type]) {
-                ev.preventDefault();
-            }
+            this._lastEv = ev;
 
             var NormalizedEventConstructor = eventMap[ev.type][0];
 
@@ -196,24 +262,6 @@ function _getPath(ev) {
     }
     return path;
 }
-
-
-/**
- * Determines the size of the context by querying the DOM for `offsetWidth` and
- * `offsetHeight`.
- *
- * @method
- *
- * @return {Array} Offset size.
- */
-DOMRenderer.prototype.getSize = function getSize() {
-    this._size[0] = this._root.element.offsetWidth;
-    this._size[1] = this._root.element.offsetHeight;
-    return this._size;
-};
-
-DOMRenderer.prototype._getSize = DOMRenderer.prototype.getSize;
-
 
 /**
  * Executes the retrieved draw commands. Draw commands only refer to the
@@ -420,6 +468,12 @@ DOMRenderer.prototype.insertEl = function insertEl (tagName) {
         this._assertParentLoaded();
         this._assertChildrenLoaded();
 
+        if (this._parent.void)
+            throw new Error(
+                this._parent.path + ' is a void element. ' +
+                'Void elements are not allowed to have children.'
+            );
+
         if (this._target) this._parent.element.removeChild(this._target.element);
 
         this._target = new ElementCache(document.createElement(tagName), this._path);
@@ -558,15 +612,21 @@ DOMRenderer.prototype.setContent = function setContent(content) {
     this._assertTargetLoaded();
     this.findChildren();
 
-    if (!this._target.content) {
-        this._target.content = document.createElement('div');
-        this._target.content.classList.add('famous-dom-element-content');
-        this._target.element.insertBefore(
-            this._target.content,
-            this._target.element.firstChild
-        );
+    if (this._target.formElement) {
+        this._target.element.value = content;
     }
-    this._target.content.innerHTML = content;
+    else {
+        if (!this._target.content) {
+            this._target.content = document.createElement('div');
+            this._target.content.classList.add('famous-dom-element-content');
+            this._target.element.insertBefore(
+                this._target.content,
+                this._target.element.firstChild
+            );
+        }
+        this._target.content.innerHTML = content;
+    }
+
 
     this.setSize(
         this._target.explicitWidth ? false : this._target.size[0],

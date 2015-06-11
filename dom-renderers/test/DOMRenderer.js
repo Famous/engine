@@ -28,7 +28,7 @@ var test = require('tape');
 var DOMRenderer = require('../DOMRenderer');
 
 /**
- * Helpers method used for creating a mock compostior that fails on received
+ * Helpers method used for creating a mock compositor that fails on received
  * events. Used for ensuring that certain DOMRenderer methods don't (directly
  * or indirectly) trigger DOM events.
  *
@@ -36,7 +36,7 @@ var DOMRenderer = require('../DOMRenderer');
  * @private
  *
  * @param  {tape} t tape-test object
- * @return {Object} mock compostior
+ * @return {Object} mock compositor
  */
 function createUnidirectionalCompositor(t) {
     return {
@@ -47,7 +47,7 @@ function createUnidirectionalCompositor(t) {
 }
 
 test('DOMRenderer', function(t) {
-    t.test('basic DOM insertions', function(t) {
+    t.test('basic insertEl', function(t) {
         var element = document.createElement('div');
         var selector = 'selector';
         element.classList.add(selector);
@@ -92,6 +92,27 @@ test('DOMRenderer', function(t) {
 
         t.equal(element.children[1].children[0].children[0].tagName, 'SECTION', 'injecting a SECTION between a parent and a child node');
         t.equal(element.children[1].children[0].children[0].children[0].tagName, 'DIV', 'original child should not become child of injected node');
+
+        t.end();
+    });
+
+    t.test('insertEl with content', function(t) {
+        var element = document.createElement('div');
+        var selector = 'selector';
+        var compositor = createUnidirectionalCompositor();
+        var domRenderer = new DOMRenderer(element, selector, compositor);
+
+        domRenderer.loadPath('selector/0/0/1');
+        domRenderer.findTarget();
+        domRenderer.insertEl('div');
+
+        t.equal(element.children.length, 1, 'domRenderer.insertEl should create a single DIV when no content is being set');
+        t.equal(element.children[0].children.length, 0, 'domRenderer.insertEl should not create a separate content DIV by default');
+
+        var content001 = 'hello world 1';
+        domRenderer.setContent(content001);
+        t.equal(element.children[0].children.length, 1, 'domRenderer.insertEl should wrap content in DIV');
+        t.equal(element.children[0].children[0].innerHTML, 'hello world 1', 'domRenderer.insertEl should wrap content in DIV');
 
         t.end();
     });
@@ -263,6 +284,105 @@ test('DOMRenderer', function(t) {
         t.notDeepEqual(domRenderer.getSize(), [0, 0]);
 
         document.body.removeChild(element);
+
+        t.end();
+    });
+
+    t.test('_triggerEvent method', function(t) {
+        var element = document.createElement('div');
+        var selector = 'selector';
+        var sentEvents = [];
+
+        var compositor = {
+            sendEvent: function (path, ev, payload) {
+                sentEvents.push([path, ev, payload]);
+            }
+        };
+
+        var domRenderer = new DOMRenderer(element, selector, compositor);
+
+        domRenderer.loadPath(selector + '/' + 0);
+        domRenderer.findTarget();
+        domRenderer.insertEl('div');
+
+        domRenderer.loadPath(selector + '/' + 0 + '/' + 1);
+        domRenderer.findTarget();
+        domRenderer.insertEl('div');
+
+        domRenderer.subscribe('click');
+
+        domRenderer.loadPath(selector + '/' + 0 + '/' + 1 + '/' + 0);
+        domRenderer.findTarget();
+        domRenderer.insertEl('div');
+
+        domRenderer.subscribe('click');
+
+        var ev1 = {
+            type: 'click',
+            target: {},
+            path: [
+                { dataset: { faPath: selector + '/' + 0 + '/' + 1 + '/' + 0 } },
+                { dataset: { faPath: selector + '/' + 0 + '/' + 1 } },
+                { dataset: { faPath: selector + '/' + 0 } }
+            ],
+            stopPropagation: function() {
+                t.fail('domRenderer._triggerEvent should not stopPropagation of DOM event');
+            }
+        };
+
+        domRenderer._triggerEvent(ev1);
+
+        t.deepEqual(
+            sentEvents[0].slice(0, 2),
+            [ selector + '/' + 0 + '/' + 1 + '/' + 0, ev1.type ],
+            'domRenderer._triggerEvent should emit correct event on leaf node'
+        );
+
+        sentEvents.length = 0;
+
+        domRenderer._triggerEvent(ev1);
+
+        t.equal(sentEvents.length, 0, 'domRenderer._triggerEvent should not emit same event multiple times in a row');
+
+        t.end();
+    });
+
+    t.test('Man in the middle insertion', function(t) {
+        var element = document.createElement('div');
+        var selector = 'selector';
+        var compositor = createUnidirectionalCompositor();
+        var domRenderer = new DOMRenderer(element, selector, compositor);
+
+        domRenderer.loadPath('selector/0/0/1');
+        domRenderer.findTarget();
+        domRenderer.insertEl('div');
+
+        t.equal(element.children.length, 1, 'domRenderer.insertEl should create a single DIV when no content is being set');
+        t.equal(element.children[0].children.length, 0, 'domRenderer.insertEl should not create a separate content DIV by default');
+
+        domRenderer.loadPath('selector/0');
+        domRenderer.findTarget();
+        domRenderer.insertEl('section');
+
+        t.equal(element.children.length, 1, 'domRenderer.insertEl should insert second element in between root element and leaf node');
+        t.equal(element.children[0].tagName.toUpperCase(), 'SECTION', 'domRenderer.insertEl should insert using correct tagName');
+
+        t.equal(element.children[0].children.length, 1, 'domRenderer.insertEl should insert new element in between that has the previous leaf node as a child');
+        t.equal(element.children[0].children[0].tagName.toUpperCase(), 'DIV', 'domRenderer.insertEl should preserve tagName of previously inserted leaf node');
+
+        domRenderer.loadPath('selector/0/1');
+        domRenderer.findTarget();
+        domRenderer.insertEl('span');
+
+        t.equal(element.children[0].children.length, 2, 'domRenderer.insertEl should insert sibling');
+        t.equal(element.children[0].children[1].tagName.toUpperCase(), 'SPAN', 'domRenderer.insertEl should insert sibling using correct tagName');
+        t.equal(element.children[0].children[1].children.length, 0, 'domRenderer.insertEl should insert sibling as leaf node');
+
+        domRenderer.loadPath('selector/0');
+        domRenderer.findTarget();
+        domRenderer.setContent('hello world');
+
+        t.equal(element.children[0].children.length, 3, 'domRenderer.insertEl should preserve correct DOM nesting when wrapping content');
 
         t.end();
     });

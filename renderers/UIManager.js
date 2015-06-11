@@ -113,10 +113,24 @@ UIManager.prototype.getCompositor = function getCompositor() {
  * Returns the engine being used by this UIManager.
  *
  * @method
+ * @deprecated Use {@link UIManager#getRenderLoop instead!}
  *
  * @return {Engine} The engine used by the UIManager.
  */
 UIManager.prototype.getEngine = function getEngine() {
+    return this._renderLoop;
+};
+
+
+/**
+ * Returns the render loop currently being used by the UIManager.
+ *
+ * @method
+ *
+ * @return {RenderLoop}  The registered render loop used for updating the
+ * UIManager.
+ */
+UIManager.prototype.getRenderLoop = function getRenderLoop() {
     return this._renderLoop;
 };
 
