@@ -26,10 +26,9 @@
 
 var glslify = require('glslify');
 
-var shaders = glslify({
-	sourceOnly: true,
-	vertex: './VertexShader.glsl',
-	fragment: './FragmentShader.glsl'
-});
+var shaders = {
+	  vertex: glslify('./VertexShader.glsl'),
+	  fragment: glslify('./FragmentShader.glsl')
+};
 
 module.exports = shaders;

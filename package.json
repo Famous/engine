@@ -40,7 +40,7 @@
     "uglify-js": "^2.4.17"
   },
   "dependencies": {
-    "glslify": "^1.6.0"
+    "glslify": "^2.0.0"
   },
   "browserify": {
     "transform": [
