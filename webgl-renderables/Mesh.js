@@ -40,7 +40,7 @@ var Geometry = require('../webgl-geometries');
  * @return {undefined} undefined
  */
 
-var inputs = ['baseColor', 'normals', 'glossiness', 'positionOffset'];
+var INPUTS = ['baseColor', 'normals', 'glossiness', 'positionOffset'];
 
 function Mesh (node, options) {
     this._node = node;
@@ -411,14 +411,17 @@ Mesh.prototype.getValue = function getValue () {
 Mesh.prototype._pushInvalidations = function _pushInvalidations (expressionName) {
     var uniformKey;
     var expression = this.value.expressions[expressionName];
+    var sender = this._node;
     if (expression) {
-        var i = expression.invalidations.length;
-        while (i--) {
-            uniformKey = expression.invalidations.pop();
-            this._node.sendDrawCommand('GL_UNIFORMS');
-            this._node.sendDrawCommand(uniformKey);
-            this._node.sendDrawCommand(expression.uniforms[uniformKey]);
-        }
+        expression.traverse(function (node) {
+            var i = node.invalidations.length;
+            while (i--) {
+                uniformKey = node.invalidations.pop();
+                sender.sendDrawCommand('GL_UNIFORMS');
+                sender.sendDrawCommand(uniformKey);
+                sender.sendDrawCommand(node.uniforms[uniformKey]);
+            }
+        });
     }
     return this;
 };
@@ -664,14 +667,20 @@ function addMeshToMaterial(mesh, material, name) {
     var expressions = mesh.value.expressions;
     var previous = expressions[name];
     var shouldRemove = true;
+    var i;
 
-    for (var i = 0; i < inputs.length; i++) {
-        if (name !== inputs[i] && previous !== expressions[inputs[i]])
+    for (i = 0; i < material.inputs.length; i++) {
+        addMeshToMaterial(mesh, material.inputs[i], name);
+        
+    }
+
+    for (i = 0; i < INPUTS.length; i++) {
+        if (name !== INPUTS[i] && previous !== expressions[INPUTS[i]])
             shouldRemove = false;
     }
 
     if (shouldRemove) material.meshes.splice(material.meshes.indexOf(previous), 1);
-        
+         
     if (material.meshes.indexOf(mesh) === -1)
         material.meshes.push(mesh);
 }

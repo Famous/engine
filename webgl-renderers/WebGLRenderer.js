@@ -107,7 +107,7 @@ function WebGLRenderer(canvas, compositor) {
     };
 
     this.resolutionName = ['u_resolution'];
-    this.resolutionValues = [];
+    this.resolutionValues = [0, 0];
 
     this.cachedSize = [];
 
@@ -161,6 +161,8 @@ WebGLRenderer.prototype.getWebGLContext = function getWebGLContext(canvas) {
             break;
         }
     }
+
+    canvas.style.pointerEvents = 'none';
     return context ? context : false;
 };
 

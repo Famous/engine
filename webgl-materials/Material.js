@@ -210,3 +210,16 @@ expressions.Texture = function (source) {
 expressions.Custom = function (schema, inputs, uniforms) {
     return new Material('custom', {glsl: schema, output: 1, uniforms: uniforms || {}} , inputs);
 };
+
+// Recursively iterates over a material's inputs, invoking a given callback
+// with the current material
+Material.prototype.traverse = function traverse(callback) {
+	var inputs = this.inputs;
+    var len = inputs && inputs.length;
+    var idx = -1;
+
+    while (++idx < len) inputs[idx].traverse(callback);
+
+    callback(this);
+};
+
