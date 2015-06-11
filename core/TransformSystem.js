@@ -47,16 +47,20 @@ function TransformSystem () {
  * @return {void}
  *
  * @param {String} path for the transform to be registered to.
+ * @param {Transform | undefined} an optional transform to register.
  */
-TransformSystem.prototype.registerTransformAtPath = function registerTransformAtPath (path) {
-    if (!PathUtils.depth(path)) return this.pathStore.insert(path, new Transform());
+TransformSystem.prototype.registerTransformAtPath = function registerTransformAtPath (path, transform) {
+    if (!PathUtils.depth(path)) return this.pathStore.insert(path, transform ? transform : new Transform());
 
     var parent = this.pathStore.get(PathUtils.parent(path));
 
     if (!parent) throw new Error(
             'No parent transform registered at expected path: ' + PathUtils.parent(path)
     );
-    this.pathStore.insert(path, new Transform(parent));
+
+    if (transform) transform.setParent(parent);
+
+    this.pathStore.insert(path, transform ? transform : new Transform(parent));
 };
 
 /**

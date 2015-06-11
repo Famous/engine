@@ -29,12 +29,29 @@ var Size = require('./Size');
 var Dispatch = require('./Dispatch');
 var PathUtils = require('./Path');
 
+/**
+ * The size system is used to calculate size throughout the scene graph.
+ * It holds size components and operates upon them.
+ *
+ * @constructor
+ */
 function SizeSystem () {
     this.pathStore = new PathStore();
 }
 
-SizeSystem.prototype.registerSizeAtPath = function registerSizeAtPath (path) {
-    if (!PathUtils.depth(path)) return this.pathStore.insert(path, new Size());
+/**
+ * Registers a size component to a give path. A size component can be passed as the second argument
+ * or a default one will be created. Throws if no size component has been added at the parent path.
+ *
+ * @method
+ *
+ * @param {String} path The path at which to register the size component
+ * @param {Size | undefined} size The size component to be registered or undefined.
+ *
+ * @return {undefined} undefined
+ */
+SizeSystem.prototype.registerSizeAtPath = function registerSizeAtPath (path, size) {
+    if (!PathUtils.depth(path)) return this.pathStore.insert(path, size ? size : new Size());
 
     var parent = this.pathStore.get(PathUtils.parent(path));
 
@@ -42,17 +59,46 @@ SizeSystem.prototype.registerSizeAtPath = function registerSizeAtPath (path) {
             'No parent size registered at expected path: ' + PathUtils.parent(path)
     );
 
-    this.pathStore.insert(path, new Size(parent));
+    if (size) size.setParent(parent);
+
+    this.pathStore.insert(path, size ? size : new Size(parent));
 };
 
+/**
+ * Removes the size component from the given path. Will throw if no component is at that
+ * path
+ *
+ * @method
+ *
+ * @param {String} path The path at which to remove the size.
+ *
+ * @return {undefined} undefined
+ */
 SizeSystem.prototype.deregisterSizeAtPath = function deregisterSizeAtPath(path) {
     this.pathStore.remove(path);
 };
 
+/**
+ * Returns the size component stored at a given path. Returns undefined if no
+ * size component is registered to that path.
+ *
+ * @method
+ *
+ * @param {String} path The path at which to get the size component.
+ *
+ * @return {undefined} undefined
+ */
 SizeSystem.prototype.get = function get (path) {
     return this.pathStore.get(path);
 };
 
+/**
+ * Updates the sizes in the scene graph. Called internally by the famous engine.
+ *
+ * @method
+ *
+ * @return {undefined} undefined
+ */
 SizeSystem.prototype.update = function update () {
     var sizes = this.pathStore.getItems();
     var paths = this.pathStore.getPaths();
@@ -76,6 +122,18 @@ SizeSystem.prototype.update = function update () {
     }
 };
 
+// private methods
+
+/**
+ * Private method to alert the node and components that size mode changed.
+ *
+ * @method
+ * @private
+ *
+ * @param {Node} node Node to potentially call sizeModeChanged on
+ * @param {Array} components a list of the nodes' components
+ * @param {Size} the size component
+ */
 function sizeModeChanged (node, components, size) {
     var sizeMode = size.getSizeMode();
     var x = sizeMode[0];
@@ -87,7 +145,17 @@ function sizeModeChanged (node, components, size) {
             components[i].onSizeModeChange(x, y, z);
     size.sizeModeChanged = false;
 }
-    
+
+/**
+ * Private method to alert the node and components that absoluteSize changed.
+ *
+ * @method
+ * @private
+ *
+ * @param {Node} node Node to potentially call onAbsoluteSizeChange on
+ * @param {Array} components a list of the nodes' components
+ * @param {Size} the size component
+ */   
 function absoluteSizeChanged (node, components, size) {
     var absoluteSize = size.getAbsoluteSize();
     var x = absoluteSize[0];
@@ -100,6 +168,16 @@ function absoluteSizeChanged (node, components, size) {
     size.absoluteSizeChanged = false;
 }
 
+/**
+ * Private method to alert the node and components that the proportional size changed.
+ *
+ * @method
+ * @private
+ *
+ * @param {Node} node Node to potentially call onProportionalSizeChange on
+ * @param {Array} components a list of the nodes' components
+ * @param {Size} the size component
+ */
 function proportionalSizeChanged (node, components, size) {
     var proportionalSize = size.getProportionalSize();
     var x = proportionalSize[0];
@@ -112,6 +190,16 @@ function proportionalSizeChanged (node, components, size) {
     size.proportionalSizeChanged = false;
 }
 
+/**
+ * Private method to alert the node and components that differential size changed.
+ *
+ * @method
+ * @private
+ *
+ * @param {Node} node Node to potentially call onDifferentialSize on
+ * @param {Array} components a list of the nodes' components
+ * @param {Size} the size component
+ */
 function differentialSizeChanged (node, components, size) {
     var differentialSize = size.getDifferentialSize();
     var x = differentialSize[0];
@@ -124,6 +212,16 @@ function differentialSizeChanged (node, components, size) {
     size.differentialSizeChanged = false;
 }
 
+/**
+ * Private method to alert the node and components that render size changed.
+ *
+ * @method
+ * @private
+ *
+ * @param {Node} node Node to potentially call onRenderSizeChange on
+ * @param {Array} components a list of the nodes' components
+ * @param {Size} the size component
+ */
 function renderSizeChanged (node, components, size) {
     var renderSize = size.getRenderSize();
     var x = renderSize[0];
@@ -136,6 +234,16 @@ function renderSizeChanged (node, components, size) {
     size.renderSizeChanged = false;
 }
 
+/**
+ * Private method to alert the node and components that the size changed.
+ *
+ * @method
+ * @private
+ *
+ * @param {Node} node Node to potentially call onSizeChange on
+ * @param {Array} components a list of the nodes' components
+ * @param {Size} the size component
+ */
 function sizeChanged (node, components, size) {
     var finalSize = size.get();
     var x = finalSize[0];
