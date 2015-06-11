@@ -144,24 +144,26 @@ function WebGLRenderer(canvas, compositor) {
  *
  * @param {Object} canvas Canvas element from which the context is retreived
  *
- * @return {Object} WebGLContext of canvas element
+ * @return {Object} WebGLContext WebGL context
  */
 WebGLRenderer.prototype.getWebGLContext = function getWebGLContext(canvas) {
     var names = ['webgl', 'experimental-webgl', 'webkit-3d', 'moz-webgl'];
-    var context = null;
-    for (var i = 0; i < names.length; i++) {
+    var context;
+
+    for (var i = 0, len = names.length; i < len; i++) {
         try {
             context = canvas.getContext(names[i]);
         }
         catch (error) {
-            var msg = 'Error creating WebGL context: ' + error.prototype.toString();
-            console.error(msg);
+            console.error('Error creating WebGL context: ' + error.toString());
         }
-        if (context) {
-            break;
-        }
+        if (context) return context;
     }
-    return context ? context : false;
+
+    if (!context) {
+        console.error('Could not retrieve WebGL context. Please refer to https://www.khronos.org/webgl/ for requirements');
+        return false;
+    }
 };
 
 /**
@@ -810,13 +812,14 @@ WebGLRenderer.prototype.handleOptions = function handleOptions(options, mesh) {
     var gl = this.gl;
     if (!options) return;
 
+    if (options.blending) gl.enable(gl.BLEND);
+
     if (options.side === 'double') {
         this.gl.cullFace(this.gl.FRONT);
         this.drawBuffers(this.bufferRegistry.registry[mesh.geometry], mesh.drawType, mesh.geometry);
         this.gl.cullFace(this.gl.BACK);
     }
 
-    if (options.blending) gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
     if (options.side === 'back') gl.cullFace(gl.FRONT);
 };
 
@@ -832,7 +835,7 @@ WebGLRenderer.prototype.handleOptions = function handleOptions(options, mesh) {
 WebGLRenderer.prototype.resetOptions = function resetOptions(options) {
     var gl = this.gl;
     if (!options) return;
-    if (options.blending) gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+    if (options.blending) gl.disable(gl.BLEND);
     if (options.side === 'back') gl.cullFace(gl.BACK);
 };
 

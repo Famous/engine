@@ -46,7 +46,7 @@ function Mesh (node, options) {
     this._requestingUpdate = false;
     this._inDraw = false;
     this.value = {
-        drawOptions: {},
+        drawOptions: null,
         color: null,
         expressions: {},
         geometry: null,
@@ -72,6 +72,8 @@ function Mesh (node, options) {
 Mesh.prototype.setDrawOptions = function setDrawOptions (options) {
     this._changeQueue.push('GL_SET_DRAW_OPTIONS');
     this._changeQueue.push(options);
+
+    this.value.drawOptions = options;
     return this;
 };
 
