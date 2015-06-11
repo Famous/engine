@@ -50,36 +50,8 @@ function Dispatch () {
                       //    traversal of the scene graph.
 }
 
-/**
- * Associates a node with a path. Commands issued to this path will be sent to the
- * registered node. Throws if there is already a node registered at that path.
- *
- * @method registerNodeAtPath
- * @return {void}
- *
- * @param {String} path to register the node to.
- * @param {Node} node to register at that path.
- */
-Dispatch.prototype.registerNodeAtPath = function registerNodeAtPath (path, node) {
-    if (this._nodes[path]) throw new Error('Node already defined at path: ' + path);
-    this._nodes[path] = node;
-    this.mount(path);
-};
-
-/**
- * Ends the association between a node and a path name. Messages sent to that path
- * while there is no node associated with it will throw errors. If the given node
- * is not currently registered to that path, an error is thrown.
- *
- * @method deregisterNodeAtPath
- * @return {void}
- *
- * @param {String} path to remove the node from.
- * @param {Node} node to remove.
- */
-Dispatch.prototype.deregisterNodeAtPath = function deregisterNodeAtPath (path, node) {
-    if (this._nodes[path] !== node) throw new Error('Node is not registered at this path: ' + path);
-    this.dismount(path);
+Dispatch.prototype._setUpdater = function _setUpdater (updater) {
+    this._updater = updater;
 };
 
 /**
@@ -136,17 +108,18 @@ Dispatch.prototype.breadthFirstNext = function breadthFirstNext () {
  *
  * @param {String} path at which to begin mounting
  */
-Dispatch.prototype.mount = function mount (path) {
-    var node = this._nodes[path];
+Dispatch.prototype.mount = function mount (path, node) {
+    if (!node) throw new Error('Dispatch: no node passed to mount at: ' + path);
+    if (this._nodes[path])
+        throw new Error('Dispatch: there is a node already registered at: ' + path);
+
+    node._setUpdater(this._updater);
+    this._nodes[path] = node;
     var parentPath = PathUtils.parent(path);
 
     // scenes are their own parents
     var parent = !parentPath ? node : this._nodes[parentPath];
 
-    if (!node)
-        throw new Error(
-                'No node registered to path: ' + path
-        );
     if (!parent)
         throw new Error(
                 'Parent to path: ' + path +
@@ -155,19 +128,29 @@ Dispatch.prototype.mount = function mount (path) {
 
     var children = node.getChildren();
     var components = node.getComponents();
-
-    if (node.onMount) node.onMount(path);
-
     var i;
     var len;
 
-    for (i = 0, len = components.length ; i < len ; i++)
-        if (components[i] && components[i].onMount)
-            components[i].onMount(path);
+    if (parent.isMounted()) {
+        node._setMounted(true, path);
+        node._setParent(parent);
+        if (node.onMount) node.onMount(path);
 
-    for (i = 0, len = children.length ; i < len ; i++)
-        if (!children[i].isMounted())
-            children[i].mount(path + '/' + i);
+        for (i = 0, len = components.length ; i < len ; i++)
+            if (components[i] && components[i].onMount)
+                components[i].onMount(path);
+
+        for (i = 0, len = children.length ; i < len ; i++)
+            if (children[i]) this.mount(path + '/' + i, children[i]);
+    }
+
+    if (parent.isShown()) {
+        node._setShown(true);
+        if (node.onShow) node.onShow();
+        for (i = 0, len = components.length ; i < len ; i++)
+            if (components[i] && components[i].onShow)
+                components[i].onShow();
+    }
 };
 
 /**
@@ -189,6 +172,28 @@ Dispatch.prototype.dismount = function dismount (path) {
         );
 
     var children = node.getChildren();
+    var components = node.getComponents();
+
+    if (node.isShown()) {
+        node._setShown(false);
+        if (node.onHide) node.onHide();
+        for (i = 0, len = components.length ; i < len ; i++)
+            if (components[i] && components[i].onHide)
+                components[i].onHide();
+    }
+
+    if (node.isMounted()) {
+        node._setMounted(false);
+        node._setParent(null);
+        if (node.onDismount) node.onDismount(path);
+
+        for (i = 0, len = children.length ; i < len ; i++)
+            if (children[i]) this.dismount(path + '/' + i);
+
+        for (i = 0, len = components.length ; i < len ; i++)
+            if (components[i] && components[i].onDismount)
+                components[i].onDismount(path);
+    }
 
     for (var i = 0, len = children.length ; i < len ; i++)
         this.deregisterNodeAtPath(children[i], path + '/' + i);

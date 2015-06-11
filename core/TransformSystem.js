@@ -135,7 +135,7 @@ TransformSystem.prototype.onUpdate = function onUpdate () {
         if (vectors.positionChanged) positionChanged(node, components, vectors);
         if (vectors.rotationChanged) rotationChanged(node, components, vectors);
         if (vectors.scaleChanged) scaleChanged(node, components, vectors);
-        if ((changed = transform.from(node))) {
+        if ((changed = transform.calculate(node))) {
             transformChanged(node, components, transform);
             if (changed & Transform.LOCAL_CHANGED) localTransformChanged(node, components, transform.getLocalTransform());
             if (changed & Transform.WORLD_CHANGED) worldTransformChanged(node, components, transform.getWorldTransform());

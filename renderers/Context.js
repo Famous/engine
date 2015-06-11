@@ -104,7 +104,7 @@ Context.prototype.updateSize = function () {
     var newSize = this.getRootSize();
     this._compositor.sendResize(this._selector, newSize);
 
-    if (this.canvas && this.WebGLRenderer) {
+    if (this._canvasEl && this.WebGLRenderer) {
         this.WebGLRenderer.updateSize(newSize);
     }
 

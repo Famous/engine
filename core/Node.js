@@ -74,6 +74,7 @@ function Node () {
     this._inUpdate = false;
     this._mounted = false;
     this._shown = false;
+    this._updater = null;
     this._opacity = 1;
     this._UIEvents = [];
 
@@ -87,7 +88,6 @@ function Node () {
     this._children = [];
 
     this._parent = null;
-    this._globalUpdater = null;
 
     this._id = null;
 }
@@ -96,6 +96,23 @@ Node.RELATIVE_SIZE = 0;
 Node.ABSOLUTE_SIZE = 1;
 Node.RENDER_SIZE = 2;
 Node.DEFAULT_SIZE = 0;
+
+Node.prototype._setParent = function _setParent (parent) {
+    this._parent = parent;
+};
+
+Node.prototype._setMounted = function _setMounted (mounted, path) {
+    this._mounted = mounted;
+    this._id = path ? path : null;
+};
+
+Node.prototype._setShown = function _setShown (shown) {
+    this._shown = shown;
+};
+
+Node.prototype._setUpdater = function _setUpdater (updater) {
+    this._updater = updater;
+};
 
 /**
  * Determine the node's location in the scene graph hierarchy.
@@ -138,7 +155,7 @@ Node.prototype.emit = function emit (event, payload) {
 
 // THIS WILL BE DEPRECATED
 Node.prototype.sendDrawCommand = function sendDrawCommand (message) {
-    this._globalUpdater.message(message);
+    this._updater.message(message);
     return this;
 };
 
@@ -192,23 +209,23 @@ Node.prototype.getValue = function getValue () {
         var size = SizeSystem.get(this.getId());
 
         for (i = 0 ; i < 3 ; i++) {
-            value.offsets.mountPoint[i] = transform.offsets.mountPoint[i];
-            value.offsets.align[i] = transform.offsets.align[i];
-            value.offsets.origin[i] = transform.offsets.origin[i];
-            value.vectors.position[i] = transform.vectors.position[i];
-            value.vectors.rotation[i] = transform.vectors.rotation[i];
-            value.vectors.scale[i] = transform.vectors.scale[i];
-            value.size.sizeMode[i] = size.sizeMode[i];
-            value.size.proportional[i] = size.proportionalSize[i];
-            value.size.differential[i] = size.differentialSize[i];
-            value.size.absolute[i] = size.absoluteSize[i];
-            value.size.render[i] = size.renderSize[i];
+            value.spec.offsets.mountPoint[i] = transform.offsets.mountPoint[i];
+            value.spec.offsets.align[i] = transform.offsets.align[i];
+            value.spec.offsets.origin[i] = transform.offsets.origin[i];
+            value.spec.vectors.position[i] = transform.vectors.position[i];
+            value.spec.vectors.rotation[i] = transform.vectors.rotation[i];
+            value.spec.vectors.scale[i] = transform.vectors.scale[i];
+            value.spec.size.sizeMode[i] = size.sizeMode[i];
+            value.spec.size.proportional[i] = size.proportionalSize[i];
+            value.spec.size.differential[i] = size.differentialSize[i];
+            value.spec.size.absolute[i] = size.absoluteSize[i];
+            value.spec.size.render[i] = size.renderSize[i];
         }
 
-        value.vectors.rotation[3] = transform.vectors.rotation[3];
+        value.spec.vectors.rotation[3] = transform.vectors.rotation[3];
     }
 
-    for (; i < numberOfChildren ; i++)
+    for (i = 0; i < numberOfChildren ; i++)
         if (this._children[i] && this._children[i].getValue)
             value.children.push(this._children[i].getValue());
 
@@ -312,17 +329,6 @@ Node.prototype.requestUpdate = function requestUpdate (requester) {
 Node.prototype.requestUpdateOnNextTick = function requestUpdateOnNextTick (requester) {
     this._nextUpdateQueue.push(requester);
     return this;
-};
-
-/**
- * Get the object responsible for updating this node.
- *
- * @method
- *
- * @return {Object} The global updater.
- */
-Node.prototype.getUpdater = function getUpdater () {
-    return this._globalUpdater;
 };
 
 /**
@@ -565,7 +571,7 @@ Node.prototype.removeChild = function removeChild (child) {
 
         this._children[index] = null;
 
-        child.dismount();
+        Dispatch.dismount(this.getLocation() + '/' + index);
 
         return true;
     } else throw new Error('Node is not a child of this node');
@@ -671,8 +677,8 @@ Node.prototype.addUIEvent = function addUIEvent (eventName) {
  * @return {undefined} undefined
  */
 Node.prototype._requestUpdate = function _requestUpdate (force) {
-    if (force || (!this._requestingUpdate && this._globalUpdater)) {
-        this._globalUpdater.requestUpdate(this);
+    if (force || !this._requestingUpdate) {
+        this._updater.requestUpdate(this);
         this._requestingUpdate = true;
     }
 };
@@ -955,7 +961,7 @@ Node.prototype.setAbsoluteSize = function setAbsoluteSize (x, y, z) {
  * @return {Number} current frame
  */
 Node.prototype.getFrame = function getFrame () {
-    return this._globalUpdater.getFrame();
+    return this._updater.getFrame();
 };
 
 /**
@@ -1002,10 +1008,9 @@ Node.prototype.update = function update (time){
         // last update
         this._parent = null;
         this._id = null;
-        this._globalUpdater = null;
     }
     else if (this._nextUpdateQueue.length) {
-        this._globalUpdater.requestUpdateOnNextTick(this);
+        this._updater.requestUpdateOnNextTick(this);
         this._requestingUpdate = true;
     }
     return this;
@@ -1025,15 +1030,9 @@ Node.prototype.mount = function mount (path) {
     if (this.isMounted())
         throw new Error('Node is already mounted at: ' + this.getLocation());
 
-    Dispatch.registerNodeAtPath(path, this);
+    Dispatch.mount(path, this);
     TransformSystem.registerTransformAtPath(path);
     SizeSystem.registerSizeAtPath(path);
-
-    var parent = Dispatch.getNode(pathUtils.parent(path));
-    this._parent = parent;
-    this._globalUpdater = parent.getUpdater();
-    this._id = path;
-    this._mounted = true;
 
     if (!this._requestingUpdate) this._requestUpdate();
     return this;
@@ -1054,11 +1053,9 @@ Node.prototype.dismount = function dismount () {
 
     var path = this.getLocation();
 
-    Dispatch.deregisterNodeAtPath(path, this);
+    Dispatch.dismount(path);
     TransformSystem.deregisterTransformAtPath(path);
     SizeSystem.deregisterSizeAtPath(path);
-
-    this._mounted = false;
 
     if (!this._requestingUpdate) this._requestUpdate();
 };

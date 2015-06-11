@@ -141,7 +141,7 @@ Scene.prototype.onReceive = function onReceive (event, payload) {
 Scene.prototype.mount = function mount (path) {
     if (this.isMounted())
         throw new Error('Scene is already mounted at: ' + this.getLocation());
-    Dispatch.registerNodeAtPath(path, this);
+    Dispatch.mount(path, this);
     this._id = path;
     this._mounted = true;
     this._parent = this;
