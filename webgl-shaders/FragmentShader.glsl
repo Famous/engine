@@ -47,7 +47,13 @@ void main() {
     vec4 glossiness = u_glossiness.x < 0.0 ? applyMaterial(u_glossiness) : u_glossiness;
 
     vec4 color = lightsEnabled ?
-    applyLight(material, normalize(v_normal), glossiness, int(u_numLights), u_ambientLight * u_baseColor.rgb, normalize(v_eyeVector), u_lightColor, u_lightPosition, v_position)
+    applyLight(material, normalize(v_normal), glossiness,
+               int(u_numLights),
+               u_ambientLight * u_baseColor.rgb,
+               normalize(v_eyeVector),
+               u_lightPosition,
+               u_lightColor,   
+               v_position)
     : material;
 
     gl_FragColor = color;
