@@ -172,6 +172,7 @@ WebGLRenderer.prototype.getWebGLContext = function getWebGLContext(canvas) {
         console.error('Could not retrieve WebGL context. Please refer to https://www.khronos.org/webgl/ for requirements');
         return false;
     }
+
 };
 
 /**
