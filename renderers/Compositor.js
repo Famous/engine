@@ -243,6 +243,10 @@ Compositor.prototype.receiveCommands = function receiveCommands(commands) {
     for (var i = 0; i < len; i++) {
         this._inCommands.push(commands[i]);
     }
+    
+    for (var selector in this._contexts) {
+        this._contexts[selector].checkInit();
+    }
 };
 
 /**

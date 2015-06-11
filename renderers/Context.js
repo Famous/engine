@@ -58,12 +58,13 @@ function Context(selector, compositor) {
     // Create DOM element to be used as root for all famous DOM
     // rendering and append element to the root element.
 
-    var DOMLayerEl = document.createElement('div');
-    this._rootEl.appendChild(DOMLayerEl);
+    this._domLayerEl = document.createElement('div');
+    this._domLayerEl.style.display = 'none';
+    this._rootEl.appendChild(this._domLayerEl);
 
     // Instantiate renderers
 
-    this.DOMRenderer = new DOMRenderer(DOMLayerEl, selector, compositor);
+    this.DOMRenderer = new DOMRenderer(this._domLayerEl, selector, compositor);
     this.WebGLRenderer = null;
     this.canvas = null;
 
@@ -83,6 +84,8 @@ function Context(selector, compositor) {
 
     this._meshTransform = [];
     this._meshSize = [0, 0, 0];
+
+    this._initDOM = false;
 }
 
 /**
@@ -92,7 +95,7 @@ function Context(selector, compositor) {
  * @return {Context} this
  */
 Context.prototype.updateSize = function () {
-    var newSize = this.DOMRenderer.getSize();
+    var newSize = this.getRootSize();
     this._compositor.sendResize(this._selector, newSize);
 
     if (this.canvas && this.WebGLRenderer) {
@@ -119,14 +122,17 @@ Context.prototype.draw = function draw() {
 };
 
 /**
- * Gets the size of the parent element of the DOMRenderer for this context.
+ * Determines the root element's offset size.
  *
  * @method
  *
  * @return {undefined} undefined
  */
 Context.prototype.getRootSize = function getRootSize() {
-    return this.DOMRenderer.getSize();
+    return [
+        this._rootEl.offsetWidth,
+        this._rootEl.offsetHeight,
+    ];
 };
 
 /**
@@ -143,6 +149,19 @@ Context.prototype.initWebGL = function initWebGL() {
     this._rootEl.appendChild(this.canvas);
     this.WebGLRenderer = new WebGLRenderer(this.canvas, this._compositor);
     this.updateSize();
+};
+
+
+/**
+ * Initializes the context if the `READY` command has been received earlier.
+ *
+ * @return {undefined} undefined
+ */
+Context.prototype.checkInit = function checkInit () {
+    if (this._initDOM) {
+        this._domLayerEl.style.display = 'block';
+        this._initDOM = false;
+    }
 };
 
 /**
@@ -370,7 +389,12 @@ Context.prototype.receive = function receive(path, commands, iterator) {
                 this._renderState.viewDirty = true;
                 break;
 
-            case 'WITH': return localIterator - 1;
+            case 'READY':
+                this._initDOM = true;
+                break;
+
+            case 'WITH':
+                return localIterator - 1;
         }
 
         command = commands[++localIterator];

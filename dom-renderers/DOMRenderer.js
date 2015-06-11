@@ -84,8 +84,6 @@ function DOMRenderer (element, selector, compositor) {
 
     this.perspectiveTransform = new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
     this._VPtransform = new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
-
-    this._size = [null, null];
 }
 
 
@@ -260,24 +258,6 @@ function _getPath(ev) {
     }
     return path;
 }
-
-
-/**
- * Determines the size of the context by querying the DOM for `offsetWidth` and
- * `offsetHeight`.
- *
- * @method
- *
- * @return {Array} Offset size.
- */
-DOMRenderer.prototype.getSize = function getSize() {
-    this._size[0] = this._root.element.offsetWidth;
-    this._size[1] = this._root.element.offsetHeight;
-    return this._size;
-};
-
-DOMRenderer.prototype._getSize = DOMRenderer.prototype.getSize;
-
 
 /**
  * Executes the retrieved draw commands. Draw commands only refer to the
