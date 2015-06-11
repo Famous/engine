@@ -74,7 +74,6 @@ var snippets = {
 
     smoothstep: {glsl: 'smoothstep(%1);', output: { '1,1,1':1, '2,2,2':2, '3,3,3':3, '4,4,4':4 }},
 
-
     /* fragCoord - The fragCoord function returns the fragment's position in screenspace. */
 
     fragCoord: {glsl: 'gl_FragColor;', output: 4 },
@@ -178,6 +177,8 @@ function Material(name, chunk, inputs, options) {
     this.varyings = options.varyings;
     this.attributes = options.attributes;
 
+    this.meshes = [];
+
     if (options.texture) {
         this.texture = options.texture.__isATexture__ ? options.texture : TextureRegistry.register(null, options.texture);
     }
@@ -194,6 +195,8 @@ Material.prototype.setUniform = function setUniform(name, value) {
     this.uniforms[name] = value;
 
     this.invalidations.push(name);
+
+    for(var i = 0; i < this.meshes.length; i++) this.meshes[i]._requestUpdate();
 };
 
 module.exports = expressions;
@@ -207,3 +210,16 @@ expressions.Texture = function (source) {
 expressions.Custom = function (schema, inputs, uniforms) {
     return new Material('custom', {glsl: schema, output: 1, uniforms: uniforms || {}} , inputs);
 };
+
+// Recursively iterates over a material's inputs, invoking a given callback
+// with the current material
+Material.prototype.traverse = function traverse(callback) {
+	var inputs = this.inputs;
+    var len = inputs && inputs.length;
+    var idx = -1;
+
+    while (++idx < len) inputs[idx].traverse(callback);
+
+    callback(this);
+};
+

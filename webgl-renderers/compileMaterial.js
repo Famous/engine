@@ -50,7 +50,7 @@ function compileMaterial(material, textureSlot) {
     var defines = [];
     var textures = [];
 
-    _traverse(material, function (node, depth) {
+    material.traverse(function (node, depth) {
         if (! node.chunk) return;
 
         var type = types[_getOutputLength(node)];
@@ -66,6 +66,7 @@ function compileMaterial(material, textureSlot) {
         if (node.texture) textures.push(node.texture);
     });
 
+    console.log(uniforms);
     return {
         _id: material._id,
         glsl: glsl + 'return ' + _makeLabel(material) + ';',
@@ -75,20 +76,6 @@ function compileMaterial(material, textureSlot) {
         attributes: attributes,
         textures: textures
     };
-}
-
-// Recursively iterates over a material's inputs, invoking a given callback
-// with the current material
-function _traverse(material, callback) {
-	var inputs = material.inputs;
-    var len = inputs && inputs.length;
-    var idx = -1;
-
-    while (++idx < len) _traverse(inputs[idx], callback);
-
-    callback(material);
-
-    return material;
 }
 
 // Helper function used to infer length of the output
