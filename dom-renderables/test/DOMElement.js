@@ -200,7 +200,7 @@ test('DOMElement', function(t) {
     });
 
     t.test('onMount, onUpdate, onDismount lifecyle', function(t) {
-        t.plan(11);
+        t.plan(12);
 
         var node = createMockNode(t);
         var domElement = new DOMElement(node);
@@ -238,7 +238,7 @@ test('DOMElement', function(t) {
         domElement.onUpdate();
         t.deepEqual(
             node.sentDrawCommands,
-            [ 'WITH', 'body/0', 'CHANGE_ATTRIBUTE', 'data-fa-path', '' ],
+            [ 'WITH', 'body/0', 'CHANGE_ATTRIBUTE', 'data-fa-path', '', 'GL_CUTOUT_STATE', false],
             'Dismounting the node should result into the DOMElement being ' +
             'hidden'
         );
