@@ -106,7 +106,7 @@ function WebGLRenderer(canvas, compositor) {
     };
 
     this.resolutionName = ['u_resolution'];
-    this.resolutionValues = [];
+    this.resolutionValues = [[0, 0, 0]];
 
     this.cachedSize = [];
 
@@ -776,6 +776,7 @@ WebGLRenderer.prototype.drawBuffers = function drawBuffers(vertexBuffers, mode, 
 
     this.state.lastDrawn = id;
 };
+
 
 /**
  * Updates the width and height of parent canvas, sets the viewport size on

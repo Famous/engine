@@ -51,11 +51,7 @@ var Commands = require('../core/Commands');
 function Context(selector, compositor) {
     this._compositor = compositor;
     this._rootEl = document.querySelector(selector);
-<<<<<<< HEAD
-=======
-
     this._selector = selector;
->>>>>>> fixed issues from rebase
 
     if (this._rootEl === null) {
         throw new Error(

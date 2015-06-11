@@ -50,6 +50,8 @@ var TIME_UPDATE = [Commands.TIME, null];
 function FamousEngine() {
     var _this = this;
 
+    Dispatch._setUpdater(this);
+
     this._updateQueue = []; // The updateQueue is a place where nodes
                             // can place themselves in order to be
                             // updated on the frame.
