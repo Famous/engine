@@ -230,8 +230,6 @@ Context.prototype.receive = function receive(path, commands, iterator) {
 
 // Command Callbacks
 
-function 
-
 function preventDefault (context, path, commands, iterator) {
     if (context.WebGLRenderer) context.WebGLRenderer.getOrSetCutout(path);
     context.DOMRenderer.preventDefault(commands[++iterator]);
