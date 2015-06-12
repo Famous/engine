@@ -28,6 +28,7 @@ var ElementCache = require('./ElementCache');
 var math = require('./Math');
 var PathUtils = require('../core/Path');
 var vendorPrefix = require('../utilities/vendorPrefix');
+var CallbackStore = require('../utilities/CallbackStore');
 var eventMap = require('./events/EventMap');
 
 var TRANSFORM = null;
@@ -67,6 +68,9 @@ function DOMRenderer (element, selector, compositor) {
 
     this._children = []; // a register for holding the children of the
                          // current target.
+
+     this._insertElCallbackStore = new CallbackStore();
+     this._removeElCallbackStore = new CallbackStore();
 
     this._root = new ElementCache(element, selector); // the root
                                                       // of the dom tree that this
@@ -457,7 +461,10 @@ DOMRenderer.prototype.insertEl = function insertEl (tagName) {
                 'Void elements are not allowed to have children.'
             );
 
-        if (this._target) this._parent.element.removeChild(this._target.element);
+        if (this._target) {
+            this._parent.element.removeChild(this._target.element);
+            this._removeElCallbackStore.trigger(this._path, this._target);
+        }
 
         this._target = new ElementCache(document.createElement(tagName), this._path);
 
@@ -468,6 +475,8 @@ DOMRenderer.prototype.insertEl = function insertEl (tagName) {
 
         this._parent.element.appendChild(this._target.element);
         this._elements[this._path] = this._target;
+
+        this._insertElCallbackStore.trigger(this._path, this._target);
     }
 };
 
@@ -703,6 +712,71 @@ DOMRenderer.prototype._stringifyMatrix = function _stringifyMatrix(m) {
 
     r += m[15] + ')';
     return r;
+};
+
+/**
+ * Registers a function to be executed when a new element is being inserted at
+ * the specified path.
+ *
+ * @method
+ *
+ * @param  {String}   path      Path at which to listen for element insertion.
+ * @param  {Function} callback  Function to be executed when an insertion
+ *                              occurs.
+ * @return {DOMRenderer}        this
+ */
+DOMRenderer.prototype.onInsertEl = function onInsertEl(path, callback) {
+    this._insertElCallbackStore.on(path, callback);
+    return this;
+};
+
+/**
+ * Deregisters a listener function to be no longer executed on future element
+ * insertions at the specified path.
+ *
+ * @method
+ *
+ * @param  {String}   path      Path at which the listener function has been
+ *                              registered.
+ * @param  {Function} callback  Callback function to be deregistered.
+ * @return {DOMRenderer}        this
+ */
+DOMRenderer.prototype.offInsertEl = function offInsertEl(path, callback) {
+    this._insertElCallbackStore.off(path, callback);
+    return this;
+};
+
+/**
+ * Registers an event handler to be triggered as soon as an element at the
+ * specified path is being removed.
+ *
+ * @method
+ *
+ * @param  {String}   path      Path at which to listen for the removal of an
+ *                              element.
+ * @param  {Function} callback  Function to be executed when an element is
+ *                              being removed at the specified path.
+ * @return {DOMRenderer}        this
+ */
+DOMRenderer.prototype.onRemoveEl = function onRemoveEl(path, callback) {
+    this._removeElCallbackStore.on(path, callback);
+    return this;
+};
+
+/**
+ * Deregisters a listener function to be no longer executed when an element is
+ * being removed from the specified path.
+ *
+ * @method
+ *
+ * @param  {String}   path      Path at which the listener function has been
+ *                              registered.
+ * @param  {Function} callback  Callback function to be deregistered.
+ * @return {DOMRenderer}        this
+ */
+DOMRenderer.prototype.offRemoveEl = function offRemoveEl(path, callback) {
+    this._removeElCallbackStore.off(path, callback);
+    return this;
 };
 
 module.exports = DOMRenderer;
