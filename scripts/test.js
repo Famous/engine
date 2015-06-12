@@ -92,7 +92,24 @@ test.createStream({objectMode: true}).on('data', function (row) {
         } else succeeded++;
 });
 
+console.log(
+        '\n\n\n\n\n', 
+        '\n\n beginning test suite'.underline.green + '\n', 
+        '\n\nfor files:\n-> ' + process.argv.slice(2).map(function (file) { return file.cyan; }).join('\n-> ') + '\n\n\n\n\n'
+);
+
 process.argv.slice(2).forEach(function (file, i, files) {
     require(path.resolve(file));
+});
+
+process.on('beforeExit', function () {
+    while (characterStack.length) popCharacterStack();
+
+    console.log('ok'.underline.green + ': ' + succeeded);
+    console.log('not ok'.underline.red + ': ' + failed);
+    var percent = succeeded / (failed + succeeded); 
+    console.log('\n' + 'Percent ok'.underline + ': ' + (percent * 100) + '%');
+    if (percent === 1) console.log('\n\n all tests ok'.underline.green + '\n\n\n\n\n');
+    else console.log('\n\n some tests not ok'.underline.red + '\n\n\n\n\n');
 });
 

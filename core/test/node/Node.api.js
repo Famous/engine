@@ -1,4 +1,5 @@
 module.exports = [
+    '_setUpdater',
     'getLocation',
     'getId',
     'emit',
