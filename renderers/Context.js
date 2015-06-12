@@ -180,7 +180,7 @@ Context.prototype.initCommandCallbacks = function initCommandCallbacks () {
     this._commandCallbacks[Commands.CHANGE_VIEW_TRANSFORM] = changeViewTransform;
     this._commandCallbacks[Commands.PREVENT_DEFAULT] = preventDefault;
     this._commandCallbacks[Commands.ALLOW_DEFAULT] = allowDefault;
-    this._commandCallbacks[Commands.READY] = Commands.READY;
+    this._commandCallbacks[Commands.READY] = ready;
 }
 
 /**
