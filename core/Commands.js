@@ -60,7 +60,10 @@ var Commands = {
     TIME: 29,
     TRIGGER: 30,
     NEED_SIZE_FOR: 31,
-    DOM: 32
+    DOM: 32,
+    READY: 33,
+    ALLOW_DEFAULT: 34,
+    PREVENT_DEFAULT: 35
 };
 
 module.exports = Commands;
