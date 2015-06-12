@@ -60,6 +60,20 @@ Size.ABSOLUTE = 1;
 Size.RENDER = 2;
 Size.DEFAULT = Size.RELATIVE;
 
+/**
+ * Private method which sets a value within an array
+ * and report if the value has changed.
+ *
+ * @method
+ *
+ * @param {Array} vec The array to set the value in
+ * @param {Number} index The index at which to set the value
+ * @param {Any} val If the val is undefined or null, or if the value
+ *                  is the same as what is already there, then nothing
+ *                  is set.
+ *
+ * @return {Boolean} returns true if anything changed
+ */
 function _vecOptionalSet (vec, index, val) {
     if (val != null && vec[index] !== val) {
         vec[index] = val;
@@ -67,6 +81,19 @@ function _vecOptionalSet (vec, index, val) {
     } else return false;
 }
 
+/**
+ * Private method which sets three values within an array of three
+ * using _vecOptionalSet. Returns whether anything has changed.
+ *
+ * @method
+ *
+ * @param {Array} vec The array to set the values of
+ * @param {Any} x The first value to set within the array
+ * @param {Any} y The second value to set within the array
+ * @param {Any} z The third value to set within the array
+ *
+ * @return {Boolean} whether anything has changed
+ */
 function setVec (vec, x, y, z) {
     var propagate = false;
 
@@ -77,6 +104,16 @@ function setVec (vec, x, y, z) {
     return propagate;
 }
 
+/**
+ * Private method to allow for polymorphism in the size mode such that strings
+ * or the numbers from the enumeration can be used.
+ *
+ * @method
+ *
+ * @param {String|Number} val The Size mode to resolve.
+ *
+ * @return {Number} the resolved size mode from the enumeration.
+ */
 function resolveSizeMode (val) {
     if (val.constructor === String) {
         switch (val.toLowerCase()) {
@@ -91,15 +128,38 @@ function resolveSizeMode (val) {
     return val;
 }
 
+/**
+ * Sets the parent of this size.
+ *
+ * @method
+ *
+ * @param {Size} parent The parent size component
+ *
+ * @return {Size} this
+ */
 Size.prototype.setParent = function setParent (parent) {
     this.parent = parent;
     return this;
 };
 
+/**
+ * Gets the parent of this size.
+ *
+ * @method
+ *
+ * @returns {Size|undefined} the parent if one exists
+ */
 Size.prototype.getParent = function getParent () {
     return this.parent;
 };
 
+/**
+ * Gets the size mode of this size representation
+ *
+ * @method
+ *
+ * @return {array} array of size modes
+ */
 Size.prototype.setSizeMode = function setSizeMode (x, y, z) {
     if (x != null) x = resolveSizeMode(x);
     if (y != null) y = resolveSizeMode(y);
@@ -108,37 +168,109 @@ Size.prototype.setSizeMode = function setSizeMode (x, y, z) {
     return this;
 };
 
+/**
+ * Returns the size mode of this component.
+ *
+ * @method
+ *
+ * @return {Array} the current size mode of the this.
+ */
 Size.prototype.getSizeMode = function getSizeMode () {
     return this.sizeMode;
 };
 
+/**
+ * Sets the absolute size of this size representation.
+ *
+ * @method
+ *
+ * @param {Number} x The x dimension of the absolute size
+ * @param {Number} y The y dimension of the absolute size
+ * @param {Number} z The z dimension of the absolute size
+ *
+ * @return {Size} this
+ */
 Size.prototype.setAbsolute = function setAbsolute (x, y, z) {
     this.absoluteSizeChanged = setVec(this.absoluteSize, x, y, z);
     return this;
 };
 
+/**
+ * Gets the absolute size of this size representation
+ *
+ * @method
+ *
+ * @return {array} array of absolute size
+ */
 Size.prototype.getAbsoluteSize = function getAbsoluteSize () {
     return this.absoluteSize;
 };
 
+/**
+ * Sets the proportional size of this size representation.
+ *
+ * @method
+ *
+ * @param {Number} x The x dimension of the proportional size
+ * @param {Number} y The y dimension of the proportional size
+ * @param {Number} z The z dimension of the proportional size
+ *
+ * @return {Size} this
+ */
 Size.prototype.setProportional = function setProportional (x, y, z) {
     this.proportionalSizeChanged = setVec(this.proportionalSize, x, y, z);
     return this;
 };
 
+/**
+ * Gets the propotional size of this size representation
+ *
+ * @method
+ *
+ * @return {array} array of proportional size
+ */
 Size.prototype.getProportionalSize = function getProportionalSize () {
     return this.proportionalSize;
 };
 
+/**
+ * Sets the differential size of this size representation.
+ *
+ * @method
+ *
+ * @param {Number} x The x dimension of the differential size
+ * @param {Number} y The y dimension of the differential size
+ * @param {Number} z The z dimension of the differential size
+ *
+ * @return {Size} this
+ */
 Size.prototype.setDifferential = function setDifferential (x, y, z) {
     this.differentialSizeChanged = setVec(this.differentialSize, x, y, z);
     return this;
 };
 
+/**
+ * Gets the differential size of this size representation
+ *
+ * @method
+ *
+ * @return {array} array of differential size
+ */
 Size.prototype.getDifferential = function getDifferential () {
     return this.differentialSize;
 };
 
+/**
+ * Sets the size of this size representation.
+ *
+ * @method
+ *
+ * @param {Number} x The x dimension of the size
+ * @param {Number} y The y dimension of the size
+ * @param {Number} z The z dimension of the size
+ *
+ * @return {Size} this
+ */
 Size.prototype.get = function get () {
     return this.finalSize;
 };
