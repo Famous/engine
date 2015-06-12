@@ -6,7 +6,7 @@
   "scripts": {
     "test-new": "node ./scripts/test.js ./core/**/*.spec.js",
     "test-components": "browserify components/test/*.js | tap-closer | smokestack -b firefox",
-    "test-core": "browserify core/test/*.js | tap-closer | smokestack -b firefox",
+    "test-core": "npm run test-new",
     "test-dom-renderables": "browserify dom-renderables/test/*.js | tap-closer | smokestack -b firefox",
     "test-dom-renderers": "browserify dom-renderers/test/*.js | tap-closer | smokestack -b firefox",
     "test-render-loops": "browserify render-loops/test/*.js | tap-closer | smokestack -b firefox",
@@ -37,6 +37,7 @@
     "browserify": "^10.2.1",
     "colors": "^1.1.0",
     "eslint": "^0.21.2",
+    "glob": "^5.0.10",
     "istanbul": "^0.3.15",
     "rewire": "^2.3.3",
     "sinon": "^1.14.1",

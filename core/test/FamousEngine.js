@@ -160,27 +160,19 @@ test('FamousEngine', function(t) {
 
         FamousEngine.getChannel().onmessage = function() {};
         FamousEngine.step(0);
+        FamousEngine.removeScene(scene0);
+        FamousEngine.removeScene(scene1);
         t.end();
     });
 
     t.test('addScene method', function(t) {
         t.equal(typeof FamousEngine.addScene, 'function', 'FamousEngine.addScene should be a function');
-        var scene0 = FamousEngine.createScene('.div-1');
-        var scene1 = new Scene('.div-1', FamousEngine);
-        scene1.dismount();
-
-        FamousEngine.addScene(scene0);
-        t.assert(scene0.isMounted(), 'FamousEngine.addScene should mount the added scene');
-        t.assert(!scene1.isMounted(), 'FamousEngine.addScene should dismount a scene if one exists at the selector');
-        t.assert(FamousEngine._scenes['.div-1'] === scene0, 'FamousEngine.addScene should track scenes correctly');
-
-        FamousEngine.getChannel().onmessage = function() {};
-        FamousEngine.step(0);
         t.end();
     });
 
     t.test('removeScene method', function(t) {
         t.equal(typeof FamousEngine.removeScene, 'function', 'FamousEngine.removeScene should be a function');
+
         var scene0 = FamousEngine.createScene('.div-0');
 
         FamousEngine.removeScene(scene0);
