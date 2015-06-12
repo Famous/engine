@@ -28,7 +28,6 @@ var WebGLRenderer = require('../webgl-renderers/WebGLRenderer');
 var Camera = require('../components/Camera');
 var DOMRenderer = require('../dom-renderers/DOMRenderer');
 var Commands = require('../core/Commands');
-require('./styles.css');
 
 /**
  * Context is a render layer with its own WebGLRenderer and DOMRenderer.
