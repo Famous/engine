@@ -316,4 +316,69 @@ test('DOMRenderer', function(t) {
         t.end();
     });
 
+    t.test('onInsertEl method', function(t) {
+        var element = document.createElement('div');
+        var selector = 'selector';
+        var compositor = createUnidirectionalCompositor();
+        var domRenderer = new DOMRenderer(element, selector, compositor);
+
+        t.equal(typeof domRenderer.onInsertEl, 'function', 'domRenderer.onInsertEl should be a function');
+
+        var triggeredInsertEl = false;
+        var triggeredElementCache = null;
+
+        domRenderer.onInsertEl(selector + '/1/2/3', function(elementCache) {
+            triggeredInsertEl = true;
+            triggeredElementCache = elementCache;
+        });
+
+        domRenderer.loadPath(selector + '/1/2');
+        domRenderer.findTarget();
+        domRenderer.insertEl('div');
+        t.equal(triggeredInsertEl, false, 'domRenderer.onInsertEl should not be triggered on parent of registered path');
+
+
+        domRenderer.loadPath(selector + '/1/2/3');
+        domRenderer.findTarget();
+        domRenderer.insertEl('div');
+        t.equal(triggeredInsertEl, true, 'domRenderer.onInsertEl should be triggered on element insertion at registered path');
+        t.notEqual(triggeredElementCache, null, 'domRenderer.onInsertEl listener should receive newly created ElementCache');
+
+        t.equal(triggeredElementCache.path, selector + '/1/2/3', 'domRenderer.onInsertEl should trigger ElementCache with the correct path');
+        t.equal(triggeredElementCache.element, element.children[0].children[0], 'domRenderer.onInsertEl should trigger ElementCache that manages the correct element');
+
+        t.end();
+    });
+
+    t.test('onRemoveEl method', function(t) {
+        var element = document.createElement('div');
+        var selector = 'selector';
+        var compositor = createUnidirectionalCompositor();
+        var domRenderer = new DOMRenderer(element, selector, compositor);
+
+        t.equal(typeof domRenderer.onRemoveEl, 'function', 'domRenderer.onRemoveEl should be a function');
+
+        var triggeredInsertEl = false;
+        var triggeredElementCache = null;
+
+        domRenderer.onRemoveEl(selector + '/1', function(elementCache) {
+            triggeredInsertEl = true;
+            triggeredElementCache = elementCache;
+        });
+
+        domRenderer.loadPath(selector + '/1');
+        domRenderer.findTarget();
+        domRenderer.insertEl('div');
+
+        t.equal(triggeredInsertEl, false, 'DOMRenderer.onRemoveEl should not be triggered on initial insertion');
+
+        domRenderer.findTarget();
+        domRenderer.insertEl('section');
+
+        t.equal(triggeredInsertEl, true, 'DOMRenderer.onRemoveEl should be triggered when overriding an element at the same path');
+
+        t.equal(triggeredElementCache.element.tagName.toLowerCase(), 'div', 'DOMRenderer.onRemoveEl listener should receive ElementCache with correct tagName');
+
+        t.end();
+    });
 });
