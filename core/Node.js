@@ -29,6 +29,8 @@
 var SizeSystem = require('./SizeSystem');
 var Dispatch = require('./Dispatch');
 var TransformSystem = require('./TransformSystem');
+var Size = require('./Size');
+var Transform = require('./Transform');
 var pathUtils = require('./Path');
 
 /**
@@ -90,13 +92,37 @@ function Node () {
     this._parent = null;
 
     this._id = null;
+
+    this._transformID = null;
+    this._sizeID = null;
+
+    if (this.constructor.INIT_DEFAULT_COMPONENTS) this._init();
 }
 
 Node.RELATIVE_SIZE = 0;
 Node.ABSOLUTE_SIZE = 1;
 Node.RENDER_SIZE = 2;
 Node.DEFAULT_SIZE = 0;
+Node.INIT_DEFAULT_COMPONENTS = true;
 
+/**
+ * Protected method. Initializes a node with a default Transform and Size component
+ *
+ * @method
+ * @protected
+ *
+ * @return {undefined} undefined
+ */
+Node.prototype._init = function _init () {
+    this._transformID = this.addComponent(new Transform());
+    this._sizeID = this.addComponent(new Size());
+};
+
+/**
+ * Protected method. Sets the parent of this node such that it can be looked up.
+ *
+ * @method
+ * @
 Node.prototype._setParent = function _setParent (parent) {
     this._parent = parent;
 };

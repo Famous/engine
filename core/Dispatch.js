@@ -49,8 +49,21 @@ function Dispatch () {
                       //    traversal of the scene graph.
 }
 
+/**
+ * Protected method that sets the updater for the dispatch. The updater will
+ * almost certainly be the FamousEngine class.
+ *
+ * @method
+ * @protected
+ *
+ * @param {FamousEngine} updater The updater which will be passed through the scene graph
+ *
+ * @return {undefined} undefined
+ */
 Dispatch.prototype._setUpdater = function _setUpdater (updater) {
     this._updater = updater;
+
+    for (var key in this._nodes) this._nodes[key]._setUpdater(updater);
 };
 
 /**
