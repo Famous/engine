@@ -74,7 +74,7 @@ function Node () {
     this._requestingUpdate = false;
     this._inUpdate = false;
     this._mounted = false;
-    this._shown = false;
+    this._shown = true;
     this._updater = null;
     this._opacity = 1;
     this._UIEvents = [];
@@ -422,6 +422,18 @@ Node.prototype.requestUpdateOnNextTick = function requestUpdateOnNextTick (reque
  */
 Node.prototype.isMounted = function isMounted () {
     return this._mounted;
+};
+
+/**
+ * Checks if the node is being rendered. A node is being rendererd when it is
+ * mounted to a parent node **and** shown.
+ *
+ * @method isRendered
+ *
+ * @return {Boolean}    Boolean indicating whether the node is rendered or not.
+ */
+Node.prototype.isRendered = function isRendered () {
+    return this._mounted && this._shown;
 };
 
 /**

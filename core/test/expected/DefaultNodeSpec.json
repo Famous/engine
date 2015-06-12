@@ -2,7 +2,7 @@
     "location": null,
     "showState": {
         "mounted": false,
-        "shown": false,
+        "shown": true,
         "opacity": 1
     },
     "offsets": {

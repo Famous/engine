@@ -197,11 +197,15 @@ test('Node', function(t) {
     t.test('isShown method', function(t) {
         var child = new Node();
         t.equal(typeof child.isShown, 'function', 'child.isShown should be a function');
-        t.equal(child.isShown(), false, 'nodes should not be shown when being initialized');
+        t.equal(child.isShown(), true, 'nodes should be shown by default');
+
+        child.hide();
+
+        t.equal(child.isShown(), false, 'node.isShown should return false when node has been hidden using Node#hide');
 
         child.show();
 
-        t.equal(child.isShown(), true, 'node.isShown should indicate shown state after node has been mounted');
+        t.equal(child.isShown(), true, 'node.isShown should return true when node has been shown using Node#shown');
 
         t.end();
     });
