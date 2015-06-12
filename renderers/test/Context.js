@@ -26,37 +26,39 @@
 
 var test = require('tape');
 var Context = require('../Context');
-var Compositor = require('../Compositor');
+
+var noop = function() {};
 
 test('Context', function(t) {
     t.test('constructor', function(t) {
-        var compositor = new Compositor();
-        var context = new Context('body', compositor);
+        t.plan(3);
 
-        t.ok(context.DOMRenderer, 'Should have a DOMRenderer');
-        t.ok(context._renderState, 'Should have a renderState object');
+        t.equal(
+            typeof Context,
+            'function',
+            'Context should b a constructor function'
+        );
 
-        t.ok(Array.isArray(context._size), 'Should have a size array');
-
-        t.end();
-    });
-
-    t.test('updateSize method', function(t) {
-        // TODO: These tests.
-
-        t.end();
+        new Context('body', {
+            sendResize: function(selector, size) {
+                t.equal(selector, 'body', 'Context should sendResize with selector');
+                t.ok(size instanceof Array && size.length === 3, 'Context should send size as an array with three elements');
+            }
+        });
     });
 
     t.test('draw method', function(t) {
-        var context = new Context('body');
+        var context = new Context('body', {
+            sendResize: noop
+        });
 
-        context.DOMRenderer = {
+        context._domRenderer = {
             draw: function() {
                 this.wasDrawn = true;
             }
         };
 
-        context.WebGLRenderer = {
+        context._webGLRenderer = {
             draw: function() {
                 this.wasDrawn = true;
             }
@@ -64,30 +66,8 @@ test('Context', function(t) {
 
         context.draw();
 
-        t.ok(context.DOMRenderer.wasDrawn, 'Should call draw on the DOMRenderer');
-        t.ok(context.WebGLRenderer.wasDrawn, 'Should call draw on the WebGLRenderer');
-
-        t.end();
-    });
-
-    t.test('initWebGL method', function(t) {
-        // TODO: These tests.
-
-        t.end();
-    });
-
-    t.test('getRootSize method', function(t) {
-        var context = new Context('body');
-        var rootSize = context.getRootSize();
-
-        t.deepEquals(typeof rootSize[0], 'number', 'Should return pixel size');
-        t.deepEquals(typeof rootSize[1], 'number', 'Should return pixel size');
-
-
-        t.end();
-    });
-
-    t.test('receive method', function(t) {
+        t.ok(context._domRenderer.wasDrawn, 'Should call draw on the DOMRenderer');
+        t.ok(context._webGLRenderer.wasDrawn, 'Should call draw on the WebGLRenderer');
 
         t.end();
     });

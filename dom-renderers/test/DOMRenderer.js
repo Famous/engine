@@ -264,30 +264,6 @@ test('DOMRenderer', function(t) {
         t.end();
     });
 
-    t.test('getSize method', function(t) {
-        var element = document.createElement('div');
-        var selector = 'selector';
-        element.classList.add(selector);
-        var compositor = createUnidirectionalCompositor(t);
-        var domRenderer = new DOMRenderer(element, selector, compositor);
-
-        t.equal(typeof domRenderer.getSize, 'function', 'domRenderer.getSize should be a function');
-
-        domRenderer.loadPath(selector + '/' + 0);
-        domRenderer.findTarget();
-        domRenderer.insertEl('div');
-
-        domRenderer.setSize(true, true);
-        domRenderer.setContent('some content');
-
-        document.body.appendChild(element);
-        t.notDeepEqual(domRenderer.getSize(), [0, 0]);
-
-        document.body.removeChild(element);
-
-        t.end();
-    });
-
     t.test('_triggerEvent method', function(t) {
         var element = document.createElement('div');
         var selector = 'selector';
