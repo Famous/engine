@@ -74,7 +74,7 @@ function Node () {
     this._requestingUpdate = false;
     this._inUpdate = false;
     this._mounted = false;
-    this._shown = false;
+    this._shown = true;
     this._updater = null;
     this._opacity = 1;
     this._UIEvents = [];
@@ -121,7 +121,7 @@ Node.prototype._init = function _init () {
  * Protected method. Sets the parent of this node such that it can be looked up.
  *
  * @method
- * 
+ *
  * @param {Node} parent The node to set as the parent of this
  *
  * @return {undefined} undefined;
@@ -231,7 +231,7 @@ Node.prototype.getValue = function getValue () {
     var numberOfChildren = this._children.length;
     var numberOfComponents = this._components.length;
     var i = 0;
- 
+
     var value = {
         location: this.getId(),
         spec: {
@@ -263,7 +263,7 @@ Node.prototype.getValue = function getValue () {
         components: [],
         children: []
     };
-    
+
     if (value.location) {
         var transform = TransformSystem.get(this.getId());
         var size = SizeSystem.get(this.getId());
@@ -401,6 +401,18 @@ Node.prototype.requestUpdateOnNextTick = function requestUpdateOnNextTick (reque
  */
 Node.prototype.isMounted = function isMounted () {
     return this._mounted;
+};
+
+/**
+ * Checks if the node is being rendered. A node is being rendererd when it is
+ * mounted to a parent node **and** shown.
+ *
+ * @method isRendered
+ *
+ * @return {Boolean}    Boolean indicating whether the node is rendered or not.
+ */
+Node.prototype.isRendered = function isRendered () {
+    return this._mounted && this._shown;
 };
 
 /**
@@ -749,7 +761,7 @@ Node.prototype.removeComponent = function removeComponent (component) {
 };
 
 /**
- * Removes a node's subscription to a particular UIEvent. All components 
+ * Removes a node's subscription to a particular UIEvent. All components
  * on the node will have the opportunity to remove all listeners depending
  * on this event.
  *
