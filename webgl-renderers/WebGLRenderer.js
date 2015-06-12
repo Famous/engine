@@ -779,7 +779,6 @@ WebGLRenderer.prototype.drawBuffers = function drawBuffers(vertexBuffers, mode, 
  * @return {undefined} undefined
  */
 WebGLRenderer.prototype.updateSize = function updateSize(size) {
-    console.log('hey');
     if (size) {
         var pixelRatio = window.devicePixelRatio || 1;
         var displayWidth = ~~(size[0] * pixelRatio);
