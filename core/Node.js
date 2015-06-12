@@ -122,20 +122,54 @@ Node.prototype._init = function _init () {
  * Protected method. Sets the parent of this node such that it can be looked up.
  *
  * @method
- * @
+ * 
+ * @param {Node} parent The node to set as the parent of this
+ *
+ * @return {undefined} undefined;
+ */
 Node.prototype._setParent = function _setParent (parent) {
     this._parent = parent;
 };
 
+/**
+ * Protected method. Sets the mount state of the node. Should only be called
+ * by the dispatch
+ *
+ * @method
+ *
+ * @param {Boolean} mounted whether or not the Node is mounted.
+ * @param {String} path The path that the node will be mounted to
+ *
+ * @return {undefined} undefined
+ */
 Node.prototype._setMounted = function _setMounted (mounted, path) {
     this._mounted = mounted;
     this._id = path ? path : null;
 };
 
+/**
+ * Protected method, sets whether or not the Node is shown. Should only
+ * be called by the dispatch
+ *
+ * @method
+ *
+ * @param {Boolean} whether or not the node is shown
+ *
+ * @return {undefined} undefined
+ */
 Node.prototype._setShown = function _setShown (shown) {
     this._shown = shown;
 };
 
+/**
+ * Protected method. Sets the updater of the node.
+ *
+ * @method
+ *
+ * @param {FamousEngine} updater the Updater of the node.
+ *
+ * @return {undefined} undefined
+ */
 Node.prototype._setUpdater = function _setUpdater (updater) {
     this._updater = updater;
 };
