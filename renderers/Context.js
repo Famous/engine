@@ -255,8 +255,8 @@ Context.prototype.receive = function receive(path, commands, iterator) {
 
     var command = commands[++localIterator];
 
-    this.DOMRenderer.loadPath(path);
-    this.DOMRenderer.findTarget();
+    this._domRenderer.loadPath(path);
+    this._domRenderer.findTarget();
     while (command != null) {
         if (command === Commands.WITH || command === Commands.TIME) return localIterator - 1;
         else localIterator = this._commandCallbacks[command](this, path, commands, localIterator) + 1; 
@@ -290,14 +290,14 @@ Context.prototype.getWebGLRenderer = function getWebGLRenderer() {
 
 // Command Callbacks
 function preventDefault (context, path, commands, iterator) {
-    if (context.WebGLRenderer) context.WebGLRenderer.getOrSetCutout(path);
-    context.DOMRenderer.preventDefault(commands[++iterator]);
+    if (context._webGLRenderer) context._webGLRenderer.getOrSetCutout(path);
+    context._domRenderer.preventDefault(commands[++iterator]);
     return iterator;
 }
 
 function allowDefault (context, path, commands, iterator) {
-    if (context.WebGLRenderer) context.WebGLRenderer.getOrSetCutout(path);
-    context.DOMRenderer.allowDefault(commands[++iterator]);
+    if (context._webGLRenderer) context._webGLRenderer.getOrSetCutout(path);
+    context._domRenderer.allowDefault(commands[++iterator]);
     return iterator;
 }
 
@@ -307,12 +307,12 @@ function ready (context, path, commands, iterator) {
 }
 
 function initDOM (context, path, commands, iterator) {
-    context.DOMRenderer.insertEl(commands[++iterator]);
+    context._domRenderer.insertEl(commands[++iterator]);
     return iterator;
 }
 
 function domRenderSize (context, path, commands, iterator) {
-    context.DOMRenderer.getSizeOf(commands[++iterator]);
+    context._domRenderer.getSizeOf(commands[++iterator]);
     return iterator;
 }
 
@@ -336,10 +336,10 @@ function changeTransform (context, path, commands, iterator) {
     temp[14] = commands[++iterator];
     temp[15] = commands[++iterator];
 
-    context.DOMRenderer.setMatrix(temp);
+    context._domRenderer.setMatrix(temp);
     
-    if (context.WebGLRenderer)
-        context.WebGLRenderer.setCutoutUniform(path, 'u_transform', temp);
+    if (context._webGLRenderer)
+        context._webGLRenderer.setCutoutUniform(path, 'u_transform', temp);
 
     return iterator;
 }
@@ -348,61 +348,61 @@ function changeSize (context, path, commands, iterator) {
     var width = commands[++iterator];
     var height = commands[++iterator];
 
-    context.DOMRenderer.setSize(width, height);
-    if (context.WebGLRenderer) {
+    context._domRenderer.setSize(width, height);
+    if (context._webGLRenderer) {
         context._meshSize[0] = width;
         context._meshSize[1] = height;
-        context.WebGLRenderer.setCutoutUniform(path, 'u_size', context._meshSize);
+        context._webGLRenderer.setCutoutUniform(path, 'u_size', context._meshSize);
     }
     
     return iterator;
 }
 
 function changeProperty (context, path, commands, iterator) {
-    if (context.WebGLRenderer) context.WebGLRenderer.getOrSetCutout(path);
-    context.DOMRenderer.setProperty(commands[++iterator], commands[++iterator]);
+    if (context._webGLRenderer) context._webGLRenderer.getOrSetCutout(path);
+    context._domRenderer.setProperty(commands[++iterator], commands[++iterator]);
     return iterator;
 }
 
 function changeContent (context, path, commands, iterator) {
-    if (context.WebGLRenderer) context.WebGLRenderer.getOrSetCutout(path);
-    context.DOMRenderer.setContent(commands[++iterator]);
+    if (context._webGLRenderer) context._webGLRenderer.getOrSetCutout(path);
+    context._domRenderer.setContent(commands[++iterator]);
     return iterator;
 }
   
 function changeAttribute (context, path, commands, iterator) {
-    if (context.WebGLRenderer) context.WebGLRenderer.getOrSetCutout(path);
-    context.DOMRenderer.setAttribute(commands[++iterator], commands[++iterator]);
+    if (context._webGLRenderer) context._webGLRenderer.getOrSetCutout(path);
+    context._domRenderer.setAttribute(commands[++iterator], commands[++iterator]);
     return iterator;
 }
 
 function addClass (context, path, commands, iterator) {
-    if (context.WebGLRenderer) context.WebGLRenderer.getOrSetCutout(path);
-    context.DOMRenderer.addClass(commands[++iterator]);
+    if (context._webGLRenderer) context._webGLRenderer.getOrSetCutout(path);
+    context._domRenderer.addClass(commands[++iterator]);
     return iterator;
 }
 
 function removeClass (context, path, commands, iterator) {
-    if (context.WebGLRenderer) context.WebGLRenderer.getOrSetCutout(path);
-    context.DOMRenderer.removeClass(commands[++iterator]);
+    if (context._webGLRenderer) context._webGLRenderer.getOrSetCutout(path);
+    context._domRenderer.removeClass(commands[++iterator]);
     return iterator;
 }
 
 function subscribe (context, path, commands, iterator) {
-    if (context.WebGLRenderer) context.WebGLRenderer.getOrSetCutout(path);
-    context.DOMRenderer.subscribe(commands[++iterator], commands[++iterator]);
+    if (context._webGLRenderer) context._webGLRenderer.getOrSetCutout(path);
+    context._domRenderer.subscribe(commands[++iterator], commands[++iterator]);
     return iterator;
 }
 
 function glSetDrawOptions (context, path, commands, iterator) {
-    if (!context.WebGLRenderer) context.initWebGL();
-    context.WebGLRenderer.setMeshOptions(path, commands[++iterator]);
+    if (!context._webGLRenderer) context.initWebGL();
+    context._webGLRenderer.setMeshOptions(path, commands[++iterator]);
     return iterator;
 }
 
 function glAmbientLight (context, path, commands, iterator) {
-    if (!context.WebGLRenderer) context.initWebGL();
-    context.WebGLRenderer.setAmbientLightColor(
+    if (!context._webGLRenderer) context.initWebGL();
+    context._webGLRenderer.setAmbientLightColor(
         path,
         commands[++iterator],
         commands[++iterator],
@@ -412,8 +412,8 @@ function glAmbientLight (context, path, commands, iterator) {
 }
 
 function glLightPosition (context, path, commands, iterator) {
-    if (!context.WebGLRenderer) context.initWebGL();
-    context.WebGLRenderer.setLightPosition(
+    if (!context._webGLRenderer) context.initWebGL();
+    context._webGLRenderer.setLightPosition(
         path,
         commands[++iterator],
         commands[++iterator],
@@ -423,8 +423,8 @@ function glLightPosition (context, path, commands, iterator) {
 }
 
 function glLightColor (context, path, commands, iterator) {
-    if (!context.WebGLRenderer) context.initWebGL();
-    context.WebGLRenderer.setLightColor(
+    if (!context._webGLRenderer) context.initWebGL();
+    context._webGLRenderer.setLightColor(
         path,
         commands[++iterator],
         commands[++iterator],
@@ -434,8 +434,8 @@ function glLightColor (context, path, commands, iterator) {
 }
 
 function materialInput (context, path, commands, iterator) {
-    if (!context.WebGLRenderer) context.initWebGL();
-    context.WebGLRenderer.handleMaterialInput(
+    if (!context._webGLRenderer) context.initWebGL();
+    context._webGLRenderer.handleMaterialInput(
         path,
         commands[++iterator],
         commands[++iterator]
@@ -444,8 +444,8 @@ function materialInput (context, path, commands, iterator) {
 }
 
 function glSetGeometry (context, path, commands, iterator) {
-    if (!context.WebGLRenderer) context.initWebGL();
-    context.WebGLRenderer.setGeometry(
+    if (!context._webGLRenderer) context.initWebGL();
+    context._webGLRenderer.setGeometry(
         path,
         commands[++iterator],
         commands[++iterator],
@@ -455,8 +455,8 @@ function glSetGeometry (context, path, commands, iterator) {
 }
 
 function glUniforms (context, path, commands, iterator) {
-    if (!context.WebGLRenderer) context.initWebGL();
-    context.WebGLRenderer.setMeshUniform(
+    if (!context._webGLRenderer) context.initWebGL();
+    context._webGLRenderer.setMeshUniform(
         path,
         commands[++iterator],
         commands[++iterator]
@@ -465,8 +465,8 @@ function glUniforms (context, path, commands, iterator) {
 }
 
 function glBufferData (context, path, commands, iterator) {
-    if (!context.WebGLRenderer) context.initWebGL();
-    context.WebGLRenderer.bufferData(
+    if (!context._webGLRenderer) context.initWebGL();
+    context._webGLRenderer.bufferData(
         path,
         commands[++iterator],
         commands[++iterator],
@@ -478,20 +478,20 @@ function glBufferData (context, path, commands, iterator) {
 }
 
 function glCutoutState (context, path, commands, iterator) {
-    if (!context.WebGLRenderer) context.initWebGL();
-    context.WebGLRenderer.setCutoutState(path, commands[++iterator]);
+    if (!context._webGLRenderer) context.initWebGL();
+    context._webGLRenderer.setCutoutState(path, commands[++iterator]);
     return iterator;
 }
 
 function glMeshVisibility (context, path, commands, iterator) {
-    if (!context.WebGLRenderer) context.initWebGL();
-    context.WebGLRenderer.setMeshVisibility(path, commands[++iterator]);
+    if (!context._webGLRenderer) context.initWebGL();
+    context._webGLRenderer.setMeshVisibility(path, commands[++iterator]);
     return iterator;
 }
 
 function glRemoveMesh (context, path, commands, iterator) {
-    if (!context.WebGLRenderer) context.initWebGL();
-    context.WebGLRenderer.removeMesh(path);
+    if (!context._webGLRenderer) context.initWebGL();
+    context._webGLRenderer.removeMesh(path);
     return iterator;
 }
 
