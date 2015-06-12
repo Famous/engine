@@ -291,8 +291,8 @@ Mesh.prototype.getNormals = function getNormals (materialExpression) {
  *
  * @method
  *
- * @param {MaterialExpression|Color} glossiness Accepts either a material expression or Color instance
- * @param {Number} strength Optional value for changing the strength of the glossiness
+ * @param {MaterialExpression|Number} glossiness Accepts either a material expression or a number setting its strength
+ * @param {Color} specularColor Optional value for being able to change the specular color for glossiness.
  *
  * @return {Mesh} Mesh
  */
