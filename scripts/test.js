@@ -4,6 +4,7 @@ var istanbul = require('istanbul');
 var test = require('tape');
 var path = require('path');
 var colors = require('colors');
+var glob = require('glob');
 
 var characterStack = [];
 var messageStack = [''];
@@ -92,15 +93,41 @@ test.createStream({objectMode: true}).on('data', function (row) {
         } else succeeded++;
 });
 
-console.log(
+if (process.argv.length > 3) {
+
+    console.log(
         '\n\n\n\n\n', 
         '\n\n beginning test suite'.underline.green + '\n', 
-        '\n\nfor files:\n-> ' + process.argv.slice(2).map(function (file) { return file.cyan; }).join('\n-> ') + '\n\n\n\n\n'
-);
+        '\n\nfor files:\n-> ' + process.argv.slice(2).map(function (file) {
+            return file.cyan;
+        }).join('\n-> ') + '\n\n\n\n\n'
+    );
 
-process.argv.slice(2).forEach(function (file, i, files) {
-    require(path.resolve(file));
-});
+    process.argv.slice(2).forEach(function (file) {
+        require(path.resolve(file));
+    });
+
+} else if (process.argv.length === 3) {
+
+    process.argv.slice(2).forEach(function (arg) {
+
+        var files = glob.sync(arg);
+
+        console.log(
+            '\n\n\n\n\n', 
+            '\n\n beginning test suite'.underline.green + '\n', 
+            '\n\nfor files:\n-> ' + files.map(function (file) {
+                return file.cyan;
+            }).join('\n-> ') + '\n\n\n\n\n'
+        );
+        
+        files.forEach(function (file) {
+            require(path.resolve(file));
+        });
+
+    });
+
+}
 
 process.on('beforeExit', function () {
     while (characterStack.length) popCharacterStack();
@@ -111,5 +138,7 @@ process.on('beforeExit', function () {
     console.log('\n' + 'Percent ok'.underline + ': ' + (percent * 100) + '%');
     if (percent === 1) console.log('\n\n all tests ok'.underline.green + '\n\n\n\n\n');
     else console.log('\n\n some tests not ok'.underline.red + '\n\n\n\n\n');
+
+    process.exit(percent === 1 ? 0 : 1);
 });
 
