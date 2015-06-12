@@ -133,7 +133,7 @@ Scene.prototype.onReceive = function onReceive (event, payload) {
                              payload[1],
                              payload[2] ? payload[2] : 0);
 
-        this._updater.message('WITH').message(this._selector).message('READY');
+        this._updater.message(Commands.WITH).message(this._selector).message(Commands.READY);
     }
 };
 

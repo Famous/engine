@@ -56,9 +56,8 @@ var RENDER_SIZE = 2;
 function DOMElement(node, options) {
     if (!node) throw new Error('DOMElement must be instantiated on a node');
 
-    this._node = node;
     this._changeQueue = [];
-
+    
     this._requestingUpdate = false;
     this._renderSized = false;
     this._requestRenderSize = false;
@@ -73,11 +72,14 @@ function DOMElement(node, options) {
 
     this._tagName = options && options.tagName ? options.tagName : 'div';
     this._renderSize = [0, 0, 0];
+
+    this._id = node ? node.addComponent(this) : null;
+    this._node = node;
+
     this.onSizeModeChange.apply(this, node.getSizeMode());
 
     this._callbacks = new CallbackStore();
 
-    this._id = node ? node.addComponent(this) : null;
     this.setProperty('display', node.isShown() ? 'block' : 'none');
     this.onOpacityChange(node.getOpacity());
 
