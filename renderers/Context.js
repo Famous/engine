@@ -147,7 +147,7 @@ Context.prototype.getRootSize = function getRootSize() {
 Context.prototype.initWebGL = function initWebGL() {
     this.canvas = document.createElement('canvas');
     this._rootEl.appendChild(this.canvas);
-    this.WebGLRenderer = new WebGLRenderer(this.canvas, this._compositor);
+    this.WebGLRenderer = new WebGLRenderer(this.canvas, this._compositor, this.DOMLayerEl);
     this.updateSize();
 };
 
@@ -259,6 +259,16 @@ Context.prototype.receive = function receive(path, commands, iterator) {
             case 'ALLOW_DEFAULT':
                 if (this.WebGLRenderer) this.WebGLRenderer.getOrSetCutout(path);
                 this.DOMRenderer.allowDefault(commands[++localIterator]);
+                break;
+
+            case 'GL_SUBSCRIBE':
+                if (!this.WebGLRenderer) this.initWebGL();
+                this.WebGLRenderer.subscribe(path, commands[++localIterator]);
+                break;
+
+            case 'GL_UNSUBSCRIBE':
+                if (!this.WebGLRenderer) this.initWebGL();
+                this.WebGLRenderer.unsubscribe(path, commands[++localIterator]);
                 break;
 
             case 'GL_SET_DRAW_OPTIONS':
