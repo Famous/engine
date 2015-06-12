@@ -670,7 +670,7 @@ Node.prototype.removeComponent = function removeComponent (component) {
 *
 * @param {String} eventName the name of the event
 *
-* @return {undefined} undefined
+* @return {Node} this
 */
 Node.prototype.removeUIEvent = function removeUIEvent (eventName) {
    var UIEvents = this.getUIEvents();
@@ -685,6 +685,7 @@ Node.prototype.removeUIEvent = function removeUIEvent (eventName) {
            if (component && component.onRemoveUIEvent) component.onRemoveUIEvent(eventName);
        }
    }
+   return this;
 };
 
 /**
@@ -696,7 +697,7 @@ Node.prototype.removeUIEvent = function removeUIEvent (eventName) {
  *
  * @param {String} eventName the name of the event
  *
- * @return {undefined} undefined
+ * @return {Node} this
  */
 Node.prototype.addUIEvent = function addUIEvent (eventName) {
     var UIEvents = this.getUIEvents();
@@ -711,6 +712,7 @@ Node.prototype.addUIEvent = function addUIEvent (eventName) {
             if (component && component.onAddUIEvent) component.onAddUIEvent(eventName);
         }
     }
+    return this;
 };
 
 /**
