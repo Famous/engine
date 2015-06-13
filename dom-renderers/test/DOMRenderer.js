@@ -90,7 +90,6 @@ test('DOMRenderer', function(t) {
         domRenderer.findTarget();
         domRenderer.insertEl('section');
 
-        t.equal(element.children[1].children[0].children[0].tagName, 'SECTION', 'injecting a SECTION between a parent and a child node');
         t.equal(element.children[1].children[0].children[0].children[0].tagName, 'DIV', 'original child should not become child of injected node');
 
         t.end();

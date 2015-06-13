@@ -30,7 +30,7 @@ MockDispatch.prototype.addRenderable = function addRenderable() {};
 
 MockDispatch.prototype.addComponent = function addComponent() {};
 
-MockDispatch.prototype.getRenderPath = function getRenderPath() {
+MockDispatch.prototype.getLocation = function getLocation() {
     return 'body/0/1';
 };
 

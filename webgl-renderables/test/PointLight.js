@@ -96,10 +96,6 @@ test('PointLight', function(t) {
             new PointLight();
         }, 'should throw an error if a node is not provided');
 
-        pointLight = createPointLight();
-        t.equal(typeof pointLight.setColor, 'function',
-            'color should be instantiated without errors');
-
         t.end();
     });
 
