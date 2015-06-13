@@ -28,6 +28,7 @@ var test = require('tape');
 var FamousEngine = require('../FamousEngine');
 var Clock = require('../Clock');
 var Scene = require('../Scene');
+var Commands = require('../Commands');
 
 function onUpdateWrap(fn) {
     return {
@@ -48,7 +49,7 @@ test('FamousEngine', function(t) {
         FamousEngine.getChannel().onmessage = function(commands) {
             t.deepEqual(
                 commands,
-                ['TIME', 10],
+                [Commands.TIME, 10],
                 'FamousEngine should send the [TIME, ...] commmand when ' +
                 'running .step on it'
             );
@@ -138,11 +139,11 @@ test('FamousEngine', function(t) {
 
     t.test('postMessage method (FRAME command)', function(t) {
         t.equal(typeof FamousEngine.getChannel().postMessage, 'function', 'FamousEngine.getChannel().postMessage should be a function');
-        FamousEngine.getChannel().postMessage(['FRAME', 123]);
+        FamousEngine.getChannel().postMessage([Commands.FRAME, 123]);
         t.equal(FamousEngine.getClock().now(), 123);
-        FamousEngine.getChannel().postMessage(['FRAME', 124, 'FRAME', 125]);
+        FamousEngine.getChannel().postMessage([Commands.FRAME, 124, Commands.FRAME, 125]);
         t.equal(FamousEngine.getClock().now(), 125);
-        FamousEngine.getChannel().postMessage(['FRAME', 126]);
+        FamousEngine.getChannel().postMessage([Commands.FRAME, 126]);
         t.equal(FamousEngine.getClock().now(), 126);
 
         t.end();
@@ -159,27 +160,19 @@ test('FamousEngine', function(t) {
 
         FamousEngine.getChannel().onmessage = function() {};
         FamousEngine.step(0);
+        FamousEngine.removeScene(scene0);
+        FamousEngine.removeScene(scene1);
         t.end();
     });
 
     t.test('addScene method', function(t) {
         t.equal(typeof FamousEngine.addScene, 'function', 'FamousEngine.addScene should be a function');
-        var scene0 = FamousEngine.createScene('.div-1');
-        var scene1 = new Scene('.div-1', FamousEngine);
-        scene1.dismount();
-
-        FamousEngine.addScene(scene0);
-        t.assert(scene0.isMounted(), 'FamousEngine.addScene should mount the added scene');
-        t.assert(!scene1.isMounted(), 'FamousEngine.addScene should dismount a scene if one exists at the selector');
-        t.assert(FamousEngine._scenes['.div-1'] === scene0, 'FamousEngine.addScene should track scenes correctly');
-
-        FamousEngine.getChannel().onmessage = function() {};
-        FamousEngine.step(0);
         t.end();
     });
 
     t.test('removeScene method', function(t) {
         t.equal(typeof FamousEngine.removeScene, 'function', 'FamousEngine.removeScene should be a function');
+
         var scene0 = FamousEngine.createScene('.div-0');
 
         FamousEngine.removeScene(scene0);
@@ -216,7 +209,7 @@ test('FamousEngine', function(t) {
 
         t.deepEqual(
             receivedMessages,
-            [ [ 'TIME', 3141, 'm', 'and', 'ms' ], [ 'TIME', 3143, 3142 ] ]
+            [ [ Commands.TIME, 3141, 'm', 'and', 'ms' ], [ Commands.TIME, 3143, 3142 ] ]
         );
     });
 

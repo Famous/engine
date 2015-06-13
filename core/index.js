@@ -30,7 +30,5 @@ module.exports = {
     Scene: require('./Scene'),
     FamousEngine: require('./FamousEngine'),
     Dispatch: require('./Dispatch'),
-    Node: require('./Node'),
-    Size: require('./Size'),
-    Transform: require('./Transform')
+    Node: require('./Node')
 };
