@@ -28,6 +28,7 @@ var test = require('tape');
 var Mesh = require('../Mesh');
 var MockDispatch = require('./MockDispatch');
 var MockColor = require('./MockColor');
+var Commands = require('../../core/Commands');
 
 var time = 0;
 var node;
@@ -121,7 +122,7 @@ test('Mesh', function(t) {
             'mesh should be instantiated without errors');
 
         mesh = createMesh('randomOption').mesh;
-        t.true(contains(['GL_SET_DRAW_OPTIONS', 'randomOption'], mesh._changeQueue),
+        t.true(contains([Commands.GL_SET_DRAW_OPTIONS, 'randomOption'], mesh._changeQueue),
             'should take options');
 
         t.end();
@@ -137,10 +138,10 @@ test('Mesh', function(t) {
             'should not contain false options');
 
         mesh.setDrawOptions('randomOption');
-        t.true(contains(['GL_SET_DRAW_OPTIONS', 'randomOption'], mesh._changeQueue),
+        t.true(contains([Commands.GL_SET_DRAW_OPTIONS, 'randomOption'], mesh._changeQueue),
             'should take options');
 
-        t.false(contains(['GL_SET_DRAW_OPTIONS', 'notIncluded'], mesh._changeQueue),
+        t.false(contains([Commands.GL_SET_DRAW_OPTIONS, 'notIncluded'], mesh._changeQueue),
             'should not pass fake options');
 
         t.end();
@@ -157,7 +158,7 @@ test('Mesh', function(t) {
 
         mesh.onSizeChange(transform);
 
-        t.ok(contains(mesh._changeQueue, ['GL_UNIFORMS', 'u_transform', transform]),
+        t.ok(contains(mesh._changeQueue, [Commands.GL_UNIFORMS, 'u_transform', transform]),
              'should enqueue transform changes');
         t.end();
     });
@@ -171,7 +172,7 @@ test('Mesh', function(t) {
 
         mesh.onSizeChange('none');
 
-        t.ok(contains(mesh._changeQueue, ['GL_UNIFORMS', 'u_size', 'none']),
+        t.ok(contains(mesh._changeQueue, [Commands.GL_UNIFORMS, 'u_size', 'none']),
              'should enqueue size changes');
 
         t.end();
@@ -186,7 +187,7 @@ test('Mesh', function(t) {
 
         mesh.onOpacityChange(5);
 
-        t.ok(contains(mesh._changeQueue, ['GL_UNIFORMS', 'u_opacity', 5]),
+        t.ok(contains(mesh._changeQueue, [Commands.GL_UNIFORMS, 'u_opacity', 5]),
              'should enqueue opacity changes');
 
         t.end();
@@ -209,7 +210,7 @@ test('Mesh', function(t) {
 
         var geometry = mesh.value.geometry;
 
-        t.true(contains(['GL_SET_GEOMETRY', geometry.spec.id, geometry.spec.type, geometry.spec.dynamic], mesh._changeQueue),
+        t.true(contains([Commands.GL_SET_GEOMETRY, geometry.spec.id, geometry.spec.type, geometry.spec.dynamic], mesh._changeQueue),
             'sends the appropriate commands for geometry');
 
         t.end();
@@ -331,7 +332,7 @@ test('Mesh', function(t) {
 
         mesh.setNormals(materialExpression);
 
-        t.true(contains(['MATERIAL_INPUT', 'u_normals', materialExpression], mesh._changeQueue),
+        t.true(contains([Commands.MATERIAL_INPUT, 'u_normals', materialExpression], mesh._changeQueue),
 
             'should be able to take a normal material expression');
 
@@ -362,7 +363,7 @@ test('Mesh', function(t) {
             'should be a function');
 
         mesh.setGlossiness(materialExpression);
-        t.true(contains(['MATERIAL_INPUT', 'u_glossiness', materialExpression], mesh._changeQueue),
+        t.true(contains([Commands.MATERIAL_INPUT, 'u_glossiness', materialExpression], mesh._changeQueue),
             'should take a material expression for glossiness');
 
         mesh.setGlossiness(new MockColor(), 10);
@@ -400,7 +401,7 @@ test('Mesh', function(t) {
             'should be a function');
 
         mesh.setPositionOffset(materialExpression);
-        t.true(contains(['MATERIAL_INPUT', 'u_positionOffset', materialExpression], mesh._changeQueue),
+        t.true(contains([Commands.MATERIAL_INPUT, 'u_positionOffset', materialExpression], mesh._changeQueue),
             'should take a material expression for positionOffset');
 
         mesh.setPositionOffset([.5, .2, .1]);
