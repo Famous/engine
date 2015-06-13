@@ -28,6 +28,8 @@
 
 var Transform = require('./Transform');
 var Size = require('./Size');
+var Serialize = require('../utilities/serialize');
+var ComponentFactory = require('../components/ComponentFactory');
 
 var TRANSFORM_PROCESSOR = new Transform();
 var SIZE_PROCESSOR = new Size();
@@ -40,7 +42,9 @@ var IDENT = [
 ];
 
 var ONES = [1, 1, 1];
+var ZEROS = [0, 0, 0];
 var QUAT = [0, 0, 0, 1];
+var SIZE_RELATIVE = [Size.RELATIVE, Size.RELATIVE, Size.RELATIVE];
 
 /**
  * Nodes define hierarchy and geometrical transformations. They can be moved
@@ -121,6 +125,7 @@ Node.DEFAULT_SIZE = Size.DEFAULT;
  * @constructor
  *
  * @property {String} location path to the node (e.g. "body/0/1")
+ * @property {String} nodeName human readable identifier
  * @property {Object} showState
  * @property {Boolean} showState.mounted
  * @property {Boolean} showState.shown
@@ -142,6 +147,7 @@ Node.DEFAULT_SIZE = Size.DEFAULT;
  */
 Node.Spec = function Spec () {
     this.location = null;
+    this.nodeName = null;
     this.showState = {
         mounted: false,
         shown: false,
@@ -158,7 +164,7 @@ Node.Spec = function Spec () {
         scale: new Float32Array(ONES)
     };
     this.size = {
-        sizeMode: new Float32Array([Size.RELATIVE, Size.RELATIVE, Size.RELATIVE]),
+        sizeMode: new Float32Array(SIZE_RELATIVE),
         proportional: new Float32Array(ONES),
         differential: new Float32Array(3),
         absolute: new Float32Array(3),
@@ -275,6 +281,160 @@ Node.prototype.getComputedValue = function getComputedValue () {
 };
 
 /**
+ * Recursively serializes the Node and supported components.
+ * This version is intended as a human editable and diff friendly file format.
+ * If a serialized Node has no name it will be named after its index in order
+ * to facillitate overlays.
+ *
+ * @param  {Boolean} If the name of the node is not required.  Optional.
+ *
+ * @method serialize
+ *
+ * @return {Object}     JSON representation.
+ */
+Node.prototype._serialize = function _serialize (skipName) {
+    var t, i, v = this.value, result = { _type:'Node', _version:1 };
+    var numberOfChildren = this._children.length;
+    var numberOfComponents = this._components.length;
+
+    if(!skipName&&v.nodeName) result.nodeName = v.nodeName;
+    if(v.showState.opacity !== 1) result.opacity = v.showState.opacity;
+    if(t = Serialize.serializeArray3ZOffset(v.offsets.mountPoint, ZEROS)) result.mountPoint = t;
+    if(t = Serialize.serializeArray3ZOffset(v.offsets.align, ZEROS)) result.align = t;
+    if(t = Serialize.serializeArray3ZOffset(v.offsets.origin, ZEROS)) result.origin = t;
+    if(t = Serialize.serializeArray(v.vectors.position, ZEROS)) result.position = t;
+    if(t = Serialize.serializeArray(v.vectors.rotation, QUAT)) result.rotation = t;
+    if(t = Serialize.serializeArray(v.vectors.scale, ONES)) result.scale = t;
+    if(t = Serialize.serializeArray(v.size.sizeMode, SIZE_RELATIVE)) result.sizeMode = t;
+    if(t = Serialize.serializeArray(v.size.proportional, ONES)) result.proportionalSize = t;
+    if(t = Serialize.serializeArray(v.size.differential, ZEROS)) result.differentialSize = t;
+    if(t = Serialize.serializeArray(v.size.absolute, ZEROS)) result.absoluteSize = t;
+
+    for (i = 0 ; i < numberOfChildren ; i++) {
+        result.children = result.children || {};
+        t = this._children[i];
+        result.children[t.nodeName ? t.nodeName : i] = t._serialize(true);
+    }
+
+    for (i = 0; i < numberOfComponents ; i++) {
+        t = this._components[i];
+        if (t && t._serialize && t.constructor.name) {
+            result.components = result.components || {};            
+            result.components[t.constructor.name] = t._serialize();
+        }
+    }
+
+    return result;
+};
+
+/**
+ * Recursively deserializes and overlays Nodes and supported Components.
+ * This version is intended as a human editable and diff friendly file format.
+ *
+ * @method deserialize
+ *
+ * @param  {Object} json representation to deserialize
+ * @param  {Object} overlayDefaults whether to reset overlayed nodes to default values when
+ *                                  properties are not provided.  Useful when applying a diff
+ *                                  that may be missing defualt values due to the filtering
+ *                                  of default values in serialize().
+ *
+ * @return {Node} this
+ */
+Node.prototype._deserialize = function _deserialize(json, overlayDefaults) {
+    var key, i, len, match;
+    if(json._type !== 'Node' || json._version != 1)
+        throw new Error('expected JSON serialized Node version 1');
+
+    if(overlayDefaults) {
+        if(!json.opacity) this.setOpacity(1);
+        if(!json.mountPoint) this.setMountPoint(0,0,0);
+        if(!json.align) this.setAlign(0,0,0);
+        if(!json.origin) this.setOrigin(0,0,0);
+        if(!json.position) this.setPosition(0,0,0);
+        if(!json.rotation) this.setRotation(0,0,0,1);
+        if(!json.scale) this.setScale(1,1,1);
+        if(!json.sizeMode) this.setSizeMode(Size.RELATIVE, Size.RELATIVE, Size.RELATIVE);
+        if(!json.proportionalSize) this.setProportionalSize(1,1,1);
+        if(!json.differentialSize) this.setDifferentialSize(0,0,0);
+        if(!json.absoluteSize) this.setAbsoluteSize(0,0,0);
+    }
+
+    // If speed was not an issue, these 4 line blocks could be reduced to:
+    // if(json.mountPoint) this.setMountPoint.apply(this, json.mountPoint = Serialize.deserializeArray(json.mountPoint));
+
+
+    if(json.opacity) this.setOpacity(json.opacity);
+    if(json.mountPoint) {
+        json.mountPoint = Serialize.deserializeArray(json.mountPoint);
+        this.setMountPoint(json.mountPoint[0],json.mountPoint[1],json.mountPoint[2]);
+    }
+    if(json.align) {
+        json.align = Serialize.deserializeArray(json.align);
+        this.setAlign(json.align[0],json.align[1],json.align[2]);
+    }
+    if(json.origin) {
+        json.origin = Serialize.deserializeArray(json.origin);
+        this.setOrigin(json.origin[0],json.origin[1],json.origin[2]);
+    }
+    if(json.position) {
+        json.position = Serialize.deserializeArray(json.position);
+        this.setPosition(json.position[0],json.position[1],json.position[2]);
+    }
+    if(json.rotation) {
+        json.rotation = Serialize.deserializeArray(json.rotation);
+        this.setRotation(json.rotation[0],json.rotation[1],json.rotation[2],json.rotation[3]);
+    }
+    if(json.scale) {
+        json.scale = Serialize.deserializeArray(json.scale);
+        this.setScale(json.scale[0],json.scale[1],json.scale[2]);
+    }
+    if(json.sizeMode) {
+        json.sizeMode = Serialize.deserializeArray(json.sizeMode);
+        this.setSizeMode(json.sizeMode[0],json.sizeMode[1],json.sizeMode[2]);
+    }
+    if(json.proportionalSize) {
+        json.proportionalSize = Serialize.deserializeArray(json.proportionalSize);
+        this.setProportionalSize(json.proportionalSize[0],json.proportionalSize[1],json.proportionalSize[2]);
+    }
+    if(json.differentialSize) {
+        json.differentialSize = Serialize.deserializeArray(json.differentialSize);
+        this.setDifferentialSize(json.differentialSize[0],json.differentialSize[1],json.differentialSize[2]);
+    }
+    if(json.absoluteSize) {
+        json.absoluteSize = Serialize.deserializeArray(json.absoluteSize);
+        this.setAbsoluteSize(json.absoluteSize[0],json.absoluteSize[1],json.absoluteSize[2]);
+    }
+
+    len = this._children.length;
+    for(key in json.children) {
+        match = null;
+        for(i=0; i<len; ++i)
+            if(key === this._children[i].value.nodeName) {
+                match = this._children[i];
+                break;                
+            }
+        match = match || this.addChild();
+        match._deserialize(json.children[key], overlayDefaults);
+        match.setName(key);
+    }
+
+    len = this._components.length;
+    for(key in json.components) {
+        match = null;
+        for(i=0; i<len; ++i)
+            if(key === this._components[i].constructor.name) {
+                match = this._components[i];
+                break;                
+            }
+
+        if(match) match._deserialize(json.components[key], overlayDefaults);
+        else ComponentFactory(key, this, json.components[key]);
+    }
+    return this;
+}
+
+/**
  * Retrieves all children of the current node.
  *
  * @method getChildren
@@ -372,6 +532,18 @@ Node.prototype.isMounted = function isMounted () {
  */
 Node.prototype.isShown = function isShown () {
     return this.value.showState.shown;
+};
+
+/**
+ * Names may optionally be assigned to nodes.  They are useful when searching
+ * for nodes read in from disk.
+ *
+ * @method getName
+ *
+ * @return {Number}         The name of this Node.
+ */
+Node.prototype.getName = function getName () {
+    return this.value.nodeName;
 };
 
 /**
@@ -1073,6 +1245,22 @@ Node.prototype.setScale = function setScale (x, y, z) {
     }
     return this;
 };
+
+/**
+ * Names may optionally be assigned to nodes.  They are useful when searching
+ * for nodes who's location is not known in advance.
+ *
+ * @method setName
+ *
+ * @param {String} val The name of this Node.
+ *
+ * @return {Node} this
+ */
+Node.prototype.setName = function setName (val) {
+    this.value.name = val;
+    return this;
+};
+
 
 /**
  * Sets the value of the opacity of this node. All of the node's

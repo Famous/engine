@@ -24,6 +24,13 @@
 
 'use strict';
 var Geometry = require('../webgl-geometries');
+var Serialize = require('../utilities/serialize');
+var Color = require('../utilities/Color');
+
+var ComponentFactory = require('../components/ComponentFactory');
+ComponentFactory.register(Mesh);
+
+var NULL_COLOR = new Color();
 
 /**
  * The Mesh class is responsible for providing the API for how
@@ -58,6 +65,12 @@ function Mesh (node, options) {
 
     if (options) this.setDrawOptions(options);
     this._id = node.addComponent(this);
+
+    // WARNING: addComponent must be called before setGeometry.
+
+    if (options)
+        if(options._type==='Mesh') this._deserialize(options);
+        else setDrawOptions(options);
 }
 
 /**
@@ -120,6 +133,7 @@ Mesh.prototype.setGeometry = function setGeometry (geometry, options) {
     if (this._initialized) {
         if (this._node) {
             var i = this.value.geometry.spec.invalidations.length;
+            if (i) this._requestUpdate();
             while (i--) {
                 this.value.geometry.spec.invalidations.pop();
                 this._changeQueue.push('GL_BUFFER_DATA');
@@ -129,8 +143,8 @@ Mesh.prototype.setGeometry = function setGeometry (geometry, options) {
                 this._changeQueue.push(this.value.geometry.spec.bufferSpacings[i]);
                 this._changeQueue.push(this.value.geometry.spec.dynamic);
             }
-            if (i) this._requestUpdate();
         }
+
     }
     return this;
 };
@@ -395,6 +409,61 @@ Mesh.prototype.getMaterialExpressions = function getMaterialExpressions () {
 Mesh.prototype.getValue = function getValue () {
     return this.value;
 };
+
+/**
+ * Serializes the Mesh.  This version is intended as a human editable and
+ * diff friendly file format.
+ *
+ * @method serialize
+ *
+ * @return {Object}     Serialized representation.
+ */
+Mesh.prototype._serialize = function _serialize() {
+    var val = this.value, t, result = {_type:"Mesh", _version:1};
+    if(this.value.positionOffset !== null)
+        throw new Error('serializing positionOffset unsupported in Mesh version 1');
+    for(t in val.drawOptions) {
+        result.drawOptions = val.drawOptions;
+        break;
+    }
+    if(t = this.getBaseColor()) result.color = JSON.stringify(t.getRGB());
+    if(val.geometry) result.geometry = val.geometry._serialize();
+    if(t = this.getFlatShading()) result.flatShading = t;
+    if(t = this.getGlossiness()) result.glossiness = JSON.stringify([t[0].getRGB(), t[1]]);
+    return result;
+};
+
+/**
+ * Deserialize the Mesh.
+ *
+ * @method deserialize
+ *
+ * @param  {Object} json representation to deserialize
+ * @param  {Object} overlayDefaults whether to reset to default values when properties are not provided.
+ *
+ * @return {Node} this
+ */
+Mesh.prototype._deserialize = function _deserialize(json, overlayDefaults) {
+    if(json._type !== 'Mesh' || json._version != 1)
+        throw new Error('expected JSON serialized Mesh version 1');
+    if(overlayDefaults) {
+        if(!json.drawOptions) this.setDrawOptions({});
+        if(!json.color) this.setBaseColor(NULL_COLOR);
+        if(json.flatShading === undefined) this.setFlatShading(true); // TODO: need default param.
+        if(!json.glossiness) this.setGlossiness(NULL_COLOR, 20);
+    }
+    if (json.drawOptions) this.setDrawOptions(json.drawOptions);
+    if (json.color) {
+        json.color = Serialize.deserializeArray(json.color);
+        this.setBaseColor(new Color(json.color));
+    }
+    if (json.geometry) this.setGeometry(new Geometry.Geometry(json.geometry));
+    if (json.flatShading !== undefined) this.setFlatShading(json.flatShading);
+    if (json.glossiness) {
+        json.glossiness = Serialize.deserializeArray(json.glossiness);
+        this.setGlossiness(new Color(json.glossiness[0]), json.glossiness[1]);
+    }
+}
 
 /**
  * Queues the invalidations for Mesh

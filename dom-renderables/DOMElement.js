@@ -26,7 +26,13 @@
 
 var CallbackStore = require('../utilities/CallbackStore');
 
+var ComponentFactory = require('../components/ComponentFactory');
+ComponentFactory.register(DOMElement);
+
 var RENDER_SIZE = 2;
+var DEFAULT_CLASSES = ['famous-dom-element'];
+var EMPTY_CLASS = {}; // Avoid garbage collection.
+var EMPTY_ARRAY = []; // Avoid garbage collection.
 
 /**
  * A DOMElement is a component that can be added to a Node with the
@@ -39,6 +45,9 @@ var RENDER_SIZE = 2;
  *                                      renderable should be attached to.
  * @param {Object} options              Initial options used for instantiating
  *                                      the Node.
+ *
+ * @param {Object} options.tagName      The tagName of the renderable.
+ *
  * @param {Object} options.properties   CSS properties that should be added to
  *                                      the actual DOMElement on the initial draw.
  * @param {Object} options.attributes   Element attributes that should be added to
@@ -101,7 +110,7 @@ function DOMElement(node, options) {
     if (options.id) this.setId(options.id);
     if (options.content) this.setContent(options.content);
     if (options.cutout === false) this.setCutoutState(options.cutout);
-}
+};
 
 /**
  * Serializes the state of the DOMElement.
@@ -119,6 +128,89 @@ DOMElement.prototype.getValue = function getValue() {
         id: this._attributes.id,
         tagName: this._tagName
     };
+};
+
+/**
+ * Serializes the DOMElement.  This version is intended as a human editable and
+ * diff friendly file format.
+ *
+ * @method serialize
+ *
+ * @return {Object}     Serialized representation.
+ */
+DOMElement.prototype._serialize = function _serialize() {
+    var key, result = { _type:"DOMElement", _version:1 };
+
+    if(this._tagName !== 'div') result.tagName = this._tagName;
+    if(this._content !== '') result.content = this._content;
+
+    for (key in this._attributes) {
+        if (key === 'data-fa-path' || this._attributes[key] === '')
+            continue;
+        result.attributes = result.attributes || { };
+        result.attributes[key] = this._attributes[key];
+    }
+
+    // Record absense of default class.
+    if(this._classes.length != 1 || this._classes[0] !== DEFAULT_CLASSES[0])
+        result.classes = this._classes;
+
+    for (key in this._styles) {
+        if (!this._styles[key] || key === 'display' || key === 'opacity')
+            continue;
+        result.properties = result.properties || { };
+        result.properties[key] = this._styles[key];
+    }
+
+    return result;
+};
+
+/**
+ * Deserialize the DOMElement.  This version should only be used to animate properties.
+ * To construct a new DOMElement (required for tagName changes) pass the JSON to the constructor.
+ *
+ * @method deserialize
+ *
+ * @param  {Object} json representation to deserialize
+ * @param  {Object} overlayDefaults whether to reset properties that are not provided.
+ *
+ * @return {Node} this
+ */
+DOMElement.prototype._deserialize = function _deserialize(json, overlayDefaults) {
+    var i, key;
+    var classes = json.classes || (overlayDefaults ? DEFAULT_CLASSES : EMPTY_ARRAY);
+    var attributes = json.attributes || EMPTY_CLASS;
+    var properties = json.properties || EMPTY_CLASS;
+
+    if(json._type !== 'DOMElement' || json._version != 1)
+        throw new Error('expected JSON serialized DOMElement version 1');
+    if(json.tagName && json.tagName !== this.tagName)
+        throw new Error('cannot change tagName');
+
+    if(overlayDefaults) {
+        len = this._classes.length;
+        for (i = 0; i < len; ++i)
+            if (classes.indexOf(this._classes[i]) < 0)
+                this.removeClass(this._classes[i]);
+        for (key in this._attributes)
+            if (key !== 'data-fa-path' && !attributes[key])
+                this.setAttribute(key, '');
+        for (key in this._styles)
+            if (key !== 'display' && key !== 'opacity' && !properties[key])
+                this.setProperty(key, '');
+        if (!json.content) this.setContent('');
+    }
+
+    len = classes.length;
+    for (i = 0; i < len; ++i)
+        this.addClass(classes[i]);
+    for (key in attributes)
+        this.setAttribute(key, attributes[key]);
+    for (key in properties)
+        this.setProperty(key, properties[key]);
+    if (json.content) this.setContent(json.content);
+
+    return result;
 };
 
 /**

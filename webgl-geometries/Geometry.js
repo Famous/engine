@@ -24,6 +24,11 @@
 
 'use strict';
 
+var Serialize = require('../utilities/serialize');
+
+var ComponentFactory = require('../components/ComponentFactory');
+ComponentFactory.register(Geometry);
+
 var GeometryIds = 0;
 
 /**
@@ -37,28 +42,62 @@ var GeometryIds = 0;
  * @return {undefined} undefined
  */
 function Geometry(options) {
-    this.options = options || {};
+    var spec;
     this.DEFAULT_BUFFER_SIZE = 3;
 
-    this.spec = {
+    options = options || {}
+    this.spec = spec = {
         id: GeometryIds++,
-        dynamic: false,
-        type: this.options.type || 'TRIANGLES',
-        bufferNames: [],
-        bufferValues: [],
-        bufferSpacings: [],
-        invalidations: []
+        dynamic: options.dynamic || false,
+        type: options.type || 'TRIANGLES',
+        invalidations : []
     };
 
-    if (this.options.buffers) {
-        var len = this.options.buffers.length;
+    if(options.bufferNames) {
+        spec.bufferNames = options.bufferNames = Serialize.deserializeArray(options.bufferNames);
+        spec.bufferValues = options.bufferValues = Serialize.deserializeArray(options.bufferValues);
+        spec.bufferSpacings = options.bufferSpacings = Serialize.deserializeArray(options.bufferSpacings);
+
+        // WTF: The actual values here are ignored by Mesh.prototype.setGeometry 
+        var len = spec.bufferNames.length;
         for (var i = 0; i < len;) {
-            this.spec.bufferNames.push(this.options.buffers[i].name);
-            this.spec.bufferValues.push(this.options.buffers[i].data);
-            this.spec.bufferSpacings.push(this.options.buffers[i].size || this.DEFAULT_BUFFER_SIZE);
-            this.spec.invalidations.push(i++);
+            spec.invalidations.push(i++);
+        }        
+    }
+    else {
+        spec.bufferNames = [];
+        spec.bufferValues = [];
+        spec.bufferSpacings = [];
+
+        if (options.buffers) {
+            var len = options.buffers.length;
+            for (var i = 0; i < len;) {
+                spec.bufferNames.push(options.buffers[i].name);
+                spec.bufferValues.push(options.buffers[i].data);
+                spec.bufferSpacings.push(options.buffers[i].size || this.DEFAULT_BUFFER_SIZE);
+                // WTF: The actual values here are ignored by Mesh.prototype.setGeometry 
+                spec.invalidations.push(i++);
+            }
         }
     }
 }
+
+/**
+ * Serializes the Geometry.  This version is intended as a human editable and
+ * diff friendly file format.  Use constructor to deserialize.
+ *
+ * @method serialize
+ *
+ * @return {Object}     Serialized representation.
+ */
+Geometry.prototype._serialize = function _serialize() {
+    var t; var spec=this.spec; var result = {_type:"Geometry", _version:1};
+    if(spec.dynamic) result.dynamic = true;
+    if(spec.type !== 'TRIANGLES') result.type = spec.type;
+    result.bufferNames = Serialize.serializeArray(spec.bufferNames);
+    result.bufferValues = Serialize.serializeArray(spec.bufferValues);
+    result.bufferSpacings = Serialize.serializeArray(spec.bufferSpacings);
+    return result;
+};
 
 module.exports = Geometry;

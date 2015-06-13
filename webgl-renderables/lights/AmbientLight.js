@@ -25,6 +25,11 @@
 'use strict';
 
 var Light = require('./Light');
+var Color = require('../../utilities/Color');
+
+var ComponentFactory = require('../../components/ComponentFactory');
+ComponentFactory.register(AmbientLight);
+
 
 /**
  * AmbientLight extends the functionality of Light. It sets the ambience in
@@ -40,8 +45,8 @@ var Light = require('./Light');
  *
  * @return {undefined} undefined
  */
-function AmbientLight(node) {
-    Light.call(this, node);
+function AmbientLight(node, options) {
+    Light.call(this, node, options);
     this.commands.color = 'GL_AMBIENT_LIGHT';
 }
 
@@ -54,5 +59,38 @@ AmbientLight.prototype = Object.create(Light.prototype);
  * Sets AmbientLight as the constructor
  */
 AmbientLight.prototype.constructor = AmbientLight;
+
+/**
+ * Serializes the AmbientLight.  This version is intended as a human editable and
+ * diff friendly file format.
+ *
+ * @method serialize
+ *
+ * @return {Object}     Serialized representation.
+ */
+
+AmbientLight.prototype._serialize = function _serialize() {
+    var json = { _type:"AmbientLight", _version:1 };
+    this._serializeLight(json);
+    return json; 
+}
+
+/**
+ * Deserialize the AmbientLight.
+ *
+ * @method deserialize
+ *
+ * @param  {Object} json representation to deserialize
+ * @param  {Object} overlayDefaults whether to reset to default values when properties are not provided.
+ *                  (Currently unimplemented.)
+ *
+ * @return {Node} this
+ */
+AmbientLight.prototype._deserialize = function _deserialize(json, overlayDefaults) {
+    if(json._type !== 'AmbientLight' || json._version != 1)
+        throw new Error('expected JSON serialized AmbientLight version 1');
+    debugger;
+    this._deserializeLight(json, overlayDefaults);
+}
 
 module.exports = AmbientLight;

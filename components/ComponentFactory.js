@@ -24,17 +24,16 @@
 
 'use strict';
 
-module.exports = {
-    CallbackStore: require('./CallbackStore'),
-    clamp: require('./clamp'),
-    clone: require('./clone'),
-    Color: require('./Color'),
-    KeyCodes: require('./KeyCodes'),
-    keyValueToArrays: require('./keyValueToArrays'),
-    loadURL: require('./loadURL'),
-    ObjectManager: require('./ObjectManager'),
-    Serialize: require('./Serialize'),
-    strip: require('./strip'),
-    vendorPrefix: require('./vendorPrefix')
-};
+var ComponentRegistry = {};
 
+function ComponentFactory (type, options0, options1, options2) {
+    if(!ComponentRegistry[type])
+        throw new Error('ComponentFactory: require() type before use: ' + type);
+    return new ComponentRegistry[type](options0, options1, options2);
+}
+
+ComponentFactory.register = function register (constructor) {
+    ComponentRegistry[constructor.name] = constructor;
+}
+
+module.exports = ComponentFactory;
