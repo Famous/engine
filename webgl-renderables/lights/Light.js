@@ -24,6 +24,9 @@
 
 'use strict';
 
+var Serialize = require('../../utilities/serialize');
+var Color = require('../../utilities/Color');
+
 /**
  * The blueprint for all light components.
  *
@@ -35,13 +38,15 @@
  *
  * @return {undefined} undefined
  */
-function Light(node) {
+function Light(node, options) {
     this._node = node;
     this._id = node.addComponent(this);
     this._requestingUpdate = false;
     this.queue = [];
     this._color = null;
     this.commands = { color: 'GL_LIGHT_COLOR' };
+    if(options)
+        this._deserializeLight(options);
 }
 
 /**
@@ -111,5 +116,38 @@ Light.prototype.onUpdate = function onUpdate() {
         this._requestingUpdate = false;
     }
 };
+
+/**
+ * Serializes the Light.  This version is intended as a human editable and
+ * diff friendly file format.
+ *
+ * @private
+ * @method serialize
+ *
+ * @return {Object}     Serialized representation.
+ */
+
+Light.prototype._serializeLight = function _serializeLight(json) {
+    if(this._color) json.color = JSON.stringify(this._color.getRGB());
+}
+
+/**
+ * Deserialize the Light.
+ *
+ * @private
+ * @method deserialize
+ *
+ * @param  {Object} json representation to deserialize
+ * @param  {Object} overlayDefaults whether to reset to default values when properties are not provided.
+ *                  (Currently unimplemented.)
+ *
+ * @return {Node} this
+ */
+Light.prototype._deserializeLight = function _deserializeLight(json, overlayDefaults) {
+    if(json.color) {
+        json.color = Serialize.deserializeArray(json.color);
+        this.setColor(new Color(json.color));
+    }
+}
 
 module.exports = Light;

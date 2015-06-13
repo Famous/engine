@@ -25,6 +25,10 @@
 'use strict';
 
 var Light = require('./Light');
+var Color = require('../../utilities/Color');
+
+var ComponentFactory = require('../../components/ComponentFactory');
+ComponentFactory.register(PointLight);
 
 /**
  * PointLight extends the functionality of Light. PointLight is a light source
@@ -39,8 +43,8 @@ var Light = require('./Light');
  *
  * @return {undefined} undefined
  */
-function PointLight(node) {
-    Light.call(this, node);
+function PointLight(node, options) {
+    Light.call(this, node, options);
     this.commands.position = 'GL_LIGHT_POSITION';
     this.onTransformChange(node.getTransform());
 }
@@ -74,5 +78,37 @@ PointLight.prototype.onTransformChange = function onTransformChange (transform) 
     this.queue.push(transform[13]);
     this.queue.push(transform[14]);
 };
+
+/**
+ * Serializes the PointLight.  This version is intended as a human editable and
+ * diff friendly file format.
+ *
+ * @method serialize
+ *
+ * @return {Object}     Serialized representation.
+ */
+
+PointLight.prototype._serialize = function _serialize() {
+    var json = { _type:"PointLight", _version:1 };
+    this._serializeLight(json);
+    return json; 
+}
+
+/**
+ * Deserialize the PointLight.
+ *
+ * @method deserialize
+ *
+ * @param  {Object} json representation to deserialize
+ * @param  {Object} overlayDefaults whether to reset to default values when properties are not provided.
+ *                  (Currently unimplemented.)
+ *
+ * @return {Node} this
+ */
+PointLight.prototype._deserialize = function _deserialize(json, overlayDefaults) {
+    if(json._type !== 'PointLight' || json._version != 1)
+        throw new Error('expected JSON serialized PointLight version 1');
+    this._deserializeLight(json, overlayDefaults);
+}
 
 module.exports = PointLight;
