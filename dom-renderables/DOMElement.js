@@ -341,7 +341,7 @@ DOMElement.prototype._subscribe = function _subscribe (uiEvent) {
     if (this._initialized) {
         this._changeQueue.push('SUBSCRIBE', uiEvent);
     }
-<<<<<<< HEAD
+
     if (!this._requestingUpdate) this._requestUpdate();
 };
 
