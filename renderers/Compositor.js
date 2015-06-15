@@ -133,10 +133,9 @@ Compositor.prototype.handleWith = function handleWith (iterator, commands) {
  * query selector. If no such Context exists, a new one will be instantiated.
  *
  * @method
- * @private
  *
  * @param  {String} selector document query selector used for retrieving the
- * DOM node the VirtualElement should be attached to
+ * DOM node that should be used as a root element by the Context
  *
  * @return {Context} context
  */
@@ -149,6 +148,20 @@ Compositor.prototype.getOrSetContext = function getOrSetContext(selector) {
         this._contexts[selector] = context;
         return context;
     }
+};
+
+/**
+ * Retrieves a context object registered under the passed in selector.
+ *
+ * @method
+ *
+ * @param  {String} selector    Query selector that has previously been used to
+ *                              register the context.
+ * @return {Context}            The repsective context.
+ */
+Compositor.prototype.getContext = function getContext(selector) {
+    if (this._contexts[selector])
+        return this._contexts[selector];
 };
 
 /**
@@ -243,7 +256,7 @@ Compositor.prototype.receiveCommands = function receiveCommands(commands) {
     for (var i = 0; i < len; i++) {
         this._inCommands.push(commands[i]);
     }
-    
+
     for (var selector in this._contexts) {
         this._contexts[selector].checkInit();
     }

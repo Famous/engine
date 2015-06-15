@@ -403,4 +403,27 @@ Context.prototype.receive = function receive(path, commands, iterator) {
     return localIterator;
 };
 
+/**
+ * Getter method used for retrieving the used DOMRenderer.
+ *
+ * @method
+ *
+ * @return {DOMRenderer}    The DOMRenderer being used by the Context.
+ */
+Context.prototype.getDOMRenderer = function getDOMRenderer() {
+    return this.DOMRenderer;
+};
+
+/**
+ * Getter method used for retrieving the used WebGLRenderer (if any).
+ *
+ * @method
+ *
+ * @return {WebGLRenderer|null}    The WebGLRenderer being used by the Context.
+ */
+Context.prototype.getWebGLRenderer = function getWebGLRenderer() {
+    return this.WebGLRenderer;
+};
+
+
 module.exports = Context;
