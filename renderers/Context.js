@@ -68,6 +68,7 @@ function Context(selector, compositor, options) {
 
     // WebGLRenderer will be instantiated if needed.
     if (this.options.disableWebGL !== true) {
+        console.log(1)
         this._initWebGLRenderer();
     }
 
@@ -305,93 +306,96 @@ Context.prototype.receive = function receive(path, commands, iterator) {
                 break;
 
             case 'GL_SET_DRAW_OPTIONS':
-                if (!this._webGLRenderer) this._initWebGLRenderer();
-                this._webGLRenderer.setMeshOptions(path, commands[++localIterator]);
+                if (this._webGLRenderer)
+                    this._webGLRenderer.setMeshOptions(
+                        path,
+                        commands[++localIterator]
+                    );
                 break;
 
             case 'GL_AMBIENT_LIGHT':
-                if (!this._webGLRenderer) this._initWebGLRenderer();
-                this._webGLRenderer.setAmbientLightColor(
-                    path,
-                    commands[++localIterator],
-                    commands[++localIterator],
-                    commands[++localIterator]
-                );
+                if (this._webGLRenderer)
+                    this._webGLRenderer.setAmbientLightColor(
+                        path,
+                        commands[++localIterator],
+                        commands[++localIterator],
+                        commands[++localIterator]
+                    );
                 break;
 
             case 'GL_LIGHT_POSITION':
-                if (!this._webGLRenderer) this._initWebGLRenderer();
-                this._webGLRenderer.setLightPosition(
-                    path,
-                    commands[++localIterator],
-                    commands[++localIterator],
-                    commands[++localIterator]
-                );
+                if (this._webGLRenderer) 
+                    this._webGLRenderer.setLightPosition(
+                        path,
+                        commands[++localIterator],
+                        commands[++localIterator],
+                        commands[++localIterator]
+                    );
                 break;
 
             case 'GL_LIGHT_COLOR':
-                if (!this._webGLRenderer) this._initWebGLRenderer();
-                this._webGLRenderer.setLightColor(
-                    path,
-                    commands[++localIterator],
-                    commands[++localIterator],
-                    commands[++localIterator]
-                );
+                if (this._webGLRenderer)
+                    this._webGLRenderer.setLightColor(
+                        path,
+                        commands[++localIterator],
+                        commands[++localIterator],
+                        commands[++localIterator]
+                    );
                 break;
 
             case 'MATERIAL_INPUT':
-                if (!this._webGLRenderer) this._initWebGLRenderer();
-                this._webGLRenderer.handleMaterialInput(
-                    path,
-                    commands[++localIterator],
-                    commands[++localIterator]
-                );
+                if (this._webGLRenderer)
+                    this._webGLRenderer.handleMaterialInput(
+                        path,
+                        commands[++localIterator],
+                        commands[++localIterator]
+                    );
                 break;
 
             case 'GL_SET_GEOMETRY':
-                if (!this._webGLRenderer) this._initWebGLRenderer();
-                this._webGLRenderer.setGeometry(
-                    path,
-                    commands[++localIterator],
-                    commands[++localIterator],
-                    commands[++localIterator]
-                );
+                if (this._webGLRenderer)
+                    this._webGLRenderer.setGeometry(
+                        path,
+                        commands[++localIterator],
+                        commands[++localIterator],
+                        commands[++localIterator]
+                    );
                 break;
 
             case 'GL_UNIFORMS':
-                if (!this._webGLRenderer) this._initWebGLRenderer();
-                this._webGLRenderer.setMeshUniform(
-                    path,
-                    commands[++localIterator],
-                    commands[++localIterator]
-                );
+                if (this._webGLRenderer)
+                    this._webGLRenderer.setMeshUniform(
+                        path,
+                        commands[++localIterator],
+                        commands[++localIterator]
+                    );
                 break;
 
             case 'GL_BUFFER_DATA':
-                if (!this._webGLRenderer) this._initWebGLRenderer();
-                this._webGLRenderer.bufferData(
-                    path,
-                    commands[++localIterator],
-                    commands[++localIterator],
-                    commands[++localIterator],
-                    commands[++localIterator],
-                    commands[++localIterator]
-                );
+                if (this._webGLRenderer)
+                    this._webGLRenderer.bufferData(
+                        path,
+                        commands[++localIterator],
+                        commands[++localIterator],
+                        commands[++localIterator],
+                        commands[++localIterator],
+                        commands[++localIterator]
+                    );
                 break;
 
             case 'GL_CUTOUT_STATE':
-                if (!this._webGLRenderer) this._initWebGLRenderer();
-                this._webGLRenderer.setCutoutState(path, commands[++localIterator]);
+                if (this._webGLRenderer)
+                    this._webGLRenderer.setCutoutState(path, commands[++localIterator]);
                 break;
 
             case 'GL_MESH_VISIBILITY':
-                if (!this._webGLRenderer) this._initWebGLRenderer();
-                this._webGLRenderer.setMeshVisibility(path, commands[++localIterator]);
+                if (this._webGLRenderer)
+                    this._webGLRenderer.setMeshVisibility(path, commands[++localIterator]);
                 break;
 
             case 'GL_REMOVE_MESH':
-                if (!this._webGLRenderer) this._initWebGLRenderer();
-                this._webGLRenderer.removeMesh(path);
+                if (this._webGLRenderer)
+                    this._webGLRenderer.removeMesh(path);
                 break;
 
             case 'PINHOLE_PROJECTION':
