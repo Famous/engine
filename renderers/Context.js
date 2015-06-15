@@ -276,28 +276,28 @@ Context.prototype.receive = function receive(path, commands, iterator) {
                 break;
 
             case 'SUBSCRIBE':
-            if (this._webGLRenderer) this.WebGLRenderer.getOrSetCutout(path);
+            if (this._webGLRenderer) this._webGLRenderer.getOrSetCutout(path);
                 this._domRenderer.subscribe(commands[++localIterator]);
                 break;
 
             case 'UNSUBSCRIBE':
-            if (this._webGLRenderer) this.WebGLRenderer.getOrSetCutout(path);
+            if (this._webGLRenderer) this._webGLRenderer.getOrSetCutout(path);
                 this._domRenderer.unsubscribe(commands[++localIterator]);
                 break;
 
             case 'PREVENT_DEFAULT':
-            if (this._webGLRenderer) this.WebGLRenderer.getOrSetCutout(path);
+            if (this._webGLRenderer) this._webGLRenderer.getOrSetCutout(path);
                 this._domRenderer.preventDefault(commands[++localIterator]);
                 break;
 
             case 'ALLOW_DEFAULT':
-            if (this._webGLRenderer) this.WebGLRenderer.getOrSetCutout(path);
+            if (this._webGLRenderer) this._webGLRenderer.getOrSetCutout(path);
                 this._domRenderer.allowDefault(commands[++localIterator]);
                 break;
 
             case 'UNSUBSCRIBE':
-                if (this.WebGLRenderer) this.WebGLRenderer.getOrSetCutout(path);
-                this.DOMRenderer.unsubscribe(commands[++localIterator]);
+                if (this._webGLRenderer) this._webGLRenderer.getOrSetCutout(path);
+                this._domRenderer.unsubscribe(commands[++localIterator]);
                 break;
 
             case 'GL_SET_DRAW_OPTIONS':
@@ -450,7 +450,7 @@ Context.prototype.receive = function receive(path, commands, iterator) {
  * @return {DOMRenderer}    The DOMRenderer being used by the Context.
  */
 Context.prototype.getDOMRenderer = function getDOMRenderer() {
-    return this.DOMRenderer;
+    return this._domRenderer;
 };
 
 /**
@@ -461,7 +461,7 @@ Context.prototype.getDOMRenderer = function getDOMRenderer() {
  * @return {WebGLRenderer|null}    The WebGLRenderer being used by the Context.
  */
 Context.prototype.getWebGLRenderer = function getWebGLRenderer() {
-    return this.WebGLRenderer;
+    return this._webGLRenderer;
 };
 
 
