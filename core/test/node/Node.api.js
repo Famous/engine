@@ -7,6 +7,7 @@ module.exports = [
     'getValue',
     'getComputedValue',
     'getChildren',
+    'getRawChildren',
     'getParent',
     'requestUpdate',
     'requestUpdateOnNextTick',
