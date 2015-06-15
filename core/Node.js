@@ -88,6 +88,8 @@ function Node () {
     this._freedChildIndicies = [];
     this._children = [];
 
+    this._fullChildren = [];
+
     this._parent = null;
 
     this._id = null;
@@ -121,7 +123,7 @@ Node.prototype._init = function _init () {
  * Protected method. Sets the parent of this node such that it can be looked up.
  *
  * @method
- * 
+ *
  * @param {Node} parent The node to set as the parent of this
  *
  * @return {undefined} undefined;
@@ -234,7 +236,7 @@ Node.prototype.getValue = function getValue () {
     var numberOfChildren = this._children.length;
     var numberOfComponents = this._components.length;
     var i = 0;
- 
+
     var value = {
         location: this.getId(),
         spec: {
@@ -266,7 +268,7 @@ Node.prototype.getValue = function getValue () {
         components: [],
         children: []
     };
-    
+
     if (value.location) {
         var transform = TransformSystem.get(this.getId());
         var size = SizeSystem.get(this.getId());
@@ -337,6 +339,19 @@ Node.prototype.getComputedValue = function getComputedValue () {
  * @return {Array.<Node>}   An array of children.
  */
 Node.prototype.getChildren = function getChildren () {
+    return this._fullChildren;
+};
+
+/**
+ * Method used internally to retrieve the children of a node. Each index in the
+ * returned array represents a path fragment.
+ *
+ * @method getRawChildren
+ * @private
+ *
+ * @return {Array}  An array of children. Might contain `null` elements.
+ */
+Node.prototype.getRawChildren = function getRawChildren() {
     return this._children;
 };
 
@@ -659,6 +674,7 @@ Node.prototype.addChild = function addChild (child) {
                 this._freedChildIndicies.pop() : this._children.length;
 
         this._children[index] = child;
+        this._fullChildren.push(child);
     }
 
     if (this.isMounted())
@@ -686,6 +702,15 @@ Node.prototype.removeChild = function removeChild (child) {
         this._children[index] = null;
 
         if (child.isMounted()) child.dismount();
+
+        var fullChildrenIndex = this._fullChildren.indexOf(child);
+        var len = this._fullChildren.length;
+        var i = 0;
+
+        for (i = fullChildrenIndex; i < len-1; i++)
+            this._fullChildren[i] = this._fullChildren[i + 1];
+
+        this._fullChildren.pop();
 
         return true;
     } else throw new Error('Node is not a child of this node');
@@ -755,7 +780,7 @@ Node.prototype.removeComponent = function removeComponent (component) {
 };
 
 /**
- * Removes a node's subscription to a particular UIEvent. All components 
+ * Removes a node's subscription to a particular UIEvent. All components
  * on the node will have the opportunity to remove all listeners depending
  * on this event.
  *

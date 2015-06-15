@@ -102,7 +102,7 @@ Dispatch.prototype.next = function next () {
  */
 Dispatch.prototype.breadthFirstNext = function breadthFirstNext () {
     var child = this._queue.shift();
-    if (!child) return void 0; 
+    if (!child) return void 0;
     this.addChildrenToQueue(child);
     return child;
 };
