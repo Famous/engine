@@ -174,13 +174,17 @@ DOMRenderer.prototype.allowDefault = function allowDefault(type) {
 DOMRenderer.prototype._listen = function _listen(type) {
     this._assertTargetLoaded();
 
-    if (
-        !this._target.listeners[type] && !this._root.listeners[type]
-    ) {
-        // FIXME Add to content DIV if available
-        var target = eventMap[type][1] ? this._root : this._target;
-        target.listeners[type] = this._boundTriggerEvent;
-        target.element.addEventListener(type, this._boundTriggerEvent);
+    if (!this._target.listeners[type] && !this._root.listeners[type]) {
+        var container;
+
+        if (eventMap[type][1]) {
+            container = this._root;
+        }
+        else {
+            container = this._target.content ? this._target.content : this._target.element;
+        }
+        this._target.listeners[type] = this._boundTriggerEvent;
+        container.addEventListener(type, this._boundTriggerEvent);
     }
 };
 
@@ -600,6 +604,35 @@ DOMRenderer.prototype.setAttribute = function setAttribute(name, value) {
 };
 
 /**
+ * Initializes the content DIV and transfers the event listeners from the
+ * "normal" element to the content DIV. Used to ensure non-bubbeling events are
+ * being fired correctly.
+ *
+ * @method
+ * @private
+ *
+ * @return {undefined} undefined
+ */
+DOMRenderer.prototype._initContent = function _initContent () {
+    this._target.content = document.createElement('div');
+    this._target.content.classList.add('famous-dom-element-content');
+    this._target.element.insertBefore(
+        this._target.content,
+        this._target.element.firstChild
+    );
+
+    var type;
+    var target = this._target;
+
+    for (type in target.listeners) {
+        if (!target.listeners[type])
+            continue;
+        target.element.removeEventListener(type, this._boundTriggerEvent);
+        target.content.addEventListener(type, this._boundTriggerEvent);
+    }
+};
+
+/**
  * Sets the `innerHTML` content of the currently loaded target.
  *
  * @method
@@ -616,14 +649,7 @@ DOMRenderer.prototype.setContent = function setContent(content) {
         this._target.element.value = content;
     }
     else {
-        if (!this._target.content) {
-            this._target.content = document.createElement('div');
-            this._target.content.classList.add('famous-dom-element-content');
-            this._target.element.insertBefore(
-                this._target.content,
-                this._target.element.firstChild
-            );
-        }
+        if (!this._target.content) this._initContent();
         this._target.content.innerHTML = content;
     }
 
