@@ -47,7 +47,9 @@ var DOMRenderer = require('../dom-renderers/DOMRenderer');
  * @param {Compositor} compositor Compositor reference to pass down to
  * WebGLRenderer.
  */
-function Context(selector, compositor) {
+function Context(selector, compositor, options) {
+    this.options = options || {};
+
     this._compositor = compositor;
     this._rootEl = document.querySelector(selector);
 
@@ -64,8 +66,10 @@ function Context(selector, compositor) {
     // Every Context has at least a DOMRenderer for now.
     this._initDOMRenderer();
 
-    // WebGLRenderer will be instantiated when needed.
-    this._webGLRenderer = null;
+    // WebGLRenderer will be instantiated if needed.
+    if (this.options.disableWebGL !== true) {
+        this._initWebGLRenderer();
+    }
 
     // State holders
 
