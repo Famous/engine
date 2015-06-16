@@ -351,8 +351,12 @@ FamousEngine.prototype.message = function message (command) {
  *
  * @return {Scene} a new instance of Scene.
  */
-FamousEngine.prototype.createScene = function createScene (selector) {
+FamousEngine.prototype.createScene = function createScene (selector, options) {
     selector = selector || 'body';
+
+    this.message('CONTEXT');
+    this.message(selector);
+    this.message(options);
 
     if (this._scenes[selector]) this._scenes[selector].dismount();
     this._scenes[selector] = new Scene(selector, this);

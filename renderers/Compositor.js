@@ -124,30 +124,30 @@ Compositor.prototype.sendResize = function sendResize (selector, size) {
 Compositor.prototype.handleWith = function handleWith (iterator, commands) {
     var path = commands[iterator];
     var pathArr = path.split('/');
-    var context = this.getOrSetContext(pathArr.shift());
+    var context = this._contexts[pathArr.shift()];
     return context.receive(path, commands, iterator);
 };
 
 /**
- * Retrieves the top-level Context associated with the passed in document
- * query selector. If no such Context exists, a new one will be instantiated.
+ * Method used to instantiate a new context using parameters from command
+ * queue.
  *
  * @method
+ * @private
  *
- * @param  {String} selector document query selector used for retrieving the
- * DOM node that should be used as a root element by the Context
+ * @param  {Number} iterator position index within the commands queue
+ * @param  {Array} commands remaining message queue
  *
- * @return {Context} context
+ * @return {Context} newly created context.
  */
-Compositor.prototype.getOrSetContext = function getOrSetContext(selector) {
-    if (this._contexts[selector]) {
-        return this._contexts[selector];
-    }
-    else {
-        var context = new Context(selector, this);
-        this._contexts[selector] = context;
-        return context;
-    }
+Compositor.prototype.createContext = function createContext(iterator, commands) {
+    var selector = commands[++iterator];
+    var contextOptions = commands[++iterator];
+    return (this._contexts[selector] = new Context(
+        selector,
+        this,
+        contextOptions
+    ));
 };
 
 /**
@@ -184,6 +184,12 @@ Compositor.prototype.drawCommands = function drawCommands() {
                 break;
             case 'WITH':
                 localIterator = this.handleWith(++localIterator, commands);
+                break;
+            case 'CONTEXT':
+                this.createContext(localIterator, commands);
+                break;
+            case 'NEED_SIZE_FOR':
+                this.giveSizeFor(++localIterator, commands);
                 break;
         }
         command = commands[++localIterator];
