@@ -150,7 +150,7 @@ Dispatch.prototype.mount = function mount (path, node) {
 
         for (i = 0, len = components.length ; i < len ; i++)
             if (components[i] && components[i].onMount)
-                components[i].onMount(path);
+                components[i].onMount(node, i);
 
         for (i = 0, len = children.length ; i < len ; i++)
             if (children[i]) this.mount(path + '/' + i, children[i]);
@@ -206,7 +206,7 @@ Dispatch.prototype.dismount = function dismount (path) {
 
         for (i = 0, len = components.length ; i < len ; i++)
             if (components[i] && components[i].onDismount)
-                components[i].onDismount(path);
+                components[i].onDismount();
     }
 
     for (i = 0, len = children.length ; i < len ; i++)
@@ -352,14 +352,22 @@ Dispatch.prototype.dispatchUIEvent = function dispatchUIEvent (path, event, payl
 
     Event.call(payload);
     node = this.getNode(path);
-
     if (node) {
         var parent;
+        var components;
+        var i;
+        var len;
 
         payload.node = node;
 
         while (node) {
             if (node.onReceive) node.onReceive(event, payload);
+            components = node.getComponents();
+
+            for (i = 0, len = components.length ; i < len ; i++)
+                if (components[i] && components[i].onReceive)
+                    components[i].onReceive(event, payload);
+
             if (payload.propagationStopped) break;
             parent = node.getParent();
             if (parent === node) return;

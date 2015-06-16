@@ -251,12 +251,10 @@ FamousEngine.prototype.handleMessage = function handleMessage (messages) {
 FamousEngine.prototype.handleWith = function handleWith (messages) {
     var path = messages.shift();
     var command = messages.shift();
-
     switch (command) {
         case Commands.TRIGGER: // the TRIGGER command sends a UIEvent to the specified path
             var type = messages.shift();
             var ev = messages.shift();
-
             Dispatch.dispatchUIEvent(path, type, ev);
             break;
         default:

@@ -397,18 +397,18 @@ function removeClass (context, path, commands, iterator) {
 
 function subscribe (context, path, commands, iterator) {
     if (context._webGLRenderer) context._webGLRenderer.getOrSetCutout(path);
-    context._domRenderer.subscribe(commands[++iterator], commands[++iterator]);
+    context._domRenderer.subscribe(commands[++iterator]);
     return iterator;
 }
 
 function glSetDrawOptions (context, path, commands, iterator) {
-    if (!context._webGLRenderer) context.initWebGL();
+    if (!context._webGLRenderer) context._initWebGLRenderer();
     context._webGLRenderer.setMeshOptions(path, commands[++iterator]);
     return iterator;
 }
 
 function glAmbientLight (context, path, commands, iterator) {
-    if (!context._webGLRenderer) context.initWebGL();
+    if (!context._webGLRenderer) context._initWebGLRenderer();
     context._webGLRenderer.setAmbientLightColor(
         path,
         commands[++iterator],
@@ -419,7 +419,7 @@ function glAmbientLight (context, path, commands, iterator) {
 }
 
 function glLightPosition (context, path, commands, iterator) {
-    if (!context._webGLRenderer) context.initWebGL();
+    if (!context._webGLRenderer) context._initWebGLRenderer();
     context._webGLRenderer.setLightPosition(
         path,
         commands[++iterator],
@@ -430,7 +430,7 @@ function glLightPosition (context, path, commands, iterator) {
 }
 
 function glLightColor (context, path, commands, iterator) {
-    if (!context._webGLRenderer) context.initWebGL();
+    if (!context._webGLRenderer) context._initWebGLRenderer();
     context._webGLRenderer.setLightColor(
         path,
         commands[++iterator],
@@ -441,7 +441,7 @@ function glLightColor (context, path, commands, iterator) {
 }
 
 function materialInput (context, path, commands, iterator) {
-    if (!context._webGLRenderer) context.initWebGL();
+    if (!context._webGLRenderer) context._initWebGLRenderer();
     context._webGLRenderer.handleMaterialInput(
         path,
         commands[++iterator],
@@ -451,7 +451,7 @@ function materialInput (context, path, commands, iterator) {
 }
 
 function glSetGeometry (context, path, commands, iterator) {
-    if (!context._webGLRenderer) context.initWebGL();
+    if (!context._webGLRenderer) context._initWebGLRenderer();
     context._webGLRenderer.setGeometry(
         path,
         commands[++iterator],
@@ -462,7 +462,7 @@ function glSetGeometry (context, path, commands, iterator) {
 }
 
 function glUniforms (context, path, commands, iterator) {
-    if (!context._webGLRenderer) context.initWebGL();
+    if (!context._webGLRenderer) context._initWebGLRenderer();
     context._webGLRenderer.setMeshUniform(
         path,
         commands[++iterator],
@@ -472,7 +472,7 @@ function glUniforms (context, path, commands, iterator) {
 }
 
 function glBufferData (context, path, commands, iterator) {
-    if (!context._webGLRenderer) context.initWebGL();
+    if (!context._webGLRenderer) context._initWebGLRenderer();
     context._webGLRenderer.bufferData(
         path,
         commands[++iterator],
@@ -485,19 +485,19 @@ function glBufferData (context, path, commands, iterator) {
 }
 
 function glCutoutState (context, path, commands, iterator) {
-    if (!context._webGLRenderer) context.initWebGL();
+    if (!context._webGLRenderer) context._initWebGLRenderer();
     context._webGLRenderer.setCutoutState(path, commands[++iterator]);
     return iterator;
 }
 
 function glMeshVisibility (context, path, commands, iterator) {
-    if (!context._webGLRenderer) context.initWebGL();
+    if (!context._webGLRenderer) context._initWebGLRenderer();
     context._webGLRenderer.setMeshVisibility(path, commands[++iterator]);
     return iterator;
 }
 
 function glRemoveMesh (context, path, commands, iterator) {
-    if (!context._webGLRenderer) context.initWebGL();
+    if (!context._webGLRenderer) context._initWebGLRenderer();
     context._webGLRenderer.removeMesh(path);
     return iterator;
 }

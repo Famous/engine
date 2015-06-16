@@ -253,6 +253,24 @@ Compositor.prototype.receiveCommands = function receiveCommands(commands) {
 };
 
 /**
+ * Internal helper method used by `drawCommands`.
+ *
+ * @method
+ * @private
+ *
+ * @param  {Number} iterator position index within the command queue
+ * @param  {Array} commands remaining message queue received, used to
+ * shift single messages
+ *
+ * @return {undefined} undefined
+ */
+Compositor.prototype.giveSizeFor = function giveSizeFor(iterator, commands) {
+    var selector = commands[iterator];
+    var size = this.getOrSetContext(selector).getRootSize();
+    this.sendResize(selector, size);
+};
+
+/**
  * Flushes the queue of outgoing "out" commands.
  * Called by ThreadManager.
  *

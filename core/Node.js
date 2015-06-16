@@ -171,6 +171,7 @@ Node.prototype._setShown = function _setShown (shown) {
  */
 Node.prototype._setUpdater = function _setUpdater (updater) {
     this._updater = updater;
+    if (this._requestingUpdate) this._updater.requestUpdate(this);
 };
 
 /**
@@ -811,7 +812,8 @@ Node.prototype.addUIEvent = function addUIEvent (eventName) {
  */
 Node.prototype._requestUpdate = function _requestUpdate (force) {
     if (force || !this._requestingUpdate) {
-        this._updater.requestUpdate(this);
+        if (this._updater)
+            this._updater.requestUpdate(this);
         this._requestingUpdate = true;
     }
 };
@@ -1203,7 +1205,6 @@ Node.prototype.mount = function mount (path) {
     if (this.isMounted())
         throw new Error('Node is already mounted at: ' + this.getLocation());
 
-    Dispatch.mount(path, this);
     if (this.constructor.INIT_DEFAULT_COMPONENTS){
         TransformSystem.registerTransformAtPath(path, this.getComponent(this._transformID));
         SizeSystem.registerSizeAtPath(path, this.getComponent(this._sizeID));
@@ -1212,6 +1213,7 @@ Node.prototype.mount = function mount (path) {
         TransformSystem.registerTransformAtPath(path);
         SizeSystem.registerSizeAtPath(path);
     }
+    Dispatch.mount(path, this);
 
     if (!this._requestingUpdate) this._requestUpdate();
     return this;
@@ -1232,34 +1234,11 @@ Node.prototype.dismount = function dismount () {
 
     var path = this.getLocation();
 
-    Dispatch.dismount(path);
     TransformSystem.deregisterTransformAtPath(path);
     SizeSystem.deregisterSizeAtPath(path);
+    Dispatch.dismount(path);
 
     if (!this._requestingUpdate) this._requestUpdate();
-};
-
-/**
- * Method to be called in order to dispatch an event to the node and all its
- * components. Note that this doesn't recurse the subtree.
- *
- * @method receive
- *
- * @param  {String} type   The event type (e.g. "click").
- * @param  {Object} ev     The event payload object to be dispatched.
- *
- * @return {Node} this
- */
-Node.prototype.receive = function receive (type, ev) {
-    var i = 0;
-    var list = this._components;
-    var len = list.length;
-    var item;
-    for (; i < len ; i++) {
-        item = list[i];
-        if (item && item.onReceive) item.onReceive(type, ev);
-    }
-    return this;
 };
 
 module.exports = Node;
