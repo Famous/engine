@@ -264,6 +264,7 @@ Context.prototype.receive = function receive(path, commands, iterator) {
 
     this._domRenderer.loadPath(path);
     this._domRenderer.findTarget();
+
     while (command != null) {
         if (command === Commands.WITH || command === Commands.TIME) return localIterator - 1;
         else localIterator = this._commandCallbacks[command](this, path, commands, localIterator) + 1; 
