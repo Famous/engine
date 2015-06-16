@@ -678,19 +678,18 @@ function addMeshToMaterial(mesh, material, name) {
     var expressions = mesh.value.expressions;
     var previous = expressions[name];
     var shouldRemove = true;
-    var i;
+    var len = material.inputs;
 
-    for (i = 0; i < material.inputs.length; i++) {
-        addMeshToMaterial(mesh, material.inputs[i], name);
-        
-    }
+    while(len--) 
+        addMeshToMaterial(mesh, material.inputs[len], name);
 
-    for (i = 0; i < INPUTS.length; i++) {
-        if (name !== INPUTS[i] && previous !== expressions[INPUTS[i]])
-            shouldRemove = false;
-    }
+    len = INPUTS.length;
+    
+    while (len--) 
+        shouldRemove |= (name !== INPUTS[len] && previous !== expressions[INPUTS[len]]);
 
-    if (shouldRemove) material.meshes.splice(material.meshes.indexOf(previous), 1);
+    if (shouldRemove)
+        material.meshes.splice(material.meshes.indexOf(previous), 1);
          
     if (material.meshes.indexOf(mesh) === -1)
         material.meshes.push(mesh);
