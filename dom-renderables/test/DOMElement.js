@@ -26,6 +26,7 @@
 
 var test = require('tape');
 var DOMElement = require('../DOMElement.js');
+var Commands = require('../core/Commands');
 
 var IDENT = [
     1, 0, 0, 0,

@@ -100,11 +100,11 @@ Dispatch.prototype.next = function next () {
  * in a breadth first traversal of the render tree.
  *
  * @method breadthFirstNext
- * @return {Node} the next node in the traversal.
+ * @return {Node | undefined} the next node in the traversal if one exists
  */
 Dispatch.prototype.breadthFirstNext = function breadthFirstNext () {
     var child = this._queue.shift();
-    if (!child) return;
+    if (!child) return void 0; 
     this.addChildrenToQueue(child);
     return child;
 };
@@ -185,6 +185,8 @@ Dispatch.prototype.dismount = function dismount (path) {
 
     var children = node.getChildren();
     var components = node.getComponents();
+    var i;
+    var len;
 
     if (node.isShown()) {
         node._setShown(false);
@@ -207,7 +209,7 @@ Dispatch.prototype.dismount = function dismount (path) {
                 components[i].onDismount(path);
     }
 
-    for (var i = 0, len = children.length ; i < len ; i++)
+    for (i = 0, len = children.length ; i < len ; i++)
         this.deregisterNodeAtPath(children[i], path + '/' + i);
 
     this._nodes[path] = null;

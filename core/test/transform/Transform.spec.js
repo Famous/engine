@@ -1,3 +1,5 @@
+'use strict';
+
 var test = require('tape');
 var api = require('./Transform.api');
 var Transform = require('../../Transform');
@@ -48,7 +50,7 @@ test('Transform class', function (t) {
         t.equal(Transform.LOCAL_CHANGED, 2, 'Transform should have a static property LOCAL_CHANGED that equals 2');
 
         var parent = new TransformStub();
-        var transform = new Transform(parent);
+        transform = new Transform(parent);
 
         t.equal(transform.getParent(), parent, 'Transform constructor should have its parent set to the first argument');
 
@@ -136,7 +138,7 @@ test('Transform class', function (t) {
 
         // sanity check
         if (parent !== transform.getParent() || !transform.isBreakPoint())
-            throw new Error('transform.getParent or isBreakPoint is not functioning correctly')
+            throw new Error('transform.getParent or isBreakPoint is not functioning correctly');
         
         t.doesNotThrow(transform.reset.bind(transform), 'reset should be callable without arguments');
 

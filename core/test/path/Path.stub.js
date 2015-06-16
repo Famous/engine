@@ -1,3 +1,5 @@
+'use strict';
+
 var api = require('./Path.api');
 var sinon = require('sinon');
 

@@ -1,3 +1,5 @@
+'use strict';
+
 var rewire = require('rewire');
 var api = require('./Dispatch.api');
 var Dispatch = rewire('../../../core/Dispatch');
@@ -53,7 +55,7 @@ test('Dispatch singleton', function (t) {
 
         Dispatch._setUpdater(testUpdater2);
 
-        stub2 = new NodeStub();
+        var stub2 = new NodeStub();
 
         Dispatch.mount('body/0', stub2);
 

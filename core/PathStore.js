@@ -126,14 +126,14 @@ PathStore.prototype.remove = function remove (path) {
  *
  * @path {String} path The path to lookup the item for
  *
- * @return {Any} the item stored or undefined
+ * @return {Any | undefined} the item stored or undefined
  */
 PathStore.prototype.get = function get (path) {
     if (this.memo[path]) return this.items[this.memo[path]];
 
     var index = this.paths.indexOf(path);
 
-    if (index === -1) return;
+    if (index === -1) return void 0;
 
     this.memo[path] = index;
 
