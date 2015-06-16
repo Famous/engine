@@ -1,3 +1,5 @@
+'use strict';
+
 var test = require('tape');
 var rewire = require('rewire');
 var api = require('./PathStore.api');
@@ -11,13 +13,13 @@ helpers.setPathStub(PathUtilsStub);
 test('PathStore class', function (t) {
 
     t.test('PathStore constructor', function (t) {
-        t.ok(PathStore.constructor === Function, 'PathStore should be a function');
+        t.equal(PathStore.constructor, Function, 'PathStore should be a function');
 
         t.doesNotThrow(function () {
             return new PathStore();
         }, 'PathStore should be able to be called with new');
 
-        t.ok((new PathStore()).constructor === PathStore, 'PathStore should be a constructor function');
+        t.equal((new PathStore()).constructor, PathStore, 'PathStore should be a constructor function');
 
         var pathStore = new PathStore();
 
@@ -64,7 +66,7 @@ test('PathStore class', function (t) {
             pathStore.insert(triple[2], new helpers.InsertTester(triple[0], triple[1], triple[2]));
         });
 
-        var res = pathStore.getItems().forEach(function (item, i, items) {
+        pathStore.getItems().forEach(function (item, i, items) {
             t.equal(
                 pathStore.get(item.path), item,
                 'insert should insert the given item at the given path' +
@@ -90,6 +92,7 @@ test('PathStore class', function (t) {
 
     t.test('.remove method', function (t) {
         var pathStore = new PathStore();
+        var index;
 
         Array.apply(null, Array(10)).map(function (_, i) {
             return new helpers.InsertTester(i, 0, String.fromCharCode(97 + i));

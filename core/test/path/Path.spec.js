@@ -1,3 +1,5 @@
+'use strict';
+
 var test = require('tape');
 var api = require('./Path.api');
 var PathUtils = require('../../Path');
@@ -34,7 +36,9 @@ test('PathUtils', function (t) {
     });
 
     t.test('.depth method', function (t) {
-        var cases = Array.apply(null, Array(10)).map(function (_, i) { return i; });
+        var cases = Array.apply(null, Array(10)).map(function (_, i) {
+            return i;
+        });
 
         var testPaths = cases.map(helpers.generatePathOfDepth.bind(helpers));
 
@@ -95,13 +99,13 @@ test('PathUtils', function (t) {
         cases.forEach(function (path, i) {
             var index = PathUtils.index(path);
             t.equal(index, is[i], 'path ' + path + ' should have an index of ' + is[i]);
-        })
+        });
 
         t.end();
     });
     
     t.test('.indexAtDepth method', function (t) {
-        var range = Array.apply(null, Array(10)).map(function () {
+        Array.apply(null, Array(10)).map(function () {
             return Array.apply(null, Array(10)).map(function () {
                 return (Math.random() * 1000)|0;
             });
@@ -223,7 +227,7 @@ test('PathUtils', function (t) {
         t.end();
     });
 
-    t.end()
+    t.end();
 });
 
 

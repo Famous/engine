@@ -266,7 +266,6 @@ Transform.prototype.getRotation = function getRotation () {
  */
 Transform.prototype.setRotation = function setRotation (x, y, z, w) {
     var quat = this.vectors.rotation;
-    var propogate = false;
     var qx, qy, qz, qw;
 
     if (w != null) {
@@ -554,7 +553,7 @@ function fromNode (node, transform) {
         t32 !== target[14]) changed |= Transform.LOCAL_CHANGED;
 
     return changed;
-};
+}
 
 /**
  * Private function. Uses the parent transform, the node's spec, the node's size, and the parent's size
@@ -676,7 +675,7 @@ function fromNodeWithParent (node, transform) {
         t32 !== target[14]) changed |= Transform.LOCAL_CHANGED;
 
     return changed;
-};
+}
 
 /**
  * private method to multiply two transforms.

@@ -108,7 +108,7 @@ SizeSystem.prototype.update = function update () {
     var len;
     var components;
 
-    for (var i = 0, len = sizes.length ; i < len ; i++) {
+    for (i = 0, len = sizes.length ; i < len ; i++) {
         node = Dispatch.getNode(paths[i]);
         components = node.getComponents();
         if (!node) continue;

@@ -30,58 +30,13 @@ var test = require('tape');
 var Node = require('../Node');
 var Size = require('../Size');
 var Scene = require('../Scene');
-var DefaultNodeSpec = require('./expected/DefaultNodeSpec');
 
-/*
 var IDENT = [
     1, 0, 0, 0,
     0, 1, 0, 0,
     0, 0, 1, 0,
     0, 0, 0, 1
 ];
-
-function createMockNode() {
-    return {
-        sentDrawCommands: [],
-        sendDrawCommand: function(command) {},
-        shown: true,
-        isShown: function() {
-            return this.shown;
-        },
-        addComponent: function() {},
-        location: 'body/0',
-        getLocation: function() {
-            return this.location;
-        },
-        transform: IDENT,
-        getTransform: function() {
-            return this.transform;
-        },
-        requestUpdate: function() {},
-        size: [0, 0, 0],
-        getSize: function() {
-            return this.size;
-        },
-        sizeMode: [0, 0, 0],
-        getSizeMode: function() {
-            return this.sizeMode;
-        },
-        uiEvents: [],
-        getUIEvents: function() {
-            return this.uiEvents;
-        },
-        opacity: 1,
-        getOpacity: function() {
-            return this.opacity;
-        },
-        updater: {
-            requestUpdate: function() {}
-        },
-        getUpdater: function() {
-            return this.updater;
-        }
-    };
-}
 
 test('Node', function(t) {
     t.test('constructor', function(t) {
@@ -531,4 +486,3 @@ test('Node', function(t) {
         });
     });
 });
-*/

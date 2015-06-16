@@ -136,7 +136,7 @@ Context.prototype.draw = function draw() {
 Context.prototype.getRootSize = function getRootSize() {
     return [
         this._rootEl.offsetWidth,
-        this._rootEl.offsetHeight,
+        this._rootEl.offsetHeight
     ];
 };
 

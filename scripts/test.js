@@ -1,10 +1,9 @@
 'use strict';
 
-var istanbul = require('istanbul');
 var test = require('tape');
 var path = require('path');
-var colors = require('colors');
 var glob = require('glob');
+require('colors');
 
 var characterStack = [];
 var messageStack = [''];
@@ -107,7 +106,8 @@ if (process.argv.length > 3) {
         require(path.resolve(file));
     });
 
-} else if (process.argv.length === 3) {
+}
+else if (process.argv.length === 3) {
 
     process.argv.slice(2).forEach(function (arg) {
 
@@ -139,6 +139,7 @@ process.on('beforeExit', function () {
     if (percent === 1) console.log('\n\n all tests ok'.underline.green + '\n\n\n\n\n');
     else console.log('\n\n some tests not ok'.underline.red + '\n\n\n\n\n');
 
-    process.exit(percent === 1 ? 0 : 1);
+
+    if (percent !== 1) throw new Error();
 });
 

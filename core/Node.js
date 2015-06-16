@@ -31,7 +31,6 @@ var Dispatch = require('./Dispatch');
 var TransformSystem = require('./TransformSystem');
 var Size = require('./Size');
 var Transform = require('./Transform');
-var pathUtils = require('./Path');
 
 /**
  * Nodes define hierarchy and geometrical transformations. They can be moved
@@ -1182,7 +1181,8 @@ Node.prototype.mount = function mount (path) {
     if (this.constructor.INIT_DEFAULT_COMPONENTS){
         TransformSystem.registerTransformAtPath(path, this.getComponent(this._transformID));
         SizeSystem.registerSizeAtPath(path, this.getComponent(this._sizeID));
-    } else {
+    }
+    else {
         TransformSystem.registerTransformAtPath(path);
         SizeSystem.registerSizeAtPath(path);
     }

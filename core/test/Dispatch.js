@@ -26,7 +26,6 @@
 
 var test = require('tape');
 var Dispatch = require('../Dispatch');
-var MockNode = require('./helpers/MockNode');
 
 test('Dispatch', function(t) {
     t.test('constructor', function(t) {

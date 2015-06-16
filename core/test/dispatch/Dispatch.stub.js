@@ -1,3 +1,5 @@
+'use strict';
+
 var api = require('./Dispatch.api');
 var sinon = require('sinon');
 
