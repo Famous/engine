@@ -675,11 +675,11 @@ DOMElement.prototype.draw = function draw() {
     if (this._content) this.setContent(this._content);
 
     for (key in this._styles)
-        if (this._styles[key])
+        if (this._styles[key] != null)
             this.setProperty(key, this._styles[key]);
 
     for (key in this._attributes)
-        if (this._attributes[key])
+        if (this._attributes[key] != null)
             this.setAttribute(key, this._attributes[key]);
 
     for (i = 0, len = this._UIEvents.length ; i < len ; i++)
