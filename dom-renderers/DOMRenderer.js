@@ -529,13 +529,15 @@ DOMRenderer.prototype.setSize = function setSize (width, height) {
 /**
  * Sets the width of the currently loaded ElementCache.
  * 
- * @method  setWidth
+ * @method
  *  
  * @param  {Number|false} width     The explicit width to be set on the
  *                                  ElementCache's target (and content) element.
  *                                  `false` removes any explicit sizing
  *                                  constraints from the underlying DOM
  *                                  Elements.
+ *
+ * @return {undefined} undefined
  */ 
 DOMRenderer.prototype.setWidth = function setWidth(width) {
     this._assertTargetLoaded();
@@ -567,6 +569,8 @@ DOMRenderer.prototype.setWidth = function setWidth(width) {
  *                                  `false` removes any explicit sizing
  *                                  constraints from the underlying DOM
  *                                  Elements.
+ *
+ * @return {undefined} undefined
  */ 
 DOMRenderer.prototype.setHeight = function setHeight(height) {
     this._assertTargetLoaded();

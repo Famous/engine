@@ -30,6 +30,8 @@ var ZEROS = [0, 0, 0];
 /**
  * The Size class is responsible for processing Size from a node
  * @constructor Size
+ *
+ * @param {Size} parent the parent size
  */
 function Size (parent) {
 
@@ -157,6 +159,10 @@ Size.prototype.getParent = function getParent () {
  * Gets the size mode of this size representation
  *
  * @method
+ *
+ * @param {Number} x the size mode to use for the width
+ * @param {Number} y the size mode to use for the height
+ * @param {Number} z the size mode to use for the depth
  *
  * @return {array} array of size modes
  */

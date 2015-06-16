@@ -152,7 +152,7 @@ Node.prototype._setMounted = function _setMounted (mounted, path) {
  *
  * @method
  *
- * @param {Boolean} whether or not the node is shown
+ * @param {Boolean} shown whether or not the node is shown
  *
  * @return {undefined} undefined
  */
@@ -1113,9 +1113,9 @@ Node.prototype.setDifferentialSize = function setDifferentialSize (x, y, z) {
  *
  * @method setAbsoluteSize
  *
- * @param {Number} x    x-Size in pixels ("width").
- * @param {Number} y    y-Size in pixels ("height").
- * @param {Number} z    z-Size in pixels ("depth").
+ * @param {Number} x x-Size in pixels ("width").
+ * @param {Number} y y-Size in pixels ("height").
+ * @param {Number} z z-Size in pixels ("depth").
  *
  * @return {Node} this
  */
@@ -1197,7 +1197,7 @@ Node.prototype.update = function update (time){
  *
  * @method mount
  *
- * @param  {String} myId    path to node (e.g. `body/0/1`)
+ * @param  {String} path unique path of node (e.g. `body/0/1`)
  *
  * @return {Node} this
  */

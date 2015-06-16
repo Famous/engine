@@ -44,10 +44,10 @@ function TransformSystem () {
  * when the TransformSystem updates.
  *
  * @method registerTransformAtPath
- * @return {void}
+ * @return {undefined} undefined
  *
  * @param {String} path for the transform to be registered to.
- * @param {Transform | undefined} an optional transform to register.
+ * @param {Transform | undefined} transform optional transform to register.
  */
 TransformSystem.prototype.registerTransformAtPath = function registerTransformAtPath (path, transform) {
     if (!PathUtils.depth(path)) return this.pathStore.insert(path, transform ? transform : new Transform());
@@ -115,6 +115,8 @@ TransformSystem.prototype.get = function get (path) {
  * in the scene graph
  *
  * @method onUpdate
+ *
+ * @return {undefined} undefined
  */
 TransformSystem.prototype.onUpdate = function onUpdate () {
     var transforms = this.pathStore.getItems();

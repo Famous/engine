@@ -124,7 +124,7 @@ PathStore.prototype.remove = function remove (path) {
  *
  * @method
  *
- * @path {String} path The path to lookup the item for
+ * @param {String} path The path to lookup the item for
  *
  * @return {Any | undefined} the item stored or undefined
  */

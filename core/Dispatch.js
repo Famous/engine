@@ -22,8 +22,6 @@
  * THE SOFTWARE.
  */
 
-/*jshint -W079 */
-
 'use strict';
 
 var Event = require('./Event');
@@ -116,9 +114,11 @@ Dispatch.prototype.breadthFirstNext = function breadthFirstNext () {
  * a parent or if there is no node registered at that path.
  *
  * @method mount
- * @return {void}
  *
  * @param {String} path at which to begin mounting
+ * @param {Node} node the node that was mounted
+ *
+ * @return {void}
  */
 Dispatch.prototype.mount = function mount (path, node) {
     if (!node) throw new Error('Dispatch: no node passed to mount at: ' + path);
@@ -236,7 +236,7 @@ Dispatch.prototype.getNode = function getNode (path) {
  * @method show
  * @return {void}
  *
- * @param {String} path
+ * @param {String} path the path of the node to show
  */
 Dispatch.prototype.show = function show (path) {
     var node = this._nodes[path];
@@ -264,7 +264,7 @@ Dispatch.prototype.show = function show (path) {
  * @method hide
  * @return {void}
  *
- * @param {String} path
+ * @param {String} path the path of the node to hide
  */
 Dispatch.prototype.hide = function hide (path) {
     var node = this._nodes[path];
@@ -312,9 +312,11 @@ Dispatch.prototype.lookupNode = function lookupNode (location) {
  * receive the events in a breadth first traversal, meaning that parents
  * have the opportunity to react to the event before children.
  *
- * @param {String} path name
- * @param {String} event name
- * @param {Any} payload
+ * @param {String} path path of the node to send the event to
+ * @param {String} event name of the event
+ * @param {Any} payload data associated with the event
+ *
+ * @return {undefined} undefined
  */
 Dispatch.prototype.dispatch = function dispatch (path, event, payload) {
     if (!path) throw new Error('dispatch requires a path as it\'s first argument');

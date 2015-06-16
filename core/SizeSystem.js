@@ -132,7 +132,9 @@ SizeSystem.prototype.update = function update () {
  *
  * @param {Node} node Node to potentially call sizeModeChanged on
  * @param {Array} components a list of the nodes' components
- * @param {Size} the size component
+ * @param {Size} size the size class for the Node
+ *
+ * @return {undefined} undefined
  */
 function sizeModeChanged (node, components, size) {
     var sizeMode = size.getSizeMode();
@@ -154,8 +156,10 @@ function sizeModeChanged (node, components, size) {
  *
  * @param {Node} node Node to potentially call onAbsoluteSizeChange on
  * @param {Array} components a list of the nodes' components
- * @param {Size} the size component
- */   
+ * @param {Size} size the size class for the Node
+ *
+ * @return {undefined} undefined
+ */
 function absoluteSizeChanged (node, components, size) {
     var absoluteSize = size.getAbsoluteSize();
     var x = absoluteSize[0];
@@ -176,7 +180,9 @@ function absoluteSizeChanged (node, components, size) {
  *
  * @param {Node} node Node to potentially call onProportionalSizeChange on
  * @param {Array} components a list of the nodes' components
- * @param {Size} the size component
+ * @param {Size} size the size class for the Node
+ *
+ * @return {undefined} undefined
  */
 function proportionalSizeChanged (node, components, size) {
     var proportionalSize = size.getProportionalSize();
@@ -198,7 +204,9 @@ function proportionalSizeChanged (node, components, size) {
  *
  * @param {Node} node Node to potentially call onDifferentialSize on
  * @param {Array} components a list of the nodes' components
- * @param {Size} the size component
+ * @param {Size} size the size class for the Node
+ *
+ * @return {undefined} undefined
  */
 function differentialSizeChanged (node, components, size) {
     var differentialSize = size.getDifferential();
@@ -220,7 +228,9 @@ function differentialSizeChanged (node, components, size) {
  *
  * @param {Node} node Node to potentially call onRenderSizeChange on
  * @param {Array} components a list of the nodes' components
- * @param {Size} the size component
+ * @param {Size} size the size class for the Node
+ *
+ * @return {undefined} undefined
  */
 function renderSizeChanged (node, components, size) {
     var renderSize = size.getRenderSize();
@@ -242,7 +252,9 @@ function renderSizeChanged (node, components, size) {
  *
  * @param {Node} node Node to potentially call onSizeChange on
  * @param {Array} components a list of the nodes' components
- * @param {Size} the size component
+ * @param {Size} size the size class for the Node
+ *
+ * @return {undefined} undefined
  */
 function sizeChanged (node, components, size) {
     var finalSize = size.get();

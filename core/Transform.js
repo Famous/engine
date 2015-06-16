@@ -32,6 +32,8 @@ var ONES = [1, 1, 1];
  * node from the data on the node and its parent
  *
  * @constructor Transform
+ *
+ * @param {Transform} parent the parent Transform
  */
 function Transform (parent) {
     this.local = new Float32Array(Transform.IDENT);
@@ -459,10 +461,8 @@ Transform.prototype.calculateWorldMatrix = function calculateWorldMatrix () {
 /**
  * Private function. Creates a transformation matrix from a Node's spec.
  *
- * @param {Node.Spec} spec of the node
- * @param {Array} size of the node
- * @param {Array} size of the node's parent
- * @param {Array} target array to write the matrix to
+ * @param {Node} node the node to create a transform for
+ * @param {Transform} transform transform to apply
  *
  * @return {Boolean} whether or not the target array was changed
  */
@@ -560,6 +560,9 @@ function fromNode (node, transform) {
  * to calculate a final transform for the node. Returns true if the transform has changed.
  *
  * @private
+ *
+ * @param {Node} node the node to create a transform for
+ * @param {Transform} transform transform to apply
  *
  * @return {Boolean} whether or not the transform changed
  */

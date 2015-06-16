@@ -554,7 +554,9 @@ Mesh.prototype.onTransformChange = function onTransformChange (transform) {
  * @method
  * @private
  *
- * @param {Array} size Size
+ * @param {Number} x width of the Node the Mesh is attached to
+ * @param {Number} y height of the Node the Mesh is attached to
+ * @param {Number} z depth of the Node the Mesh is attached to
  *
  * @return {undefined} undefined
  */

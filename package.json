@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "tape": "tap-closer | smokestack -b firefox",
+    "tape": "tap-closer | smokestack -b firefox | tap-spec",
     "test-new": "node ./scripts/test.js ./core/**/*.spec.js",
     "test-components": "browserify components/test/*.js | npm run tape",
     "test-core": "npm run test-new",
@@ -45,6 +45,7 @@
     "smokestack": "^3.2.2",
     "tap-closer": "^1.0.0",
     "tape": "^4.0.0",
+    "tap-spec": "^4.0.0",
     "uglify-js": "^2.4.17"
   },
   "dependencies": {
