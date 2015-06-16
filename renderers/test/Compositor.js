@@ -59,9 +59,9 @@ test('Compositor', function(t) {
 
         compositor.sendEvent(path, eventName, eventPayload);
 
-        shouldInclude(compositor._outCommands, t, 'WITH');
+        shouldInclude(compositor._outCommands, t, 24);
         shouldInclude(compositor._outCommands, t, path);
-        shouldInclude(compositor._outCommands, t, 'TRIGGER');
+        shouldInclude(compositor._outCommands, t, 30);
         shouldInclude(compositor._outCommands, t, eventName);
         shouldInclude(compositor._outCommands, t, eventPayload);
 
@@ -127,9 +127,9 @@ test('Compositor', function(t) {
 
         compositor.sendResize('body', size);
 
-        shouldInclude(compositor._outCommands, t, 'WITH');
+        shouldInclude(compositor._outCommands, t, 24);
         shouldInclude(compositor._outCommands, t, selector);
-        shouldInclude(compositor._outCommands, t, 'TRIGGER');
+        shouldInclude(compositor._outCommands, t, 30);
         shouldInclude(compositor._outCommands, t, 'CONTEXT_RESIZE');
         shouldInclude(compositor._outCommands, t, size);
 
@@ -158,7 +158,7 @@ test('Compositor', function(t) {
             contexts[i].draw = draw;
         }
 
-        compositor._inCommands.push('WITH', paths[0], 'WITH', paths[1], 'WITH', paths[2]);
+        compositor._inCommands.push(24, paths[0], 24, paths[1], 24, paths[2]);
         compositor.drawCommands();
 
         t.ok(

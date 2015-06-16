@@ -28,6 +28,7 @@ var test = require('tape');
 var Light = require('../lights/Light');
 var MockDispatch = require('./MockDispatch');
 var MockColor = require('./MockColor');
+var Commands = require('../../core/Commands');
 
 var time = 0;
 var light;
@@ -113,11 +114,11 @@ test('Light', function(t) {
             'should not have a color by default');
 
         light.setColor({ color: 'blue' });
-        t.false(contains(['GL_LIGHT_COLOR'], light.queue),
+        t.false(contains([Commands.GL_LIGHT_COLOR], light.queue),
             'should not set color if not supplied with a Color instance');
 
         light.setColor(new MockColor());
-        t.true(contains(['GL_LIGHT_COLOR'], light.queue),
+        t.true(contains([Commands.GL_LIGHT_COLOR], light.queue),
             'should be able to take a Color instance');
 
         t.end();

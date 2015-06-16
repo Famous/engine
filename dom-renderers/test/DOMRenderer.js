@@ -80,17 +80,11 @@ test('DOMRenderer', function(t) {
 
         t.equal(element.children[1].children[0].tagName, 'DIV');
 
-        domRenderer.loadPath(selector + '/' + 1 + '/' + 0 + '/' + 0 + '/' + 0);
+        domRenderer.loadPath(selector + '/' + 1 + '/' + 0 + '/' + 0);
         domRenderer.findTarget();
         domRenderer.insertEl('div');
 
         t.equal(element.children[1].children[0].children[0].tagName, 'DIV');
-
-        domRenderer.loadPath(selector + '/' + 1 + '/' + 0 + '/' + 0);
-        domRenderer.findTarget();
-        domRenderer.insertEl('section');
-
-        t.equal(element.children[1].children[0].children[0].children[0].tagName, 'DIV', 'original child should not become child of injected node');
 
         t.end();
     });
@@ -140,10 +134,10 @@ test('DOMRenderer', function(t) {
         domRenderer.insertEl('div');
 
         domRenderer.setProperty('background', 'green');
-        t.equal(element.children[0].style.backgroundColor, 'green', 'domRenderer.setProperty should set the background color to green');
+        t.equal(element.children[1].style.backgroundColor, 'green', 'domRenderer.setProperty should set the background color to green');
 
         domRenderer.setProperty('background', 'yellow');
-        t.equal(element.children[0].children[0].style.backgroundColor, 'yellow', 'domRenderer.setProperty should set the background color to yellow');
+        t.equal(element.children[0].style.backgroundColor, 'yellow', 'domRenderer.setProperty should set the background color to yellow');
 
         t.end();
     });
@@ -322,43 +316,4 @@ test('DOMRenderer', function(t) {
         t.end();
     });
 
-    t.test('Man in the middle insertion', function(t) {
-        var element = document.createElement('div');
-        var selector = 'selector';
-        var compositor = createUnidirectionalCompositor();
-        var domRenderer = new DOMRenderer(element, selector, compositor);
-
-        domRenderer.loadPath('selector/0/0/1');
-        domRenderer.findTarget();
-        domRenderer.insertEl('div');
-
-        t.equal(element.children.length, 1, 'domRenderer.insertEl should create a single DIV when no content is being set');
-        t.equal(element.children[0].children.length, 0, 'domRenderer.insertEl should not create a separate content DIV by default');
-
-        domRenderer.loadPath('selector/0');
-        domRenderer.findTarget();
-        domRenderer.insertEl('section');
-
-        t.equal(element.children.length, 1, 'domRenderer.insertEl should insert second element in between root element and leaf node');
-        t.equal(element.children[0].tagName.toUpperCase(), 'SECTION', 'domRenderer.insertEl should insert using correct tagName');
-
-        t.equal(element.children[0].children.length, 1, 'domRenderer.insertEl should insert new element in between that has the previous leaf node as a child');
-        t.equal(element.children[0].children[0].tagName.toUpperCase(), 'DIV', 'domRenderer.insertEl should preserve tagName of previously inserted leaf node');
-
-        domRenderer.loadPath('selector/0/1');
-        domRenderer.findTarget();
-        domRenderer.insertEl('span');
-
-        t.equal(element.children[0].children.length, 2, 'domRenderer.insertEl should insert sibling');
-        t.equal(element.children[0].children[1].tagName.toUpperCase(), 'SPAN', 'domRenderer.insertEl should insert sibling using correct tagName');
-        t.equal(element.children[0].children[1].children.length, 0, 'domRenderer.insertEl should insert sibling as leaf node');
-
-        domRenderer.loadPath('selector/0');
-        domRenderer.findTarget();
-        domRenderer.setContent('hello world');
-
-        t.equal(element.children[0].children.length, 3, 'domRenderer.insertEl should preserve correct DOM nesting when wrapping content');
-
-        t.end();
-    });
 });

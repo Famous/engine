@@ -44,8 +44,6 @@ var TransformSystem = require('../../core/TransformSystem');
 function PointLight(node) {
     Light.call(this, node);
     this.commands.position = Commands.GL_LIGHT_POSITION;
-    TransformSystem.makeBreakPointAt(node.getLocation());
-    this.onTransformChange(TransformSystem.get(node.getLocation()));
 }
 
 /**
@@ -57,6 +55,18 @@ PointLight.prototype = Object.create(Light.prototype);
  * Sets PointLight as the constructor
  */
 PointLight.prototype.constructor = PointLight;
+
+/**
+ * Receive the notice that the node you are on has been mounted.
+ *
+ * @private
+ *
+ * @return {undefined} undefined
+ */
+PointLight.prototype.onMount = function onMount() {
+    TransformSystem.makeBreakPointAt(this._node.getLocation());
+    this.onTransformChange(TransformSystem.get(this._node.getLocation()));
+};
 
 /**
  * Receives transform change updates from the scene graph.

@@ -160,10 +160,11 @@ test('Transform class', function (t) {
     t.test('getLocalTransform method', function (t) {
         var transform = new Transform();
         t.doesNotThrow(function () {
-            t.deepEqual(transform.getLocalTransform(), [1, 0, 0, 0,
+            t.deepEqual(transform.getLocalTransform(), new Float32Array([
+                                                        1, 0, 0, 0,
                                                         0, 1, 0, 0,
                                                         0, 0, 1, 0,
-                                                        0, 0, 0, 1], 'transform.getLocalTransform should return' +
+                                                        0, 0, 0, 1]), 'transform.getLocalTransform should return' +
                                                                      ' identity matrix after instantiation');
         }, 'getLocalTransform should be callable');
 
@@ -184,10 +185,11 @@ test('Transform class', function (t) {
         transform.setBreakPoint();
 
         t.doesNotThrow(function () {
-            t.deepEqual(transform.getWorldTransform(), [1, 0, 0, 0,
+            t.deepEqual(transform.getWorldTransform(), new Float32Array([
+                                                        1, 0, 0, 0,
                                                         0, 1, 0, 0,
                                                         0, 0, 1, 0,
-                                                        0, 0, 0, 1], 'transform.getWorldTransform should return' +
+                                                        0, 0, 0, 1]), 'transform.getWorldTransform should return' +
                                                                      ' identity matrix after instantiation');
         }, 'getWorldTransform should not throw if the transform is a breakpoint');
 
@@ -199,10 +201,11 @@ test('Transform class', function (t) {
 
         t.doesNotThrow(function () {
             transform.calculate(createTestNode());
-            t.deepEqual(transform.getLocalTransform(), [1, 0, 0, 0,
+            t.deepEqual(transform.getLocalTransform(), new Float32Array([
+                                                        1, 0, 0, 0,
                                                         0, 1, 0, 0,
                                                         0, 0, 1, 0,
-                                                        0, 0, 0, 1], 'transform.getLocalTransform should return' +
+                                                        0, 0, 0, 1]), 'transform.getLocalTransform should return' +
                                                                      ' identity matrix with no vectors changed');
         }, '.calculate should be callable');
 
@@ -214,48 +217,48 @@ test('Transform class', function (t) {
 
         t.doesNotThrow( function () {
             transform.setPosition(0);
-            t.deepEqual(transform.getPosition(), [0, 0, 0], 'transform should not change from zero when a dimension is passed ' +
+            t.deepEqual(transform.getPosition(), new Float32Array([0, 0, 0]), 'transform should not change from zero when a dimension is passed ' +
                                                             'null, undefined, or zero');
             transform.setPosition(0, 0);
-            t.deepEqual(transform.getPosition(), [0, 0, 0], 'transform should not change from zero when a dimension is passed ' +
+            t.deepEqual(transform.getPosition(), new Float32Array([0, 0, 0]), 'transform should not change from zero when a dimension is passed ' +
                                                             'null, undefined, or zero');
             transform.setPosition(0, 0, 0);
-            t.deepEqual(transform.getPosition(), [0, 0, 0], 'transform should not change from zero when a dimension is passed ' +
+            t.deepEqual(transform.getPosition(), new Float32Array([0, 0, 0]), 'transform should not change from zero when a dimension is passed ' +
                                                             'null, undefined, or zero');
             transform.setPosition(null, 0, 0);
-            t.deepEqual(transform.getPosition(), [0, 0, 0], 'transform should not change from zero when a dimension is passed ' +
+            t.deepEqual(transform.getPosition(), new Float32Array([0, 0, 0]), 'transform should not change from zero when a dimension is passed ' +
                                                             'null, undefined, or zero');
             transform.setPosition(null, null, 0);
-            t.deepEqual(transform.getPosition(), [0, 0, 0], 'transform should not change from zero when a dimension is passed ' +
+            t.deepEqual(transform.getPosition(), new Float32Array([0, 0, 0]), 'transform should not change from zero when a dimension is passed ' +
                                                             'null, undefined, or zero');
             transform.setPosition(null, null, null);
-            t.deepEqual(transform.getPosition(), [0, 0, 0], 'transform should not change from zero when a dimension is passed ' +
+            t.deepEqual(transform.getPosition(), new Float32Array([0, 0, 0]), 'transform should not change from zero when a dimension is passed ' +
                                                             'null, undefined, or zero');
             transform.setPosition(null, 0);
-            t.deepEqual(transform.getPosition(), [0, 0, 0], 'transform should not change from zero when a dimension is passed ' +
+            t.deepEqual(transform.getPosition(), new Float32Array([0, 0, 0]), 'transform should not change from zero when a dimension is passed ' +
                                                             'null, undefined, or zero');
 
             transform.setPosition(0, 1);
 
-            t.deepEqual(transform.getPosition(), [0, 1, 0], 'transform should set the value properly for the given dimension');
+            t.deepEqual(transform.getPosition(), new Float32Array([0, 1, 0]), 'transform should set the value properly for the given dimension');
 
         }, 'transform should be callable with any number of arguments');
 
         transform.setPosition(1, 2, 3);
 
-        t.deepEqual(transform.getPosition(), [1, 2, 3], 'transform should set the values returned by getPosition');
+        t.deepEqual(transform.getPosition(), new Float32Array([1, 2, 3]), 'transform should set the values returned by getPosition');
 
         transform.setPosition();
 
-        t.deepEqual(transform.getPosition(), [1,2,3], 'undefined arguments should not change the values stored');
+        t.deepEqual(transform.getPosition(), new Float32Array([1, 2, 3]), 'undefined arguments should not change the values stored');
 
         transform.setPosition(null, null, null);
 
-        t.deepEqual(transform.getPosition(), [1,2,3], 'null arguments should not change the values stored');
+        t.deepEqual(transform.getPosition(), new Float32Array([1, 2, 3]), 'null arguments should not change the values stored');
 
         transform.setPosition(0, 0, 0);
 
-        t.deepEqual(transform.getPosition(), [0, 0, 0], 'zero should successfully set the position back to zero');
+        t.deepEqual(transform.getPosition(), new Float32Array([0, 0, 0]), 'zero should successfully set the position back to zero');
 
         var node = createTestNode();
 
@@ -263,10 +266,11 @@ test('Transform class', function (t) {
 
         transform.calculate(node);
 
-        t.deepEqual(transform.getLocalTransform(), [1, 0, 0, 0,
+        t.deepEqual(transform.getLocalTransform(), new Float32Array([
+                                                    1, 0, 0, 0,
                                                     0, 1, 0, 0,
                                                     0, 0, 1, 0,
-                                                    3, 3, 3, 1], 'position should change the ' +
+                                                    3, 3, 3, 1]), 'position should change the ' +
                                                                  'result of the calculated matrix');
 
 

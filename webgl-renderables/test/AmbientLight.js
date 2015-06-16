@@ -113,11 +113,11 @@ test('AmbientLight', function(t) {
             'should not have a color by default');
 
         ambientLight.setColor({ color: 'blue' });
-        t.false(contains(['GL_AMBIENT_LIGHT'], ambientLight.queue),
+        t.false(contains([11], ambientLight.queue),
             'should not set color if not supplied with a Color instance');
 
         ambientLight.setColor(new MockColor());
-        t.true(contains(['GL_AMBIENT_LIGHT'], ambientLight.queue),
+        t.true(contains([11], ambientLight.queue),
             'should be able to take a Color instance');
 
         t.end();

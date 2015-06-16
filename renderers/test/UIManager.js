@@ -88,11 +88,11 @@ test('UIManager', function(t) {
         uiManager.update(124);
 
         t.deepEqual(actions, [
-            ['postMessage', ['FRAME', 123]],
+            ['postMessage', [25, 123]],
             ['drawCommands'],
             ['postMessage', undefined],
             ['clearCommands'],
-            ['postMessage', ['FRAME', 124]],
+            ['postMessage', [25, 124]],
             ['drawCommands'],
             ['postMessage', undefined],
             ['clearCommands']
@@ -159,7 +159,7 @@ test('UIManager', function(t) {
         t.deepEqual(postedMessages, []);
         uiManager.update(123);
         t.deepEqual(postedMessages, [
-            ['FRAME', 123],
+            [25, 123],
             ['DRAW', 'COMMANDS']
         ]);
 
