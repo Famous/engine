@@ -24,6 +24,7 @@
 
 'use strict';
 var Geometry = require('../webgl-geometries');
+var defaultGeometry = new Geometry.Plane();
 
 /**
  * The Mesh class is responsible for providing the API for how
@@ -46,10 +47,10 @@ function Mesh (node, options) {
     this._requestingUpdate = false;
     this._inDraw = false;
     this.value = {
+        geometry: defaultGeometry,
         drawOptions: null,
         color: null,
         expressions: {},
-        geometry: null,
         flatShading: null,
         glossiness: null,
         positionOffset: null,
@@ -59,7 +60,6 @@ function Mesh (node, options) {
     if (options) this.setDrawOptions(options);
     this._id = node.addComponent(this);
 }
-
 /**
  * Pass custom options to Mesh, such as a 3 element map
  * which displaces the position of each vertex in world space.
