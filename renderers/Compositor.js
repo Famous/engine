@@ -128,7 +128,18 @@ Compositor.prototype.handleWith = function handleWith (iterator, commands) {
     return context.receive(path, commands, iterator);
 };
 
-
+/**
+ * Method used to instantiate a new context using parameters from command
+ * queue.
+ *
+ * @method
+ * @private
+ *
+ * @param  {Number} iterator position index within the commands queue
+ * @param  {Array} commands remaining message queue
+ *
+ * @return {Context} newly created context.
+ */
 Compositor.prototype.createContext = function createContext(iterator, commands) {
     var selector = commands[++iterator];
     var contextOptions = commands[++iterator];
