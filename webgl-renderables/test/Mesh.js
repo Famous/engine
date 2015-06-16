@@ -49,6 +49,8 @@ function createMesh(options) {
  * Dummy material expression
  */
 var materialExpression = {
+    meshes: [],
+    inputs: [],
     __isAMaterial__: true
 };
 
