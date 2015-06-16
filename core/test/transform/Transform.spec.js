@@ -5,7 +5,6 @@ var TransformStub = require('./Transform.stub');
 var NodeStub = require('../node/Node.stub');
 var sinon = require('sinon');
 
-
 function createTestNode () {
     var node = new NodeStub();
     node.getSize.returns([100, 100, 100]);
@@ -28,7 +27,7 @@ test('Transform class', function (t) {
             return new Transform(new TransformStub());
         }, 'Transform should be callable with new and another transform as an argument');
 
-        t.ok((new Transform()).constructor === Transform, 'Transform should be a constructor function');
+        t.equal((new Transform()).constructor, Transform, 'Transform should be a constructor function');
 
         var transform = new Transform();
 
