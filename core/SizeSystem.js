@@ -201,7 +201,7 @@ function proportionalSizeChanged (node, components, size) {
  * @param {Size} the size component
  */
 function differentialSizeChanged (node, components, size) {
-    var differentialSize = size.getDifferentialSize();
+    var differentialSize = size.getDifferential();
     var x = differentialSize[0];
     var y = differentialSize[1];
     var z = differentialSize[2];
