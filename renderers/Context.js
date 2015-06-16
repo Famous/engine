@@ -68,7 +68,6 @@ function Context(selector, compositor, options) {
 
     // WebGLRenderer will be instantiated if needed.
     if (this.options.disableWebGL !== true) {
-        console.log(1)
         this._initWebGLRenderer();
     }
 
@@ -173,9 +172,6 @@ Context.prototype._initWebGLRenderer = function _initWebGLRenderer() {
         this._webGLRendererRootEl,
         this._compositor
     );
-
-    // Don't read offset width and height.
-    this._webGLRenderer.updateSize(this._size);
 };
 
 /**
