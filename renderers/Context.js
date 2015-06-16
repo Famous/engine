@@ -188,7 +188,7 @@ Context.prototype.initCommandCallbacks = function initCommandCallbacks () {
     this._commandCallbacks[Commands.PREVENT_DEFAULT] = preventDefault;
     this._commandCallbacks[Commands.ALLOW_DEFAULT] = allowDefault;
     this._commandCallbacks[Commands.READY] = ready;
-}
+};
 
 /**
  * Initializes the WebGLRenderer and updates it initial size.

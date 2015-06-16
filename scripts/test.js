@@ -31,7 +31,7 @@ function popCharacterStack () {
     logCharacterStack();
     characterStack.pop();
     logCharacterStack();
-};
+}
 
 function handleAssertion (row) {
     log('operator is "' + row.operator + '"');

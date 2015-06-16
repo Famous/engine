@@ -1,3 +1,5 @@
+'use strict';
+
 var api = require('./TransformSystem.api');
 var sinon = require('sinon');
 
