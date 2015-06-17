@@ -25,7 +25,6 @@
 'use strict';
 
 var Light = require('./Light');
-var Commands = require('../../core/Commands');
 var TransformSystem = require('../../core/TransformSystem');
 
 /**
