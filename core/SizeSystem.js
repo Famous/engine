@@ -161,7 +161,7 @@ function sizeModeChanged (node, components, size) {
  * @return {undefined} undefined
  */
 function absoluteSizeChanged (node, components, size) {
-    var absoluteSize = size.getAbsoluteSize();
+    var absoluteSize = size.getAbsolute();
     var x = absoluteSize[0];
     var y = absoluteSize[1];
     var z = absoluteSize[2];
@@ -185,7 +185,7 @@ function absoluteSizeChanged (node, components, size) {
  * @return {undefined} undefined
  */
 function proportionalSizeChanged (node, components, size) {
-    var proportionalSize = size.getProportionalSize();
+    var proportionalSize = size.getProportional();
     var x = proportionalSize[0];
     var y = proportionalSize[1];
     var z = proportionalSize[2];
