@@ -127,6 +127,9 @@ Node.prototype._init = function _init () {
  * @return {undefined} undefined;
  */
 Node.prototype._setParent = function _setParent (parent) {
+    if (this._parent && this._parent.getChildren().indexOf(this) !== -1) {
+        this._parent.removeChild(this);
+    }
     this._parent = parent;
 };
 
@@ -679,7 +682,7 @@ Node.prototype.removeChild = function removeChild (child) {
 
         this._children[index] = null;
 
-        Dispatch.dismount(this.getLocation() + '/' + index);
+        if (child.isMounted()) child.dismount();
 
         return true;
     } else throw new Error('Node is not a child of this node');
