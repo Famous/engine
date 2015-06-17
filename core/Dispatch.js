@@ -153,7 +153,8 @@ Dispatch.prototype.mount = function mount (path, node) {
                 components[i].onMount(node, i);
 
         for (i = 0, len = children.length ; i < len ; i++)
-            if (children[i]) this.mount(path + '/' + i, children[i]);
+            if (children[i] && children[i].mount) children[i].mount(path + '/' + i);
+            else if (children[i]) this.mount(path + '/' + i, children[i]);
     }
 
     if (parent.isShown()) {
@@ -200,7 +201,8 @@ Dispatch.prototype.dismount = function dismount (path) {
         if (node.onDismount) node.onDismount(path);
 
         for (i = 0, len = children.length ; i < len ; i++)
-            if (children[i]) this.dismount(path + '/' + i);
+            if (children[i] && children[i].dismount) children[i].dismount();
+            else if (children[i]) this.dismount(path + '/' + i);
 
         for (i = 0, len = components.length ; i < len ; i++)
             if (components[i] && components[i].onDismount)
