@@ -43,7 +43,6 @@ var TransformSystem = require('../../core/TransformSystem');
  */
 function PointLight(node) {
     Light.call(this, node);
-    this.commands.position = Commands.GL_LIGHT_POSITION;
 }
 
 /**
@@ -59,11 +58,13 @@ PointLight.prototype.constructor = PointLight;
 /**
  * Receive the notice that the node you are on has been mounted.
  *
- * @private
+ * @param {Node} node Node that the component has been associated with
+ * @param {Number} id ID associated with the node
  *
  * @return {undefined} undefined
  */
-PointLight.prototype.onMount = function onMount() {
+PointLight.prototype.onMount = function onMount(node, id) {
+    this._id = id;
     TransformSystem.makeBreakPointAt(this._node.getLocation());
     this.onTransformChange(TransformSystem.get(this._node.getLocation()));
 };

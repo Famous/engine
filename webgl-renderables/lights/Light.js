@@ -39,11 +39,14 @@ var Commands = require('../../core/Commands');
  */
 function Light(node) {
     this._node = node;
-    this._id = node.addComponent(this);
     this._requestingUpdate = false;
-    this.queue = [];
     this._color = null;
-    this.commands = { color: Commands.GL_LIGHT_COLOR };
+    this.queue = [];
+    this.commands = {
+        color: Commands.GL_LIGHT_COLOR,
+        position: Commands.GL_LIGHT_POSITION
+    };
+    this._id = node.addComponent(this);
 }
 
 /**
