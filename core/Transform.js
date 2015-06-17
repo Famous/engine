@@ -275,17 +275,17 @@ Transform.prototype.setRotation = function setRotation (x, y, z, w) {
         qy = y;
         qz = z;
         qw = w;
-        this._lastEuler[0] = null;
-        this._lastEuler[1] = null;
-        this._lastEuler[2] = null;
+        this._lastEulerVals[0] = null;
+        this._lastEulerVals[1] = null;
+        this._lastEulerVals[2] = null;
         this._lastEuler = false;
     }
     else {
         if (x == null || y == null || z == null) {
             if (this._lastEuler) {
-                x = x == null ? this._lastEuler[0] : x;
-                y = y == null ? this._lastEuler[1] : y;
-                z = z == null ? this._lastEuler[2] : z;
+                x = x == null ? this._lastEulerVals[0] : x;
+                y = y == null ? this._lastEulerVals[1] : y;
+                z = z == null ? this._lastEulerVals[2] : z;
             }
             else {
                 var sp = -2 * (quat[1] * quat[2] - quat[3] * quat[0]);
@@ -325,9 +325,9 @@ Transform.prototype.setRotation = function setRotation (x, y, z, w) {
         qw = cx * cycz - sx * sysz;
 
         this._lastEuler = true;
-        this._lastEuler[0] = x;
-        this._lastEuler[1] = y;
-        this._lastEuler[2] = z;
+        this._lastEulerVals[0] = x;
+        this._lastEulerVals[1] = y;
+        this._lastEulerVals[2] = z;
     }
 
     this.vectors.rotationChanged = setVec(quat, qx, qy, qz, qw);
