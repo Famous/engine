@@ -208,7 +208,7 @@ Size.prototype.setAbsolute = function setAbsolute (x, y, z) {
  *
  * @return {array} array of absolute size
  */
-Size.prototype.getAbsoluteSize = function getAbsoluteSize () {
+Size.prototype.getAbsolute = function getAbsolute () {
     return this.absoluteSize;
 };
 
@@ -235,7 +235,7 @@ Size.prototype.setProportional = function setProportional (x, y, z) {
  *
  * @return {array} array of proportional size
  */
-Size.prototype.getProportionalSize = function getProportionalSize () {
+Size.prototype.getProportional = function getProportional () {
     return this.proportionalSize;
 };
 
