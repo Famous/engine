@@ -190,6 +190,7 @@ DOMElement.prototype.onDismount = function onDismount() {
     this.setAttribute('data-fa-path', '');
     this.setCutoutState(false);
 
+    this.onUpdate();
     this._initialized = false;
 };
 

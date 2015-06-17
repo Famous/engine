@@ -197,8 +197,6 @@ Dispatch.prototype.dismount = function dismount (path) {
     }
 
     if (node.isMounted()) {
-        node._setMounted(false);
-        node._setParent(null);
         if (node.onDismount) node.onDismount(path);
 
         for (i = 0, len = children.length ; i < len ; i++)
@@ -207,10 +205,10 @@ Dispatch.prototype.dismount = function dismount (path) {
         for (i = 0, len = components.length ; i < len ; i++)
             if (components[i] && components[i].onDismount)
                 components[i].onDismount();
-    }
 
-    for (i = 0, len = children.length ; i < len ; i++)
-        this.deregisterNodeAtPath(children[i], path + '/' + i);
+        node._setMounted(false);
+        node._setParent(null);
+    }
 
     this._nodes[path] = null;
 };
