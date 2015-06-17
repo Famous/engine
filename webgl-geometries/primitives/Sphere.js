@@ -52,8 +52,6 @@ function ParametricSphere (options) {
         true
     );
 
-    GeometryHelper.getUniqueFaces(buffers.vertices, buffers.indices);
-
     return new Geometry({
         buffers: [
             { name: 'a_pos', data: buffers.vertices },
