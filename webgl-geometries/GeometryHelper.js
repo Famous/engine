@@ -69,11 +69,13 @@ GeometryHelper.generateParametric = function generateParametric(detailX, detailY
 
     // We can wrap around slightly more than once for uv coordinates to look correct.
 
-    var Xrange = wrap ? Math.PI + (Math.PI / (detailX - 1)) : Math.PI;
+    var offset = (Math.PI / (detailX - 1));
+    var Xrange = wrap ? Math.PI + offset : Math.PI;
+
     var out = [];
 
     for (i = 0; i < detailX + 1; i++) {
-        theta = i * Xrange / detailX;
+        theta = (i === 0 ? 0.0001 : i) * Math.PI / detailX;
         for (j = 0; j < detailY; j++) {
             phi = j * 2.0 * Xrange / detailY;
             func(theta, phi, out);
@@ -348,8 +350,11 @@ GeometryHelper.getSpheroidUV = function getSpheroidUV(vertices, out) {
         .normalize()
         .toArray();
 
-        uv[0] = this.getAzimuth(vertex) * 0.5 / Math.PI + 0.5;
-        uv[1] = this.getAltitude(vertex) / Math.PI + 0.5;
+        var azimuth = this.getAzimuth(vertex);
+        var altitude = this.getAltitude(vertex);
+
+        uv[0] = azimuth * 0.5 / Math.PI + 0.5;
+        uv[1] = altitude / Math.PI + 0.5;
 
         out.push.apply(out, uv);
     }
