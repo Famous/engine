@@ -275,7 +275,7 @@ Node.prototype.getValue = function getValue () {
     if (value.location) {
         var transform = TransformSystem.get(this.getId());
         var size = SizeSystem.get(this.getId());
-        var opacity = SizeSystem.get(this.getId());
+        var opacity = OpacitySystem.get(this.getId());
 
         value.spec.showState.opacity = opacity.getOpacity();
 

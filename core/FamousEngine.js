@@ -32,6 +32,7 @@ var UIManager = require('../renderers/UIManager');
 var Compositor = require('../renderers/Compositor');
 var RequestAnimationFrameLoop = require('../render-loops/RequestAnimationFrameLoop');
 var TransformSystem = require('./TransformSystem');
+var OpacitySystem = require('./OpacitySystem');
 var SizeSystem = require('./SizeSystem');
 var Commands = require('./Commands');
 
@@ -158,6 +159,7 @@ FamousEngine.prototype._update = function _update () {
 
     SizeSystem.update();
     TransformSystem.update();
+    OpacitySystem.update();
 
     while (nextQueue.length) queue.unshift(nextQueue.pop());
 

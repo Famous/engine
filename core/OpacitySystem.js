@@ -48,15 +48,18 @@ function OpacitySystem () {
  *
  * @param {String} path for the opacity to be registered to.
  */
-OpacitySystem.prototype.registerOpacityAtPath = function registerOpacityAtPath (path) {
-    if (!PathUtils.depth(path)) return this.pathStore.insert(path, new Opacity());
+OpacitySystem.prototype.registerOpacityAtPath = function registerOpacityAtPath (path, opacity) {
+    if (!PathUtils.depth(path)) return this.pathStore.insert(path, opacity ? opacity : new Opacity());
 
     var parent = this.pathStore.get(PathUtils.parent(path));
 
     if (!parent) throw new Error(
             'No parent opacity registered at expected path: ' + PathUtils.parent(path)
     );
-    this.pathStore.insert(path, new Opacity(parent));
+
+    if (opacity) opacity.setParent(parent);
+
+    this.pathStore.insert(path, opacity ? opacity : new Opacity(parent));
 };
 
 /**
@@ -105,14 +108,14 @@ OpacitySystem.prototype.get = function get (path) {
 };
 
 /**
- * onUpdate is called when the opacity system requires an update.
+ * update is called when the opacity system requires an update.
  * It traverses the opacity array and evaluates the necessary opacities
  * in the scene graph with the information from the corresponding node
  * in the scene graph
  *
- * @method onUpdate
+ * @method update
  */
-OpacitySystem.prototype.onUpdate = function onUpdate () {
+OpacitySystem.prototype.update = function update () {
     var opacities = this.pathStore.getItems();
     var paths = this.pathStore.getPaths();
     var opacity;
@@ -125,7 +128,8 @@ OpacitySystem.prototype.onUpdate = function onUpdate () {
         if (!node) continue;
         components = node.getComponents();
         opacity = opacities[i];
-        if ((changed = opacity.from(node))) {
+
+        if ((changed = opacity.calculate())) {
             opacityChanged(node, components, opacity);
             if (changed & Opacity.LOCAL_CHANGED) localOpacityChanged(node, components, opacity.getLocalOpacity());
             if (changed & Opacity.WORLD_CHANGED) worldOpacityChanged(node, components, opacity.getWorldOpacity());
