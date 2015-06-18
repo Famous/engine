@@ -326,7 +326,7 @@ WebGLRenderer.prototype.setCutoutUniform = function setCutoutUniform(path, unifo
 
     var index = cutout.uniformKeys.indexOf(uniformName);
 
-    if (Array.isArray(uniformValue)) {
+    if (uniformValue.length) {
         for (var i = 0, len = uniformValue.length; i < len; i++) {
             cutout.uniformValues[index][i] = uniformValue[i];
         }
