@@ -29,7 +29,9 @@
 var SizeSystem = require('./SizeSystem');
 var Dispatch = require('./Dispatch');
 var TransformSystem = require('./TransformSystem');
+var OpacitySystem = require('./OpacitySystem');
 var Size = require('./Size');
+var Opacity = require('./Opacity');
 var Transform = require('./Transform');
 
 /**
@@ -76,7 +78,6 @@ function Node () {
     this._mounted = false;
     this._shown = true;
     this._updater = null;
-    this._opacity = 1;
     this._UIEvents = [];
 
     this._updateQueue = [];
@@ -96,6 +97,7 @@ function Node () {
 
     this._transformID = null;
     this._sizeID = null;
+    this._opacityID = null;
 
     if (!this.constructor.NO_DEFAULT_COMPONENTS) this._init();
 }
@@ -117,6 +119,7 @@ Node.NO_DEFAULT_COMPONENTS = false;
 Node.prototype._init = function _init () {
     this._transformID = this.addComponent(new Transform());
     this._sizeID = this.addComponent(new Size());
+    this._opacityID = this.addComponent(new Opacity());
 };
 
 /**
@@ -473,7 +476,11 @@ Node.prototype.isShown = function isShown () {
  * @return {Number}         Relative opacity of the node.
  */
 Node.prototype.getOpacity = function getOpacity () {
-    return this._opacity;
+    if (this.constructor.INIT_DEFAULT_COMPONENTS)
+        return this.getComponent(this._opacityID).getOpacity();
+    else if (this.isMounted())
+        return TransformSystem.get(this.getLocation()).getOpacity();
+    else throw new Error('This node does not have access to an opacity component');
 };
 
 /**
@@ -1062,28 +1069,20 @@ Node.prototype.setScale = function setScale (x, y, z) {
 
 /**
  * Sets the value of the opacity of this node. All of the node's
- * components will have onOpacityChange called on them/
+ * components will have onOpacityChange called on them.
  *
  * @method
  *
- * @param {Number} val Value of the opacity. 1 is the default.
+ * @param {Number} val=1 Value of the opacity. 1 is the default.
  *
  * @return {Node} this
  */
 Node.prototype.setOpacity = function setOpacity (val) {
-    if (val !== this._opacity) {
-        this._opacity = val;
-        if (!this._requestingUpdate) this._requestUpdate();
-
-        var i = 0;
-        var list = this._components;
-        var len = list.length;
-        var item;
-        for (; i < len ; i++) {
-            item = list[i];
-            if (item && item.onOpacityChange) item.onOpacityChange(val);
-        }
-    }
+    if (this.constructor.INIT_DEFAULT_COMPONENTS)
+        this.getComponent(this._opacityID).setOpacity(val);
+    else if (this.isMounted())
+        SizeSystem.get(this.getLocation()).setOpacity(val);
+    else throw new Error('This node does not have access to an opacity component');
     return this;
 };
 

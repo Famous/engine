@@ -83,6 +83,8 @@ Opacity.prototype.setOpacity = function setOpacity (opacity) {
 Opacity.prototype.calculateWorldOpacity = function calculateWorldOpacity () {
     var nearestBreakPoint = this.parent;
 
+    var previousGlobal = this.global;
+
     while (nearestBreakPoint && !nearestBreakPoint.isBreakPoint())
         nearestBreakPoint = nearestBreakPoint.parent;
 
@@ -91,35 +93,36 @@ Opacity.prototype.calculateWorldOpacity = function calculateWorldOpacity () {
     }
     else {
         this.global = this.local;
-        return false;
     }
+
+    return previousGlobal !== this.global;
 };
 
 Opacity.prototype.fromNode = function fromNode () {
     var changed = 0;
-
-    if (this.isBreakPoint() && this.calculateWorldOpacity())
-        changed |= Opacity.WORLD_CHANGED;
 
     if (this.opacity !== this.local)
         changed |= Opacity.LOCAL_CHANGED;
 
     this.local = this.opacity;
 
+    if (this.isBreakPoint() && this.calculateWorldOpacity())
+        changed |= Opacity.WORLD_CHANGED;
+
     return changed;
 };
 
 Opacity.prototype.fromNodeWithParent = function fromNodeWithParent () {
-    var oldLocalOpacity = this.getLocalOpacity();
-
     var changed = 0;
 
-    this.localOpacity = this.parent.getLocalOpacity() * oldLocalOpacity;
+    var previousLocal = this.local;
+
+    this.local = this.parent.getLocalOpacity() * this.opacity;
 
     if (this.isBreakPoint() && this.calculateWorldOpacity())
         changed |= Opacity.WORLD_CHANGED;
 
-    if (oldLocalOpacity !== this.localOpacity)
+    if (previousLocal !== this.local)
         changed |= Opacity.LOCAL_CHANGED;
 
     return changed;
