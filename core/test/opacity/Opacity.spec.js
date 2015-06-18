@@ -81,133 +81,136 @@ test('Opacity class', function (t) {
             opacity.setOpacity(0.5);
         }
 
+        t.test('Root Opacity (no breakpoint): 0.5', function(t) {
+            t.equal(
+                opacities[0].calculate(), Opacity.LOCAL_CHANGED & ~Opacity.WORLD_CHANGED,
+                'Calculating the root opacity should only change the local opacity'
+            );
+            t.equal(
+                opacities[0].getLocalOpacity(), 0.5,
+                'The root local opacity should be set to 0.5'
+            );
 
-        t.comment('Root Opacity (no breakpoint): 0.5');
+            t.equal(
+                opacities[0].getOpacity(), 0.5,
+                'The root opacity should still be set to 0.5 after calculation'
+            );
+            t.throws(
+                function() {
+                    opacities[0].getWorldOpacity();
+                },
+                /not calculating world transforms/,
+                'Attempting to get the world opacity of the root opacity should throw an error, since no breakpoint has been set on it'
+            );
 
-        t.equal(
-            opacities[0].calculate(), Opacity.LOCAL_CHANGED & ~Opacity.WORLD_CHANGED,
-            'Calculating the root opacity should only change the local opacity'
-        );
-        t.equal(
-            opacities[0].getLocalOpacity(), 0.5,
-            'The root local opacity should be set to 0.5'
-        );
+            t.end();
+        });
 
-        t.equal(
-            opacities[0].getOpacity(), 0.5,
-            'The root opacity should still be set to 0.5 after calculation'
-        );
-        t.throws(
-            function() {
-                opacities[0].getWorldOpacity();
-            },
-            /not calculating world transforms/,
-            'Attempting to get the world opacity of the root opacity should throw an error, since no breakpoint has been set on it'
-        );
+        t.test('2nd Opacity (no breakpoint): 0.5', function(t) {
+            t.equal(
+                opacities[1].calculate(), Opacity.LOCAL_CHANGED & ~Opacity.WORLD_CHANGED,
+                'Calculating the 2nd opacity (child of root) should only change the local opacity, since no breakpoint has been set on it'
+            );
+            t.equal(
+                opacities[1].getLocalOpacity(), 0.25,
+                'The 2nd opacity should have been multiplied with the root opacity'
+            );
 
+            t.equal(
+                opacities[1].getOpacity(), 0.5,
+                'The 2nd opacity should still be set to 0.5 after calculation'
+            );
+            t.throws(
+                function() {
+                    opacities[1].getWorldOpacity();
+                },
+                /not calculating world transforms/,
+                'Attempting to get the world opacity of the 2nd opacity should throw an error, since no breakpoint has been set on it'
+            );
 
-        t.comment('2nd Opacity (no breakpoint): 0.5');
+            t.end();
+        });
 
-        t.equal(
-            opacities[1].calculate(), Opacity.LOCAL_CHANGED & ~Opacity.WORLD_CHANGED,
-            'Calculating the 2nd opacity (child of root) should only change the local opacity, since no breakpoint has been set on it'
-        );
-        t.equal(
-            opacities[1].getLocalOpacity(), 0.25,
-            'The 2nd opacity should have been multiplied with the root opacity'
-        );
+        t.test('3rd Opacity (no breakpoint): 0.5', function(t) {
+            t.equal(
+                opacities[2].calculate(), Opacity.LOCAL_CHANGED & ~Opacity.WORLD_CHANGED,
+                'Calculating the 3rd opacity should only change the local opacity, since no breakpoint has been set on it'
+            );
+            t.equal(
+                opacities[2].getLocalOpacity(), 0.125,
+                'The 3rd opacity should have been multiplied with the root and 2nd opacity'
+            );
 
-        t.equal(
-            opacities[1].getOpacity(), 0.5,
-            'The 2nd opacity should still be set to 0.5 after calculation'
-        );
-        t.throws(
-            function() {
-                opacities[1].getWorldOpacity();
-            },
-            /not calculating world transforms/,
-            'Attempting to get the world opacity of the 2nd opacity should throw an error, since no breakpoint has been set on it'
-        );
+            t.equal(
+                opacities[2].getOpacity(), 0.5,
+                'The 3rd opacity should still be set to 0.5 after calculation'
+            );
+            t.throws(
+                function() {
+                    opacities[2].getWorldOpacity();
+                },
+                /not calculating world transforms/,
+                'Attempting to get the world opacity of the 3rd opacity should throw an error, since no breakpoint has been set on it'
+            );
 
+            t.end();
+        });
 
-        t.comment('3rd Opacity (no breakpoint): 0.5');
+        t.test('4th Opacity (breakpoint): 0.5', function(t) {
+            opacities[3].setBreakPoint();
+            t.equal(
+                opacities[3].calculate(), Opacity.LOCAL_CHANGED | Opacity.WORLD_CHANGED,
+                'Calculating the 4th opacity should have checked if the world opacity changed, since it has a breakpoint set on it'
+            );
 
-        t.equal(
-            opacities[2].calculate(), Opacity.LOCAL_CHANGED & ~Opacity.WORLD_CHANGED,
-            'Calculating the 3rd opacity should only change the local opacity, since no breakpoint has been set on it'
-        );
-        t.equal(
-            opacities[2].getLocalOpacity(), 0.125,
-            'The 3rd opacity should have been multiplied with the root and 2nd opacity'
-        );
+            t.equal(
+                opacities[3].isBreakPoint(), true,
+                'The 4th opacity should still have breakpoint after calculation'
+            );
+            t.equal(
+                opacities[3].getLocalOpacity(), 0.0625,
+                'The 4th local opacity should have been multiplied with the root, 2nd and 3rd opacity'
+            );
+            t.equal(
+                opacities[3].getOpacity(), 0.5,
+                'The 4th opacity should still be set to 0.5 after calculation'
+            );
+            t.doesNotThrow(function() {
+                opacities[3].getWorldOpacity();
+            }, 'Attempting to calculate the world on the 4th opacity should not throw an error, since a breakpoint has been set on it');
 
-        t.equal(
-            opacities[2].getOpacity(), 0.5,
-            'The 3rd opacity should still be set to 0.5 after calculation'
-        );
-        t.throws(
-            function() {
-                opacities[2].getWorldOpacity();
-            },
-            /not calculating world transforms/,
-            'Attempting to get the world opacity of the 3rd opacity should throw an error, since no breakpoint has been set on it'
-        );
+            t.equal(
+                opacities[3].getWorldOpacity(), 0.0625,
+                'The 4th world opacity should be have been multiplied with all previous opacities'
+            );
 
+            t.end();
+        });
 
-        t.comment('4th Opacity (breakpoint): 0.5');
+        t.test('5th Opacity (no breakpoint): 0.5', function(t) {
+            t.equal(
+                opacities[4].calculate(), Opacity.LOCAL_CHANGED & ~Opacity.WORLD_CHANGED,
+                'Calculating the 5th opacity should only change the local opacity, since no breakpoint has been set on it'
+            );
+            t.equal(
+                opacities[4].getLocalOpacity(), 0.5,
+                'The 5th local opacity should be equivalent to the opacity set on it, it should not have been multiplied, since the 4th node has a breakpoint set on it'
+            );
 
-        opacities[3].setBreakPoint();
-        t.equal(
-            opacities[3].calculate(), Opacity.LOCAL_CHANGED | Opacity.WORLD_CHANGED,
-            'Calculating the 4th opacity should have checked if the world opacity changed, since it has a breakpoint set on it'
-        );
+            t.equal(
+                opacities[4].getOpacity(), 0.5,
+                'The 5th opacity should still be set to 0.5 after calculation'
+            );
 
-        t.equal(
-            opacities[3].isBreakPoint(), true,
-            'The 4th opacity should still have breakpoint after calculation'
-        );
-        t.equal(
-            opacities[3].getLocalOpacity(), 0.0625,
-            'The 4th local opacity should have been multiplied with the root, 2nd and 3rd opacity'
-        );
-        t.equal(
-            opacities[3].getOpacity(), 0.5,
-            'The 4th opacity should still be set to 0.5 after calculation'
-        );
-        t.doesNotThrow(function() {
-            opacities[3].getWorldOpacity();
-        }, 'Attempting to calculate the world on the 4th opacity should not throw an error, since a breakpoint has been set on it');
+            t.throws(
+                function() {
+                    opacities[4].getWorldOpacity();
+                },
+                /not calculating world transforms/,
+                'Attempting to get the world opacity of the 4th opacity should throw an error, since no breakpoint has been set on it'
+            );
 
-        t.equal(
-            opacities[3].getWorldOpacity(), 0.0625,
-            'The 4th world opacity should be have been multiplied with all previous opacities'
-        );
-
-
-        t.comment('5th Opacity (no breakpoint): 0.5')
-
-        t.equal(
-            opacities[4].calculate(), Opacity.LOCAL_CHANGED & ~Opacity.WORLD_CHANGED,
-            'Calculating the 5th opacity should only change the local opacity, since no breakpoint has been set on it'
-        );
-        t.equal(
-            opacities[4].getLocalOpacity(), 0.5,
-            'The 5th local opacity should be equivalent to the opacity set on it, it should not have been multiplied, since the 4th node has a breakpoint set on it'
-        );
-
-        t.equal(
-            opacities[4].getOpacity(), 0.5,
-            'The 5th opacity should still be set to 0.5 after calculation'
-        );
-
-        t.throws(
-            function() {
-                opacities[4].getWorldOpacity();
-            },
-            /not calculating world transforms/,
-            'Attempting to get the world opacity of the 4th opacity should throw an error, since no breakpoint has been set on it'
-        );
-
-        t.end();
+            t.end();
+        });
     });
 });
