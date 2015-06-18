@@ -26,6 +26,7 @@
 
 var CallbackStore = require('../utilities/CallbackStore');
 var TransformSystem = require('../core/TransformSystem');
+var OpacitySystem = require('../core/OpacitySystem');
 var Commands = require('../core/Commands');
 var Size = require('../core/Size');
 
@@ -79,7 +80,6 @@ function DOMElement(node, options) {
     this._callbacks = new CallbackStore();
 
     this.setProperty('display', node.isShown() ? 'block' : 'none');
-    this.onOpacityChange(node.getOpacity());
 
     if (!options) return;
 

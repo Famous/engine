@@ -74,8 +74,8 @@ OpacitySystem.prototype.deregisterOpacityAtPath = function deregisterOpacityAtPa
 /**
  * Method which will make the opacity currently stored at the given path a breakpoint.
  * A opacity being a breakpoint means that both a local and world opacity will be calculated
- * for that point. The local opacity being the concatinated opacity of all ancestor opacites up
- * until the nearest breakpoint, and the world being the concatinated opacity of all ancestor opacites.
+ * for that point. The local opacity being the concatinated opacity of all ancestor opacities up
+ * until the nearest breakpoint, and the world being the concatinated opacity of all ancestor opacities.
  * This method throws if no opacity is at the provided path.
  *
  * @method
@@ -106,25 +106,25 @@ OpacitySystem.prototype.get = function get (path) {
 
 /**
  * onUpdate is called when the opacity system requires an update.
- * It traverses the opacity array and evaluates the necessary opacites
+ * It traverses the opacity array and evaluates the necessary opacities
  * in the scene graph with the information from the corresponding node
  * in the scene graph
  *
  * @method onUpdate
  */
 OpacitySystem.prototype.onUpdate = function onUpdate () {
-    var opacites = this.pathStore.getItems();
+    var opacities = this.pathStore.getItems();
     var paths = this.pathStore.getPaths();
     var opacity;
     var changed;
     var node;
     var components;
 
-    for (var i = 0, len = opacites.length ; i < len ; i++) {
+    for (var i = 0, len = opacities.length ; i < len ; i++) {
         node = Dispatch.getNode(paths[i]);
         if (!node) continue;
         components = node.getComponents();
-        opacity = opacites[i];
+        opacity = opacities[i];
         if ((changed = opacity.from(node))) {
             opacityChanged(node, components, opacity);
             if (changed & Opacity.LOCAL_CHANGED) localOpacityChanged(node, components, opacity.getLocalOpacity());

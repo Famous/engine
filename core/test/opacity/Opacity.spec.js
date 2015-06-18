@@ -208,10 +208,6 @@ test('Opacity class', function (t) {
             'Attempting to get the world opacity of the 4th opacity should throw an error, since no breakpoint has been set on it'
         );
 
-        for (i = 0; i < opacities.length; i++)
-            console.log(JSON.stringify(opacities[i]));
-
-
         t.end();
     });
 });

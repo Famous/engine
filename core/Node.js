@@ -247,7 +247,7 @@ Node.prototype.getValue = function getValue () {
             showState: {
                 mounted: this.isMounted(),
                 shown: this.isShown(),
-                opacity: this.getOpacity() || null
+                opacity: 1
             },
             offsets: {
                 mountPoint: [0, 0, 0],
@@ -275,6 +275,9 @@ Node.prototype.getValue = function getValue () {
     if (value.location) {
         var transform = TransformSystem.get(this.getId());
         var size = SizeSystem.get(this.getId());
+        var opacity = SizeSystem.get(this.getId());
+
+        value.spec.showState.opacity = opacity.getOpacity();
 
         for (i = 0 ; i < 3 ; i++) {
             value.spec.offsets.mountPoint[i] = transform.offsets.mountPoint[i];
@@ -322,7 +325,8 @@ Node.prototype.getComputedValue = function getComputedValue () {
         location: this.getId(),
         computedValues: {
             transform: this.isMounted() ? TransformSystem.get(this.getLocation()).getLocalTransform() : null,
-            size: this.isMounted() ? SizeSystem.get(this.getLocation()).get() : null
+            size: this.isMounted() ? SizeSystem.get(this.getLocation()).get() : null,
+            opacity: this.isMounted() ? OpacitySystem.get(this.getLocation()).get() : null
         },
         children: []
     };
@@ -479,7 +483,7 @@ Node.prototype.getOpacity = function getOpacity () {
     if (this.constructor.INIT_DEFAULT_COMPONENTS)
         return this.getComponent(this._opacityID).getOpacity();
     else if (this.isMounted())
-        return TransformSystem.get(this.getLocation()).getOpacity();
+        return OpacitySystem.get(this.getLocation()).getOpacity();
     else throw new Error('This node does not have access to an opacity component');
 };
 
@@ -1081,7 +1085,7 @@ Node.prototype.setOpacity = function setOpacity (val) {
     if (this.constructor.INIT_DEFAULT_COMPONENTS)
         this.getComponent(this._opacityID).setOpacity(val);
     else if (this.isMounted())
-        SizeSystem.get(this.getLocation()).setOpacity(val);
+        OpacitySystem.get(this.getLocation()).setOpacity(val);
     else throw new Error('This node does not have access to an opacity component');
     return this;
 };
@@ -1266,10 +1270,12 @@ Node.prototype.mount = function mount (path) {
 
     if (!this.constructor.NO_DEFAULT_COMPONENTS){
         TransformSystem.registerTransformAtPath(path, this.getComponent(this._transformID));
+        OpacitySystem.registerOpacityAtPath(path, this.getComponent(this._opacityID));
         SizeSystem.registerSizeAtPath(path, this.getComponent(this._sizeID));
     }
     else {
         TransformSystem.registerTransformAtPath(path);
+        OpacitySystem.registerOpacityAtPath(path);
         SizeSystem.registerSizeAtPath(path);
     }
     Dispatch.mount(path, this);
@@ -1295,6 +1301,7 @@ Node.prototype.dismount = function dismount () {
 
     TransformSystem.deregisterTransformAtPath(path);
     SizeSystem.deregisterSizeAtPath(path);
+    OpacitySystem.deregisterOpacityAtPath(path);
     Dispatch.dismount(path);
 
     if (!this._requestingUpdate) this._requestUpdate();
