@@ -143,7 +143,7 @@ commandPrinters[Commands.MATERIAL_INPUT] = function material_input (buffer, data
     data.result += data.i + '. MATERIAL_INPUT\n    key: ' + buffer[++data.i] + ', value: ' + buffer[++data.i] + '\n';
 };
 
-comamndPrinters[Commands.GL_SET_GEOMETRY] = function gl_set_geometry (buffer, data) {
+commandPrinters[Commands.GL_SET_GEOMETRY] = function gl_set_geometry (buffer, data) {
     data.result += data.i + '. GL_SET_GEOMETRY\n   x: ' + buffer[++data.i] + ', y: ' + buffer[++data.i] + ', z: ' + buffer[++data.i] + '\n';
 };
 
