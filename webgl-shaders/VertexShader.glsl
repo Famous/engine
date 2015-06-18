@@ -27,45 +27,21 @@
 #pragma glslify: transpose = require(./chunks/transpose)
 
 /**
- * Converts vertex from modelspace to screenspace using transform
- * information from context.
+ * Placeholder for positionOffset chunks to be templated in.
+ * Used for mesh deformation.
  *
- * @method applyTransform
+ * @method calculateOffset
  * @private
  *
  *
  */
+#vert_definitions
+vec3 calculateOffset(vec3 ID) {
+    #vert_applications
+    return vec3(0.0);
+}
 
-vec4 applyTransform(vec4 pos) {
-    //TODO: move this multiplication to application code. 
-
-    /**
-     * Currently multiplied in the vertex shader to avoid consuming the complexity of holding an additional
-     * transform as state on the mesh object in WebGLRenderer. Multiplies the object's transformation from object space
-     * to world space with its transformation from world space to eye space.
-     */
-    mat4 MVMatrix = u_view * u_transform;
-
-    //TODO: move the origin, sizeScale and y axis inversion to application code in order to amortize redundant per-vertex calculations.
-
-    /**
-     * The transform uniform should be changed to the result of the transformation chain:
-     *
-     * view * modelTransform * invertYAxis * sizeScale * origin
-     *
-     * which could be simplified to:
-     *
-     * view * modelTransform * convertToDOMSpace
-     *
-     * where convertToDOMSpace represents the transform matrix:
-     *
-     *                           size.x 0       0       size.x 
-     *                           0      -size.y 0       size.y
-     *                           0      0       1       0
-     *                           0      0       0       1
-     *
-     */
-
+vec3 clipSpacePos(in vec3 pos) {
     /**
      * Assuming a unit volume, moves the object space origin [0, 0, 0] to the "top left" [1, -1, 0], the DOM space origin.
      * Later in the transformation chain, the projection transform negates the rigidbody translation.
@@ -110,48 +86,7 @@ vec4 applyTransform(vec4 pos) {
      */
     pos.y *= -1.0;
 
-    /**
-     * Exporting the vertex's position as a varying, in DOM space, to be used for lighting calculations. This has to be in DOM space
-     * since light position and direction is derived from the scene graph, calculated in DOM space.
-     */
-
-    v_position = (MVMatrix * pos).xyz;
-
-    /**
-    * Exporting the eye vector (a vector from the center of the screen) as a varying, to be used for lighting calculations.
-    * In clip space deriving the eye vector is a matter of simply taking the inverse of the position, as the position is a vector
-    * from the center of the screen. However, since our points are represented in DOM space,
-    * the position is a vector from the top left corner of the screen, so some additional math is needed (specifically, subtracting
-    * the position from the center of the screen, i.e. half the resolution of the canvas).
-    */
-
-    v_eyeVector = (u_resolution * 0.5) - v_position;
-
-    /**
-     * Transforming the position (currently represented in dom space) into view space (with our dom space view transform)
-     * and then projecting the point into raster both by applying a perspective transformation and converting to clip space
-     * (the perspective matrix is a combination of both transformations, therefore it's probably more apt to refer to it as a
-     * projection transform).
-     */
-
-    pos = u_perspective * MVMatrix * pos;
-
     return pos;
-}
-
-/**
- * Placeholder for positionOffset chunks to be templated in.
- * Used for mesh deformation.
- *
- * @method calculateOffset
- * @private
- *
- *
- */
-#vert_definitions
-vec3 calculateOffset(vec3 ID) {
-    #vert_applications
-    return vec3(0.0);
 }
 
 /**
@@ -165,10 +100,21 @@ vec3 calculateOffset(vec3 ID) {
  *
  */
 void main() {
+    vec3 offsetPos,
+        invertedNormals;
+
+    vec4 pos4;
+
     v_textureCoordinate = a_texCoord;
-    vec3 invertedNormals = a_normals + (u_normals.x < 0.0 ? calculateOffset(u_normals) * 2.0 - 1.0 : vec3(0.0));
+
+    invertedNormals = a_normals;
     invertedNormals.y *= -1.0;
-    v_normal = transpose(mat3(inverse(u_transform))) * invertedNormals;
-    vec3 offsetPos = a_pos + calculateOffset(u_positionOffset);
-    gl_Position = applyTransform(vec4(offsetPos, 1.0));
+    v_normal = u_normalMatrix * invertedNormals;
+
+    offsetPos = a_pos + calculateOffset(u_positionOffset);
+    offsetPos = clipSpacePos(offsetPos);
+    pos4 = vec4(offsetPos, 1.0);
+    v_position  = (u_mvMatrix * pos4).xyz;
+    v_eyeVector = (u_resolution * 0.5) - v_position;
+    gl_Position = u_perspective * u_mvMatrix * pos4;
 }

@@ -30,6 +30,9 @@ var sorter = require('./radixSort');
 var keyValueToArrays = require('../utilities/keyValueToArrays');
 var TextureManager = require('./TextureManager');
 var compileMaterial = require('./compileMaterial');
+var glMatrix = require('gl-matrix');
+var mat44 = glMatrix.mat4;
+var mat33 = glMatrix.mat3;
 
 var identity = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
 
@@ -39,8 +42,12 @@ var globalUniforms = keyValueToArrays({
     'u_lightPosition': new Array(3),
     'u_lightColor': new Array(3),
     'u_perspective': new Array(16),
-    'u_time': 0,
-    'u_view': new Array(16)
+    'u_time': 0
+});
+
+var meshTransforms = keyValueToArrays({
+    'u_mvMatrix': new Array(16),
+    'u_normalMatrix': new Array(9)
 });
 
 /**
@@ -536,7 +543,7 @@ WebGLRenderer.prototype.draw = function draw(renderState) {
 
     this.setGlobalUniforms(renderState);
     this.drawCutouts();
-    this.drawMeshes();
+    this.drawMeshes(renderState);
 };
 
 /**
@@ -548,7 +555,7 @@ WebGLRenderer.prototype.draw = function draw(renderState) {
  *
  * @return {undefined} undefined
  */
-WebGLRenderer.prototype.drawMeshes = function drawMeshes() {
+WebGLRenderer.prototype.drawMeshes = function drawMeshes(renderState) {
     var gl = this.gl;
     var buffers;
     var mesh;
@@ -575,7 +582,12 @@ WebGLRenderer.prototype.drawMeshes = function drawMeshes() {
 
         if (mesh.options) this.handleOptions(mesh.options, mesh);
 
+        mat44.multiply(meshTransforms.values[0], renderState.viewTransform, mesh.uniformValues[1]);
+        mat33.normalFromMat4(meshTransforms.values[1], mesh.uniformValues[1]);
+
         this.program.setUniforms(mesh.uniformKeys, mesh.uniformValues);
+        this.program.setUniforms(meshTransforms.keys, meshTransforms.values);
+
         this.drawBuffers(buffers, mesh.drawType, mesh.geometry);
 
         if (mesh.options) this.resetOptions(mesh.options);

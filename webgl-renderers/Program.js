@@ -43,6 +43,7 @@ var TYPES = {
     2: 'vec2 ',
     3: 'vec3 ',
     4: 'vec4 ',
+    9: 'mat3 ',
     16: 'mat4 '
 };
 
@@ -65,9 +66,9 @@ var masks =  {
  */
 var uniforms = keyValueToArrays({
     u_perspective: identityMatrix,
-    u_view: identityMatrix,
+    u_mvMatrix: identityMatrix,
     u_resolution: [0, 0, 0],
-    u_transform: identityMatrix,
+    u_normalMatrix: [0, 0, 0, 0, 0, 0, 0, 0, 0],
     u_size: [1, 1, 1],
     u_time: 0,
     u_opacity: 1,
