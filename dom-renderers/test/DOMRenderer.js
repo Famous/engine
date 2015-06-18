@@ -59,15 +59,12 @@ test('DOMRenderer', function(t) {
         t.equal(typeof domRenderer.insertEl, 'function', 'domRender.setProperty should be a function');
 
         domRenderer.loadPath(selector + '/' + 0);
-        domRenderer.findTarget();
         domRenderer.insertEl('div');
 
         domRenderer.loadPath(selector + '/' + 1);
-        domRenderer.findTarget();
         domRenderer.insertEl('section');
 
         domRenderer.loadPath(selector + '/' + 2);
-        domRenderer.findTarget();
         domRenderer.insertEl('div');
 
         t.equal(element.children[0].tagName, 'DIV');
@@ -75,13 +72,11 @@ test('DOMRenderer', function(t) {
         t.equal(element.children[2].tagName, 'DIV');
 
         domRenderer.loadPath(selector + '/' + 1 + '/' + 0);
-        domRenderer.findTarget();
         domRenderer.insertEl('div');
 
         t.equal(element.children[1].children[0].tagName, 'DIV');
 
         domRenderer.loadPath(selector + '/' + 1 + '/' + 0 + '/' + 0);
-        domRenderer.findTarget();
         domRenderer.insertEl('div');
 
         t.equal(element.children[1].children[0].children[0].tagName, 'DIV');
@@ -96,7 +91,6 @@ test('DOMRenderer', function(t) {
         var domRenderer = new DOMRenderer(element, selector, compositor);
 
         domRenderer.loadPath('selector/0/0/1');
-        domRenderer.findTarget();
         domRenderer.insertEl('div');
 
         t.equal(element.children.length, 1, 'domRenderer.insertEl should create a single DIV when no content is being set');
@@ -120,7 +114,6 @@ test('DOMRenderer', function(t) {
         t.equal(typeof domRenderer.setProperty, 'function', 'domRenderer.setProperty should be a function');
 
         domRenderer.loadPath(selector + '/' + 1 + '/' + 0 + '/' + 0);
-        domRenderer.findTarget();
         domRenderer.insertEl('div');
 
         domRenderer.setProperty('background', 'red');
@@ -130,7 +123,6 @@ test('DOMRenderer', function(t) {
         t.equal(element.children[0].style.backgroundColor, 'yellow', 'domRenderer.setProperty should set the background color to yellow');
 
         domRenderer.loadPath(selector + '/' + 1);
-        domRenderer.findTarget();
         domRenderer.insertEl('div');
 
         domRenderer.setProperty('background', 'green');
@@ -152,7 +144,6 @@ test('DOMRenderer', function(t) {
         t.equal(typeof domRenderer.setSize, 'function', 'domRenderer.setSize should be a function');
 
         domRenderer.loadPath(selector + '/' + 0);
-        domRenderer.findTarget();
         domRenderer.insertEl('div');
         domRenderer.setSize(200, 100);
 
@@ -172,7 +163,6 @@ test('DOMRenderer', function(t) {
         t.equal(typeof domRenderer.setAttribute, 'function', 'domRenderer.setSize should be a function');
 
         domRenderer.loadPath(selector + '/' + 0);
-        domRenderer.findTarget();
         domRenderer.insertEl('div');
 
         domRenderer.setAttribute('id', 'id-value');
@@ -191,7 +181,6 @@ test('DOMRenderer', function(t) {
         t.equal(typeof domRenderer.setContent, 'function', 'domRenderer.setContent should be a function');
 
         domRenderer.loadPath(selector + '/' + 0);
-        domRenderer.findTarget();
         domRenderer.insertEl('div');
 
         domRenderer.setContent('only text');
@@ -203,7 +192,6 @@ test('DOMRenderer', function(t) {
 
         domRenderer.setContent('combined <strong>HTML</strong> and nodes <section></section>');
         domRenderer.loadPath(selector + '/' + 0 + '/' + 1);
-        domRenderer.findTarget();
         domRenderer.insertEl('section');
         t.equal(element.children[0].children[0].innerHTML, 'combined <strong>HTML</strong> and nodes <section></section>');
 
@@ -221,7 +209,6 @@ test('DOMRenderer', function(t) {
         t.equal(typeof domRenderer.removeClass, 'function', 'domRenderer.removeClass should be a function');
 
         domRenderer.loadPath(selector + '/' + 0 + '/' + 1);
-        domRenderer.findTarget();
         domRenderer.insertEl('div');
 
         domRenderer.addClass('some-class');
@@ -243,13 +230,11 @@ test('DOMRenderer', function(t) {
         t.equal(typeof domRenderer.findParent, 'function', 'domRenderer.findParent should be a function');
 
         domRenderer.loadPath(selector + '/' + 0);
-        domRenderer.findTarget();
         domRenderer.insertEl('div');
 
         t.equal(domRenderer.findParent().path, selector);
 
         domRenderer.loadPath(selector + '/' + 0 + '/' + 1);
-        domRenderer.findTarget();
         domRenderer.insertEl('section');
 
         t.equal(domRenderer.findParent().path, selector + '/' + 0);
@@ -271,17 +256,14 @@ test('DOMRenderer', function(t) {
         var domRenderer = new DOMRenderer(element, selector, compositor);
 
         domRenderer.loadPath(selector + '/' + 0);
-        domRenderer.findTarget();
         domRenderer.insertEl('div');
 
         domRenderer.loadPath(selector + '/' + 0 + '/' + 1);
-        domRenderer.findTarget();
         domRenderer.insertEl('div');
 
         domRenderer.subscribe('click');
 
         domRenderer.loadPath(selector + '/' + 0 + '/' + 1 + '/' + 0);
-        domRenderer.findTarget();
         domRenderer.insertEl('div');
 
         domRenderer.subscribe('click');
@@ -316,68 +298,42 @@ test('DOMRenderer', function(t) {
         t.end();
     });
 
-    t.test('onInsertEl method', function(t) {
+    t.test('Man in the middle insertion', function(t) {
         var element = document.createElement('div');
         var selector = 'selector';
         var compositor = createUnidirectionalCompositor();
         var domRenderer = new DOMRenderer(element, selector, compositor);
 
-        t.equal(typeof domRenderer.onInsertEl, 'function', 'domRenderer.onInsertEl should be a function');
-
-        var triggeredInsertEl = false;
-        var triggeredElementCache = null;
-
-        domRenderer.onInsertEl(selector + '/1/2/3', function(elementCache) {
-            triggeredInsertEl = true;
-            triggeredElementCache = elementCache;
-        });
-
-        domRenderer.loadPath(selector + '/1/2');
-        domRenderer.findTarget();
+        domRenderer.loadPath('selector/0/0/1');
         domRenderer.insertEl('div');
-        t.equal(triggeredInsertEl, false, 'domRenderer.onInsertEl should not be triggered on parent of registered path');
+        domRenderer.setAttribute('data-fa-path', 'selector/0/0/1');
 
+        t.equal(element.children.length, 1, 'domRenderer.insertEl should create a single DIV when no content is being set');
+        t.equal(element.children[0].children.length, 0, 'domRenderer.insertEl should not create a separate content DIV by default');
 
-        domRenderer.loadPath(selector + '/1/2/3');
-        domRenderer.findTarget();
-        domRenderer.insertEl('div');
-        t.equal(triggeredInsertEl, true, 'domRenderer.onInsertEl should be triggered on element insertion at registered path');
-        t.notEqual(triggeredElementCache, null, 'domRenderer.onInsertEl listener should receive newly created ElementCache');
-
-        t.equal(triggeredElementCache.path, selector + '/1/2/3', 'domRenderer.onInsertEl should trigger ElementCache with the correct path');
-        t.equal(triggeredElementCache.element, element.children[0].children[0], 'domRenderer.onInsertEl should trigger ElementCache that manages the correct element');
-
-        t.end();
-    });
-
-    t.test('onRemoveEl method', function(t) {
-        var element = document.createElement('div');
-        var selector = 'selector';
-        var compositor = createUnidirectionalCompositor();
-        var domRenderer = new DOMRenderer(element, selector, compositor);
-
-        t.equal(typeof domRenderer.onRemoveEl, 'function', 'domRenderer.onRemoveEl should be a function');
-
-        var triggeredInsertEl = false;
-        var triggeredElementCache = null;
-
-        domRenderer.onRemoveEl(selector + '/1', function(elementCache) {
-            triggeredInsertEl = true;
-            triggeredElementCache = elementCache;
-        });
-
-        domRenderer.loadPath(selector + '/1');
-        domRenderer.findTarget();
-        domRenderer.insertEl('div');
-
-        t.equal(triggeredInsertEl, false, 'DOMRenderer.onRemoveEl should not be triggered on initial insertion');
-
-        domRenderer.findTarget();
+        domRenderer.loadPath('selector/0');
         domRenderer.insertEl('section');
+        domRenderer.setAttribute('data-fa-path', 'selector/0');
 
-        t.equal(triggeredInsertEl, true, 'DOMRenderer.onRemoveEl should be triggered when overriding an element at the same path');
+        t.equal(element.children.length, 1, 'domRenderer.insertEl should insert second element in between root element and leaf node');
+        t.equal(element.children[0].tagName.toUpperCase(), 'SECTION', 'domRenderer.insertEl should insert using correct tagName');
 
-        t.equal(triggeredElementCache.element.tagName.toLowerCase(), 'div', 'DOMRenderer.onRemoveEl listener should receive ElementCache with correct tagName');
+        t.equal(element.children[0].children.length, 1, 'domRenderer.insertEl should insert new element in between that has the previous leaf node as a child');
+        t.equal(element.children[0].children[0].tagName.toUpperCase(), 'DIV', 'domRenderer.insertEl should preserve tagName of previously inserted leaf node');
+
+        domRenderer.loadPath('selector/0/1');
+        domRenderer.insertEl('span');
+        domRenderer.setAttribute('data-fa-path', 'selector/0/1');
+
+        t.equal(element.children[0].children.length, 2, 'domRenderer.insertEl should insert sibling');
+        t.equal(element.children[0].children[1].tagName.toUpperCase(), 'SPAN', 'domRenderer.insertEl should insert sibling using correct tagName');
+        t.equal(element.children[0].children[1].children.length, 0, 'domRenderer.insertEl should insert sibling as leaf node');
+
+        domRenderer.loadPath('selector/0');
+
+        domRenderer.setContent('hello world');
+
+        t.equal(element.children[0].children.length, 3, 'domRenderer.insertEl should preserve correct DOM nesting when wrapping content');
 
         t.end();
     });
