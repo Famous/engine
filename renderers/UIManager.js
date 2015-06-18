@@ -226,7 +226,7 @@ UIManager.prototype.requestContainerSize = function requestContainerSize() {
     }
 
     this._container.postMessage([Commands.CONTAINER, Commands.REQUEST_SIZE], '*');
-}
+};
 
 /**
  * Exits from container mode. Starts the render loop if possible, but won't

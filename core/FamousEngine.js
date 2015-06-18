@@ -231,8 +231,10 @@ FamousEngine.prototype.handleMessage = function handleMessage (messages) {
                 this.handleFrame(messages);
                 break;
             case Commands.SEND_SIZE:
-                var containerWidth = messages.shift();
-                var containerHeight = messages.shift();
+                // var containerWidth = messages.shift();
+                // var containerHeight = messages.shift();
+                messages.shift();
+                messages.shift();
                 // TODO
                 break;
             default:
