@@ -254,6 +254,7 @@ UIManager.prototype.exitContainerMode = function exitContainerMode () {
  */
 UIManager.prototype._handleWindowMessage = function _handleWindowMessage (message) {
     var windowCommands = message.data;
+
     if (windowCommands && windowCommands.constructor === Array && windowCommands[0] === Commands.FAMOUS) {
         this.enterContainerMode(message);
 

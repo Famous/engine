@@ -67,11 +67,11 @@ var Commands = {
 
     FAMOUS: 36,
     CONTAINER_EVENT: 37,
-
     CONTAINER: 38,
     REQUEST_SIZE: 39,
+    SEND_SIZE: 40,
 
-    UNSUBSCRIBE: 40,
+    UNSUBSCRIBE: 41,
 
     prettyPrint: function (buffer, start, count) {
         var callback;
