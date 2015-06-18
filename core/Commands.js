@@ -63,7 +63,40 @@ var Commands = {
     DOM: 32,
     READY: 33,
     ALLOW_DEFAULT: 34,
-    PREVENT_DEFAULT: 35
+    PREVENT_DEFAULT: 35,
+    prettyPrint: function (buffer, start, finish) {
+        var result = '';
+        for (var i = start ? start : 0, len = finish ? finish : buffer.length ; i < len ; i++)
+            i = commandPrinters[i](buffer, i, result);
+        return result;
+    }
 };
 
+var commandPrinters = [
+    function init_dom (buffer, i, result) {
+        result += i + '. INIT_DOM\n    tagName: ' + buffer[i + 1] + '\n';
+        return i + 1;
+    }, function dom_render_size (buffer, i, result) {
+        result += i + '. DOM_RENDER_SIZE\n    selector: ' + buffer[i + 1] + '\n';
+        return i + 1;
+    }, function change_transform (buffer, i, result) {
+        result += i + '. CHANGE_TRANSFORM\n    val: ';
+        for (var j = 0 ; j < 16 ; j++) result += buffer[i + j] + ', ';
+        result += '\n';
+        return i + 16;
+    }, function change_size (buffer, i, result) {
+        result += i + '. CHANGE_SIZE\n    x: ' + buffer[i + 1] + ', y: ' + buffer[i + 2] + '\n';
+        return i + 2;
+    }, function change_property (buffer, i, result) {
+        result += i + '. CHANGE_PROPERTY\n    key: ' + buffer[i + 1] + ', value: ' + buffer[i + 2] + '\n';
+        return i + 2;
+    }, function change_content (buffer, i, result) {
+        result += i + '. CHANGE_CONTENT\n    content: ' + buffer[i + 1] + '\n';
+        return i + 1;
+    }, function change_attribute (buffer, i, result) {
+        result += i + '. CHANGE_ATTRIBUTE\n    key: ' + buffer[i + 1] + ', value: ' + buffer[i + 2] + '\n';
+        return i + 2;
+    }];
+
 module.exports = Commands;
+
