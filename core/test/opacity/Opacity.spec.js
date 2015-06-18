@@ -1,3 +1,27 @@
+/**
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2015 Famous Industries Inc.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
 'use strict';
 
 var test = require('tape');
@@ -7,17 +31,9 @@ var OpacityStub = require('./Opacity.stub');
 var NodeStub = require('../node/Node.stub');
 var sinon = require('sinon');
 
-function createTestNode () {
-    var node = new NodeStub();
-    // node.getSize.returns([100, 100, 100]);
-    // node.getParent.returns({ getSize: sinon.stub().returns([200, 200, 200]) });
-    return node;
-}
-
 test('Opacity class', function (t) {
 
     t.test('Opacity constructor' , function (t) {
-
         t.ok(Opacity, 'There should be a transform module');
         t.equal(Opacity.constructor, Function, 'Opacity should be a function');
 
@@ -53,252 +69,149 @@ test('Opacity class', function (t) {
         t.end();
     });
 
-    t.test('no breakpoints', function (t) {
-
+    t.test('calculate', function (t) {
         var opacities = [];
 
-        for (var i = 0; i < 5; i++)
-            opacities.push(new Opacity(opacities[i - 1]));
+        var opacity;
 
+        for (var i = 0; i < 5; i++) {
+            opacity = new Opacity(opacities[i - 1]);
+
+            opacities.push(opacity);
+            opacity.setOpacity(0.5);
+        }
+
+
+        t.comment('Root Opacity (no breakpoint): 0.5');
+
+        t.equal(
+            opacities[0].calculate(), Opacity.LOCAL_CHANGED & ~Opacity.WORLD_CHANGED,
+            'Calculating the root opacity should only change the local opacity'
+        );
+        t.equal(
+            opacities[0].getLocalOpacity(), 0.5,
+            'The root local opacity should be set to 0.5'
+        );
+
+        t.equal(
+            opacities[0].getOpacity(), 0.5,
+            'The root opacity should still be set to 0.5 after calculation'
+        );
+        t.throws(
+            function() {
+                opacities[0].getWorldOpacity();
+            },
+            /not calculating world transforms/,
+            'Attempting to get the world opacity of the root opacity should throw an error, since no breakpoint has been set on it'
+        );
+
+
+        t.comment('2nd Opacity (no breakpoint): 0.5');
+
+        t.equal(
+            opacities[1].calculate(), Opacity.LOCAL_CHANGED & ~Opacity.WORLD_CHANGED,
+            'Calculating the 2nd opacity (child of root) should only change the local opacity, since no breakpoint has been set on it'
+        );
+        t.equal(
+            opacities[1].getLocalOpacity(), 0.25,
+            'The 2nd opacity should have been multiplied with the root opacity'
+        );
+
+        t.equal(
+            opacities[1].getOpacity(), 0.5,
+            'The 2nd opacity should still be set to 0.5 after calculation'
+        );
+        t.throws(
+            function() {
+                opacities[1].getWorldOpacity();
+            },
+            /not calculating world transforms/,
+            'Attempting to get the world opacity of the 2nd opacity should throw an error, since no breakpoint has been set on it'
+        );
+
+
+        t.comment('3rd Opacity (no breakpoint): 0.5');
+
+        t.equal(
+            opacities[2].calculate(), Opacity.LOCAL_CHANGED & ~Opacity.WORLD_CHANGED,
+            'Calculating the 3rd opacity should only change the local opacity, since no breakpoint has been set on it'
+        );
+        t.equal(
+            opacities[2].getLocalOpacity(), 0.125,
+            'The 3rd opacity should have been multiplied with the root and 2nd opacity'
+        );
+
+        t.equal(
+            opacities[2].getOpacity(), 0.5,
+            'The 3rd opacity should still be set to 0.5 after calculation'
+        );
+        t.throws(
+            function() {
+                opacities[2].getWorldOpacity();
+            },
+            /not calculating world transforms/,
+            'Attempting to get the world opacity of the 3rd opacity should throw an error, since no breakpoint has been set on it'
+        );
+
+
+        t.comment('4th Opacity (breakpoint): 0.5');
+
+        opacities[3].setBreakPoint();
+        t.equal(
+            opacities[3].calculate(), Opacity.LOCAL_CHANGED | Opacity.WORLD_CHANGED,
+            'Calculating the 4th opacity should have checked if the world opacity changed, since it has a breakpoint set on it'
+        );
+
+        t.equal(
+            opacities[3].isBreakPoint(), true,
+            'The 4th opacity should still have breakpoint after calculation'
+        );
+        t.equal(
+            opacities[3].getLocalOpacity(), 0.0625,
+            'The 4th local opacity should have been multiplied with the root, 2nd and 3rd opacity'
+        );
+        t.equal(
+            opacities[3].getOpacity(), 0.5,
+            'The 4th opacity should still be set to 0.5 after calculation'
+        );
+        t.doesNotThrow(function() {
+            opacities[3].getWorldOpacity();
+        }, 'Attempting to calculate the world on the 4th opacity should not throw an error, since a breakpoint has been set on it');
+
+        t.equal(
+            opacities[3].getWorldOpacity(), 0.0625,
+            'The 4th world opacity should be have been multiplied with all previous opacities'
+        );
+
+
+        t.comment('5th Opacity (no breakpoint): 0.5')
+
+        t.equal(
+            opacities[4].calculate(), Opacity.LOCAL_CHANGED & ~Opacity.WORLD_CHANGED,
+            'Calculating the 5th opacity should only change the local opacity, since no breakpoint has been set on it'
+        );
+        t.equal(
+            opacities[4].getLocalOpacity(), 0.5,
+            'The 5th local opacity should be equivalent to the opacity set on it, it should not have been multiplied, since the 4th node has a breakpoint set on it'
+        );
+
+        t.equal(
+            opacities[4].getOpacity(), 0.5,
+            'The 5th opacity should still be set to 0.5 after calculation'
+        );
+
+        t.throws(
+            function() {
+                opacities[4].getWorldOpacity();
+            },
+            /not calculating world transforms/,
+            'Attempting to get the world opacity of the 4th opacity should throw an error, since no breakpoint has been set on it'
+        );
 
         for (i = 0; i < opacities.length; i++)
-            opacities[i].setOpacity(0.5);
-
-
-        for (i = 0; i < opacities.length; i++)
-            console.log(opacities[i])
-
+            console.log(JSON.stringify(opacities[i]));
 
 
         t.end();
     });
-    //
-    // t.test('getParent method', function (t) {
-    //
-    //     var transform = new Opacity('hello');
-    //     t.doesNotThrow(function () {
-    //         transform.getParent();
-    //     }, 'transform should be callable');
-    //
-    //     t.equal(transform.getParent(), 'hello', 'getParent should return the value passed to the constructor');
-    //     transform.setParent('bye');
-    //     t.equal(transform.getParent(), 'bye', 'getParent should return the value passed to the setParent method');
-    //
-    //     t.end();
-    // });
-    //
-    // t.test('setBreakPoint', function (t) {
-    //
-    //     var transform = new Opacity();
-    //
-    //     // sanity check
-    //     if (transform.isBreakPoint())
-    //         throw new Error('Opacity should not be a breakpoint by default.' +
-    //             ' isBreakPoint or the constructor might be broken');
-    //
-    //     t.doesNotThrow( function () {
-    //         transform.setBreakPoint();
-    //     }, 'setBreakPoint should be callable');
-    //
-    //     t.ok(transform.isBreakPoint(), 'after calling setBreakpoint, a transform should be a breakpoint');
-    //
-    //     t.end();
-    // });
-    //
-    // t.test('isBreakPoint', function (t) {
-    //
-    //     var transform = new Opacity();
-    //
-    //     t.doesNotThrow(function () {
-    //         t.notOk(transform.isBreakPoint(), 'transforms are not a breakpoint when they are first instantiated');
-    //     }, 'isBreakPoint should be callable if the transform is not a breakpoint');
-    //
-    //     transform.setBreakPoint();
-    //
-    //     t.doesNotThrow(function () {
-    //         t.ok(transform.isBreakPoint(), 'isBreakPoint should return true when the transform is a breakpoint');
-    //     }, 'isBreakPoint should be callable if the transform is a breakpoint');
-    //
-    //     transform.reset();
-    //
-    //     t.end();
-    // });
-    //
-    // t.test('reset method', function (t) {
-    //     var parent = new OpacityStub();
-    //     var transform = new Opacity(parent);
-    //     transform.setBreakPoint();
-    //
-    //     // sanity check
-    //     if (parent !== transform.getParent() || !transform.isBreakPoint())
-    //         throw new Error('transform.getParent or isBreakPoint is not functioning correctly');
-    //
-    //     t.doesNotThrow(transform.reset.bind(transform), 'reset should be callable without arguments');
-    //
-    //     api.forEach(function (method) {
-    //         t.notOk(parent[method].called, 'No calls should be made on the parent during reset');
-    //     });
-    //
-    //     var a = 2;
-    //     while (a--) {
-    //         t.ok(transform.getParent() == null, 'after being reset, transform should not have a parent');
-    //         t.notOk(transform.isBreakPoint(), 'after being reset, transform should not be a breakpoint');
-    //         transform = new Opacity();
-    //         transform.reset();
-    //     }
-    //
-    //     t.end();
-    // });
-    //
-    // t.test('getLocalTransform method', function (t) {
-    //     var transform = new Opacity();
-    //     t.doesNotThrow(function () {
-    //         t.deepEqual(transform.getLocalTransform(), new Float32Array([
-    //                                                     1, 0, 0, 0,
-    //                                                     0, 1, 0, 0,
-    //                                                     0, 0, 1, 0,
-    //                                                     0, 0, 0, 1]), 'transform.getLocalTransform should return' +
-    //                                                                  ' identity matrix after instantiation');
-    //     }, 'getLocalTransform should be callable');
-    //
-    //     t.end();
-    // });
-    //
-    // t.test('getWorldTransform method', function (t) {
-    //     var transform = new Opacity();
-    //
-    //     // sanity check
-    //     if (transform.isBreakPoint()) throw new Error('transform is reporting itself to be ' +
-    //                                                   'a breakpoint after instantiation. isBreakPoint ' +
-    //                                                   'or the constructor might be broken');
-    //
-    //     t.throws(transform.getWorldTransform.bind(transform), 'getWorldTransform should throw if ' +
-    //                                                           'the transform isn\'t a breakpoint');
-    //
-    //     transform.setBreakPoint();
-    //
-    //     t.doesNotThrow(function () {
-    //         t.deepEqual(transform.getWorldTransform(), new Float32Array([
-    //                                                     1, 0, 0, 0,
-    //                                                     0, 1, 0, 0,
-    //                                                     0, 0, 1, 0,
-    //                                                     0, 0, 0, 1]), 'transform.getWorldTransform should return' +
-    //                                                                  ' identity matrix after instantiation');
-    //     }, 'getWorldTransform should not throw if the transform is a breakpoint');
-    //
-    //     t.end();
-    // });
-    //
-    // t.test('calculate method', function (t) {
-    //     var transform = new Opacity();
-    //
-    //     t.doesNotThrow(function () {
-    //         transform.calculate(createTestNode());
-    //         t.deepEqual(transform.getLocalTransform(), new Float32Array([
-    //                                                     1, 0, 0, 0,
-    //                                                     0, 1, 0, 0,
-    //                                                     0, 0, 1, 0,
-    //                                                     0, 0, 0, 1]), 'transform.getLocalTransform should return' +
-    //                                                                  ' identity matrix with no vectors changed');
-    //     }, '.calculate should be callable');
-    //
-    //     t.end();
-    // });
-    //
-    // t.test('setPosition method', function (t) {
-    //     var transform = new Opacity();
-    //
-    //     t.doesNotThrow( function () {
-    //         transform.setPosition(0);
-    //         t.deepEqual(transform.getPosition(), new Float32Array([0, 0, 0]), 'transform should not change from zero when a dimension is passed ' +
-    //                                                         'null, undefined, or zero');
-    //         transform.setPosition(0, 0);
-    //         t.deepEqual(transform.getPosition(), new Float32Array([0, 0, 0]), 'transform should not change from zero when a dimension is passed ' +
-    //                                                         'null, undefined, or zero');
-    //         transform.setPosition(0, 0, 0);
-    //         t.deepEqual(transform.getPosition(), new Float32Array([0, 0, 0]), 'transform should not change from zero when a dimension is passed ' +
-    //                                                         'null, undefined, or zero');
-    //         transform.setPosition(null, 0, 0);
-    //         t.deepEqual(transform.getPosition(), new Float32Array([0, 0, 0]), 'transform should not change from zero when a dimension is passed ' +
-    //                                                         'null, undefined, or zero');
-    //         transform.setPosition(null, null, 0);
-    //         t.deepEqual(transform.getPosition(), new Float32Array([0, 0, 0]), 'transform should not change from zero when a dimension is passed ' +
-    //                                                         'null, undefined, or zero');
-    //         transform.setPosition(null, null, null);
-    //         t.deepEqual(transform.getPosition(), new Float32Array([0, 0, 0]), 'transform should not change from zero when a dimension is passed ' +
-    //                                                         'null, undefined, or zero');
-    //         transform.setPosition(null, 0);
-    //         t.deepEqual(transform.getPosition(), new Float32Array([0, 0, 0]), 'transform should not change from zero when a dimension is passed ' +
-    //                                                         'null, undefined, or zero');
-    //
-    //         transform.setPosition(0, 1);
-    //
-    //         t.deepEqual(transform.getPosition(), new Float32Array([0, 1, 0]), 'transform should set the value properly for the given dimension');
-    //
-    //     }, 'transform should be callable with any number of arguments');
-    //
-    //     transform.setPosition(1, 2, 3);
-    //
-    //     t.deepEqual(transform.getPosition(), new Float32Array([1, 2, 3]), 'transform should set the values returned by getPosition');
-    //
-    //     transform.setPosition();
-    //
-    //     t.deepEqual(transform.getPosition(), new Float32Array([1, 2, 3]), 'undefined arguments should not change the values stored');
-    //
-    //     transform.setPosition(null, null, null);
-    //
-    //     t.deepEqual(transform.getPosition(), new Float32Array([1, 2, 3]), 'null arguments should not change the values stored');
-    //
-    //     transform.setPosition(0, 0, 0);
-    //
-    //     t.deepEqual(transform.getPosition(), new Float32Array([0, 0, 0]), 'zero should successfully set the position back to zero');
-    //
-    //     var node = createTestNode();
-    //
-    //     transform.setPosition(3, 3, 3);
-    //
-    //     transform.calculate(node);
-    //
-    //     t.deepEqual(transform.getLocalTransform(), new Float32Array([
-    //                                                 1, 0, 0, 0,
-    //                                                 0, 1, 0, 0,
-    //                                                 0, 0, 1, 0,
-    //                                                 3, 3, 3, 1]), 'position should change the ' +
-    //                                                              'result of the calculated matrix');
-    //
-    //
-    //     t.end();
-    // });
-    //
-    // t.test('setRotation method', function (t) {
-    //
-    //     // todo
-    //
-    //     t.end();
-    // });
-    //
-    // t.test('setScale method', function (t) {
-    //
-    //     t.end();
-    // });
-    //
-    // t.test('setAlign method', function (t) {
-    //
-    //     t.end();
-    // });
-    //
-    // t.test('setMountPoint method', function (t) {
-    //
-    //     t.end();
-    // });
-    //
-    // t.test('setOrigin method', function (t) {
-    //
-    //     t.end();
-    // });
-    //
-    // t.test('calculateWorldMatrix', function (t) {
-    //
-    //     t.end();
-    // });
 });
