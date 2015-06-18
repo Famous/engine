@@ -68,7 +68,10 @@ var Commands = {
     FAMOUS: 36,
     CONTAINER_EVENT: 37,
 
-    UNSUBSCRIBE: 38,
+    CONTAINER: 38,
+    REQUEST_SIZE: 39,
+
+    UNSUBSCRIBE: 40,
 
     prettyPrint: function (buffer, start, count) {
         var callback;

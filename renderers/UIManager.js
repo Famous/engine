@@ -193,15 +193,40 @@ UIManager.prototype._sendDrawCommands = function _sendDrawCommands () {
  * stopped, assuming it is available.
  *
  * @method
+ * @param {MessageEvent} [message] Message received from container used for
+ *                                 establishing two way messaging between
+ *                                 container and UIManager.
  * @return {undefined}          undefined
  */
-UIManager.prototype.enterContainerMode = function enterContainerMode () {
+UIManager.prototype.enterContainerMode = function enterContainerMode (message) {
     if (!this._containerMode) {
         this._containerMode = true;
+        if (message) {
+            this._container = message.source;
+            this.requestContainerSize();
+        }
         if (this._renderLoop) this._renderLoop.stop();
     }
 };
 
+/**
+ * Requests the container size by posting a REQUEST_SIZE message to the parent
+ * container.
+ *
+ * @method
+ *
+ * @return {undefined} undefined
+ */
+UIManager.prototype.requestContainerSize = function requestContainerSize() {
+    if (!this._containerMode) {
+        throw new Error('Not in container mode');
+    }
+    if (!this._container) {
+        throw new Error('No access to parent container');
+    }
+
+    this._container.postMessage([Commands.CONTAINER, Commands.REQUEST_SIZE], '*');
+}
 
 /**
  * Exits from container mode. Starts the render loop if possible, but won't
@@ -230,7 +255,7 @@ UIManager.prototype.exitContainerMode = function exitContainerMode () {
 UIManager.prototype._handleWindowMessage = function _handleWindowMessage (message) {
     var windowCommands = message.data;
     if (windowCommands && windowCommands.constructor === Array && windowCommands[0] === Commands.FAMOUS) {
-        this.enterContainerMode();
+        this.enterContainerMode(message);
 
         // Remove FAMOUS prefix command
         windowCommands.shift();
