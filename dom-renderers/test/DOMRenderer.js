@@ -330,7 +330,6 @@ test('DOMRenderer', function(t) {
         t.equal(element.children[0].children[1].children.length, 0, 'domRenderer.insertEl should insert sibling as leaf node');
 
         domRenderer.loadPath('selector/0');
-
         domRenderer.setContent('hello world');
 
         t.equal(element.children[0].children.length, 3, 'domRenderer.insertEl should preserve correct DOM nesting when wrapping content');
