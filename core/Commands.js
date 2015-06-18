@@ -65,38 +65,139 @@ var Commands = {
     ALLOW_DEFAULT: 34,
     PREVENT_DEFAULT: 35,
     prettyPrint: function (buffer, start, finish) {
-        var result = '';
-        for (var i = start ? start : 0, len = finish ? finish : buffer.length ; i < len ; i++)
-            i = commandPrinters[i](buffer, i, result);
-        return result;
+        var callback;
+        var data = {
+            i: start ? start : 0,
+            result: ''
+        };
+        for (var len = finish ? finish : buffer.length ; data.i < len ; data.i++) {
+            callback = commandPrinters[buffer[data.i]];
+            if (!callback) throw new Error('PARSE ERROR: no command registered for: ' + buffer[data.i]);
+            callback(buffer, data);
+        }
+        return data.result;
     }
 };
 
-var commandPrinters = [
-    function init_dom (buffer, i, result) {
-        result += i + '. INIT_DOM\n    tagName: ' + buffer[i + 1] + '\n';
-        return i + 1;
-    }, function dom_render_size (buffer, i, result) {
-        result += i + '. DOM_RENDER_SIZE\n    selector: ' + buffer[i + 1] + '\n';
-        return i + 1;
-    }, function change_transform (buffer, i, result) {
-        result += i + '. CHANGE_TRANSFORM\n    val: ';
-        for (var j = 0 ; j < 16 ; j++) result += buffer[i + j] + ', ';
-        result += '\n';
-        return i + 16;
-    }, function change_size (buffer, i, result) {
-        result += i + '. CHANGE_SIZE\n    x: ' + buffer[i + 1] + ', y: ' + buffer[i + 2] + '\n';
-        return i + 2;
-    }, function change_property (buffer, i, result) {
-        result += i + '. CHANGE_PROPERTY\n    key: ' + buffer[i + 1] + ', value: ' + buffer[i + 2] + '\n';
-        return i + 2;
-    }, function change_content (buffer, i, result) {
-        result += i + '. CHANGE_CONTENT\n    content: ' + buffer[i + 1] + '\n';
-        return i + 1;
-    }, function change_attribute (buffer, i, result) {
-        result += i + '. CHANGE_ATTRIBUTE\n    key: ' + buffer[i + 1] + ', value: ' + buffer[i + 2] + '\n';
-        return i + 2;
-    }];
+var commandPrinters = [];
+
+commandPrinters[Commands.INIT_DOM] = function init_dom (buffer, data) {
+    data.result += data.i + '. INIT_DOM\n    tagName: ' + buffer[++data.i] + '\n';
+}; 
+
+commandPrinters[Commands.DOM_RENDER_SIZE] = function dom_render_size (buffer, data) {
+    data.result += data.i + '. DOM_RENDER_SIZE\n    selector: ' + buffer[++data.i] + '\n';
+};
+
+commandPrinters[Commands.CHANGE_TRANSFORM] = function change_transform (buffer, data) {
+    data.result += data.i + '. CHANGE_TRANSFORM\n    val: ';
+    for (var j = 0 ; j < 16 ; j++) data.result += buffer[++data.i + j] + ', ';
+    data.result += '\n';
+};
+
+commandPrinters[Commands.CHANGE_SIZE] = function change_size (buffer, data) {
+    data.result += data.i + '. CHANGE_SIZE\n    x: ' + buffer[++data.i] + ', y: ' + buffer[++data.i] + '\n';
+};
+
+commandPrinters[Commands.CHANGE_PROPERTY] = function change_property (buffer, data) {
+    data.result += data.i + '. CHANGE_PROPERTY\n    key: ' + buffer[++data.i] + ', value: ' + buffer[++data.i] + '\n';
+};
+
+commandPrinters[Commands.CHANGE_CONTENT] = function change_content (buffer, data) {
+    data.result += data.i + '. CHANGE_CONTENT\n    content: ' + buffer[++data.i] + '\n';
+};
+
+commandPrinters[Commands.CHANGE_ATTRIBUTE] = function change_attribute (buffer, data) {
+    data.result += data.i + '. CHANGE_ATTRIBUTE\n    key: ' + buffer[++data.i] + ', value: ' + buffer[++data.i] + '\n';
+};
+
+commandPrinters[Commands.ADD_CLASS] = function add_class (buffer, data) {
+    data.result += data.i + '. ADD_CLASS\n    className: ' + buffer[++data.i] + '\n';
+};
+
+commandPrinters[Commands.REMOVE_CLASS] = function remove_class (buffer, data) {
+    data.result += data.i + '. REMOVE_CLASS\n    className: ' + buffer[++data.i] + '\n';
+};
+
+commandPrinters[Commands.SUBSCRIBE] = function subscribe (buffer, data) {
+    data.result += data.i + '. SUBSCRIBE\n    event: ' + buffer[++data.i] + '\n';
+};
+
+commandPrinters[Commands.GL_SET_DRAW_OPTIONS] = function gl_set_draw_options (buffer, data) {
+    data.result += data.i + '. GL_SET_DRAW_OPTIONS\n    options: ' + buffer[++data.i] + '\n';
+};
+
+commandPrinters[Commands.GL_AMBIENT_LIGHT] = function gl_ambient_light (buffer, data) {
+    data.result += data.i + '. GL_AMBIENT_LIGHT\n    r: ' + buffer[++data.i] + 'g: ' + buffer[++data.i] + 'b: ' + buffer[++data.i] + '\n';
+};
+
+commandPrinters[Commands.GL_LIGHT_POSITION] = function gl_light_position (buffer, data) {
+    data.result += data.i + '. GL_LIGHT_POSITION\n    x: ' + buffer[++data.i] + 'y: ' + buffer[ i] + 'z: ' + buffer[++data.i] + '\n';
+};
+
+commandPrinters[Commands.GL_LIGHT_COLOR] = function gl_light_color (buffer, data) {
+    data.result += data.i + '. GL_LIGHT_COLOR\n    r: ' + buffer[++data.i] + 'g: ' + buffer[++data.i] + 'b: ' + buffer[++data.i] + '\n';
+};
+
+commandPrinters[Commands.MATERIAL_INPUT] = function material_input (buffer, data) {
+    data.result += data.i + '. MATERIAL_INPUT\n    key: ' + buffer[++data.i] + ', value: ' + buffer[++data.i] + '\n';
+};
+
+comamndPrinters[Commands.GL_SET_GEOMETRY] = function gl_set_geometry (buffer, data) {
+    data.result += data.i + '. GL_SET_GEOMETRY\n   x: ' + buffer[++data.i] + ', y: ' + buffer[++data.i] + ', z: ' + buffer[++data.i] + '\n';
+};
+
+commandPrinters[Commands.GL_UNIFORMS] = function gl_uniforms (buffer, data) {
+    data.result += data.i + '. GL_UNIFORMS\n    key: ' + buffer[++data.i] + ', value: ' + buffer[++data.i] + '\n';
+};
+
+commandPrinters[Commands.GL_BUFFER_DATA] = function gl_buffer_data (buffer, data) {
+    data.result += data.i + '. GL_BUFFER_DATA\n    data: ';
+    for (var i = 0; i < 5 ; i++) data.result += buffer[++data.i] + ', ';
+    data.result += '\n';
+};
+
+commandPrinters[Commands.GL_CUTOUT_STATE] = function gl_cutout_state (buffer, data) {
+    data.result += data.i + '. GL_CUTOUT_STATE\n    state: ' + buffer[++data.i] + '\n';
+};
+
+commandPrinters[Commands.GL_MESH_VISIBILITY] = function gl_mesh_visibility (buffer, data) {
+    data.result += data.i + '. GL_MESH_VISIBILITY\n    visibility: ' + buffer[++data.i] + '\n';
+};
+
+commandPrinter[Commands.GL_REMOVE_MESH] = function gl_remove_mesh (buffer, data) {
+    data.result += data.i + '. GL_REMOVE_MESH\n';
+};
+
+commandPrinter[Commands.PINHOLE_PROJECTION] = function pinhole_projection (buffer, data) {
+    data.result += data.i + '. PINHOLE_PROJECTION\n    depth: ' + buffer[++data.i] + '\n';
+};
+
+commandPrinter[Commands.ORTHOGRAPHIC_PROJECTION] = function orthographic_projection (buffer, data) {
+    data.result += data.i + '. ORTHOGRAPHIC_PROJECTION\n';
+};
+
+commandPrinter[Commands.CHANGE_VIEW_TRANSFORM] = function change_view_transform (buffer, data) {
+    data.result += data.i + '. CHANGE_VIEW_TRANSFORM\n   value: ';
+    for (var i = 0; i < 16 ; i++) data.result += buffer[++data.i];
+    data.result += '\n';
+};
+
+commandPrinter[Commands.PREVENT_DEFAULT] = function prevent_default (buffer, data) {
+    data.result += data.i + '. PREVENT_DEFAULT\n    value: ' + buffer[++data.i] + '\n';
+};
+
+commandPrinter[Commands.ALLOW_DEFAULT] = function allow_default (buffer, data) {
+    data.result += data.i + '. ALLOW_DEFAULT\n    value: ' + buffer[++data.i] + '\n';
+};
+
+commandPrinter[Commands.READY] = function ready (buffer, data) {
+    data.result += data.i + '. READY\n';
+};
+
+commandPrinter[Commands.WITH] = function w (buffer, data) {
+    data.result += data.i + '. WITH\n     path: ' + buffer[++data.i] + '\n';
+};
 
 module.exports = Commands;
 
