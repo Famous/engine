@@ -34,11 +34,11 @@
  * @property {Function} easeIn
  * @property {Function} easeOut
  * @property {Function} easeInOut
- * @property {Function} easeOutBounc
+ * @property {Function} easeOutBounce
  * @property {Function} spring
  * @property {Function} inQuad
  * @property {Function} outQuad
- * @property {Function} inOutQua
+ * @property {Function} inOutQuad
  * @property {Function} inCubic
  * @property {Function} outCubic
  * @property {Function} inOutCubic
@@ -61,7 +61,7 @@
  * @property {Function} outElastic
  * @property {Function} inOutElastic
  * @property {Function} inBounce
- * @property {Function} outBounc
+ * @property {Function} outBounce
  * @property {Function} inOutBounce
  * @property {Function} flat            - Useful for delaying the execution of
  *                                        a subsequent transition.
