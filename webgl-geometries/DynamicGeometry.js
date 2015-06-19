@@ -138,7 +138,7 @@ DynamicGeometry.prototype.setVertexPositions = function (value) {
  * @return {Object}            current geometry.
  */
 DynamicGeometry.prototype.setNormals = function (value) {
-    return this.setVertexBuffer('a_normals', value, 3);
+    return this.setVertexBuffer('a_normal', value, 3);
 };
 
 /**
@@ -190,7 +190,7 @@ DynamicGeometry.prototype.getVertexPositions = function () {
  * @return {Array} Vertex Buffer.
  */
 DynamicGeometry.prototype.getNormals = function () {
-    return this.getVertexBuffer('a_normals');
+    return this.getVertexBuffer('a_normal');
 };
 
 /**

@@ -1,18 +1,18 @@
 /**
  * The MIT License (MIT)
- * 
+ *
  * Copyright (c) 2015 Famous Industries Inc.
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -37,7 +37,7 @@
  */
 
 vec4 applyTransform(vec4 pos) {
-    //TODO: move this multiplication to application code. 
+    //TODO: move this multiplication to application code.
 
     /**
      * Currently multiplied in the vertex shader to avoid consuming the complexity of holding an additional
@@ -59,7 +59,7 @@ vec4 applyTransform(vec4 pos) {
      *
      * where convertToDOMSpace represents the transform matrix:
      *
-     *                           size.x 0       0       size.x 
+     *                           size.x 0       0       size.x
      *                           0      -size.y 0       size.y
      *                           0      0       1       0
      *                           0      0       0       1
@@ -71,7 +71,7 @@ vec4 applyTransform(vec4 pos) {
      * Later in the transformation chain, the projection transform negates the rigidbody translation.
      * Equivalent to (but much faster than) multiplying a translation matrix "origin"
      *
-     *                           1 0 0 1 
+     *                           1 0 0 1
      *                           0 1 0 -1
      *                           0 0 1 0
      *                           0 0 0 1
@@ -87,7 +87,7 @@ vec4 applyTransform(vec4 pos) {
      * by the inverse of the canvas' resolution.
      * Equivalent to (but much faster than) multiplying a scale matrix "sizeScale"
      *
-     *                           size.x 0      0      0 
+     *                           size.x 0      0      0
      *                           0      size.y 0      0
      *                           0      0      size.z 0
      *                           0      0      0      1
@@ -97,11 +97,11 @@ vec4 applyTransform(vec4 pos) {
     pos.xyz *= u_size * 0.5;
 
     /**
-     * Inverts the object space's y axis in order to match DOM space conventions. 
+     * Inverts the object space's y axis in order to match DOM space conventions.
      * Later in the transformation chain, the projection transform reinverts the y axis to convert to clip space.
      * Equivalent to (but much faster than) multiplying a scale matrix "invertYAxis"
      *
-     *                           1 0 0 0 
+     *                           1 0 0 0
      *                           0 -1 0 0
      *                           0 0 1 0
      *                           0 0 0 1
@@ -166,7 +166,7 @@ vec3 calculateOffset(vec3 ID) {
  */
 void main() {
     v_textureCoordinate = a_texCoord;
-    vec3 invertedNormals = a_normals + (u_normals.x < 0.0 ? calculateOffset(u_normals) * 2.0 - 1.0 : vec3(0.0));
+    vec3 invertedNormals = a_normal + (u_normals.x < 0.0 ? calculateOffset(u_normals) * 2.0 - 1.0 : vec3(0.0));
     invertedNormals.y *= -1.0;
     v_normal = transpose(mat3(inverse(u_transform))) * invertedNormals;
     vec3 offsetPos = a_pos + calculateOffset(u_positionOffset);

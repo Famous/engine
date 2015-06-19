@@ -58,7 +58,7 @@ function ParametricCone (options) {
         buffers: [
             { name: 'a_pos', data: buffers.vertices },
             { name: 'a_texCoord', data: GeometryHelper.getSpheroidUV(buffers.vertices), size: 2 },
-            { name: 'a_normals', data: GeometryHelper.computeNormals(buffers.vertices, buffers.indices) },
+            { name: 'a_normal', data: GeometryHelper.computeNormals(buffers.vertices, buffers.indices) },
             { name: 'indices', data: buffers.indices, size: 1 }
         ]
     });

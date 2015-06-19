@@ -84,7 +84,7 @@ function BoxGeometry(options) {
         buffers: [
             { name: 'a_pos', data: vertices },
             { name: 'a_texCoord', data: textureCoords, size: 2 },
-            { name: 'a_normals', data: normals },
+            { name: 'a_normal', data: normals },
             { name: 'indices', data: indices, size: 1 }
         ]
     });
