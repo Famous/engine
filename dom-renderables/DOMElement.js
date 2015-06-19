@@ -81,6 +81,8 @@ DOMElement.Spec = function Spec(options) {
     this.properties = options.properties || {};
     this.content = options.content || '';
     this.cutout = options.cutout != null ? options.cutout : true;
+    this.allowDefault = options.allowDefault || {};
+    this.preventDefault = options.preventDefault || {};
 
     this.classes['famous-dom-element'] = true;
 
