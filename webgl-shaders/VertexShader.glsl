@@ -1,18 +1,18 @@
 /**
  * The MIT License (MIT)
- * 
+ *
  * Copyright (c) 2015 Famous Industries Inc.
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -43,7 +43,7 @@ vec3 clipSpacePos(in vec3 pos) {
      * Later in the transformation chain, the projection transform negates the rigidbody translation.
      * Equivalent to (but much faster than) multiplying a translation matrix "origin"
      *
-     *                           1 0 0 1 
+     *                           1 0 0 1
      *                           0 1 0 -1
      *                           0 0 1 0
      *                           0 0 0 1
@@ -59,7 +59,7 @@ vec3 clipSpacePos(in vec3 pos) {
      * by the inverse of the canvas' resolution.
      * Equivalent to (but much faster than) multiplying a scale matrix "sizeScale"
      *
-     *                           size.x 0      0      0 
+     *                           size.x 0      0      0
      *                           0      size.y 0      0
      *                           0      0      size.z 0
      *                           0      0      0      1
@@ -69,11 +69,11 @@ vec3 clipSpacePos(in vec3 pos) {
     pos.xyz *= u_size * 0.5;
 
     /**
-     * Inverts the object space's y axis in order to match DOM space conventions. 
+     * Inverts the object space's y axis in order to match DOM space conventions.
      * Later in the transformation chain, the projection transform reinverts the y axis to convert to clip space.
      * Equivalent to (but much faster than) multiplying a scale matrix "invertYAxis"
      *
-     *                           1 0 0 0 
+     *                           1 0 0 0
      *                           0 -1 0 0
      *                           0 0 1 0
      *                           0 0 0 1
@@ -98,14 +98,10 @@ vec3 clipSpacePos(in vec3 pos) {
 void main() {
     vec4 mvPos;
     vec3 offsetPos,
-        invertedNormals;
+         invertedNormals;
 
     v_textureCoordinate = a_texCoord;
-
-    invertedNormals = a_normals;
-    invertedNormals.y *= -1.0;
-    v_normal = u_normalMatrix * invertedNormals;
-
+    v_normal = a_normals;
     offsetPos = (u_positionOffset.x < 0.0) ? a_pos + calculateOffset(u_positionOffset) : a_pos;
     offsetPos = clipSpacePos(offsetPos);
     mvPos = u_mvMatrix * vec4(offsetPos, 1.0);

@@ -616,7 +616,7 @@ WebGLRenderer.prototype.drawCutouts = function drawCutouts(renderState) {
     for (var i = 0; i < len; i++) {
         cutout = this.cutoutRegistry[this.cutoutRegistryKeys[i]];
         buffers = this.bufferRegistry.registry[cutout.geometry];
-        
+
         if (!cutout.visible) continue;
 
         mat44.multiply(meshTransforms.values[0], renderState.viewTransform, cutout.uniformValues[1]);
