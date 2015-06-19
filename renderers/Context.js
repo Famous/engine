@@ -70,7 +70,7 @@ function Context(selector, compositor) {
     this._webGLRenderer = null;
     this._domRenderer = new DOMRenderer(this._domRendererRootEl, selector, compositor);
     this._canvasEl = null;
-    
+
     // State holders
 
     this._renderState = {
@@ -171,6 +171,7 @@ Context.prototype.initCommandCallbacks = function initCommandCallbacks () {
     this._commandCallbacks[Commands.ADD_CLASS] = addClass;
     this._commandCallbacks[Commands.REMOVE_CLASS] = removeClass;
     this._commandCallbacks[Commands.SUBSCRIBE] = subscribe;
+    this._commandCallbacks[Commands.UNSUBSCRIBE] = unsubscribe;
     this._commandCallbacks[Commands.GL_SET_DRAW_OPTIONS] = glSetDrawOptions;
     this._commandCallbacks[Commands.GL_AMBIENT_LIGHT] = glAmbientLight;
     this._commandCallbacks[Commands.GL_LIGHT_POSITION] = glLightPosition;
@@ -267,7 +268,7 @@ Context.prototype.receive = function receive(path, commands, iterator) {
 
     while (command != null) {
         if (command === Commands.WITH || command === Commands.TIME) return localIterator - 1;
-        else localIterator = this._commandCallbacks[command](this, path, commands, localIterator) + 1; 
+        else localIterator = this._commandCallbacks[command](this, path, commands, localIterator) + 1;
         command = commands[localIterator];
     }
 
@@ -345,7 +346,7 @@ function changeTransform (context, path, commands, iterator) {
     temp[15] = commands[++iterator];
 
     context._domRenderer.setMatrix(temp);
-    
+
     if (context._webGLRenderer)
         context._webGLRenderer.setCutoutUniform(path, 'u_transform', temp);
 
@@ -362,7 +363,7 @@ function changeSize (context, path, commands, iterator) {
         context._meshSize[1] = height;
         context._webGLRenderer.setCutoutUniform(path, 'u_size', context._meshSize);
     }
-    
+
     return iterator;
 }
 
@@ -377,7 +378,7 @@ function changeContent (context, path, commands, iterator) {
     context._domRenderer.setContent(commands[++iterator]);
     return iterator;
 }
-  
+
 function changeAttribute (context, path, commands, iterator) {
     if (context._webGLRenderer) context._webGLRenderer.getOrSetCutout(path);
     context._domRenderer.setAttribute(commands[++iterator], commands[++iterator]);
@@ -399,6 +400,12 @@ function removeClass (context, path, commands, iterator) {
 function subscribe (context, path, commands, iterator) {
     if (context._webGLRenderer) context._webGLRenderer.getOrSetCutout(path);
     context._domRenderer.subscribe(commands[++iterator]);
+    return iterator;
+}
+
+function unsubscribe (context, path, commands, iterator) {
+    if (context._webGLRenderer) context._webGLRenderer.getOrSetCutout(path);
+    context._domRenderer.unsubscribe(commands[++iterator]);
     return iterator;
 }
 
