@@ -63,7 +63,8 @@ var Commands = {
     DOM: 32,
     READY: 33,
     ALLOW_DEFAULT: 34,
-    PREVENT_DEFAULT: 35
+    PREVENT_DEFAULT: 35,
+    UNSUBSCRIBE: 36
 };
 
 module.exports = Commands;

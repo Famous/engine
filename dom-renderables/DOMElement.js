@@ -400,7 +400,7 @@ DOMElement.prototype.allowDefault = function allowDefault (uiEvent) {
  */
 DOMElement.prototype._unsubscribe = function _unsubscribe (UIEvent) {
     if (this._initialized) {
-        this._changeQueue.push('UNSUBSCRIBE', UIEvent);
+        this._changeQueue.push(Commands.UNSUBSCRIBE, UIEvent);
     }
 
     if (!this._requestingUpdate) this._requestUpdate();
