@@ -46,7 +46,7 @@ void main() {
     vec3 normalOffset = u_normals.x < 0.0 ? applyMaterial(u_normals) * 2.0 - 1.0 : vec3(0.0);
     vec3 normal = (v_normal + normalOffset);
     normal.y *= -1.0;
-    normal = normalize(u_normalMatrix * (normal + normalOffset));
+    normal = normalize(u_normalMatrix * normal);
 
     vec4 glossiness = u_glossiness.x < 0.0 ? applyMaterial(u_glossiness) : u_glossiness;
     int numLights = int(u_numLights);
