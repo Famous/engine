@@ -36,7 +36,7 @@
  */
 void main() {
     vec4 material = u_baseColor.r >= 0.0 ? u_baseColor : applyMaterial(u_baseColor);
-    vec4 color;
+
     /**
      * Apply lights only if flat shading is false
      * and at least one light is added to the scene
@@ -51,6 +51,7 @@ void main() {
     int numLights = int(u_numLights);
     vec3 ambience = u_ambientLight * u_baseColor.rgb;
     vec3 eyeVector = normalize(v_eyeVector);
+    vec4 color;
 
     if (lightsEnabled) {
         color = applyLight(material, normal, glossiness, numLights, ambience, 

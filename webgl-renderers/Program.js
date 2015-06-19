@@ -49,7 +49,7 @@ var TYPES = {
 
 var inputTypes = {
     u_baseColor: 'vec4',
-    u_normals: 'vert',
+    u_normals: 'vec3',
     u_glossiness: 'vec4',
     u_positionOffset: 'vert'
 };

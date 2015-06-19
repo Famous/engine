@@ -100,10 +100,9 @@ vec3 clipSpacePos(in vec3 pos) {
  *
  */
 void main() {
+    vec4 mvPos;
     vec3 offsetPos,
         invertedNormals;
-
-    vec4 pos4;
 
     v_textureCoordinate = a_texCoord;
 
@@ -111,10 +110,10 @@ void main() {
     invertedNormals.y *= -1.0;
     v_normal = u_normalMatrix * invertedNormals;
 
-    offsetPos = a_pos + calculateOffset(u_positionOffset);
+    offsetPos = (u_positionOffset.x < 0.0) ? a_pos + calculateOffset(u_positionOffset) : a_pos;
     offsetPos = clipSpacePos(offsetPos);
-    pos4 = vec4(offsetPos, 1.0);
-    v_position  = (u_mvMatrix * pos4).xyz;
+    mvPos = u_mvMatrix * vec4(offsetPos, 1.0);
+    v_position = mvPos.xyz;
     v_eyeVector = (u_resolution * 0.5) - v_position;
-    gl_Position = u_perspective * u_mvMatrix * pos4;
+    gl_Position = u_perspective * mvPos;
 }
