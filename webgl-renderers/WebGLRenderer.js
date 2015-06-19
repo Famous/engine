@@ -542,7 +542,7 @@ WebGLRenderer.prototype.draw = function draw(renderState) {
     this.meshRegistryKeys = sorter(this.meshRegistryKeys, this.meshRegistry);
 
     this.setGlobalUniforms(renderState);
-    this.drawCutouts();
+    this.drawCutouts(renderState);
     this.drawMeshes(renderState);
 };
 
@@ -602,7 +602,7 @@ WebGLRenderer.prototype.drawMeshes = function drawMeshes(renderState) {
  *
  * @return {undefined} undefined
  */
-WebGLRenderer.prototype.drawCutouts = function drawCutouts() {
+WebGLRenderer.prototype.drawCutouts = function drawCutouts(renderState) {
     var cutout;
     var buffers;
     var len = this.cutoutRegistryKeys.length;
@@ -616,10 +616,14 @@ WebGLRenderer.prototype.drawCutouts = function drawCutouts() {
     for (var i = 0; i < len; i++) {
         cutout = this.cutoutRegistry[this.cutoutRegistryKeys[i]];
         buffers = this.bufferRegistry.registry[cutout.geometry];
-
+        
         if (!cutout.visible) continue;
 
+        mat44.multiply(meshTransforms.values[0], renderState.viewTransform, cutout.uniformValues[1]);
+
+        this.program.setUniforms(meshTransforms.keys, meshTransforms.values);
         this.program.setUniforms(cutout.uniformKeys, cutout.uniformValues);
+
         this.drawBuffers(buffers, cutout.drawType, cutout.geometry);
     }
 
