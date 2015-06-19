@@ -100,12 +100,14 @@ void main() {
     vec3 offsetPos,
          invertedNormals;
 
-    v_textureCoordinate = a_texCoord;
     v_normal = a_normals;
+    v_textureCoordinate = a_texCoord;
+
     offsetPos = (u_positionOffset.x < 0.0) ? a_pos + calculateOffset(u_positionOffset) : a_pos;
     offsetPos = clipSpacePos(offsetPos);
     mvPos = u_mvMatrix * vec4(offsetPos, 1.0);
     v_position = mvPos.xyz;
     v_eyeVector = (u_resolution * 0.5) - v_position;
+
     gl_Position = u_perspective * mvPos;
 }

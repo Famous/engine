@@ -582,7 +582,10 @@ WebGLRenderer.prototype.drawMeshes = function drawMeshes(renderState) {
 
         if (mesh.options) this.handleOptions(mesh.options, mesh);
 
+        // Model View Matrix from View Matrix multipled by the Mesh transform
         mat44.multiply(meshTransforms.values[0], renderState.viewTransform, mesh.uniformValues[1]);
+
+        // Normal Matrix calculated from the Model View Matrix
         mat33.normalFromMat4(meshTransforms.values[1], mesh.uniformValues[1]);
 
         this.program.setUniforms(mesh.uniformKeys, mesh.uniformValues);
