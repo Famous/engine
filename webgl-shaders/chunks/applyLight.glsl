@@ -29,12 +29,13 @@
  * @private
  *
  */
-vec4 applyLight(in vec4 baseColor, in vec3 normal, in vec4 glossiness, int numLights, vec3 ambientColor, vec3 eyeVector, mat4 lightPosition, mat4 lightColor, vec3 v_position) {
+vec4 applyLight(vec4 baseColor, vec3 normal, vec4 glossiness, int numLights, vec3 ambience, vec3 eyeVector, mat4 lightPosition, mat4 lightColor, vec3 v_position) {
     vec3 diffuse = vec3(0.0);
     bool hasGlossiness = glossiness.a > 0.0;
     bool hasSpecularColor = length(glossiness.rgb) > 0.0;
 
     for(int i = 0; i < 4; i++) {
+        
         if (i >= numLights) break;
         vec3 lightDirection = normalize(lightPosition[i].xyz - v_position);
         float lambertian = max(dot(lightDirection, normal), 0.0);
@@ -51,7 +52,7 @@ vec4 applyLight(in vec4 baseColor, in vec3 normal, in vec4 glossiness, int numLi
 
     }
 
-    return vec4(ambientColor + diffuse, baseColor.a);
+    return vec4(ambience + diffuse, baseColor.a);
 }
 
 #pragma glslify: export(applyLight)
