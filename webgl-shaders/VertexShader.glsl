@@ -22,10 +22,6 @@
  * THE SOFTWARE.
  */
 
-#pragma glslify: getNormalMatrix = require(./chunks/getNormalMatrix)
-#pragma glslify: inverse = require(./chunks/inverse)
-#pragma glslify: transpose = require(./chunks/transpose)
-
 /**
  * Placeholder for positionOffset chunks to be templated in.
  * Used for mesh deformation.
