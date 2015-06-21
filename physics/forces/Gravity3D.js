@@ -52,9 +52,9 @@ Gravity3D.prototype.constructor = Gravity3D;
  * @method
  * @return {undefined} undefined
  */
-Gravity3D.prototype.init = function() {
-    this.max = this.max || Infinity;
-    this.strength = this.strength || 200;
+Gravity3D.prototype.init = function(options) {
+    this.max = options.max || Infinity;
+    this.strength = options.strength || 200;
 };
 
 /**

@@ -71,10 +71,10 @@ RotationalDrag.LINEAR = function LINEAR() {
  * @method
  * @return {undefined} undefined
  */
-RotationalDrag.prototype.init = function init() {
-    this.max = this.max || Infinity;
-    this.strength = this.strength || 1;
-    this.type = this.type || RotationalDrag.LINEAR;
+RotationalDrag.prototype.init = function init(options) {
+    this.max = options.max || Infinity;
+    this.strength = options.strength || 1;
+    this.type = options.type || RotationalDrag.LINEAR;
 };
 
 /**
