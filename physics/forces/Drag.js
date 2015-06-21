@@ -73,10 +73,10 @@ Drag.LINEAR = function LINEAR(v) {
  * @param {Object} options The options hash.
  * @return {undefined} undefined
  */
-Drag.prototype.init = function() {
-    this.max = this.max || Infinity;
-    this.strength = this.strength || 1;
-    this.type = this.type || Drag.LINEAR;
+Drag.prototype.init = function(options) {
+    this.max = options.max || Infinity;
+    this.strength = options.strength || 1;
+    this.type = options.type || Drag.LINEAR;
 };
 
 /**
