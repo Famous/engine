@@ -128,7 +128,7 @@ Dispatch.prototype.mount = function mount (path, node) {
     node._setUpdater(this._updater);
     this._nodes[path] = node;
     var parentPath = PathUtils.parent(path);
-    
+
     // scenes are their own parents
     var parent = !parentPath ? node : this._nodes[parentPath];
 
