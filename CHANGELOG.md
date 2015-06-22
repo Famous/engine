@@ -1,5 +1,16 @@
 # Famous Rendering Engine Changelog
 
+## 0.6.2
+
+### Bug Fixes
+
+- mount and show logic 8a916b91986cad8f704fbf4ecd5efced2474c093
+
+### Testing and Tooling
+
+- fix test for default geometry 6a33d097b7876fa47fe09a8560224b1a7906a105
+
+
 ## 0.6.1
 
 ### Bug Fixes
