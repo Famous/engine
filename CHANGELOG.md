@@ -1,5 +1,24 @@
 # Famous Rendering Engine Changelog
 
+## 0.6.1
+
+### Bug Fixes
+
+- removing unique faces in sphere 657db0168b71674c48fe8296845a5a03e78eaf0c
+- sphere texture issues near poles 7583532a80ab8efde5acf93cf7fe613029530062
+- accounting for float32 array in cutoutuniform setting 04b0ea3e2925f841b735cdc6d32f3db640efd46b
+- Correct typos for inline documentation of Curves.js 3a867292384bb7abcfdf7c90fdb0eea9409ceeef
+- removing duplicate switch case 427adeaae9c5bc0983df348ce6b1049e05939056
+- removing breaking bug where canvas size is attempted to be set when no size is passed into updateSize 089fa3937e124f6c54cd203bf839baa667b91c7d
+- remove-subtree b518234caf9dc91672ecb6a12e5cd48e8c3d37c2
+- Add ID reference to component after onMount call e05c2f2edc698d58bb4848d53cd90e4548739b1d
+- rotation bug with passing null c91faae954f1e8210702bc540100cab9c5d8dfaf
+- Dismount logic 0df10bf05b4416d634b6860ff7c114e7eece6b04
+- Export all core modules af25946e31046b475199f27180329c7882e6b049
+- missed two calls 9e86bcd4faccb66519c2d5761204e52fa4839354
+- made method names consistent in size 0243991250922f2edc1125999e995877c7c1e32e
+
+
 ## 0.6.0
 
 ### Breaking Changes
