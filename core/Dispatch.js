@@ -128,7 +128,7 @@ Dispatch.prototype.mount = function mount (path, node) {
     node._setUpdater(this._updater);
     this._nodes[path] = node;
     var parentPath = PathUtils.parent(path);
-
+    
     // scenes are their own parents
     var parent = !parentPath ? node : this._nodes[parentPath];
 
@@ -143,8 +143,10 @@ Dispatch.prototype.mount = function mount (path, node) {
     var i;
     var len;
 
+    if (parent.isMounted()) node._setMounted(true, path);
+    if (parent.isShown()) node._setShown(true);
+
     if (parent.isMounted()) {
-        node._setMounted(true, path);
         node._setParent(parent);
         if (node.onMount) node.onMount(path);
 
@@ -158,7 +160,6 @@ Dispatch.prototype.mount = function mount (path, node) {
     }
 
     if (parent.isShown()) {
-        node._setShown(true);
         if (node.onShow) node.onShow();
         for (i = 0, len = components.length ; i < len ; i++)
             if (components[i] && components[i].onShow)
