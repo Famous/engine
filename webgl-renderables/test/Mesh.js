@@ -222,8 +222,8 @@ test('Mesh', function(t) {
         t.equal(typeof mesh.getGeometry, 'function',
             'should be a function');
 
-        t.false(mesh.getGeometry(),
-            'should not return a geometry if none has been set');
+        t.true(mesh.getGeometry(),
+            'should return a default geometry of plane if none was set');
 
         mesh.setGeometry('Box');
         t.true(mesh.getGeometry(),
