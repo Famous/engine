@@ -66,7 +66,6 @@ function compileMaterial(material, textureSlot) {
         if (node.texture) textures.push(node.texture);
     });
 
-    console.log(uniforms);
     return {
         _id: material._id,
         glsl: glsl + 'return ' + _makeLabel(material) + ';',
