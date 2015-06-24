@@ -25,6 +25,7 @@
 'use strict';
 
 var Transitionable = require('../transitions/Transitionable');
+var SizeSystem = require('../core/SizeSystem');
 
 /**
  * Size component used for managing the size of the Node it is attached to.
@@ -128,7 +129,7 @@ Size.prototype.toString = function toString() {
  */
 Size.prototype.getValue = function getValue() {
     return {
-        sizeMode: this._node.value.sizeMode,
+        sizeMode: SizeSystem.get(this._node.getLocation()).getSizeMode(),
         absolute: {
             x: this._absolute.x.get(),
             y: this._absolute.y.get(),
