@@ -598,6 +598,9 @@ DOMElement.prototype.setProperty = function setProperty (name, value) {
  * @method
  *
  * @param {String} content Content to be set using `.innerHTML = ...`
+ * @param {String|HTMLElement} content Content to be set using `.innerHTML = ...`
+ *                                     or an instance of HTMLElement to be set
+ *                                     as the child element.
  *
  * @return {DOMElement} this
  */

@@ -48,6 +48,10 @@ function ElementCache (element, path) {
         constructor === HTMLTextAreaElement ||
         constructor === HTMLSelectElement;
 
+    this.isSelectElement = constructor === HTMLSelectElement;
+    this.isInputElement = constructor === HTMLInputElement;
+    this.isTextAreaElement = constructor === HTMLTextAreaElement;
+
     this.element = element;
     this.path = path;
     this.content = null;
