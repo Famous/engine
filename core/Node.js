@@ -201,7 +201,7 @@ Node.prototype.getLocation = function getLocation () {
 Node.prototype.getId = Node.prototype.getLocation;
 
 /**
- * Globally dispatches the event using the Dispatch. All descendent nodes will
+ * Dispatches the event using the Dispatch. All descendent nodes will
  * receive the dispatched event.
  *
  * @method emit
