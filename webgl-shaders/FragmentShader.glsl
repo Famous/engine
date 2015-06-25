@@ -43,10 +43,18 @@ void main() {
      */
     bool lightsEnabled = (u_flatShading == 0.0) && (u_numLights > 0.0 || length(u_ambientLight) > 0.0);
 
+    vec3 normal = normalize(v_normal);
+    vec3 tangent = normalize(v_tangent);
+
+    tangent = normalize(tangent - dot(tangent, normal) * normal);
+    vec3 bitangent = cross(tangent, normal);
     vec3 normalOffset = u_normals.x < 0.0 ? applyMaterial(u_normals) * 2.0 - 1.0 : vec3(0.0);
-    vec3 normal = (v_normal + normalOffset);
-    normal.y *= -1.0;
-    normal = normalize(u_normalMatrix * normal);
+    normalOffset.y *= 1.0;
+
+    mat3 TBNMatrix = mat3(tangent, bitangent, normal);
+    vec3 newNormal = normalize(TBNMatrix * normalOffset);
+    
+    // normal = normalize(u_normalMatrix * normal);
 
     vec4 glossiness = u_glossiness.x < 0.0 ? applyMaterial(u_glossiness) : u_glossiness;
     int numLights = int(u_numLights);
@@ -54,9 +62,9 @@ void main() {
     vec3 ambience = u_ambientLight * u_baseColor.rgb;
 
     vec4 color = !lightsEnabled ? material :
-        applyLight(material, normal, glossiness, numLights, ambience,
+        applyLight(material, newNormal, glossiness, numLights, ambience,
                    eyeVector, u_lightPosition, u_lightColor, v_position);
 
-    gl_FragColor = color;
+    gl_FragColor = vec4((v_tangent + 1.0) * 0.5, 1.0);
     gl_FragColor.a *= u_opacity;
 }

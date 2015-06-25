@@ -90,7 +90,8 @@ var uniforms = keyValueToArrays({
 var attributes = keyValueToArrays({
     a_pos: [0, 0, 0],
     a_texCoord: [0, 0],
-    a_normals: [0, 0, 0]
+    a_normals: [0, 0, 0],
+    a_tangent: [0, 0, 0]
 });
 
 /**
@@ -100,7 +101,8 @@ var varyings = keyValueToArrays({
     v_textureCoordinate: [0, 0],
     v_normal: [0, 0, 0],
     v_position: [0, 0, 0],
-    v_eyeVector: [0, 0, 0]
+    v_eyeVector: [0, 0, 0],
+    v_tangent: [0, 0, 0]
 });
 
 /**

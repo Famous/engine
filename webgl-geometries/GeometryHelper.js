@@ -26,6 +26,8 @@
 
 var Vec3 = require('../math/Vec3');
 var Vec2 = require('../math/Vec2');
+var glMatrix = require('gl-matrix');
+var vec3 = glMatrix.vec3;
 
 var outputs = [
     new Vec3(),
@@ -562,5 +564,105 @@ GeometryHelper.addBackfaceTriangles = function addBackfaceTriangles(vertices, in
         vertices.push(vertices[i]);
     }
 };
+
+// http://www.terathon.com/code/tangent.html
+
+GeometryHelper.computeTangents = function computeTangents(vertices, indices, normals, textureCoords, out) {
+    var nFaces = indices.length / 3;
+    var nVerts = vertices.length / 3;
+    var tdir = vec3.create();
+    var sdir = vec3.create();
+    var tan1 = [],
+        tan2 = [];
+    var out = out || [];
+
+    for (var i = 0; i < nVerts; i++) {
+        tan1[i] = vec3.create();
+        tan2[i] = vec3.create();
+    }
+    
+    for (var i = 0; i < nFaces; i++)
+    {
+        var i1 = indices[i * 3];
+        var i2 = indices[i * 3 + 1];
+        var i3 = indices[i * 3 + 2];
+        
+        var v1 = vertices.slice(i1 * 3, i1 * 3 + 3);
+        var v2 = vertices.slice(i2 * 3, i2 * 3 + 3);
+        var v3 = vertices.slice(i3 * 3, i3 * 3 + 3);
+
+        var w1 = textureCoords.slice(i1 * 2, i1 * 2 + 2);
+        var w2 = textureCoords.slice(i2 * 2, i2 * 2 + 2);
+        var w3 = textureCoords.slice(i3 * 2, i3 * 2 + 2);
+
+        var x1 = v2[0] - v1[0];
+        var x2 = v3[0] - v1[0];
+        var y1 = v2[1] - v1[1];
+        var y2 = v3[1] - v1[1];
+        var z1 = v2[2] - v1[2];
+        var z2 = v3[2] - v1[2];
+        
+        var s1 = w2[0] - w1[0];
+        var s2 = w3[0] - w1[0];
+        var t1 = w2[1] - w1[1];
+        var t2 = w3[1] - w1[1];
+        
+        var r = 1.0 / (s1 * t2 - s2 * t1);
+
+        vec3.set(sdir,
+            (t2 * x1 - t1 * x2) * r,
+            (t2 * y1 - t1 * y2) * r,
+            (t2 * z1 - t1 * z2) * r
+        );
+
+
+        vec3.set(tdir,
+            (s1 * x2 - s2 * x1) * r,
+            (s1 * y2 - s2 * y1) * r,
+            (s1 * z2 - s2 * z1) * r
+        );
+
+        vec3.add(tan1[i1], tan1[i1], sdir);
+        vec3.add(tan1[i2], tan1[i2], sdir);
+        vec3.add(tan1[i3], tan1[i3], sdir);
+        
+        vec3.add(tan2[i1], tan2[i1], tdir);
+        vec3.add(tan2[i2], tan2[i2], tdir);
+        vec3.add(tan2[i3], tan2[i3], tdir);
+
+    }
+
+    var normal = vec3.create();
+    var t = vec3.create();
+
+    for (i = 0; i < nVerts; i++)
+    {
+        vec3.set(normal,
+            normals[i * 3],
+            normals[i * 3 + 1],
+            normals[i * 3 + 2]
+        );
+
+        vec3.set(t,
+            tan1[i][0],
+            tan1[i][1],
+            tan1[i][2]
+        );
+
+        // Gram-Schmidt orthogonalize
+
+        vec3.scale(normal, normal, vec3.dot(normal, t));
+        vec3.subtract(t, t, normal);
+        vec3.normalize(t, t);
+
+        out[i * 3] = t[0];
+        out[i * 3 + 1] = t[1];
+        out[i * 3 + 2] = t[2];
+
+        console.log(t)
+    }
+
+    return out;
+}
 
 module.exports = GeometryHelper;

@@ -100,7 +100,11 @@ void main() {
     vec3 offsetPos,
          invertedNormals;
 
-    v_normal = a_normals;
+    invertedNormals = a_normals;
+    invertedNormals.y *= -1.0;
+    
+    v_normal = u_normalMatrix * invertedNormals;
+    v_tangent = u_normalMatrix * a_tangent;
     v_textureCoordinate = a_texCoord;
 
     offsetPos = (u_positionOffset.x < 0.0) ? a_pos + calculateOffset(u_positionOffset) : a_pos;
