@@ -65,6 +65,6 @@ void main() {
         applyLight(material, newNormal, glossiness, numLights, ambience,
                    eyeVector, u_lightPosition, u_lightColor, v_position);
 
-    gl_FragColor = vec4((v_tangent + 1.0) * 0.5, 1.0);
+    gl_FragColor = color;
     gl_FragColor.a *= u_opacity;
 }

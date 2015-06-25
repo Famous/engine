@@ -615,7 +615,6 @@ GeometryHelper.computeTangents = function computeTangents(vertices, indices, nor
             (t2 * z1 - t1 * z2) * r
         );
 
-
         vec3.set(tdir,
             (s1 * x2 - s2 * x1) * r,
             (s1 * y2 - s2 * y1) * r,
@@ -658,8 +657,6 @@ GeometryHelper.computeTangents = function computeTangents(vertices, indices, nor
         out[i * 3] = t[0];
         out[i * 3 + 1] = t[1];
         out[i * 3 + 2] = t[2];
-
-        console.log(t)
     }
 
     return out;
