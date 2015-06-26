@@ -133,7 +133,7 @@ commandPrinters[Commands.GL_AMBIENT_LIGHT] = function gl_ambient_light (buffer, 
 };
 
 commandPrinters[Commands.GL_LIGHT_POSITION] = function gl_light_position (buffer, data) {
-    data.result += data.i + '. GL_LIGHT_POSITION\n    x: ' + buffer[++data.i] + 'y: ' + buffer[ i] + 'z: ' + buffer[++data.i] + '\n\n';
+    data.result += data.i + '. GL_LIGHT_POSITION\n    x: ' + buffer[++data.i] + 'y: ' + buffer[++data.i] + 'z: ' + buffer[++data.i] + '\n\n';
 };
 
 commandPrinters[Commands.GL_LIGHT_COLOR] = function gl_light_color (buffer, data) {
