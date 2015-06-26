@@ -75,8 +75,6 @@ function DOMElement(node, options) {
     this._id = node ? node.addComponent(this) : null;
     this._node = node;
 
-    this.onSizeModeChange.apply(this, node.getSizeMode());
-
     this._callbacks = new CallbackStore();
 
     this.setProperty('display', node.isShown() ? 'block' : 'none');
@@ -172,6 +170,7 @@ DOMElement.prototype.onMount = function onMount(node, id) {
     this._id = id;
     this._UIEvents = node.getUIEvents().slice(0);
     TransformSystem.makeBreakPointAt(node.getLocation());
+    this.onSizeModeChange.apply(this, node.getSizeMode());
     this.draw();
     this.setAttribute('data-fa-path', node.getLocation());
 };
