@@ -95,14 +95,17 @@ function Node () {
     this._transformID = null;
     this._sizeID = null;
 
+    // initialize constants on the constructor directly
+    // this will allow subclasses to inherit default values
+    this.constructor.RELATIVE_SIZE = 0;
+    this.constructor.ABSOLUTE_SIZE = 1;
+    this.constructor.RENDER_SIZE = 2;
+    this.constructor.DEFAULT_SIZE = 0;
+    if (this.constructor.NO_DEFAULT_COMPONENTS === undefined)
+        this.constructor.NO_DEFAULT_COMPONENTS = false;
+
     if (!this.constructor.NO_DEFAULT_COMPONENTS) this._init();
 }
-
-Node.RELATIVE_SIZE = 0;
-Node.ABSOLUTE_SIZE = 1;
-Node.RENDER_SIZE = 2;
-Node.DEFAULT_SIZE = 0;
-Node.NO_DEFAULT_COMPONENTS = false;
 
 /**
  * Protected method. Initializes a node with a default Transform and Size component
