@@ -50,6 +50,9 @@ function Scene (selector, updater) {
     if (!selector) throw new Error('Scene needs to be created with a DOM selector');
     if (!updater) throw new Error('Scene needs to be created with a class like Famous');
 
+    // The scene itself should not have a size
+    this.constructor.NO_DEFAULT_COMPONENTS = true;
+
     Node.call(this);         // Scene inherits from node
 
     this._globalUpdater = updater; // The updater that will both
