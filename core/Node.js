@@ -95,8 +95,8 @@ function Node () {
     this._transformID = null;
     this._sizeID = null;
 
-    // initialize defaults on the constructor directly
-    // this will allow subclasses to inherit defaults
+    // initialize constants on the constructor directly
+    // this will allow subclasses to inherit default values
     this.constructor.RELATIVE_SIZE = 0;
     this.constructor.ABSOLUTE_SIZE = 1;
     this.constructor.RENDER_SIZE = 2;
