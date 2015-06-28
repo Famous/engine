@@ -51,14 +51,14 @@ function Circle (options) {
     var textureCoords = getCircleTexCoords(buffers.vertices);
     var normals = GeometryHelper.computeNormals(buffers.vertices, buffers.indices);
 
-    return new Geometry({
-        buffers: [
-            { name: 'a_pos', data: buffers.vertices },
-            { name: 'a_texCoord', data: textureCoords, size: 2 },
-            { name: 'a_normals', data: normals },
-            { name: 'indices', data: buffers.indices, size: 1 }
-        ]
-    });
+    options.buffers = [
+        { name: 'a_pos', data: buffers.vertices },
+        { name: 'a_texCoord', data: textureCoords, size: 2 },
+        { name: 'a_normals', data: normals },
+        { name: 'indices', data: buffers.indices, size: 1 }
+    ];
+
+    return new Geometry(options);
 }
 
 function getCircleTexCoords (vertices) {
