@@ -65,14 +65,14 @@ function Triangle (options) {
 
     normals = GeometryHelper.computeNormals(vertices, indices);
 
-    return new Geometry({
-        buffers: [
+    options.buffers = [
             { name: 'a_pos', data: vertices },
             { name: 'a_texCoord', data: textureCoords, size: 2 },
             { name: 'a_normals', data: normals },
             { name: 'indices', data: indices, size: 1 }
-        ]
-    });
+    ];
+
+    return new Geometry(options);
 }
 
 module.exports = Triangle;
