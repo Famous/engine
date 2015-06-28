@@ -42,19 +42,43 @@ var primitives = {
 
 test('Primitives', function(t) {
 
-    for (var name in primitives) {
-        var primitive = new primitives[name]();
+    t.test('Primitives.noParameter', function(t) {
+        for (var name in primitives) {
+            var primitive = new primitives[name]();
 
-        t.ok(primitive instanceof Geometry, 'should be an instance of a static geometry');
+            t.ok(primitive instanceof Geometry, 'should be an instance of a static geometry');
 
-        t.notEquals(primitive.spec.bufferNames.indexOf('a_texCoord'), -1, 'should contain a texCoord buffer');
-        t.notEquals(primitive.spec.bufferNames.indexOf('a_normals'), -1, 'should contain a normal buffer');
-        t.notEquals(primitive.spec.bufferNames.indexOf('a_pos'), -1, 'should contain a pos buffer');
+            t.notEquals(primitive.spec.bufferNames.indexOf('a_texCoord'), -1, 'should contain a texCoord buffer');
+            t.notEquals(primitive.spec.bufferNames.indexOf('a_normals'), -1, 'should contain a normal buffer');
+            t.notEquals(primitive.spec.bufferNames.indexOf('a_pos'), -1, 'should contain a pos buffer');
 
-        if (name !== 'Circle') {
-            t.notEquals(primitive.spec.bufferNames.indexOf('indices'), -1, 'should contain an index buffer');
+            if (name !== 'Circle') {
+                t.notEquals(primitive.spec.bufferNames.indexOf('indices'), -1, 'should contain an index buffer');
+            }
         }
-    }
+		t.end();
+    });
+    
+    t.test('Primitives.optionsParameter', function(t) {
+        for (var name in primitives) {
+            var primitive = new primitives[name]({type:'POINTS'});
+
+            t.ok(primitive instanceof Geometry, 'should be an instance of a static geometry');
+
+            t.notEquals(primitive.spec.bufferNames.indexOf('a_texCoord'), -1, 'should contain a texCoord buffer');
+            t.notEquals(primitive.spec.bufferNames.indexOf('a_normals'), -1, 'should contain a normal buffer');
+            t.notEquals(primitive.spec.bufferNames.indexOf('a_pos'), -1, 'should contain a pos buffer');
+            
+            t.equals(primitive.spec.type, 'POINTS', 'draw type should be passed through');
+
+            if (name !== 'Circle') {
+                t.notEquals(primitive.spec.bufferNames.indexOf('indices'), -1, 'should contain an index buffer');
+            }
+        }
+		t.end();
+    });
+    
 
     t.end();
 });
+
