@@ -112,20 +112,6 @@ DOMRenderer.prototype.subscribe = function subscribe(type) {
 };
 
 /**
- * Unsubscribes from all events that are of the specified type.
- *
- * @method
- *
- * @param  {String} type    Event type to unsubscribe from.
- * @return {undefined}      undefined
- */
-DOMRenderer.prototype.unsubscribe = function unsubscribe(type) {
-    this._assertTargetLoaded();
-    this._listen(type);
-    this._target.subscribe[type] = false;
-};
-
-/**
  * Used to preventDefault if an event of the specified type is being emitted on
  * the currently loaded target.
  *
@@ -186,13 +172,11 @@ DOMRenderer.prototype._listen = function _listen(type) {
 };
 
 /**
- * Removes an EventListener of given type from the element on which it was
- * registered.
+ * Unsubscribes from all events that are of the specified type.
  *
  * @method
  *
  * @param {String} type DOM event type (e.g. click, mouseover).
- *
  * @return {undefined} undefined
  */
 DOMRenderer.prototype.unsubscribe = function unsubscribe(type) {
@@ -508,7 +492,7 @@ DOMRenderer.prototype.setProperty = function setProperty (name, value) {
  * Sets the size of the currently loaded target.
  * Removes any explicit sizing constraints when passed in `false`
  * ("true-sizing").
- * 
+ *
  * Invoking setSize is equivalent to a manual invocation of `setWidth` followed
  * by `setHeight`.
  *
@@ -528,9 +512,9 @@ DOMRenderer.prototype.setSize = function setSize (width, height) {
 
 /**
  * Sets the width of the currently loaded ElementCache.
- * 
+ *
  * @method
- *  
+ *
  * @param  {Number|false} width     The explicit width to be set on the
  *                                  ElementCache's target (and content) element.
  *                                  `false` removes any explicit sizing
@@ -538,7 +522,7 @@ DOMRenderer.prototype.setSize = function setSize (width, height) {
  *                                  Elements.
  *
  * @return {undefined} undefined
- */ 
+ */
 DOMRenderer.prototype.setWidth = function setWidth(width) {
     this._assertTargetLoaded();
 
@@ -561,9 +545,9 @@ DOMRenderer.prototype.setWidth = function setWidth(width) {
 
 /**
  * Sets the height of the currently loaded ElementCache.
- * 
+ *
  * @method  setHeight
- *  
+ *
  * @param  {Number|false} height    The explicit height to be set on the
  *                                  ElementCache's target (and content) element.
  *                                  `false` removes any explicit sizing
@@ -571,7 +555,7 @@ DOMRenderer.prototype.setWidth = function setWidth(width) {
  *                                  Elements.
  *
  * @return {undefined} undefined
- */ 
+ */
 DOMRenderer.prototype.setHeight = function setHeight(height) {
     this._assertTargetLoaded();
 
@@ -700,7 +684,7 @@ DOMRenderer.prototype.removeClass = function removeClass(domClass) {
  */
 DOMRenderer.prototype._stringifyMatrix = function _stringifyMatrix(m) {
     var r = 'matrix3d(';
-    
+
     r += (m[0] < 0.000001 && m[0] > -0.000001) ? '0,' : m[0] + ',';
     r += (m[1] < 0.000001 && m[1] > -0.000001) ? '0,' : m[1] + ',';
     r += (m[2] < 0.000001 && m[2] > -0.000001) ? '0,' : m[2] + ',';
@@ -716,7 +700,7 @@ DOMRenderer.prototype._stringifyMatrix = function _stringifyMatrix(m) {
     r += (m[12] < 0.000001 && m[12] > -0.000001) ? '0,' : m[12] + ',';
     r += (m[13] < 0.000001 && m[13] > -0.000001) ? '0,' : m[13] + ',';
     r += (m[14] < 0.000001 && m[14] > -0.000001) ? '0,' : m[14] + ',';
-    
+
     r += m[15] + ')';
     return r;
 };
