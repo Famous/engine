@@ -713,7 +713,10 @@ Node.prototype.removeChild = function removeChild (child) {
         this._fullChildren.pop();
 
         return true;
-    } else throw new Error('Node is not a child of this node');
+    }
+    else {
+        return false;
+    }
 };
 
 /**
