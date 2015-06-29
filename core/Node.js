@@ -121,7 +121,7 @@ Node.prototype._init = function _init () {
  * Protected method. Sets the parent of this node such that it can be looked up.
  *
  * @method
- * 
+ *
  * @param {Node} parent The node to set as the parent of this
  *
  * @return {undefined} undefined;
@@ -234,7 +234,7 @@ Node.prototype.getValue = function getValue () {
     var numberOfChildren = this._children.length;
     var numberOfComponents = this._components.length;
     var i = 0;
- 
+
     var value = {
         location: this.getId(),
         spec: {
@@ -266,7 +266,7 @@ Node.prototype.getValue = function getValue () {
         components: [],
         children: []
     };
-    
+
     if (value.location) {
         var transform = TransformSystem.get(this.getId());
         var size = SizeSystem.get(this.getId());
@@ -688,7 +688,10 @@ Node.prototype.removeChild = function removeChild (child) {
         if (child.isMounted()) child.dismount();
 
         return true;
-    } else throw new Error('Node is not a child of this node');
+    }
+    else {
+        return false;
+    }
 };
 
 /**
@@ -755,7 +758,7 @@ Node.prototype.removeComponent = function removeComponent (component) {
 };
 
 /**
- * Removes a node's subscription to a particular UIEvent. All components 
+ * Removes a node's subscription to a particular UIEvent. All components
  * on the node will have the opportunity to remove all listeners depending
  * on this event.
  *
