@@ -1,4 +1,9 @@
 module.exports = [
+    '_init',
+    '_setParent',
+    '_setMounted',
+    '_setShown',
+    '_setUpdater',
     'getLocation',
     'getId',
     'getLocation',
@@ -35,6 +40,8 @@ module.exports = [
     'removeComponent',
     'removeUIEvent',
     'addUIEvent',
+    '_requestUpdate',
+    '_vecOptionalSet',
     'show',
     'hide',
     'setAlign',
