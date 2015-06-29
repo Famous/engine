@@ -480,7 +480,7 @@ Node.prototype.isShown = function isShown () {
  * @return {Number}         Relative opacity of the node.
  */
 Node.prototype.getOpacity = function getOpacity () {
-    if (this.constructor.INIT_DEFAULT_COMPONENTS)
+    if (!this.constructor.NO_DEFAULT_COMPONENTS)
         return this.getComponent(this._opacityID).getOpacity();
     else if (this.isMounted())
         return OpacitySystem.get(this.getLocation()).getOpacity();
@@ -1082,7 +1082,7 @@ Node.prototype.setScale = function setScale (x, y, z) {
  * @return {Node} this
  */
 Node.prototype.setOpacity = function setOpacity (val) {
-    if (this.constructor.INIT_DEFAULT_COMPONENTS)
+    if (!this.constructor.NO_DEFAULT_COMPONENTS)
         this.getComponent(this._opacityID).setOpacity(val);
     else if (this.isMounted())
         OpacitySystem.get(this.getLocation()).setOpacity(val);
