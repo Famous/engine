@@ -1,7 +1,7 @@
 module.exports = [
-    '_setUpdater',
     'getLocation',
     'getId',
+    'getLocation',
     'emit',
     'sendDrawCommand',
     'getValue',
@@ -11,7 +11,6 @@ module.exports = [
     'getParent',
     'requestUpdate',
     'requestUpdateOnNextTick',
-    'getUpdater',
     'isMounted',
     'isShown',
     'getOpacity',
@@ -34,11 +33,13 @@ module.exports = [
     'addComponent',
     'getComponent',
     'removeComponent',
+    'removeUIEvent',
     'addUIEvent',
     'show',
     'hide',
     'setAlign',
     'setMountPoint',
+    'setOrigin',
     'setPosition',
     'setRotation',
     'setScale',
@@ -51,6 +52,5 @@ module.exports = [
     'getComponents',
     'update',
     'mount',
-    'dismount',
-    'receive'
+    'dismount'
 ];
