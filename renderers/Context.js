@@ -51,7 +51,6 @@ var Commands = require('../core/Commands');
 function Context(selector, compositor) {
     this._compositor = compositor;
     this._rootEl = document.querySelector(selector);
-    this._selector = selector;
 
     if (this._rootEl === null) {
         throw new Error(
@@ -60,15 +59,19 @@ function Context(selector, compositor) {
         );
     }
 
+    this._size = [];
     this._selector = selector;
 
-    // Initializes the DOMRenderer.
-    // Every Context has at least a DOMRenderer for now.
-    this._initDOMRenderer();
+    // Cache the size of the container upfront
+    this.updateSize();
+
+    // Initially hide the root element while the tree is initialy built to avoid jitters
+    // TODO: This should eventually be removed as it should not be necessary
+    this._rootEl.style.display = 'none';
 
     // WebGLRenderer will be instantiated when needed.
     this._webGLRenderer = null;
-    this._domRenderer = new DOMRenderer(this._domRendererRootEl, selector, compositor);
+    this._domRenderer = new DOMRenderer(this._rootEl, selector, compositor);
     this._canvasEl = null;
     
     // State holders
@@ -81,8 +84,6 @@ function Context(selector, compositor) {
         perspectiveDirty: false
     };
 
-    this._size = [];
-
     this._meshTransform = new Float32Array(16);
     this._meshSize = [0, 0, 0];
 
@@ -90,8 +91,6 @@ function Context(selector, compositor) {
 
     this._commandCallbacks = [];
     this.initCommandCallbacks();
-
-    this.updateSize();
 }
 
 /**
@@ -130,34 +129,6 @@ Context.prototype.draw = function draw() {
 
     if (this._renderState.perspectiveDirty) this._renderState.perspectiveDirty = false;
     if (this._renderState.viewDirty) this._renderState.viewDirty = false;
-};
-
-/**
- * Initializes the DOMRenderer by creating a root DIV element and appending it
- * to the context.
- *
- * @method
- * @private
- *
- * @return {undefined} undefined
- */
-Context.prototype._initDOMRenderer = function _initDOMRenderer() {
-    this._domRendererRootEl = document.createElement('div');
-    this._rootEl.appendChild(this._domRendererRootEl);
-    this._domRendererRootEl.style.display = 'none';
-
-    this._domRenderer = new DOMRenderer(
-        this._domRendererRootEl,
-        this._selector,
-        this._compositor
-    );
-};
-
-Context.prototype.getRootSize = function getRootSize() {
-    return [
-        this._rootEl.offsetWidth,
-        this._rootEl.offsetHeight
-    ];
 };
 
 Context.prototype.initCommandCallbacks = function initCommandCallbacks () {
@@ -239,7 +210,7 @@ Context.prototype.getRootSize = function getRootSize() {
  */
 Context.prototype.checkInit = function checkInit () {
     if (this._initDOM) {
-        this._domRendererRootEl.style.display = 'block';
+        this._rootEl.style.display = 'block';
         this._initDOM = false;
     }
 };
