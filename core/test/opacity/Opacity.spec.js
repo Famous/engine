@@ -28,8 +28,6 @@ var test = require('tape');
 var api = require('./Opacity.api');
 var Opacity = require('../../Opacity');
 var OpacityStub = require('./Opacity.stub');
-var NodeStub = require('../node/Node.stub');
-var sinon = require('sinon');
 
 test('Opacity class', function (t) {
 

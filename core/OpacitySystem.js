@@ -44,9 +44,10 @@ function OpacitySystem () {
  * when the OpacitySystem updates.
  *
  * @method registerOpacityAtPath
- * @return {void}
  *
- * @param {String} path for the opacity to be registered to.
+ * @param {String} path path for the opacity to be registered to.
+ * @param {Opacity} [opacity] opacity to register.
+ * @return {undefined} undefined
  */
 OpacitySystem.prototype.registerOpacityAtPath = function registerOpacityAtPath (path, opacity) {
     if (!PathUtils.depth(path)) return this.pathStore.insert(path, opacity ? opacity : new Opacity());
@@ -63,7 +64,7 @@ OpacitySystem.prototype.registerOpacityAtPath = function registerOpacityAtPath (
 };
 
 /**
- * deregisters a opacity registered at the given path.
+ * Deregisters a opacity registered at the given path.
  *
  * @method deregisterOpacityAtPath
  * @return {void}
@@ -114,6 +115,7 @@ OpacitySystem.prototype.get = function get (path) {
  * in the scene graph
  *
  * @method update
+ * @return {undefined} undefined
  */
 OpacitySystem.prototype.update = function update () {
     var opacities = this.pathStore.getItems();
