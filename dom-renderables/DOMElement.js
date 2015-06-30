@@ -327,8 +327,8 @@ DOMElement.prototype.onTransformChange = function onTransformChange (transform) 
  *
  * @method
  *
- * @param {Number} x width of the Node the DOMElement is attached to
- * @param {Number} y height of the Node the DOMElement is attached to
+ * @param {Number} width width of the Node the DOMElement is attached to
+ * @param {Number} height height of the Node the DOMElement is attached to
  *
  * @return {DOMElement} this
  */

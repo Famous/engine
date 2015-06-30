@@ -25,69 +25,70 @@
 'use strict';
 
 var test = require('tape');
-var DOMElement = require('../DOMElement');
 
-
-var IDENT = [
-    1, 0, 0, 0,
-    0, 1, 0, 0,
-    0, 0, 1, 0,
-    0, 0, 0, 1
-];
-
-function createMockNode() {
-    return {
-        sentDrawCommands: [],
-        sendDrawCommand: function(command) {
-            this.sentDrawCommands.push(command);
-        },
-        shown: true,
-        isShown: function() {
-            return this.shown;
-        },
-        addedComponent: false,
-        addComponent: function() {
-            this.addedComponent = true;
-        },
-        location: 'body/0',
-        getLocation: function() {
-            return this.location;
-        },
-        transform: IDENT,
-        getTransform: function() {
-            return this.transform;
-        },
-        requestedUpdate: false,
-        requestUpdate: function() {
-            this.requestedUpdate = true;
-        },
-        size: [0, 0, 0],
-        getSize: function() {
-            return this.size;
-        },
-        sizeMode: [0, 0, 0],
-        getSizeMode: function() {
-            return this.sizeMode;
-        },
-        uiEvents: [],
-        getUIEvents: function() {
-            return this.uiEvents;
-        },
-        opacity: 1,
-        getOpacity: function() {
-            return this.opacity;
-        }
-    };
-}
-
-function createMountedDOMElement() {
-    var node = createMockNode();
-    var domElement = new DOMElement(node);
-    domElement.onMount(node, 0);
-    domElement.onUpdate();
-    node.sentDrawCommands.length = 0;
-    return domElement;
-}
+// var DOMElement = require('../DOMElement');
+//
+//
+// var IDENT = [
+//     1, 0, 0, 0,
+//     0, 1, 0, 0,
+//     0, 0, 1, 0,
+//     0, 0, 0, 1
+// ];
+//
+// function createMockNode() {
+//     return {
+//         sentDrawCommands: [],
+//         sendDrawCommand: function(command) {
+//             this.sentDrawCommands.push(command);
+//         },
+//         shown: true,
+//         isShown: function() {
+//             return this.shown;
+//         },
+//         addedComponent: false,
+//         addComponent: function() {
+//             this.addedComponent = true;
+//         },
+//         location: 'body/0',
+//         getLocation: function() {
+//             return this.location;
+//         },
+//         transform: IDENT,
+//         getTransform: function() {
+//             return this.transform;
+//         },
+//         requestedUpdate: false,
+//         requestUpdate: function() {
+//             this.requestedUpdate = true;
+//         },
+//         size: [0, 0, 0],
+//         getSize: function() {
+//             return this.size;
+//         },
+//         sizeMode: [0, 0, 0],
+//         getSizeMode: function() {
+//             return this.sizeMode;
+//         },
+//         uiEvents: [],
+//         getUIEvents: function() {
+//             return this.uiEvents;
+//         },
+//         opacity: 1,
+//         getOpacity: function() {
+//             return this.opacity;
+//         }
+//     };
+// }
+//
+// function createMountedDOMElement() {
+//     var node = createMockNode();
+//     var domElement = new DOMElement(node);
+//     domElement.onMount(node, 0);
+//     domElement.onUpdate();
+//     node.sentDrawCommands.length = 0;
+//     return domElement;
+// }
 
 test('DOMElement', function(t) {
     // t.test('constructor', function(t) {
