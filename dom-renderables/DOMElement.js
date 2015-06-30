@@ -73,7 +73,6 @@ function DOMElement(node, options) {
 
 DOMElement.Spec = function Spec(options) {
     options = options || {};
-
     this.tagName = options.tagName ? options.tagName.toUpperCase() : 'DIV';
     this.renderSize = new Int32Array(2);
     this.classes = options.classes || {};
@@ -133,12 +132,12 @@ DOMElement.prototype.onUpdate = function onUpdate () {
 
     if (len && node) {
         node.sendDrawCommand(Commands.WITH);
-        node.sendDrawCommand(node.getLocation());
+        node.sendDrawCommand(location);
 
         while (len--) node.sendDrawCommand(queue.shift());
         if (this._requestRenderSize) {
             node.sendDrawCommand(Commands.DOM_RENDER_SIZE);
-            node.sendDrawCommand(node.getLocation());
+            node.sendDrawCommand(location);
             this._requestRenderSize = false;
         }
     }
