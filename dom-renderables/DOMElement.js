@@ -163,7 +163,41 @@ DOMElement.prototype.onMount = function onMount(node, id) {
     this._id = id;
     TransformSystem.makeBreakPointAt(node.getLocation());
 
-    this.onSizeModeChange.apply(this, node.getSizeMode());
+    var key;
+    var val;
+    var i;
+    var len;
+
+    this._initialized = true;
+    this._inDraw = true;
+
+    this._changeQueue.push(
+        Commands.INIT_DOM,
+        this.value.tagName
+    );
+
+    for (key in this.value.classes)
+        if (this.value.classes[key])
+            this.addClass(key);
+
+    for (key in this.value.properties) {
+        val = this.value.properties[key];
+        if (val)
+            this.setProperty(key, val);
+    }
+
+    for (key in this.value.attributes) {
+        val = this.value.attributes[key];
+        if (val)
+            this.setAttribute(key, val);
+    }
+
+    if (this.value.content)
+        this.setContent(this.value.content);
+
+    var uiEvents = node.getUIEvents();
+    for (i = 0, len = uiEvents.length; i < len; i++)
+        this.onAddUIEvent(uiEvents[i]);
 
     this.setAttribute('data-fa-path', node.getLocation());
     this.setProperty('display', 'block');
