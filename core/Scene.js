@@ -38,6 +38,7 @@ var SizeSystem = require('./SizeSystem');
  *
  * @class Scene
  * @constructor
+ * @extends Node
  *
  * @param {String} selector a string which is a dom selector
  *                 signifying which dom element the context
