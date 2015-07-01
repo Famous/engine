@@ -355,13 +355,13 @@ Size.prototype.fromComponents = function fromComponents (components) {
             case Size.CUSTOM:
                 if (this._customMode !== 'function') throw new Error('custom size mode requires a function');
                 var params = [i];
-                if (this._customParams) {
-                    for (var p = 0, len =this._customParams.length; p < len; p++) {
-                        var val = resolveSizeMode(this._customParams[p]);
+                if (this._customSizeParams) {
+                    for (var p = 0, len =this._customSizeParams.length; p < len; p++) {
+                        var val = resolveSizeMode(this._customSizeParams[p]);
                         if (val === 0) params[p + 1] = _calculateRelative.call(this, parentSize, i);
                         else if (val === 1) params[p + 1] = _calculateRelative.call(this, i);
                         else if (val === 2) params[p + 1] = _calculateRelative.call(this, components, target[i], i);
-                        else params[p + 1] = this._customParams[p];
+                        else params[p + 1] = this._customSizeParams[p];
                     }
                 }
                 target[i] = this._customMode.apply(this._customMode, params);
