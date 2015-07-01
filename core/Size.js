@@ -353,7 +353,7 @@ Size.prototype.fromComponents = function fromComponents (components) {
                 target[i] = _calculateRender.call(this, components, target[i], i);
                 break;
             case Size.CUSTOM:
-                if (this._customSize !== 'function') throw new Error('custom size mode requires a function');
+                if (this._customMode !== 'function') throw new Error('custom size mode requires a function');
                 var params = [i];
                 if (this._customParams) {
                     for (var p = 0, len =this._customParams.length; p < len; p++) {
