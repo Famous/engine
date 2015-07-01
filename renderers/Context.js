@@ -257,7 +257,6 @@ Context.prototype.receive = function receive(path, commands, iterator) {
     var command = commands[++localIterator];
 
     this._domRenderer.loadPath(path);
-    this._domRenderer.findTarget();
 
     while (command != null) {
         if (command === Commands.WITH || command === Commands.TIME) return localIterator - 1;

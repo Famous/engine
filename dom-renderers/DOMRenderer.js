@@ -383,6 +383,7 @@ DOMRenderer.prototype.findParent = function findParent () {
  * Used for determining the target loaded under the current path.
  *
  * @method
+ * @deprecated
  *
  * @return {ElementCache|undefined} Element loaded under defined path.
  */
@@ -391,9 +392,8 @@ DOMRenderer.prototype.findTarget = function findTarget() {
     return this._target;
 };
 
-
 /**
- * Loads the passed in path.
+ * Loads the passed in path into the DOMRenderer.
  *
  * @method
  *
@@ -403,6 +403,7 @@ DOMRenderer.prototype.findTarget = function findTarget() {
  */
 DOMRenderer.prototype.loadPath = function loadPath (path) {
     this._path = path;
+    this._target = this._elements[this._path];
     return this._path;
 };
 
