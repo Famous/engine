@@ -89,6 +89,19 @@ function DOMRenderer (element, selector, compositor) {
     this._lastEv = null;
 }
 
+/**
+ * Destroys the DOMREnderer and cleans up any associated DOM resources.
+ * 
+ * @method
+ * 
+ * @return {undefined} undefined
+ */
+DOMRenderer.prototype.destroy = function destroy() {
+    // TODO: Iterate over the DOM Elements and remove all listeners
+    
+    // Destroy the ElementCache
+    this._root.destroy();
+};
 
 /**
  * Attaches an EventListener to the element associated with the passed in path.
