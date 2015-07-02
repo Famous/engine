@@ -2,6 +2,7 @@
 
 var test = require('tape');
 var Node = require('../../Node');
+var Scene = require('../../Scene');
 var api = require('./Node.api');
 
 test('Node class', function (t) {
@@ -84,6 +85,71 @@ test('Node class', function (t) {
         t.equal(node0.getRawChildren()[0], node00, 'node0 should have node00 as first child');
         t.equal(node0.getRawChildren()[1], node03, 'node0 should have reused empty slot to store node03');
         t.equal(node0.getRawChildren()[2], node02, 'node0 should have node02 as third child');
+
+        t.end();
+    });
+
+    t.test('getPositionFrom method', function(t) {
+        var updater = {
+            message: function() {
+                return updater;
+            },
+            requestUpdate:function() {
+            }
+        };
+        var scene = new Scene('body', updater);
+
+        var node0 = scene.addChild().setPosition(3,  9,  25);
+        var node1 = node0.addChild().setPosition(11, 21, 13);
+        var node2 = node1.addChild().setPosition(20, 22, 30);
+        var node3 = node2.addChild().setPosition(14,  5,  8);
+
+        var node4 = (new Node())    .setPosition(13, 25, 27);
+        var node5 = node4.addChild().setPosition(35, 28, 46);
+        var node6 = node5.addChild().setPosition(44, 19, 23);
+
+        var pos;
+
+        pos = node3.getPositionFrom(node2);
+        t.equal(pos[0], 14);
+        t.equal(pos[1], 5);
+        t.equal(pos[2], 8);
+
+        pos = node3.getPositionFrom(node1);
+        t.equal(pos[0], 34);
+        t.equal(pos[1], 27);
+        t.equal(pos[2], 38);
+
+        pos = node3.getPositionFrom(node0);
+        t.equal(pos[0], 45);
+        t.equal(pos[1], 48);
+        t.equal(pos[2], 51);
+
+        pos = node3.getPositionFrom(scene);
+        t.equal(pos[0], 48);
+        t.equal(pos[1], 57);
+        t.equal(pos[2], 76);
+
+        // didn't pass a Node.
+        try { pos = node3.getPositionFrom({}); }
+        catch (e) {
+            if (e.message.match(/not an instance/)) t.pass(e.message);
+            else t.fail('Instance check failed.');
+        }
+
+        // reached the scene node and didn't find the ancestor.
+        try { pos = node3.getPositionFrom((new Node()).setPosition(1,2,3)); }
+        catch (e) {
+            if (e.message.match(/Scene node reached/)) t.pass(e.message);
+            else t.fail('Scene node check failed.');
+        }
+
+        // reached a null parent and didn't find the ancestor.
+        try { pos = node6.getPositionFrom(node3); }
+        catch (e) {
+            if (e.message.match(/Null parent reached/)) t.pass(e.message);
+            else t.fail('Null parent check failed.');
+        }
 
         t.end();
     });
