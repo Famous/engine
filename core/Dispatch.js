@@ -331,7 +331,7 @@ Dispatch.prototype.dispatch = function dispatch (path, event, payload) {
     var child;
 
     while ((child = this.breadthFirstNext()))
-        if (child.onReceive)
+        if (child && child.onReceive)
             child.onReceive(event, payload);
 
 };
