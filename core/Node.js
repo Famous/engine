@@ -496,6 +496,41 @@ Node.prototype.getPosition = function getPosition () {
 };
 
 /**
+ * Determines the node's position relative to an ancestor node.
+ *
+ * @method getPositionFrom
+ *
+ * @param {Node} ancestor An ancestor `Node` of the current `Node`.
+ *
+ * @return {Float32Array} An array representing the position.
+ */
+Node.prototype.getPositionFrom = function getPositionFrom (ancestor) {
+    var position = Array.prototype.slice.call(this.getPosition());
+    var currentParent = this._parent;
+    var parentPosition;
+
+    if (!(ancestor instanceof Node))
+        throw new Error(''+ancestor+' is not an instance of Node.');
+
+    // Go through all the nodes up through the ancestor.
+    while (currentParent && currentParent !== ancestor) {
+        parentPosition = currentParent.getPosition();
+
+        position[0] += parentPosition[0];
+        position[1] += parentPosition[1];
+        position[2] += parentPosition[2];
+
+        currentParent = currentParent.getParent();
+    }
+
+    if (!currentParent)
+        throw new Error(''+ancestor+' is not an ancestor of this Node.');
+
+    return position;
+}
+
+
+/**
  * Returns the node's current rotation
  *
  * @method getRotation

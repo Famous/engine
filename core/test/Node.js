@@ -26,9 +26,9 @@
 
 'use strict';
 
-var test = require('tape');
-var Node = require('../Node');
-var Size = require('../Size');
+var test  = require('tape');
+var Node  = require('../Node');
+var Size  = require('../Size');
 var Scene = require('../Scene');
 
 var IDENT = [
@@ -235,6 +235,21 @@ test('Node', function(t) {
 
         t.end();
     });
+
+    t.test('getPositionFrom method', function(t) {
+        var root  = (new Node())    .setPosition(3,  9,  25);
+        var node1 = root.addChild() .setPosition(11, 21, 13);
+        var node2 = node1.addChild().setPosition(20, 22, 30);
+        var node3 = node2.addChild().setPosition(14,  5,  8);
+
+        var pos = node3.getPositionFrom(node1);
+
+        t.equal(pos[0], 34);
+        t.equal(pos[1], 50);
+        t.equal(pos[2], 38);
+
+        t.end()
+    })
 
     t.test('addChild, getChildren method', function(t) {
         var root = new Node();
