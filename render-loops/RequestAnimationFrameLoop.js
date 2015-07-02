@@ -68,6 +68,7 @@ if (DOCUMENT_ACCESS) {
  * timestamp when switching tabs.
  *
  * @class RequestAnimationFrameLoop
+ * @param {Object} options A hash of configurable options.
  */
 function RequestAnimationFrameLoop(options) {
     var _this = this;
