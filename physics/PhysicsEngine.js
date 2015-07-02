@@ -329,7 +329,7 @@ PhysicsEngine.prototype.update = function update(time) {
 
     var frameDependent = this.frameDependent;
     var step = this.step;
-    var dt = step * 0.001;
+    var dt = step;
     var speed = this.speed;
 
     var delta = this.delta;
