@@ -176,10 +176,13 @@ Compositor.prototype.getContext = function getContext(selector) {
  * Retrieves a context object registered under the passed in selector.
  *
  * @method
+ * @private
  *
- * @param  {String} selector    Query selector that has previously been used to
- *                              register the context.
- * @return {Context}            The repsective context.
+ * @param  {Number} iterator position index within the commands queue
+ * @param  {Array} commands remaining message queue received, used to
+ * shift single messages from
+ *
+ * @return {undefined} undefined
  */
 Compositor.prototype.removeContext = function removeContext(iterator, commands) {
     var selector = commands[iterator]; 
