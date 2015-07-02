@@ -296,6 +296,13 @@ Context.prototype.getWebGLRenderer = function getWebGLRenderer() {
     return this._webGLRenderer;
 };
 
+Context.prototype.destroy = function destroy() {
+    this._domRenderer.destroy();
+    if (this._webGLRenderer) {
+        this._webGLRenderer.destroy();
+    }
+};
+
 // Command Callbacks
 function preventDefault (context, path, commands, iterator) {
     if (context._webGLRenderer) context._webGLRenderer.getOrSetCutout(path);

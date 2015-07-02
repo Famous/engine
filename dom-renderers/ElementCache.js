@@ -60,4 +60,15 @@ function ElementCache (element, path) {
     this.subscribe = {};
 }
 
+/**
+ * Destroys the cache and cleans up any associated resources.
+ * 
+ * @method
+ * 
+ * @return {undefined} undefined
+ */
+ElementCache.prototype.destroy = function destroy() {
+    // TODO:
+};
+
 module.exports = ElementCache;

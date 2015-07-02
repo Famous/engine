@@ -173,6 +173,27 @@ Compositor.prototype.getContext = function getContext(selector) {
 };
 
 /**
+ * Retrieves a context object registered under the passed in selector.
+ *
+ * @method
+ * @private
+ *
+ * @param  {Number} iterator position index within the commands queue
+ * @param  {Array} commands remaining message queue received, used to
+ * shift single messages from
+ *
+ * @return {undefined} undefined
+ */
+Compositor.prototype.removeContext = function removeContext(iterator, commands) {
+    var selector = commands[iterator]; 
+    if (this._contexts[selector]) {
+        var context = this._contexts[selector];
+        context.destroy();
+        delete this._contexts[selector];
+    }
+};
+
+/**
  * Processes the previously via `receiveCommands` updated incoming "in"
  * command queue.
  * Called by UIManager on a frame by frame basis.
@@ -195,6 +216,9 @@ Compositor.prototype.drawCommands = function drawCommands() {
                 break;
             case Commands.NEED_SIZE_FOR:
                 this.giveSizeFor(++localIterator, commands);
+                break;
+            case Commands.DESTROY:
+                this.removeContext(++localIterator, commands);
                 break;
         }
         command = commands[++localIterator];

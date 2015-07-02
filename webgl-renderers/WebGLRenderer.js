@@ -145,6 +145,17 @@ function WebGLRenderer(canvas, compositor) {
 }
 
 /**
+ * Destroys the WebGLRenderer and cleans up any associated resources.
+ * 
+ * @method
+ * 
+ * @return {undefined} undefined
+ */
+WebGLRenderer.prototype.destroy = function destroy() {
+    // TODO: 
+};
+
+/**
  * Attempts to retreive the WebGLRenderer context using several
  * accessors. For browser compatability. Throws on error.
  *
