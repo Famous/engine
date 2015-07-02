@@ -69,8 +69,12 @@ if (DOCUMENT_ACCESS) {
  *
  * @class RequestAnimationFrameLoop
  */
-function RequestAnimationFrameLoop() {
+function RequestAnimationFrameLoop(options) {
     var _this = this;
+
+    options = options || {};
+    this._debug = options.debug;
+    this._frameRate = options.frameRate;
 
     // References to objects to be updated on next frame.
     this._updates = [];
@@ -263,6 +267,12 @@ RequestAnimationFrameLoop.prototype.step = function step (time) {
  * @return {RequestAnimationFrameLoop} this
  */
 RequestAnimationFrameLoop.prototype.loop = function loop(time) {
+    // TODO: Add an AST transform to remove this code in build
+    if (this._debug) {
+        if (this._frameRate) { 
+            time = this._time + this._frameRate;
+        }
+    }
     this.step(time);
     this._rAF = rAF(this._looper);
     return this;
