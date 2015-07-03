@@ -27,8 +27,7 @@
 var CallbackStore = require('../utilities/CallbackStore');
 var TransformSystem = require('../core/TransformSystem');
 var Commands = require('../core/Commands');
-
-var RENDER_SIZE = 2;
+var Size = require('../core/Size');
 
 /**
  * A DOMElement is a component that can be added to a Node with the
@@ -57,7 +56,7 @@ function DOMElement(node, options) {
     if (!node) throw new Error('DOMElement must be instantiated on a node');
 
     this._changeQueue = [];
-    
+
     this._requestingUpdate = false;
     this._renderSized = false;
     this._requestRenderSize = false;
@@ -75,8 +74,6 @@ function DOMElement(node, options) {
 
     this._id = node ? node.addComponent(this) : null;
     this._node = node;
-
-    this.onSizeModeChange.apply(this, node.getSizeMode());
 
     this._callbacks = new CallbackStore();
 
@@ -173,6 +170,7 @@ DOMElement.prototype.onMount = function onMount(node, id) {
     this._id = id;
     this._UIEvents = node.getUIEvents().slice(0);
     TransformSystem.makeBreakPointAt(node.getLocation());
+    this.onSizeModeChange.apply(this, node.getSizeMode());
     this.draw();
     this.setAttribute('data-fa-path', node.getLocation());
 };
@@ -271,8 +269,8 @@ DOMElement.prototype.onTransformChange = function onTransformChange (transform) 
  */
 DOMElement.prototype.onSizeChange = function onSizeChange(x, y) {
     var sizeMode = this._node.getSizeMode();
-    var sizedX = sizeMode[0] !== RENDER_SIZE;
-    var sizedY = sizeMode[1] !== RENDER_SIZE;
+    var sizedX = sizeMode[0] !== Size.RENDER;
+    var sizedY = sizeMode[1] !== Size.RENDER;
     if (this._initialized)
         this._changeQueue.push(Commands.CHANGE_SIZE,
             sizedX ? x : sizedX,
@@ -404,7 +402,7 @@ DOMElement.prototype._unsubscribe = function _unsubscribe (UIEvent) {
     if (this._initialized) {
         this._changeQueue.push('UNSUBSCRIBE', UIEvent);
     }
-    
+
     if (!this._requestingUpdate) this._requestUpdate();
 };
 
@@ -422,7 +420,7 @@ DOMElement.prototype._unsubscribe = function _unsubscribe (UIEvent) {
  * @return {undefined} undefined
  */
 DOMElement.prototype.onSizeModeChange = function onSizeModeChange(x, y, z) {
-    if (x === RENDER_SIZE || y === RENDER_SIZE || z === RENDER_SIZE) {
+    if (x === Size.RENDER || y === Size.RENDER || z === Size.RENDER) {
         this._renderSized = true;
         this._requestRenderSize = true;
     }

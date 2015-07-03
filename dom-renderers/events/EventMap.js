@@ -70,6 +70,7 @@ var EventMap = {
     mouseout                       : [MouseEvent, true],
     mouseover                      : [MouseEvent, true],
     mouseup                        : [MouseEvent, true],
+    contextMenu                    : [MouseEvent, true],
     resize                         : [UIEvent, false],
 
     // might bubble
