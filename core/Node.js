@@ -95,6 +95,17 @@ function Node () {
     this._transformID = null;
     this._sizeID = null;
 
+    if (typeof this.constructor.RELATIVE_SIZE === 'undefined')
+        this.constructor.RELATIVE_SIZE = Node.RELATIVE_SIZE;
+    if (typeof this.constructor.ABSOLUTE_SIZE === 'undefined')
+        this.constructor.ABSOLUTE_SIZE = Node.ABSOLUTE_SIZE;
+    if (typeof this.constructor.RENDER_SIZE === 'undefined')
+        this.constructor.RENDER_SIZE = Node.RENDER_SIZE;
+    if (typeof this.constructor.DEFAULT_SIZE === 'undefined')
+        this.constructor.DEFAULT_SIZE = Node.DEFAULT_SIZE;
+    if (typeof this.constructor.INIT_DEFAULT_COMPONENTS === 'undefined')
+        this.constructor.INIT_DEFAULT_COMPONENTS = Node.INIT_DEFAULT_COMPONENTS;
+
     if (this.constructor.INIT_DEFAULT_COMPONENTS) this._init();
 }
 
