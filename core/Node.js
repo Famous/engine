@@ -1053,15 +1053,25 @@ Node.prototype.setOpacity = function setOpacity (val) {
  *                        y direction ("height").
  * @param {SizeMode} z    The size mode being used for determining the size in
  *                        z direction ("depth").
+ * @param {Function} customMode    The function used to calculate the custom
+ *                                 size.
+ * @param {Array} customParams     An array of parameters to pass into the 
+ *                                 custom calculation.  Updates to the original
+ *                                 array will be reflected in the next 
+ *                                 calculation.
  *
  * @return {Node} this
  */
-Node.prototype.setSizeMode = function setSizeMode (x, y, z) {
+Node.prototype.setSizeMode = function setSizeMode (x, y, z, customMode, customParams) {
+    var size;
     if (!this.constructor.NO_DEFAULT_COMPONENTS)
-        this.getComponent(this._sizeID).setSizeMode(x, y, z);
+        size = this.getComponent(this._sizeID);
     else if (this.isMounted())
-        SizeSystem.get(this.getLocation()).setSizeMode(x, y, z);
+        size = SizeSystem.get(this.getLocation());
     else throw new Error('This node does not have access to a size component');
+    
+    size.setSizeMode(x, y, z);
+    size.setCustomMode(customMode, customParams);    
     return this;
 };
 

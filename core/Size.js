@@ -60,6 +60,7 @@ function Size (parent) {
 Size.RELATIVE = 0;
 Size.ABSOLUTE = 1;
 Size.RENDER = 2;
+Size.CUSTOM = 3;
 Size.DEFAULT = Size.RELATIVE;
 
 /**
@@ -113,21 +114,46 @@ function setVec (vec, x, y, z) {
  * @method
  *
  * @param {String|Number} val The Size mode to resolve.
+ * @param {boolean} quiet Whether to throw an error for invalid mode
  *
  * @return {Number} the resolved size mode from the enumeration.
  */
-function resolveSizeMode (val) {
+function resolveSizeMode (val, quiet) {
     if (val.constructor === String) {
         switch (val.toLowerCase()) {
             case 'relative':
             case 'default': return Size.RELATIVE;
             case 'absolute': return Size.ABSOLUTE;
             case 'render': return Size.RENDER;
-            default: throw new Error('unknown size mode: ' + val);
+            case 'custom': return Size.CUSTOM;
         }
     }
-    else if (val < 0 || val > Size.RENDER) throw new Error('unknown size mode: ' + val);
-    return val;
+    else if (val >= 0 || val <= Size.CUSTOM) 
+        return val;
+    else if (!quiet) 
+        throw new Error('unknown size mode: ' + val);
+}
+
+function _calculateRelative(parentSize, i)  {
+    return parentSize[i] * this.proportionalSize[i] + this.differentialSize[i];
+}
+
+function _calculateAbsolute(i) {
+    return this.absoluteSize[i];
+}
+
+function _calculateRender(components, target, i) { 
+    var candidate;
+    var component;
+    var len = components.length;
+    for (var j = 0; j < len ; j++) {
+        component = components[j];
+        if (component && component.getRenderSize) {
+            candidate = component.getRenderSize()[i];
+            target = target < candidate || target === 0 ? candidate : target;
+        }
+    }
+    return target;
 }
 
 /**
@@ -255,6 +281,24 @@ Size.prototype.setDifferential = function setDifferential (x, y, z) {
     return this;
 };
 
+/*
+ * Sets the function used for the CUSTOM size mode.  This also takes an optional
+ * array of parameters that the function will be called with. Before invoking 
+ * the custom mode, any size dependencies will be resolved and injected.
+ * Dependencies are specified using the same Size constants.
+ * 
+ * @method
+ *
+ * @param {function} fn The size function
+ * @param {array} params An array of parameters
+ */
+Size.prototype.setCustomMode = function setCustomMode(fn, params) {
+    this._customMode = fn;
+    if (params && !Array.isArray(params))
+        params = [params];
+    this._customSizeParams = params;
+};
+
 /**
  * Gets the differential size of this size representation
  *
@@ -299,27 +343,31 @@ Size.prototype.fromComponents = function fromComponents (components) {
     var parentSize = this.parent ? this.parent.get() : ZEROS;
     var prev;
     var changed = false;
-    var len = components.length;
-    var j;
     for (var i = 0 ; i < 3 ; i++) {
         prev = target[i];
         switch (mode[i]) {
             case Size.RELATIVE:
-                target[i] = parentSize[i] * this.proportionalSize[i] + this.differentialSize[i];
+                target[i] = _calculateRelative.call(this, parentSize, i);
                 break;
             case Size.ABSOLUTE:
-                target[i] = this.absoluteSize[i];
+                target[i] = _calculateAbsolute.call(this, i);
                 break;
             case Size.RENDER:
-                var candidate;
-                var component;
-                for (j = 0; j < len ; j++) {
-                    component = components[j];
-                    if (component && component.getRenderSize) {
-                        candidate = component.getRenderSize()[i];
-                        target[i] = target[i] < candidate || target[i] === 0 ? candidate : target[i];
+                target[i] = _calculateRender.call(this, components, target[i], i);
+                break;
+            case Size.CUSTOM:
+                if (this._customMode !== 'function') throw new Error('custom size mode requires a function');
+                var params = [i];
+                if (this._customSizeParams) {
+                    for (var p = 0, len = this._customSizeParams.length; p < len; p++) {
+                        var val = resolveSizeMode(this._customSizeParams[p], true);
+                        if (val === 0) params[p + 1] = _calculateRelative.call(this, parentSize, i);
+                        else if (val === 1) params[p + 1] = _calculateAbsolute.call(this, i);
+                        else if (val === 2) params[p + 1] = _calculateRender.call(this, components, target[i], i);
+                        else params[p + 1] = this._customSizeParams[p];
                     }
                 }
+                target[i] = this._customMode.apply(this._customMode, params);
                 break;
         }
         changed = changed || prev !== target[i];
