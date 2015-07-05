@@ -283,16 +283,19 @@ Size.prototype.setDifferential = function setDifferential (x, y, z) {
 
 /*
  * Sets the function used for the CUSTOM size mode.  This also takes an optional
- * array of parameters that the function will be called with.  By specifying 
- * any of the other size modes, the function will be invoked with those params.
+ * array of parameters that the function will be called with. Before invoking 
+ * the custom mode, any size dependencies will be resolved and injected.
+ * Dependencies are specified using the same Size constants.
  * 
  * @method
  *
  * @param {function} fn The size function
  * @param {array} params An array of parameters
  */
-Size.prototype.setCustomCalculation = function setCustomCalculation(fn, params) {
+Size.prototype.setCustomMode = function setCustomMode(fn, params) {
     this._customMode = fn;
+    if (params && !Array.isArray(params))
+        params = [params];
     this._customSizeParams = params;
 };
 
@@ -356,7 +359,7 @@ Size.prototype.fromComponents = function fromComponents (components) {
                 if (this._customMode !== 'function') throw new Error('custom size mode requires a function');
                 var params = [i];
                 if (this._customSizeParams) {
-                    for (var p = 0, len =this._customSizeParams.length; p < len; p++) {
+                    for (var p = 0, len = this._customSizeParams.length; p < len; p++) {
                         var val = resolveSizeMode(this._customSizeParams[p]);
                         if (val === 0) params[p + 1] = _calculateRelative.call(this, parentSize, i);
                         else if (val === 1) params[p + 1] = _calculateAbsolute.call(this, i);
