@@ -45,7 +45,15 @@ test('Size', function(t) {
     });
 
     t.test('fromSpecWithParent method', function(t) {
-        // TODO
+        // TODO: Size.DEFAULT
+        
+        // TODO: Size.ABSOLUTE
+        
+        // TODO: Size.RELATIVE
+        
+        // TODO: Size.RENDER
+        
+        // TODO: Size.CUSTOM
 
         t.end();
     });
