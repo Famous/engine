@@ -360,7 +360,7 @@ Size.prototype.fromComponents = function fromComponents (components) {
                 var params = [i];
                 if (this._customSizeParams) {
                     for (var p = 0, len = this._customSizeParams.length; p < len; p++) {
-                        var val = resolveSizeMode(this._customSizeParams[p]);
+                        var val = resolveSizeMode(this._customSizeParams[p], true);
                         if (val === 0) params[p + 1] = _calculateRelative.call(this, parentSize, i);
                         else if (val === 1) params[p + 1] = _calculateAbsolute.call(this, i);
                         else if (val === 2) params[p + 1] = _calculateRender.call(this, components, target[i], i);
