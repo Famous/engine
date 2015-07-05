@@ -359,8 +359,8 @@ Size.prototype.fromComponents = function fromComponents (components) {
                     for (var p = 0, len =this._customSizeParams.length; p < len; p++) {
                         var val = resolveSizeMode(this._customSizeParams[p]);
                         if (val === 0) params[p + 1] = _calculateRelative.call(this, parentSize, i);
-                        else if (val === 1) params[p + 1] = _calculateRelative.call(this, i);
-                        else if (val === 2) params[p + 1] = _calculateRelative.call(this, components, target[i], i);
+                        else if (val === 1) params[p + 1] = _calculateAbsolute.call(this, i);
+                        else if (val === 2) params[p + 1] = _calculateRender.call(this, components, target[i], i);
                         else params[p + 1] = this._customSizeParams[p];
                     }
                 }
