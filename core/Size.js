@@ -128,7 +128,7 @@ function resolveSizeMode (val, quiet) {
             case 'custom': return Size.CUSTOM;
         }
     }
-    else if (val < 0 || val > Size.CUSTOM) 
+    else if (val >= 0 || val <= Size.CUSTOM) 
         return val;
     else if (!quiet) 
         throw new Error('unknown size mode: ' + val);
