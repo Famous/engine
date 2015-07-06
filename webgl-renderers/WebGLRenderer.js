@@ -93,7 +93,6 @@ function WebGLRenderer(canvas, compositor) {
     this.lightColors = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
     this.textureManager = new TextureManager(gl);
-    this.texCache = {};
     this.bufferRegistry = new BufferRegistry(gl);
     this.program = new Program(gl, { debug: true });
 
@@ -826,13 +825,16 @@ WebGLRenderer.prototype.handleOptions = function handleOptions(options, mesh) {
 
     if (options.blending) gl.enable(gl.BLEND);
 
-    if (options.side === 'double') {
-        this.gl.cullFace(this.gl.FRONT);
-        this.drawBuffers(this.bufferRegistry.registry[mesh.geometry], mesh.drawType, mesh.geometry);
-        this.gl.cullFace(this.gl.BACK);
+    switch (options.side) {
+        case 'double':
+            this.gl.cullFace(this.gl.FRONT);
+            this.drawBuffers(this.bufferRegistry.registry[mesh.geometry], mesh.drawType, mesh.geometry);
+            this.gl.cullFace(this.gl.BACK);
+            break;
+        case 'back':
+            gl.cullFace(gl.FRONT);
+            break;
     }
-
-    if (options.side === 'back') gl.cullFace(gl.FRONT);
 };
 
 /**

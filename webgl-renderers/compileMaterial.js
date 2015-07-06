@@ -35,7 +35,6 @@ var types = {
  * the vertex or fragment shader.
  *
  * @method
- * @protected
  *
  * @param {Object} material Material to be compiled.
  * @param {Number} textureSlot Next available texture slot for Mesh.

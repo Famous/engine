@@ -33,7 +33,7 @@
  *
  * @returns {Function} Augmented function
  */
-module.exports = function Debug() {
+function Debug() {
     return _augmentFunction(
         this.gl.compileShader,
         function(shader) {
@@ -44,7 +44,7 @@ module.exports = function Debug() {
             }
         }
     );
-};
+}
 
 // Takes a function, keeps the reference and replaces it by a closure that
 // executes the original function and the provided callback.
@@ -91,3 +91,5 @@ function _processErrors(errors, source) {
         report.appendChild(li);
     }
 }
+
+module.exports = Debug;
