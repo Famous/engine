@@ -57,6 +57,8 @@ function PhysicsEngine(options) {
 
     /** @prop step The time between frames in the engine. */
     this.step = options.step || 1000/60;
+    /** @prop scale The amount to scale the measured time units by, default 0.001 (ms to s) */
+    this.scale = options.scale || 0.001;
     /** @prop iterations The number of times each constraint is solved per frame. */
     this.iterations = options.iterations || 10;
     /** @prop _indexPool Pools of indicies to track holes in the arrays. */
@@ -329,7 +331,7 @@ PhysicsEngine.prototype.update = function update(time) {
 
     var frameDependent = this.frameDependent;
     var step = this.step;
-    var dt = step * 0.001;
+    var dt = step * this.scale;
     var speed = this.speed;
 
     var delta = this.delta;
