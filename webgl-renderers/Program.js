@@ -118,11 +118,9 @@ var varyings = keyValueToArrays({
  */
 function Program(gl, options) {
     this.gl = gl;
-    this.textureSlots = 1;
     this.options = options || {};
 
     this.registeredMaterials = {};
-    this.flaggedUniforms = [];
     this.cachedUniforms  = {};
     this.uniformTypes = [];
 
@@ -244,7 +242,6 @@ Program.prototype.resetProgram = function resetProgram() {
     this.uniformNames = clone(uniforms.keys);
     this.uniformValues = clone(uniforms.values);
 
-    this.flaggedUniforms = [];
     this.cachedUniforms = {};
 
     fragmentHeader.push('uniform sampler2D u_textures[7];\n');
