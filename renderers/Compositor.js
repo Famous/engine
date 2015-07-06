@@ -266,8 +266,13 @@ Compositor.prototype.receiveCommands = function receiveCommands(commands) {
  */
 Compositor.prototype.giveSizeFor = function giveSizeFor(iterator, commands) {
     var selector = commands[iterator];
-    var size = this.getOrSetContext(selector).getRootSize();
-    this.sendResize(selector, size);
+    var context = this.getContext(selector);
+    if (context) {
+        var size = context.getRootSize();
+        this.sendResize(selector, size);
+    } else {
+        this.getOrSetContext(selector);
+    }
 };
 
 /**
