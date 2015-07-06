@@ -97,7 +97,7 @@ var snippets = {
 
     /* time - The time function returns the elapsed time in the unix epoch in milliseconds.*/
 
-    time: {glsl: 'time;', output: 1},
+    time: {glsl: 'u_time;', output: 1},
 
     /* The Add function takes two inputs, adds them together and outputs the result. This addition operation is performed on a per channel basis, meaning that the inputs' R channels get added, G channels get added, B channels get added, etc. Both inputs must have the same number of channels unless one of them is a single Constant value. Constants can be added to a vector with any number of inputs. */
 
