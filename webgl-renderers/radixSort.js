@@ -69,7 +69,13 @@ function intToFloat(k) {
     return floatView[0];
 }
 
-//sorts a list of mesh IDs according to their z-depth
+/**
+ * Sorts an array of mesh IDs according to their z-depth.
+ *
+ * @param  {Array} list         An array of meshes.
+ * @param  {Object} registry    A registry mapping the path names to meshes.
+ * @return {Array}              An array of the meshes sorted by z-depth.
+ */
 function radixSort(list, registry) {
     var pass = 0;
     var out = [];
