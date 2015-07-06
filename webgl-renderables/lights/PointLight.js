@@ -33,7 +33,6 @@ var TransformSystem = require('../../core/TransformSystem');
  *
  * @class PointLight
  * @constructor
- * @component
  * @augments Light
  *
  * @param {Node} node LocalDispatch to be retrieved from the corresponding Render Node

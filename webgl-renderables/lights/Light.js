@@ -31,7 +31,7 @@ var Commands = require('../../core/Commands');
  *
  * @class Light
  * @constructor
- * @component
+ * @abstract
  *
  * @param {Node} node The controlling node from the corresponding Render Node
  *

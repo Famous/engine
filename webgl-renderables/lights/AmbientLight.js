@@ -34,7 +34,6 @@ var Commands = require('../../core/Commands');
  *
  * @class AmbientLight
  * @constructor
- * @component
  * @augments Light
  *
  * @param {Node} node LocalDispatch to be retrieved from the corresponding Render Node
