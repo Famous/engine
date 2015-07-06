@@ -483,7 +483,7 @@ Mesh.prototype.onMount = function onMount (node, id) {
     this._node = node;
     this._id = id;
 
-    TransformSystem.makeBreakPointAt(node.getLocation());
+    TransformSystem.makeCalculateWorldMatrixAt(node.getLocation());
 
     this.draw();
 };

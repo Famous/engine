@@ -58,6 +58,7 @@ function Transform (parent) {
     this._lastEuler = false;
     this.parent = parent ? parent : null;
     this.breakPoint = false;
+    this.calculatingWorldMatrix = false;
 }
 
 Transform.IDENT = [ 1, 0, 0, 0,
@@ -79,6 +80,7 @@ Transform.LOCAL_CHANGED = 2;
 Transform.prototype.reset = function reset () {
     this.parent = null;
     this.breakPoint = false;
+    this.calculatingWorldMatrix = false;
 };
 
 /**
@@ -116,6 +118,18 @@ Transform.prototype.getParent = function getParent () {
  */
 Transform.prototype.setBreakPoint = function setBreakPoint () {
     this.breakPoint = true;
+    this.calculatingWorldMatrix = true;
+};
+
+/**
+ * Set this node to calculate the world matrix.
+ *
+ * @method
+ *
+ * @return {undefined} undefined
+ */
+Transform.prototype.setCalculateWorldMatrix = function setCalculateWorldMatrix () {
+    this.calculatingWorldMatrix = true;
 };
 
 /**
@@ -148,7 +162,7 @@ Transform.prototype.getLocalTransform = function getLocalTransform () {
  * @return {Float32Array} world transform.
  */
 Transform.prototype.getWorldTransform = function getWorldTransform () {
-    if (!this.isBreakPoint())
+    if (!this.isBreakPoint() && !this.calculatingWorldMatrix)
         throw new Error('This transform is not calculating world transforms');
     return this.global;
 };
@@ -536,7 +550,7 @@ function fromNode (node, transform) {
                  (target[2] * originX + target[6] * originY + target[10] * originZ);
     target[15] = 1;
 
-    if (transform.isBreakPoint() && transform.calculateWorldMatrix())
+    if (transform.calculatingWorldMatrix && transform.calculateWorldMatrix())
         changed |= Transform.WORLD_CHANGED;
 
     if (t00 !== target[0] ||
@@ -661,7 +675,7 @@ function fromNodeWithParent (node, transform) {
     target[14] = p02 * tx + p12 * ty + p22 * tz + p32;
     target[15] = 1;
 
-    if (transform.isBreakPoint() && transform.calculateWorldMatrix())
+    if (transform.calculatingWorldMatrix && transform.calculateWorldMatrix())
         changed |= Transform.WORLD_CHANGED;
 
     if (t00 !== target[0] ||

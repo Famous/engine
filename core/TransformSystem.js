@@ -50,7 +50,8 @@ function TransformSystem () {
  * @param {Transform | undefined} transform optional transform to register.
  */
 TransformSystem.prototype.registerTransformAtPath = function registerTransformAtPath (path, transform) {
-    if (!PathUtils.depth(path)) return this.pathStore.insert(path, transform ? transform : new Transform());
+    if (!PathUtils.depth(path))
+        return this.pathStore.insert(path, transform ? transform : new Transform());
 
     var parent = this.pathStore.get(PathUtils.parent(path));
 
@@ -92,6 +93,21 @@ TransformSystem.prototype.makeBreakPointAt = function makeBreakPointAt (path) {
     var transform = this.pathStore.get(path);
     if (!transform) throw new Error('No transform Registered at path: ' + path);
     transform.setBreakPoint();
+};
+
+/**
+ * Method that will make the transform at this location calculate a world matrix.
+ *
+ * @method
+ *
+ * @param {String} path The path at which to make the transform calculate a world matrix
+ *
+ * @return {undefined} undefined
+ */
+TransformSystem.prototype.makeCalculateWorldMatrixAt = function makeCalculateWorldMatrixAt (path) {
+        var transform = this.pathStore.get(path);
+        if (!transform) throw new Error('No transform Registered at path: ' + path);
+        transform.setCalculateWorldMatrix();
 };
 
 /**
