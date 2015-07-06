@@ -133,6 +133,10 @@ function Program(gl, options) {
     this.applicationVert = [];
     this.definitionVert = [];
 
+    if (this.options.debug) {
+        this.gl.compileShader = Debug.call(this);
+    }
+
     this.resetProgram();
 }
 
@@ -463,10 +467,6 @@ Program.prototype.getUniformTypeFromValue = function getUniformTypeFromValue(val
  */
 Program.prototype.compileShader = function compileShader(shader, source) {
     var i = 1;
-
-    if (this.options.debug) {
-        this.gl.compileShader = Debug.call(this);
-    }
 
     this.gl.shaderSource(shader, source);
     this.gl.compileShader(shader);
