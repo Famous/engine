@@ -153,13 +153,6 @@ Context.prototype._initDOMRenderer = function _initDOMRenderer() {
     );
 };
 
-Context.prototype.getRootSize = function getRootSize() {
-    return [
-        this._rootEl.offsetWidth,
-        this._rootEl.offsetHeight
-    ];
-};
-
 Context.prototype.initCommandCallbacks = function initCommandCallbacks () {
     this._commandCallbacks[Commands.INIT_DOM] = initDOM;
     this._commandCallbacks[Commands.DOM_RENDER_SIZE] = domRenderSize;
