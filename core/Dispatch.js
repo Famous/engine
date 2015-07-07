@@ -211,13 +211,15 @@ Dispatch.prototype.show = function show (path) {
         if (components[i] && components[i].onShow)
             components[i].onShow();
 
-    var queue = [];
+    var queue = allocQueue();
 
     addChildrenToQueue(node, queue);
     var child;
 
     while ((child = breadthFirstNext(queue)))
         this.show(child.getLocation());
+
+    deallocQueue(queue);
 };
 
 /**
@@ -245,7 +247,7 @@ Dispatch.prototype.hide = function hide (path) {
         if (components[i] && components[i].onHide)
             components[i].onHide();
 
-    var queue = [];
+    var queue = allocQueue();
 
     addChildrenToQueue(node, queue);
     var child;
@@ -253,6 +255,7 @@ Dispatch.prototype.hide = function hide (path) {
     while ((child = breadthFirstNext(queue)))
         this.hide(child.getLocation());
 
+    deallocQueue(queue);
 };
 
 /**
@@ -266,12 +269,15 @@ Dispatch.prototype.hide = function hide (path) {
 Dispatch.prototype.lookupNode = function lookupNode (location) {
     if (!location) throw new Error('lookupNode must be called with a path');
 
-    var path = [];
+    var path = allocQueue();
 
     _splitTo(location, path);
 
     for (var i = 0, len = path.length ; i < len ; i++)
         path[i] = this._nodes[path[i]];
+
+    path.length = 0;
+    deallocQueue(path);
 
     return path[path.length - 1];
 };
@@ -298,7 +304,8 @@ Dispatch.prototype.dispatch = function dispatch (path, event, payload) {
 
     payload.node = node;
 
-    var queue = [node];
+    var queue = allocQueue();
+    queue.push(node);
 
     var child;
     var components;
@@ -316,6 +323,7 @@ Dispatch.prototype.dispatch = function dispatch (path, event, payload) {
                 components[i].onReceive(event, payload);
     }
 
+    deallocQueue(queue);
 };
 
 /**
@@ -360,6 +368,32 @@ Dispatch.prototype.dispatchUIEvent = function dispatchUIEvent (path, event, payl
         }
     }
 };
+
+var queues = [];
+
+/**
+ * Helper method used for allocating a new queue or reusing a previously freed
+ * one if possible.
+ *
+ * @private
+ *
+ * @return {Array} allocated queue.
+ */
+function allocQueue() {
+    return queues.pop() || [];
+}
+
+/**
+ * Helper method used for freeing a previously allocated queue.
+ *
+ * @private
+ *
+ * @param  {Array} queue    the queue to be relased to the pool.
+ * @return {undefined}      undefined
+ */
+function deallocQueue(queue) {
+    queues.push(queue);
+}
 
 /**
  * _splitTo is a private method which takes a path and splits it at every '/'
