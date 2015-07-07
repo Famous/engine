@@ -108,8 +108,8 @@ test('Dispatch singleton', function (t) {
         var received = [];
     
         function onReceive(actualEvent, actualPayload) {
-            t.equal(actualEvent, expectedEvent, 'Node should receive ');
-            t.equal(actualPayload, expectedPayload);
+            t.equal(actualEvent, expectedEvent, 'Node should receive expected event');
+            t.equal(actualPayload, expectedPayload, 'Node should receive expected payload');
             
             received.push(this.__path__);
         }
