@@ -327,7 +327,7 @@ Dispatch.prototype.dispatch = function dispatch (path, event, payload) {
     
     if (!node) return;
 
-    this.addChildrenToQueue(node);
+    this._queue.push(node);
     var child;
 
     while ((child = this.breadthFirstNext()))
