@@ -179,7 +179,7 @@ function Material(name, chunk, inputs, options) {
     this.attributes = options.attributes;
 
     if (options.texture) {
-        this.texture = options.texture.__isATexture__ ? options.texture : TextureRegistry.register(null, options.texture);
+        this.texture = options.texture.__isATexture__ ? options.texture : TextureRegistry.register(null, options.texture, options);
     }
 
     this._id = Material.id++;

@@ -571,7 +571,11 @@ WebGLRenderer.prototype.drawMeshes = function drawMeshes() {
         if (!buffers) continue;
 
         var j = mesh.textures.length;
-        while (j--) this.textureManager.bindTexture(mesh.textures[j]);
+        var loading;
+
+        while (j--) loading = loading || this.textureManager.bindTexture(mesh.textures[j]);
+
+        if (loading)  {console.log(123);  continue} ;
 
         if (mesh.options) this.handleOptions(mesh.options, mesh);
 

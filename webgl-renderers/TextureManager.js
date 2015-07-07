@@ -97,7 +97,10 @@ TextureManager.prototype.register = function register(input, slot) {
     if (!texture) {
 
         texture = new Texture(this.gl, options);
-        texture.setImage(this._checkerboard);
+
+        //if (options.debug) {
+            texture.setImage(this._checkerboard);
+        //}
 
         // Add texture to registry
 
@@ -108,7 +111,8 @@ TextureManager.prototype.register = function register(input, slot) {
             texture: texture,
             source: source,
             id: textureId,
-            slot: slot
+            slot: slot,
+            debug: options.debug
         };
 
         // Handle array
@@ -187,6 +191,10 @@ function loadImage (input, callback) {
  */
 TextureManager.prototype.bindTexture = function bindTexture(id) {
     var spec = this.registry[id];
+
+    if (! spec.isLoaded && ! spec.debug) { 
+        return true;
+    }
 
     if (this._activeTexture !== spec.slot) {
         this.gl.activeTexture(this.gl.TEXTURE0 + spec.slot);
