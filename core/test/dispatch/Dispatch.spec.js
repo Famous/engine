@@ -1,13 +1,10 @@
 'use strict';
 
-var rewire = require('rewire');
 var api = require('./Dispatch.api');
-var Dispatch = rewire('../../../core/Dispatch');
-var PathUtilsStub = require('../path/Path.stub');
+var Dispatch = require('../../../core/Dispatch');
 var NodeStub = require('../node/Node.stub');
+var Node = require('../../../core/Node');
 var test = require('tape');
-
-Dispatch.__set__('PathUtils', PathUtilsStub);
 
 test('Dispatch singleton', function (t) {
 
@@ -99,6 +96,51 @@ test('Dispatch singleton', function (t) {
     });
 
     t.test('.dispatch method', function (t) {
+        var nodes = {
+            'path': new Node(),
+            'path/1': new Node(),
+            'path/1/2': new Node(),
+            'path/1/1': new Node(),
+            'path/1/2/3': new Node(),
+            'path/1/2/4': new Node()
+        };
+    
+        var received = [];
+    
+        function onReceive(actualEvent, actualPayload) {
+            t.equal(actualEvent, expectedEvent, 'Node should receive ');
+            t.equal(actualPayload, expectedPayload);
+            
+            received.push(this.__path__);
+        }
+        
+        nodes.path.addChild(nodes['path/1']);
+        nodes['path/1'].addChild(nodes['path/1/2']);
+        nodes['path/1'].addChild(nodes['path/1/1']);
+        nodes['path/1/2'].addChild(nodes['path/1/2/3']);
+        nodes['path/1/2'].addChild(nodes['path/1/2/4']);
+    
+        for (var path in nodes) {
+            nodes[path].__path__ = path;
+            nodes[path].onReceive = onReceive;
+            Dispatch.mount(path, nodes[path]);
+        }
+        
+        var expectedEvent = 'event';
+        var expectedPayload = { some: 'payload' };
+    
+        Dispatch.dispatch('path/1', expectedEvent, expectedPayload);
+
+        t.equal(
+            received.indexOf('path/1'), -1,
+            'path/1 should not receive event dispatched via Dispatch.dispatch("path/1")'
+        );
+        
+        t.deepEqual(
+            received, ['path/1/2', 'path/1/1', 'path/1/2/3', 'path/1/2/4'],
+            'Dispatch.dispatch should trigger event first on parent, then on children'
+        );
+    
         t.end();
     });
 
