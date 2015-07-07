@@ -65,39 +65,6 @@ Dispatch.prototype._setUpdater = function _setUpdater (updater) {
 };
 
 /**
- * Enque the children of a node within the dispatcher. Does not clear
- * the dispatchers queue first.
- *
- * @method addChildrenToQueue
- * @return {void}
- *
- * @param {Node} node from which to add children to the queue
- */
-function addChildrenToQueue (node, queue) {
-    var children = node.getChildren();
-    var child;
-    for (var i = 0, len = children.length ; i < len ; i++) {
-        child = children[i];
-        if (child) queue.push(child);
-    }
-}
-
-/**
- * Returns the next node in the queue, but also adds its children to
- * the end of the queue. Continually calling this method will result
- * in a breadth first traversal of the render tree.
- *
- * @method breadthFirstNext
- * @return {Node | undefined} the next node in the traversal if one exists
- */
-function breadthFirstNext (queue) {
-    var child = queue.shift();
-    if (!child) return void 0;
-    addChildrenToQueue(child, queue);
-    return child;
-}
-
-/**
  * Calls the onMount method for the node at a given path and
  * properly registers all of that nodes children to their proper
  * paths. Throws if that path doesn't have a node registered as
@@ -421,5 +388,42 @@ function _splitTo (string, target) {
 
     return target;
 }
+
+/**
+ * Enque the children of a node within the dispatcher. Does not clear
+ * the dispatchers queue first.
+ *
+ * @method addChildrenToQueue
+ *
+ * @param {Node} node from which to add children to the queue
+ * @param {Array} queue the queue used for retrieving the new child from
+ *
+ * @return {void}
+ */
+function addChildrenToQueue (node, queue) {
+    var children = node.getChildren();
+    var child;
+    for (var i = 0, len = children.length ; i < len ; i++) {
+        child = children[i];
+        if (child) queue.push(child);
+    }
+}
+
+/**
+ * Returns the next node in the queue, but also adds its children to
+ * the end of the queue. Continually calling this method will result
+ * in a breadth first traversal of the render tree.
+ *
+ * @method breadthFirstNext
+ * @param {Array} queue the queue used for retrieving the new child from
+ * @return {Node | undefined} the next node in the traversal if one exists
+ */
+function breadthFirstNext (queue) {
+    var child = queue.shift();
+    if (!child) return void 0;
+    addChildrenToQueue(child, queue);
+    return child;
+}
+
 
 module.exports = new Dispatch();
