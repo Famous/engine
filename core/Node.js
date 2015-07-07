@@ -201,7 +201,7 @@ Node.prototype.getLocation = function getLocation () {
 Node.prototype.getId = Node.prototype.getLocation;
 
 /**
- * Globally dispatches the event using the Dispatch. All descendent nodes will
+ * Dispatches the event using the Dispatch. All descendent nodes will
  * receive the dispatched event.
  *
  * @method emit
@@ -370,8 +370,10 @@ Node.prototype.getParent = function getParent () {
 Node.prototype.requestUpdate = function requestUpdate (requester) {
     if (this._inUpdate || !this.isMounted())
         return this.requestUpdateOnNextTick(requester);
-    this._updateQueue.push(requester);
-    if (!this._requestingUpdate) this._requestUpdate();
+    if (this._updateQueue.indexOf(requester) === -1) {
+        this._updateQueue.push(requester);
+        if (!this._requestingUpdate) this._requestUpdate();
+    }
     return this;
 };
 
@@ -390,7 +392,8 @@ Node.prototype.requestUpdate = function requestUpdate (requester) {
  * @return {Node} this
  */
 Node.prototype.requestUpdateOnNextTick = function requestUpdateOnNextTick (requester) {
-    this._nextUpdateQueue.push(requester);
+    if (this._nextUpdateQueue.indexOf(requester) === -1)
+        this._nextUpdateQueue.push(requester);
     return this;
 };
 
@@ -1169,8 +1172,6 @@ Node.prototype.update = function update (time){
     var nextQueue = this._nextUpdateQueue;
     var queue = this._updateQueue;
     var item;
-
-    if (this.onUpdate) this.onUpdate();
 
     while (nextQueue.length) queue.unshift(nextQueue.pop());
 
