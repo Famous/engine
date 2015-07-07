@@ -327,12 +327,25 @@ Dispatch.prototype.dispatch = function dispatch (path, event, payload) {
     
     if (!node) return;
 
+    payload.node = node;
+
     this.addChildrenToQueue(node);
     var child;
+    
+    var components;
+    var i;
+    var len;
 
-    while ((child = this.breadthFirstNext()))
+    while ((child = this.breadthFirstNext())) {
         if (child && child.onReceive)
             child.onReceive(event, payload);
+
+        components = child.getComponents();
+
+        for (i = 0, len = components.length ; i < len ; i++)
+            if (components[i] && components[i].onReceive)
+                components[i].onReceive(event, payload);
+    }
 
 };
 
