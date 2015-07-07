@@ -102,7 +102,7 @@ Dispatch.prototype.next = function next () {
  */
 Dispatch.prototype.breadthFirstNext = function breadthFirstNext () {
     var child = this._queue.shift();
-    if (!child) return void 0; 
+    if (!child) return void 0;
     this.addChildrenToQueue(child);
     return child;
 };
@@ -324,8 +324,8 @@ Dispatch.prototype.dispatch = function dispatch (path, event, payload) {
     if (!event) throw new Error('dispatch requires an event name as it\'s second argument');
 
     var node = this._nodes[path];
-    if (!node)
-        throw new Error('No node registered at path: ' + path);
+    
+    if (!node) return;
 
     this.addChildrenToQueue(node);
     var child;
