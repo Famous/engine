@@ -118,20 +118,20 @@ TextureManager.prototype.register = function register(input, slot) {
         // Handle array
 
         if (Array.isArray(source) || source instanceof Uint8Array || source instanceof Float32Array) {
+            spec.isLoaded = true;
             this.bindTexture(textureId);
             texture.setArray(source);
-            spec.isLoaded = true;
         }
 
         // Handle video
 
         else if (source instanceof HTMLVideoElement) {
             source.addEventListener('loadeddata', function() {
-                _this.bindTexture(textureId);
-                texture.setImage(source);
-
                 spec.isLoaded = true;
                 spec.source = source;
+
+                _this.bindTexture(textureId);
+                texture.setImage(source);
             });
         }
 
@@ -192,9 +192,7 @@ function loadImage (input, callback) {
 TextureManager.prototype.bindTexture = function bindTexture(id) {
     var spec = this.registry[id];
 
-    if (! spec.isLoaded && ! spec.debug) { 
-        return true;
-    }
+    if (! spec.isLoaded && ! spec.debug) return true;
 
     if (this._activeTexture !== spec.slot) {
         this.gl.activeTexture(this.gl.TEXTURE0 + spec.slot);
