@@ -95,14 +95,14 @@ function Node () {
     this._transformID = null;
     this._sizeID = null;
 
-    if (this.constructor.INIT_DEFAULT_COMPONENTS) this._init();
+    if (!this.constructor.NO_DEFAULT_COMPONENTS) this._init();
 }
 
 Node.RELATIVE_SIZE = 0;
 Node.ABSOLUTE_SIZE = 1;
 Node.RENDER_SIZE = 2;
 Node.DEFAULT_SIZE = 0;
-Node.INIT_DEFAULT_COMPONENTS = true;
+Node.NO_DEFAULT_COMPONENTS = false;
 
 /**
  * Protected method. Initializes a node with a default Transform and Size component
@@ -201,7 +201,7 @@ Node.prototype.getLocation = function getLocation () {
 Node.prototype.getId = Node.prototype.getLocation;
 
 /**
- * Dispatches the event using the Dispatch. All descendent nodes will
+ * Globally dispatches the event using the Dispatch. All descendent nodes will
  * receive the dispatched event.
  *
  * @method emit
@@ -370,10 +370,8 @@ Node.prototype.getParent = function getParent () {
 Node.prototype.requestUpdate = function requestUpdate (requester) {
     if (this._inUpdate || !this.isMounted())
         return this.requestUpdateOnNextTick(requester);
-    if (this._updateQueue.indexOf(requester) === -1) {
-        this._updateQueue.push(requester);
-        if (!this._requestingUpdate) this._requestUpdate();
-    }
+    this._updateQueue.push(requester);
+    if (!this._requestingUpdate) this._requestUpdate();
     return this;
 };
 
@@ -392,8 +390,7 @@ Node.prototype.requestUpdate = function requestUpdate (requester) {
  * @return {Node} this
  */
 Node.prototype.requestUpdateOnNextTick = function requestUpdateOnNextTick (requester) {
-    if (this._nextUpdateQueue.indexOf(requester) === -1)
-        this._nextUpdateQueue.push(requester);
+    this._nextUpdateQueue.push(requester);
     return this;
 };
 
@@ -443,7 +440,7 @@ Node.prototype.getOpacity = function getOpacity () {
  * @return {Float32Array}   An array representing the mount point.
  */
 Node.prototype.getMountPoint = function getMountPoint () {
-    if (this.constructor.INIT_DEFAULT_COMPONENTS)
+    if (!this.constructor.NO_DEFAULT_COMPONENTS)
         return this.getComponent(this._transformID).getMountPoint();
     else if (this.isMounted())
         return TransformSystem.get(this.getLocation()).getMountPoint();
@@ -458,7 +455,7 @@ Node.prototype.getMountPoint = function getMountPoint () {
  * @return {Float32Array}   An array representing the align.
  */
 Node.prototype.getAlign = function getAlign () {
-    if (this.constructor.INIT_DEFAULT_COMPONENTS)
+    if (!this.constructor.NO_DEFAULT_COMPONENTS)
         return this.getComponent(this._transformID).getAlign();
     else if (this.isMounted())
         return TransformSystem.get(this.getLocation()).getAlign();
@@ -473,7 +470,7 @@ Node.prototype.getAlign = function getAlign () {
  * @return {Float32Array}   An array representing the origin.
  */
 Node.prototype.getOrigin = function getOrigin () {
-    if (this.constructor.INIT_DEFAULT_COMPONENTS)
+    if (!this.constructor.NO_DEFAULT_COMPONENTS)
         return this.getComponent(this._transformID).getOrigin();
     else if (this.isMounted())
         return TransformSystem.get(this.getLocation()).getOrigin();
@@ -488,7 +485,7 @@ Node.prototype.getOrigin = function getOrigin () {
  * @return {Float32Array}   An array representing the position.
  */
 Node.prototype.getPosition = function getPosition () {
-    if (this.constructor.INIT_DEFAULT_COMPONENTS)
+    if (!this.constructor.NO_DEFAULT_COMPONENTS)
         return this.getComponent(this._transformID).getPosition();
     else if (this.isMounted())
         return TransformSystem.get(this.getLocation()).getPosition();
@@ -503,7 +500,7 @@ Node.prototype.getPosition = function getPosition () {
  * @return {Float32Array} an array of four values, showing the rotation as a quaternion
  */
 Node.prototype.getRotation = function getRotation () {
-    if (this.constructor.INIT_DEFAULT_COMPONENTS)
+    if (!this.constructor.NO_DEFAULT_COMPONENTS)
         return this.getComponent(this._transformID).getRotation();
     else if (this.isMounted())
         return TransformSystem.get(this.getLocation()).getRotation();
@@ -518,7 +515,7 @@ Node.prototype.getRotation = function getRotation () {
  * @return {Float32Array} an array showing the current scale vector
  */
 Node.prototype.getScale = function getScale () {
-    if (this.constructor.INIT_DEFAULT_COMPONENTS)
+    if (!this.constructor.NO_DEFAULT_COMPONENTS)
         return this.getComponent(this._transformID).getScale();
     else if (this.isMounted())
         return TransformSystem.get(this.getLocation()).getScale();
@@ -533,7 +530,7 @@ Node.prototype.getScale = function getScale () {
  * @return {Float32Array} an array of numbers showing the current size mode
  */
 Node.prototype.getSizeMode = function getSizeMode () {
-    if (this.constructor.INIT_DEFAULT_COMPONENTS)
+    if (!this.constructor.NO_DEFAULT_COMPONENTS)
         return this.getComponent(this._sizeID).getSizeMode();
     else if (this.isMounted())
         return SizeSystem.get(this.getLocation()).getSizeMode();
@@ -548,7 +545,7 @@ Node.prototype.getSizeMode = function getSizeMode () {
  * @return {Float32Array} a vector 3 showing the current proportional size
  */
 Node.prototype.getProportionalSize = function getProportionalSize () {
-    if (this.constructor.INIT_DEFAULT_COMPONENTS)
+    if (!this.constructor.NO_DEFAULT_COMPONENTS)
         return this.getComponent(this._sizeID).getProportional();
     else if (this.isMounted())
         return SizeSystem.get(this.getLocation()).getProportional();
@@ -563,7 +560,7 @@ Node.prototype.getProportionalSize = function getProportionalSize () {
  * @return {Float32Array} a vector 3 showing the current differential size
  */
 Node.prototype.getDifferentialSize = function getDifferentialSize () {
-    if (this.constructor.INIT_DEFAULT_COMPONENTS)
+    if (!this.constructor.NO_DEFAULT_COMPONENTS)
         return this.getComponent(this._sizeID).getDifferential();
     else if (this.isMounted())
         return SizeSystem.get(this.getLocation()).getDifferential();
@@ -578,7 +575,7 @@ Node.prototype.getDifferentialSize = function getDifferentialSize () {
  * @return {Float32Array} a vector 3 showing the current absolute size of the node
  */
 Node.prototype.getAbsoluteSize = function getAbsoluteSize () {
-    if (this.constructor.INIT_DEFAULT_COMPONENTS)
+    if (!this.constructor.NO_DEFAULT_COMPONENTS)
         return this.getComponent(this._sizeID).getAbsolute();
     else if (this.isMounted())
         return SizeSystem.get(this.getLocation()).getAbsolute();
@@ -595,7 +592,7 @@ Node.prototype.getAbsoluteSize = function getAbsoluteSize () {
  * @return {Float32Array} a vector 3 showing the current render size
  */
 Node.prototype.getRenderSize = function getRenderSize () {
-    if (this.constructor.INIT_DEFAULT_COMPONENTS)
+    if (!this.constructor.NO_DEFAULT_COMPONENTS)
         return this.getComponent(this._sizeID).getRender();
     else if (this.isMounted())
         return SizeSystem.get(this.getLocation()).getRender();
@@ -610,7 +607,7 @@ Node.prototype.getRenderSize = function getRenderSize () {
  * @return {Float32Array} a vector 3 of the final calculated side of the node
  */
 Node.prototype.getSize = function getSize () {
-    if (this.constructor.INIT_DEFAULT_COMPONENTS)
+    if (!this.constructor.NO_DEFAULT_COMPONENTS)
         return this.getComponent(this._sizeID).get();
     else if (this.isMounted())
         return SizeSystem.get(this.getLocation()).get();
@@ -888,7 +885,7 @@ Node.prototype.hide = function hide () {
  * @return {Node} this
  */
 Node.prototype.setAlign = function setAlign (x, y, z) {
-    if (this.constructor.INIT_DEFAULT_COMPONENTS)
+    if (!this.constructor.NO_DEFAULT_COMPONENTS)
         this.getComponent(this._transformID).setAlign(x, y, z);
     else if (this.isMounted())
         TransformSystem.get(this.getLocation()).setAlign(x, y, z);
@@ -909,7 +906,7 @@ Node.prototype.setAlign = function setAlign (x, y, z) {
  * @return {Node} this
  */
 Node.prototype.setMountPoint = function setMountPoint (x, y, z) {
-    if (this.constructor.INIT_DEFAULT_COMPONENTS)
+    if (!this.constructor.NO_DEFAULT_COMPONENTS)
         this.getComponent(this._transformID).setMountPoint(x, y, z);
     else if (this.isMounted())
         TransformSystem.get(this.getLocation()).setMountPoint(x, y, z);
@@ -930,7 +927,7 @@ Node.prototype.setMountPoint = function setMountPoint (x, y, z) {
  * @return {Node} this
  */
 Node.prototype.setOrigin = function setOrigin (x, y, z) {
-    if (this.constructor.INIT_DEFAULT_COMPONENTS)
+    if (!this.constructor.NO_DEFAULT_COMPONENTS)
         this.getComponent(this._transformID).setOrigin(x, y, z);
     else if (this.isMounted())
         TransformSystem.get(this.getLocation()).setOrigin(x, y, z);
@@ -951,7 +948,7 @@ Node.prototype.setOrigin = function setOrigin (x, y, z) {
  * @return {Node} this
  */
 Node.prototype.setPosition = function setPosition (x, y, z) {
-    if (this.constructor.INIT_DEFAULT_COMPONENTS)
+    if (!this.constructor.NO_DEFAULT_COMPONENTS)
         this.getComponent(this._transformID).setPosition(x, y, z);
     else if (this.isMounted())
         TransformSystem.get(this.getLocation()).setPosition(x, y, z);
@@ -975,7 +972,7 @@ Node.prototype.setPosition = function setPosition (x, y, z) {
  * @return {Node} this
  */
 Node.prototype.setRotation = function setRotation (x, y, z, w) {
-    if (this.constructor.INIT_DEFAULT_COMPONENTS)
+    if (!this.constructor.NO_DEFAULT_COMPONENTS)
         this.getComponent(this._transformID).setRotation(x, y, z, w);
     else if (this.isMounted())
         TransformSystem.get(this.getLocation()).setRotation(x, y, z, w);
@@ -996,7 +993,7 @@ Node.prototype.setRotation = function setRotation (x, y, z, w) {
  * @return {Node} this
  */
 Node.prototype.setScale = function setScale (x, y, z) {
-    if (this.constructor.INIT_DEFAULT_COMPONENTS)
+    if (!this.constructor.NO_DEFAULT_COMPONENTS)
         this.getComponent(this._transformID).setScale(x, y, z);
     else if (this.isMounted())
         TransformSystem.get(this.getLocation()).setScale(x, y, z);
@@ -1057,7 +1054,7 @@ Node.prototype.setOpacity = function setOpacity (val) {
  * @return {Node} this
  */
 Node.prototype.setSizeMode = function setSizeMode (x, y, z) {
-    if (this.constructor.INIT_DEFAULT_COMPONENTS)
+    if (!this.constructor.NO_DEFAULT_COMPONENTS)
         this.getComponent(this._sizeID).setSizeMode(x, y, z);
     else if (this.isMounted())
         SizeSystem.get(this.getLocation()).setSizeMode(x, y, z);
@@ -1079,7 +1076,7 @@ Node.prototype.setSizeMode = function setSizeMode (x, y, z) {
  * @return {Node} this
  */
 Node.prototype.setProportionalSize = function setProportionalSize (x, y, z) {
-    if (this.constructor.INIT_DEFAULT_COMPONENTS)
+    if (!this.constructor.NO_DEFAULT_COMPONENTS)
         this.getComponent(this._sizeID).setProportional(x, y, z);
     else if (this.isMounted())
         SizeSystem.get(this.getLocation()).setProportional(x, y, z);
@@ -1106,7 +1103,7 @@ Node.prototype.setProportionalSize = function setProportionalSize (x, y, z) {
  * @return {Node} this
  */
 Node.prototype.setDifferentialSize = function setDifferentialSize (x, y, z) {
-    if (this.constructor.INIT_DEFAULT_COMPONENTS)
+    if (!this.constructor.NO_DEFAULT_COMPONENTS)
         this.getComponent(this._sizeID).setDifferential(x, y, z);
     else if (this.isMounted())
         SizeSystem.get(this.getLocation()).setDifferential(x, y, z);
@@ -1126,7 +1123,7 @@ Node.prototype.setDifferentialSize = function setDifferentialSize (x, y, z) {
  * @return {Node} this
  */
 Node.prototype.setAbsoluteSize = function setAbsoluteSize (x, y, z) {
-    if (this.constructor.INIT_DEFAULT_COMPONENTS)
+    if (!this.constructor.NO_DEFAULT_COMPONENTS)
         this.getComponent(this._sizeID).setAbsolute(x, y, z);
     else if (this.isMounted())
         SizeSystem.get(this.getLocation()).setAbsolute(x, y, z);
@@ -1173,6 +1170,8 @@ Node.prototype.update = function update (time){
     var queue = this._updateQueue;
     var item;
 
+    if (this.onUpdate) this.onUpdate();
+
     while (nextQueue.length) queue.unshift(nextQueue.pop());
 
     while (queue.length) {
@@ -1209,7 +1208,7 @@ Node.prototype.mount = function mount (path) {
     if (this.isMounted())
         throw new Error('Node is already mounted at: ' + this.getLocation());
 
-    if (this.constructor.INIT_DEFAULT_COMPONENTS){
+    if (!this.constructor.NO_DEFAULT_COMPONENTS){
         TransformSystem.registerTransformAtPath(path, this.getComponent(this._transformID));
         SizeSystem.registerSizeAtPath(path, this.getComponent(this._sizeID));
     }
