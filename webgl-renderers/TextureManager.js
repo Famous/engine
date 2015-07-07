@@ -98,9 +98,9 @@ TextureManager.prototype.register = function register(input, slot) {
 
         texture = new Texture(this.gl, options);
 
-        //if (options.debug) {
+        if (options.debug) {
             texture.setImage(this._checkerboard);
-        //}
+        }
 
         // Add texture to registry
 
@@ -139,11 +139,11 @@ TextureManager.prototype.register = function register(input, slot) {
 
         else if (typeof source === 'string') {
             loadImage(source, function (img) {
-                _this.bindTexture(textureId);
-                texture.setImage(img);
-
                 spec.isLoaded = true;
                 spec.source = img;
+
+                _this.bindTexture(textureId);
+                texture.setImage(img);
             });
         }
     }
