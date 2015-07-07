@@ -38,7 +38,7 @@ var PathUtils = require('./Path');
 function Dispatch () {
     this._nodes = {}; // a container for constant time lookup of nodes
 
-    this._queue = []; // The queue is used for two purposes
+                      // The queue is used for two purposes
                       // 1. It is used to list indicies in the
                       //    Nodes path which are then used to lookup
                       //    a node in the scene graph.
@@ -73,24 +73,14 @@ Dispatch.prototype._setUpdater = function _setUpdater (updater) {
  *
  * @param {Node} node from which to add children to the queue
  */
-Dispatch.prototype.addChildrenToQueue = function addChildrenToQueue (node) {
+function addChildrenToQueue (node, queue) {
     var children = node.getChildren();
     var child;
     for (var i = 0, len = children.length ; i < len ; i++) {
         child = children[i];
-        if (child) this._queue.push(child);
+        if (child) queue.push(child);
     }
-};
-
-/**
- * Returns the next item in the Dispatch's queue.
- *
- * @method next
- * @return {Node} next node in the queue
- */
-Dispatch.prototype.next = function next () {
-    return this._queue.shift();
-};
+}
 
 /**
  * Returns the next node in the queue, but also adds its children to
@@ -100,12 +90,12 @@ Dispatch.prototype.next = function next () {
  * @method breadthFirstNext
  * @return {Node | undefined} the next node in the traversal if one exists
  */
-Dispatch.prototype.breadthFirstNext = function breadthFirstNext () {
-    var child = this._queue.shift();
+function breadthFirstNext (queue) {
+    var child = queue.shift();
     if (!child) return void 0;
-    this.addChildrenToQueue(child);
+    addChildrenToQueue(child, queue);
     return child;
-};
+}
 
 /**
  * Calls the onMount method for the node at a given path and
@@ -254,13 +244,13 @@ Dispatch.prototype.show = function show (path) {
         if (components[i] && components[i].onShow)
             components[i].onShow();
 
+    var queue = [];
 
-    this.addChildrenToQueue(node);
+    addChildrenToQueue(node, queue);
     var child;
 
-    while ((child = this.breadthFirstNext()))
+    while ((child = breadthFirstNext(queue)))
         this.show(child.getLocation());
-
 };
 
 /**
@@ -288,11 +278,12 @@ Dispatch.prototype.hide = function hide (path) {
         if (components[i] && components[i].onHide)
             components[i].onHide();
 
+    var queue = [];
 
-    this.addChildrenToQueue(node);
+    addChildrenToQueue(node, queue);
     var child;
 
-    while ((child = this.breadthFirstNext()))
+    while ((child = breadthFirstNext(queue)))
         this.hide(child.getLocation());
 
 };
@@ -308,8 +299,7 @@ Dispatch.prototype.hide = function hide (path) {
 Dispatch.prototype.lookupNode = function lookupNode (location) {
     if (!location) throw new Error('lookupNode must be called with a path');
 
-    this._queue.length = 0;
-    var path = this._queue;
+    var path = [];
 
     _splitTo(location, path);
 
@@ -340,14 +330,15 @@ Dispatch.prototype.dispatch = function dispatch (path, event, payload) {
     if (!node) return;
 
     payload.node = node;
-    this._queue.push(node);
+
+    var queue = [node];
 
     var child;
     var components;
     var i;
     var len;
 
-    while ((child = this.breadthFirstNext())) {
+    while ((child = breadthFirstNext(queue))) {
         if (child && child.onReceive)
             child.onReceive(event, payload);
 

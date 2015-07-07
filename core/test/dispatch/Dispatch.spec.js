@@ -39,7 +39,7 @@ test('Dispatch singleton', function (t) {
         var testUpdater = 'a';
         
         t.doesNotThrow(
-            Dispatch._setUpdater.bind(Dispatch, testUpdater), 
+            Dispatch._setUpdater.bind(Dispatch, testUpdater),
             '._setUpdater should be callable'
         );
 
@@ -60,10 +60,10 @@ test('Dispatch singleton', function (t) {
         Dispatch.mount('body/0', stub2);
 
         t.notOk(stub2._setUpdater.getCall(0).calledWith(testUpdater), 'Nodes mounted with the Dispatch ' +
-                                                                      'should have their updaters set to ' + 
+                                                                      'should have their updaters set to ' +
                                                                       'the dispatch\'s current updater and not a previous one');
 
-        t.ok(stub2._setUpdater.getCall(0).calledWith(testUpdater2), 'Nodes mounted with the Dispatch ' + 
+        t.ok(stub2._setUpdater.getCall(0).calledWith(testUpdater2), 'Nodes mounted with the Dispatch ' +
                                                                     'should have their updaters set to ' +
                                                                     'the dispatch\'s current updater');
 
@@ -71,18 +71,6 @@ test('Dispatch singleton', function (t) {
                                                                    'should have their updaters set to the new ' +
                                                                    'updater when the dispatch has its updater changed');
 
-        t.end();
-    });
-
-    t.test('.addChildrenToQueue method', function (t) {
-        t.end();
-    });
-
-    t.test('.next method', function (t) {
-        t.end();
-    });
-
-    t.test('.breadthFirstNext method', function (t) {
         t.end();
     });
 
