@@ -336,15 +336,27 @@ Dispatch.prototype.dispatch = function dispatch (path, event, payload) {
     if (!event) throw new Error('dispatch requires an event name as it\'s second argument');
 
     var node = this._nodes[path];
-    
+
     if (!node) return;
 
+    payload.node = node;
     this._queue.push(node);
-    var child;
 
-    while ((child = this.breadthFirstNext()))
+    var child;
+    var components;
+    var i;
+    var len;
+
+    while ((child = this.breadthFirstNext())) {
         if (child && child.onReceive)
             child.onReceive(event, payload);
+
+        components = child.getComponents();
+
+        for (i = 0, len = components.length ; i < len ; i++)
+            if (components[i] && components[i].onReceive)
+                components[i].onReceive(event, payload);
+    }
 
 };
 
