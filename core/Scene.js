@@ -74,6 +74,7 @@ function Scene (selector, updater) {
 // Scene inherits from node
 Scene.prototype = Object.create(Node.prototype);
 Scene.prototype.constructor = Scene;
+Scene.NO_DEFAULT_COMPONENTS = true;
 
 /**
  * Scene getUpdater function returns the passed in updater
