@@ -37,9 +37,12 @@ var PathStore = require('./PathStore');
  *                            nodes.
   */
 function TransformSystem (dispatch) {
-    this.pathStore = new PathStore();
+    PathStore.call(this);
     this._dispatch = dispatch;
 }
+
+TransformSystem.prototype = Object.create(PathStore.prototype);
+TransformSystem.prototype.constructor = TransformSystem;
 
 /**
  * registers a new Transform for the given path. This transform will be updated
@@ -53,9 +56,9 @@ function TransformSystem (dispatch) {
  */
 TransformSystem.prototype.registerTransformAtPath = function registerTransformAtPath (path, transform) {
     if (!PathUtils.depth(path))
-        return this.pathStore.insert(path, transform ? transform : new Transform());
+        return this.insert(path, transform ? transform : new Transform());
 
-    var parent = this.pathStore.get(PathUtils.parent(path));
+    var parent = this.get(PathUtils.parent(path));
 
     if (!parent) throw new Error(
             'No parent transform registered at expected path: ' + PathUtils.parent(path)
@@ -63,7 +66,7 @@ TransformSystem.prototype.registerTransformAtPath = function registerTransformAt
 
     if (transform) transform.setParent(parent);
 
-    this.pathStore.insert(path, transform ? transform : new Transform(parent));
+    this.insert(path, transform ? transform : new Transform(parent));
 };
 
 /**
@@ -71,12 +74,11 @@ TransformSystem.prototype.registerTransformAtPath = function registerTransformAt
  *
  * @method deregisterTransformAtPath
  * @return {void}
+ * @alias remove
  *
  * @param {String} path at which to register the transform
  */
-TransformSystem.prototype.deregisterTransformAtPath = function deregisterTransformAtPath (path) {
-    this.pathStore.remove(path);
-};
+TransformSystem.prototype.deregisterTransformAtPath = TransformSystem.prototype.remove;
 
 /**
  * Method which will make the transform currently stored at the given path a breakpoint.
@@ -92,7 +94,7 @@ TransformSystem.prototype.deregisterTransformAtPath = function deregisterTransfo
  * @return {undefined} undefined
  */
 TransformSystem.prototype.makeBreakPointAt = function makeBreakPointAt (path) {
-    var transform = this.pathStore.get(path);
+    var transform = this.get(path);
     if (!transform) throw new Error('No transform Registered at path: ' + path);
     transform.setBreakPoint();
 };
@@ -107,7 +109,7 @@ TransformSystem.prototype.makeBreakPointAt = function makeBreakPointAt (path) {
  * @return {undefined} undefined
  */
 TransformSystem.prototype.makeCalculateWorldMatrixAt = function makeCalculateWorldMatrixAt (path) {
-        var transform = this.pathStore.get(path);
+        var transform = this.get(path);
         if (!transform) throw new Error('No transform Registered at path: ' + path);
         transform.setCalculateWorldMatrix();
 };
@@ -116,15 +118,12 @@ TransformSystem.prototype.makeCalculateWorldMatrixAt = function makeCalculateWor
  * Returns the instance of the transform class associated with the given path,
  * or undefined if no transform is associated.
  *
- * @method
+ * @method get
  *
  * @param {String} path The path to lookup
  *
  * @return {Transform | undefined} the transform at that path is available, else undefined.
  */
-TransformSystem.prototype.get = function get (path) {
-    return this.pathStore.get(path);
-};
 
 /**
  * update is called when the transform system requires an update.
@@ -137,8 +136,8 @@ TransformSystem.prototype.get = function get (path) {
  * @return {undefined} undefined
  */
 TransformSystem.prototype.update = function update () {
-    var transforms = this.pathStore.getItems();
-    var paths = this.pathStore.getPaths();
+    var transforms = this.getItems();
+    var paths = this.getPaths();
     var transform;
     var changed;
     var node;
@@ -166,8 +165,6 @@ TransformSystem.prototype.update = function update () {
         }
     }
 };
-
-// private methods
 
 /**
  * Private method to call when align changes. Triggers 'onAlignChange' methods

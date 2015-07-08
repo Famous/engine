@@ -37,9 +37,12 @@ var PathUtils = require('./Path');
  *                            nodes.
  */
 function SizeSystem (dispatch) {
-    this.pathStore = new PathStore();
+    PathStore.call(this);
     this._dispatch = dispatch;
 }
+
+SizeSystem.prototype = Object.create(PathStore.prototype);
+SizeSystem.prototype.constructor = SizeSystem;
 
 /**
  * Registers a size component to a give path. A size component can be passed as the second argument
@@ -53,9 +56,9 @@ function SizeSystem (dispatch) {
  * @return {undefined} undefined
  */
 SizeSystem.prototype.registerSizeAtPath = function registerSizeAtPath (path, size) {
-    if (!PathUtils.depth(path)) return this.pathStore.insert(path, size ? size : new Size());
+    if (!PathUtils.depth(path)) return this.insert(path, size ? size : new Size());
 
-    var parent = this.pathStore.get(PathUtils.parent(path));
+    var parent = this.get(PathUtils.parent(path));
 
     if (!parent) throw new Error(
             'No parent size registered at expected path: ' + PathUtils.parent(path)
@@ -63,7 +66,7 @@ SizeSystem.prototype.registerSizeAtPath = function registerSizeAtPath (path, siz
 
     if (size) size.setParent(parent);
 
-    this.pathStore.insert(path, size ? size : new Size(parent));
+    this.insert(path, size ? size : new Size(parent));
 };
 
 /**
@@ -71,28 +74,24 @@ SizeSystem.prototype.registerSizeAtPath = function registerSizeAtPath (path, siz
  * path
  *
  * @method
+ * @alias remove
  *
  * @param {String} path The path at which to remove the size.
  *
  * @return {undefined} undefined
  */
-SizeSystem.prototype.deregisterSizeAtPath = function deregisterSizeAtPath(path) {
-    this.pathStore.remove(path);
-};
+SizeSystem.prototype.deregisterSizeAtPath = SizeSystem.prototype.remove;
 
 /**
  * Returns the size component stored at a given path. Returns undefined if no
  * size component is registered to that path.
  *
- * @method
+ * @method get
  *
  * @param {String} path The path at which to get the size component.
  *
  * @return {undefined} undefined
  */
-SizeSystem.prototype.get = function get (path) {
-    return this.pathStore.get(path);
-};
 
 /**
  * Updates the sizes in the scene graph. Called internally by the famous engine.
@@ -102,8 +101,8 @@ SizeSystem.prototype.get = function get (path) {
  * @return {undefined} undefined
  */
 SizeSystem.prototype.update = function update () {
-    var sizes = this.pathStore.getItems();
-    var paths = this.pathStore.getPaths();
+    var sizes = this.getItems();
+    var paths = this.getPaths();
     var node;
     var size;
     var i;
@@ -123,8 +122,6 @@ SizeSystem.prototype.update = function update () {
         if (size.fromComponents(components)) sizeChanged(node, components, size);
     }
 };
-
-// private methods
 
 /**
  * Private method to alert the node and components that size mode changed.
