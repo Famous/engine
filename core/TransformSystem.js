@@ -125,16 +125,16 @@ TransformSystem.prototype.get = function get (path) {
 };
 
 /**
- * onUpdate is called when the transform system requires an update.
+ * update is called when the transform system requires an update.
  * It traverses the transform array and evaluates the necessary transforms
  * in the scene graph with the information from the corresponding node
  * in the scene graph
  *
- * @method onUpdate
+ * @method update
  *
  * @return {undefined} undefined
  */
-TransformSystem.prototype.onUpdate = function onUpdate () {
+TransformSystem.prototype.update = function update () {
     var transforms = this.pathStore.getItems();
     var paths = this.pathStore.getPaths();
     var transform;

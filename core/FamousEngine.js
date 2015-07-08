@@ -151,7 +151,7 @@ FamousEngine.prototype._update = function _update () {
     this._messages[1] = time;
 
     SizeSystem.update();
-    TransformSystem.onUpdate();
+    TransformSystem.update();
 
     while (nextQueue.length) queue.unshift(nextQueue.pop());
 
