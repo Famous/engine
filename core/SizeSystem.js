@@ -1,18 +1,18 @@
 /**
  * The MIT License (MIT)
- * 
+ *
  * Copyright (c) 2015 Famous Industries Inc.
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -26,7 +26,6 @@
 
 var PathStore = require('./PathStore');
 var Size = require('./Size');
-var Dispatch = require('./Dispatch');
 var PathUtils = require('./Path');
 
 /**
@@ -34,9 +33,12 @@ var PathUtils = require('./Path');
  * It holds size components and operates upon them.
  *
  * @constructor
+ * @param {Dispatch} dispatch The dispatch object to be used for accessing
+ *                            nodes.
  */
-function SizeSystem () {
+function SizeSystem (dispatch) {
     this.pathStore = new PathStore();
+    this._dispatch = dispatch;
 }
 
 /**
@@ -109,7 +111,7 @@ SizeSystem.prototype.update = function update () {
     var components;
 
     for (i = 0, len = sizes.length ; i < len ; i++) {
-        node = Dispatch.getNode(paths[i]);
+        node = this._dispatch.getNode(paths[i]);
         components = node.getComponents();
         if (!node) continue;
         size = sizes[i];
@@ -268,4 +270,4 @@ function sizeChanged (node, components, size) {
     size.sizeChanged = false;
 }
 
-module.exports = new SizeSystem();
+module.exports = SizeSystem;

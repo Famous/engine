@@ -1,18 +1,18 @@
 /**
  * The MIT License (MIT)
- * 
+ *
  * Copyright (c) 2015 Famous Industries Inc.
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -25,7 +25,6 @@
 'use strict';
 
 var Transitionable = require('../transitions/Transitionable');
-var SizeSystem = require('../core/SizeSystem');
 
 /**
  * Size component used for managing the size of the Node it is attached to.
@@ -129,7 +128,7 @@ Size.prototype.toString = function toString() {
  */
 Size.prototype.getValue = function getValue() {
     return {
-        sizeMode: SizeSystem.get(this._node.getLocation()).getSizeMode(),
+        sizeMode: this._node._sizeSystem.get(this._node.getLocation()).getSizeMode(),
         absolute: {
             x: this._absolute.x.get(),
             y: this._absolute.y.get(),

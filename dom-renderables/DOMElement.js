@@ -25,7 +25,6 @@
 'use strict';
 
 var CallbackStore = require('../utilities/CallbackStore');
-var TransformSystem = require('../core/TransformSystem');
 var Commands = require('../core/Commands');
 var Size = require('../core/Size');
 
@@ -169,7 +168,7 @@ DOMElement.prototype.onMount = function onMount(node, id) {
     this._node = node;
     this._id = id;
     this._UIEvents = node.getUIEvents().slice(0);
-    TransformSystem.makeBreakPointAt(node.getLocation());
+    node._transformSystem.makeBreakPointAt(node.getLocation());
     this.onSizeModeChange.apply(this, node.getSizeMode());
     this.draw();
     this.setAttribute('data-fa-path', node.getLocation());
@@ -466,7 +465,7 @@ DOMElement.prototype._requestUpdate = function _requestUpdate() {
 DOMElement.prototype.init = function init () {
     this._changeQueue.push(Commands.INIT_DOM, this._tagName);
     this._initialized = true;
-    this.onTransformChange(TransformSystem.get(this._node.getLocation()));
+    this.onTransformChange(this._node._updater._transformSystem.get(this._node.getLocation()));
     var size = this._node.getSize();
     this.onSizeChange(size[0], size[1]);
     if (!this._requestingUpdate) this._requestUpdate();

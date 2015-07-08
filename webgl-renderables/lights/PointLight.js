@@ -25,7 +25,6 @@
 'use strict';
 
 var Light = require('./Light');
-var TransformSystem = require('../../core/TransformSystem');
 
 /**
  * PointLight extends the functionality of Light. PointLight is a light source
@@ -63,8 +62,8 @@ PointLight.prototype.constructor = PointLight;
  */
 PointLight.prototype.onMount = function onMount(node, id) {
     this._id = id;
-    TransformSystem.makeBreakPointAt(this._node.getLocation());
-    this.onTransformChange(TransformSystem.get(this._node.getLocation()));
+    this._node._transformSystem.makeBreakPointAt(this._node.getLocation());
+    this.onTransformChange(this._node._transformSystem.get(this._node.getLocation()));
 };
 
 /**

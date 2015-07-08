@@ -31,11 +31,13 @@ var PathUtils = require('./Path');
  * The Dispatch class is used to propogate events down the
  * scene graph.
  *
- * @class Dispatch
- * @param {Scene} context The context on which it operates
- * @constructor
+ * @class
+ *
+ * @param {FamousEngine} updater The updater to be exposed to potential nodes.
  */
-function Dispatch () {
+function Dispatch (updater) {
+    this._updater = updater;
+    
     this._nodes = {}; // a container for constant time lookup of nodes
 
     this._queue = []; // The queue is used for two purposes
@@ -61,7 +63,8 @@ function Dispatch () {
 Dispatch.prototype._setUpdater = function _setUpdater (updater) {
     this._updater = updater;
 
-    for (var key in this._nodes) this._nodes[key]._setUpdater(updater);
+    for (var key in this._nodes)
+        this._nodes[key]._setUpdater(updater);
 };
 
 /**
@@ -125,7 +128,6 @@ Dispatch.prototype.mount = function mount (path, node) {
     if (this._nodes[path])
         throw new Error('Dispatch: there is a node already registered at: ' + path);
 
-    node._setUpdater(this._updater);
     this._nodes[path] = node;
     var parentPath = PathUtils.parent(path);
 
@@ -137,6 +139,8 @@ Dispatch.prototype.mount = function mount (path, node) {
                 'Parent to path: ' + path +
                 ' doesn\'t exist at expected path: ' + parentPath
         );
+
+    node._setUpdater(this._updater);
 
     var children = node.getChildren();
     var components = node.getComponents();
@@ -407,4 +411,4 @@ function _splitTo (string, target) {
     return target;
 }
 
-module.exports = new Dispatch();
+module.exports = Dispatch;
