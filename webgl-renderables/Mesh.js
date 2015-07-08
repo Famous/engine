@@ -57,7 +57,7 @@ function Mesh (node, options) {
         positionOffset: null,
         normals: null,
         glossiness: {
-            factor: null,
+            strength: null,
             color: [0, 0, 0]
         }
     };
@@ -304,18 +304,18 @@ Mesh.prototype.setGlossiness = function setGlossiness(glossiness, specularColor)
     var hasSpecularColor = specularColor && specularColor.getNormalizedRGB;
 
     if (isMaterial) {
-        this.value.glossiness.factor = null;
+        this.value.glossiness.strength = null;
         this.value.expressions.glossiness = glossiness;
     }
     else {
         this.value.expressions.glossiness = null;
-        this.value.glossiness.factor = glossiness;
+        this.value.glossiness.strength = glossiness;
         var glossinessValue = this.value.glossiness.color;
         if (hasSpecularColor) {
             this.value.glossiness.color = specularColor;
             glossinessValue = this.value.glossiness.color.getNormalizedRGB();
         }
-        glossinessValue.push(this.value.glossiness.factor);
+        glossinessValue.push(this.value.glossiness.strength);
         glossiness = glossinessValue;
     }
 
@@ -334,7 +334,7 @@ Mesh.prototype.setGlossiness = function setGlossiness(glossiness, specularColor)
  *
  * @method
  *
- * @returns {MaterialExpress|Number} MaterialExpress or Number
+ * @returns {MaterialExpress|Object} MaterialExpression or Glossiness
  */
 Mesh.prototype.getGlossiness = function getGlossiness() {
     return this.value.expressions.glossiness || this.value.glossiness;
@@ -457,7 +457,7 @@ Mesh.prototype.onUpdate = function onUpdate() {
             this._node.sendDrawCommand('GL_UNIFORMS');
             this._node.sendDrawCommand('u_glossiness');
             var glossiness = this.value.glossiness.color.getNormalizedRGB();
-            glossiness.push(this.value.glossiness.factor);
+            glossiness.push(this.value.glossiness.strength);
             this._node.sendDrawCommand(glossiness);
             this._node.requestUpdateOnNextTick(this._id);
         }
@@ -657,7 +657,7 @@ Mesh.prototype.draw = function draw () {
 
     if (value.geometry != null) this.setGeometry(value.geometry);
     if (value.color != null) this.setBaseColor(value.color);
-    if (value.glossiness.factor != null) this.setGlossiness.apply(this, value.glossiness.factor);
+    if (value.glossiness.strength != null) this.setGlossiness.apply(this, value.glossiness.strength);
     if (value.drawOptions != null) this.setDrawOptions(value.drawOptions);
     if (value.flatShading != null) this.setFlatShading(value.flatShading);
 
