@@ -264,7 +264,7 @@ Camera.prototype.onUpdate = function onUpdate() {
  * @return {Camera} this
  */
 Camera.prototype.onTransformChange = function onTransformChange(transform) {
-    var a = transform;
+    var a = transform.local;
     this._viewDirty = true;
 
     if (!this._requestingUpdate) {
