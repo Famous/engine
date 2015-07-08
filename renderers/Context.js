@@ -144,7 +144,7 @@ Context.prototype.draw = function draw() {
 Context.prototype._initDOMRenderer = function _initDOMRenderer() {
     this._domRendererRootEl = document.createElement('div');
     this._rootEl.appendChild(this._domRendererRootEl);
-    this._domRendererRootEl.style.display = 'none';
+    this._domRendererRootEl.style.visibility = 'hidden';
 
     this._domRenderer = new DOMRenderer(
         this._domRendererRootEl,
@@ -233,7 +233,7 @@ Context.prototype.getRootSize = function getRootSize() {
  */
 Context.prototype.checkInit = function checkInit () {
     if (this._initDOM) {
-        this._domRendererRootEl.style.display = 'block';
+        this._domRendererRootEl.style.visibility = 'visible';
         this._initDOM = false;
     }
 };
