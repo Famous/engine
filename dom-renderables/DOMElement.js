@@ -28,6 +28,9 @@ var CallbackStore = require('../utilities/CallbackStore');
 var TransformSystem = require('../core/TransformSystem');
 var Commands = require('../core/Commands');
 var Size = require('../core/Size');
+var Component = require('../core/Component');
+
+var RENDER_SIZE = 2;
 
 /**
  * A DOMElement is a component that can be added to a Node with the
@@ -35,6 +38,7 @@ var Size = require('../core/Size');
  * to through their Nodes to the Compositor where they are acted upon.
  *
  * @class DOMElement
+ * @augments Component
  *
  * @param {Node} node                   The Node to which the `DOMElement`
  *                                      renderable should be attached to.
@@ -53,7 +57,11 @@ var Size = require('../core/Size');
  *                                      for DOM and WebGL layering.  On by default.
  */
 function DOMElement(node, options) {
-    if (!node) throw new Error('DOMElement must be instantiated on a node');
+    if (!node) throw new Error(
+        'DOMElement must be instantiated on a Node'
+    );
+
+    Component.call(this, node);
 
     this._changeQueue = [];
 
@@ -102,6 +110,9 @@ function DOMElement(node, options) {
     if (options.cutout === false) this.setCutoutState(options.cutout);
 }
 
+DOMElement.prototype = Object.create(Component.prototype);
+DOMElement.prototype.constructor = DOMElement;
+
 /**
  * Serializes the state of the DOMElement.
  *
@@ -149,7 +160,7 @@ DOMElement.prototype.onUpdate = function onUpdate () {
 
     }
 
-    this._requestingUpdate = false;
+    Component.prototype.onUpdate.call(this);
 };
 
 /**
@@ -438,21 +449,6 @@ DOMElement.prototype.onSizeModeChange = function onSizeModeChange(x, y, z) {
  */
 DOMElement.prototype.getRenderSize = function getRenderSize() {
     return this._renderSize;
-};
-
-/**
- * Method to have the component request an update from its Node
- *
- * @method
- * @private
- *
- * @return {undefined} undefined
- */
-DOMElement.prototype._requestUpdate = function _requestUpdate() {
-    if (!this._requestingUpdate) {
-        this._node.requestUpdate(this._id);
-        this._requestingUpdate = true;
-    }
 };
 
 /**

@@ -28,6 +28,7 @@ module.exports = {
     Channel: require('./Channel'),
     Clock: require('./Clock'),
     Commands: require('./Commands'),
+    Component: require('./Component'),
     Dispatch: require('./Dispatch'),
     Event: require('./Event'),
     FamousEngine: require('./FamousEngine'),

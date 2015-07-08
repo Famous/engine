@@ -735,11 +735,8 @@ Node.prototype.addComponent = function addComponent (component) {
         index = this._freedComponentIndicies.length ? this._freedComponentIndicies.pop() : this._components.length;
         this._components[index] = component;
 
-        if (this.isMounted() && component.onMount)
-            component.onMount(this, index);
-
-        if (this.isShown() && component.onShow)
-            component.onShow();
+        if (component.onAdd)
+            component.onAdd(this, index);
     }
 
     return index;
@@ -771,11 +768,9 @@ Node.prototype.removeComponent = function removeComponent (component) {
     var index = this._components.indexOf(component);
     if (index !== -1) {
         this._freedComponentIndicies.push(index);
-        if (this.isShown() && component.onHide)
-            component.onHide();
 
-        if (this.isMounted() && component.onDismount)
-            component.onDismount();
+        if (component.onRemove)
+            component.onRemove(this, index);
 
         this._components[index] = null;
     }
