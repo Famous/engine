@@ -96,52 +96,139 @@ test('Dispatch singleton', function (t) {
     });
 
     t.test('.dispatch method', function (t) {
-        var nodes = {
-            'path': new Node(),
-            'path/1': new Node(),
-            'path/1/2': new Node(),
-            'path/1/1': new Node(),
-            'path/1/2/3': new Node(),
-            'path/1/2/4': new Node()
-        };
-    
-        var received = [];
-    
-        function onReceive(actualEvent, actualPayload) {
-            t.equal(actualEvent, expectedEvent, 'Node should receive expected event');
-            t.equal(actualPayload, expectedPayload, 'Node should receive expected payload');
+        
+        var nodes;
+        
+        t.test('setup', function (t) {
+            nodes = {
+                'path': new Node(),
+                'path/1': new Node(),
+                'path/1/2': new Node(),
+                'path/1/1': new Node(),
+                'path/1/2/3': new Node(),
+                'path/1/2/4': new Node()
+            };
             
-            received.push(this.__path__);
-        }
-        
-        nodes.path.addChild(nodes['path/1']);
-        nodes['path/1'].addChild(nodes['path/1/2']);
-        nodes['path/1'].addChild(nodes['path/1/1']);
-        nodes['path/1/2'].addChild(nodes['path/1/2/3']);
-        nodes['path/1/2'].addChild(nodes['path/1/2/4']);
-    
-        for (var path in nodes) {
-            nodes[path].__path__ = path;
-            nodes[path].onReceive = onReceive;
-            Dispatch.mount(path, nodes[path]);
-        }
-        
-        var expectedEvent = 'event';
-        var expectedPayload = { some: 'payload' };
-    
-        Dispatch.dispatch('path/1', expectedEvent, expectedPayload);
+            nodes.path.addChild(nodes['path/1']);
+            nodes['path/1'].addChild(nodes['path/1/2']);
+            nodes['path/1'].addChild(nodes['path/1/1']);
+            nodes['path/1/2'].addChild(nodes['path/1/2/3']);
+            nodes['path/1/2'].addChild(nodes['path/1/2/4']);
 
-        t.equal(
-            received.indexOf('path/1'), -1,
-            'path/1 should not receive event dispatched via Dispatch.dispatch("path/1")'
-        );
+            for (var path in nodes) {
+                nodes[path].__path__ = path;
+                Dispatch.mount(path, nodes[path]);
+            }
+            
+            t.end();
+        });
         
-        t.deepEqual(
-            received, ['path/1/2', 'path/1/1', 'path/1/2/3', 'path/1/2/4'],
-            'Dispatch.dispatch should trigger event first on parent, then on children'
-        );
-    
-        t.end();
+        t.test('basic', function (t) {
+            
+            var received;
+            var expectedEvent;
+            var expectedPayload;
+            
+            t.test('setup', function (t) {
+                received = [];
+
+                expectedEvent = 'event';
+                expectedPayload = { some: 'payload' };
+
+                function onReceive(actualEvent, actualPayload) {
+                    t.equal(actualEvent, expectedEvent, 'Node should receive expected event');
+                    t.equal(actualPayload, expectedPayload, 'Node should receive expected payload');
+                    
+                    received.push(this.__path__);
+                }
+
+                for (var path in nodes) {
+                    nodes[path].onReceive = onReceive;
+                }
+                
+                t.end();
+            });
+            
+            t.test('exec', function (t) {
+                Dispatch.dispatch('path/1', expectedEvent, expectedPayload);
+
+                t.equal(
+                    received.indexOf('path/1'), -1,
+                    'path/1 should not receive event dispatched via Dispatch.dispatch("path/1")'
+                );
+                
+                t.deepEqual(
+                    received, ['path/1/2', 'path/1/1', 'path/1/2/3', 'path/1/2/4'],
+                    'Dispatch.dispatch should trigger event first on parent, then on children'
+                );
+                
+                t.end();
+            });
+            
+            t.test('teardown', function (t) {
+                for (var path in nodes) {
+                    nodes[path].onReceive = null;
+                }
+                
+                t.end();
+            });
+        });
+        
+        t.test('conflicting events', function (t) {
+            var received;
+            
+            t.test('setup', function (t) {
+                received = [];
+
+                function onReceive(event, payload) {
+                    received.push([this.__path__, event, payload]);
+                }
+
+                for (var path in nodes) {
+                    nodes[path].onReceive = onReceive;
+                }
+                
+                nodes['path/1/1'].onReceive = function (event, payload) {
+                    received.push([this.__path__, event, payload]);
+                    Dispatch.dispatch('path/1/2', 'event2', {payload: 2});
+                };
+                
+                t.end();
+            });
+            
+            t.test('exec', function (t) {
+                Dispatch.dispatch('path', 'event1', {payload: 1});
+                
+                t.equal(
+                    received.length, 7,
+                    'Dispatching an event while processing a previous event should result into the correct number of events being received by the nodes'
+                );
+                
+                t.deepEqual(
+                    received,
+                    [
+                        [ 'path/1', 'event1', { payload: 1 } ],
+                        [ 'path/1/2', 'event1', { payload: 1 } ],
+                        [ 'path/1/1', 'event1', { payload: 1 } ],
+                        [ 'path/1/2/3', 'event2', { payload: 2 } ],
+                        [ 'path/1/2/4', 'event2', { payload: 2 } ],
+                        [ 'path/1/2/3', 'event1', { payload: 1 } ],
+                        [ 'path/1/2/4', 'event1', { payload: 1 } ]
+                    ],
+                    'Dispatching the second event should traverse the scene graph in the correctly'
+                );
+                
+                t.end();
+            });
+            
+            t.test('teardown', function (t) {
+                for (var path in nodes) {
+                    nodes[path].onReceive = null;
+                }
+                
+                t.end();
+            });
+        });
     });
 
     t.test('.dispatchUIEvents method', function (t) {
