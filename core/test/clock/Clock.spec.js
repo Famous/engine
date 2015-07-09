@@ -14,10 +14,6 @@ test('Clock class', function(t) {
             return new Clock();
         }, 'Clock should be callable with new');
 
-        t.doesNotThrow(function () {
-            return new Clock();
-        }, 'Clock should be callable with new and another node as an argument');
-
         t.equal((new Clock()).constructor, Clock, 'Clock should be a constructor function');
 
         var node = new Clock();

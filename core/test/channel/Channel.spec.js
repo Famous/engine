@@ -24,10 +24,34 @@
 
 'use strict';
 
-var Channel = require('../Channel');
+var Channel = require('../../Channel');
+var api = require('./Channel.api');
 var test = require('tape');
 
 test('Channel', function(t) {
+
+    t.test('Channel constructor' , function(t) {
+        t.ok(Channel, 'There should be a node module');
+        t.equal(Channel.constructor, Function, 'Channel should be a function');
+
+        t.doesNotThrow(function () {
+            return new Channel();
+        }, 'Channel should be callable with new');
+
+        t.equal((new Channel()).constructor, Channel, 'Channel should be a constructor function');
+
+        var node = new Channel();
+
+        api.forEach(function (method) {
+            t.ok(
+                node[method] && node[method].constructor === Function,
+                'Channel should have a ' + method + ' method'
+            );
+        });
+
+        t.end();
+    });
+    
     t.test('Workerless mode', function(t) {
         t.test('sendMessage method', function(t) {
             t.plan(2);
