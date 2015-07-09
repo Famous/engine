@@ -385,9 +385,11 @@ test('Mesh', function(t) {
             'should be able to return the glossiness expression');
 
         var x = new MockColor();
-        mesh.setGlossiness(x, 10);
-        t.equal(mesh.getGlossiness()[0], x,
-            'should be able to return the glossiness value');
+        mesh.setGlossiness(10, x);
+        t.equal(mesh.getGlossiness().strength, 10,
+            'should be able to return the glossiness strength');
+        t.equal(mesh.getGlossiness().color, x,
+            'should be able to return the glossiness color');
 
         t.end();
     });
