@@ -55,15 +55,7 @@ test('Clock class', function(t) {
         
         t.end();
     });
-    
-    t.test('getFrame method', function(t) {
-        var clock = new Clock();
-        
-        // TODO
-        
-        t.end();
-    });
-    
+
     t.test('setTimeout method', function(t) {
 
         t.test('basic', function(t) {
