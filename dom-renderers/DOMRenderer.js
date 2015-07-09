@@ -478,6 +478,9 @@ DOMRenderer.prototype.insertEl = function insertEl (tagName) {
 
         this._insertElCallbackStore.trigger(this._path, this._target);
     }
+    else {
+        this._target.reset();
+    }
 };
 
 

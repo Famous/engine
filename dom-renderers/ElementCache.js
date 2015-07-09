@@ -58,6 +58,66 @@ function ElementCache (element, path) {
     this.listeners = {};
     this.preventDefault = {};
     this.subscribe = {};
+
+    this._resetValues();
+}
+
+/**
+ * Resets the transform matrices to the identity matrix and size definitions to
+ * 0.
+ *
+ * @method
+ *
+ * @return {undefined} undefined
+ */
+ElementCache.prototype._resetValues = function _resetValues() {
+    this.content = null;
+
+    this.explicitHeight = false;
+    this.explicitWidth = false;
+
+    resetSize(this.size);
+    resetSize(this.postRenderSize);
+};
+
+/**
+ * Resets the underlying element's listeners, unsubscribes from all events and
+ * no longer prevents the browser's default action on any event.
+ *
+ * @method  reset
+ *
+ * @return {undefined} undefined
+ */
+ElementCache.prototype.reset = function reset () {
+    this._resetValues();
+
+    var key;
+    var listener;
+
+    for (key in this.listeners) {
+        listener = this.listeners[key];
+        this.element.removeEventListener(key, listener);
+    }
+
+    for (key in this.preventDefault)
+        this.preventDefault[key] = false;
+
+    for (key in this.subscribe)
+        this.subscribe[key] = false;
+};
+
+/**
+ * Resets the passed in size to 0.
+ *
+ * @private
+ *
+ * @param {Array} size  The Size array.
+ * @return {undefined}  undefined
+ */
+function resetSize(size) {
+    size[0] = 0;
+    size[1] = 0;
+    size[2] = 0;
 }
 
 module.exports = ElementCache;
