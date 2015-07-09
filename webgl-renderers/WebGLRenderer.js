@@ -550,6 +550,7 @@ WebGLRenderer.prototype.draw = function draw(renderState) {
  */
 WebGLRenderer.prototype.drawMeshes = function drawMeshes() {
     var gl = this.gl;
+    var loading;
     var buffers;
     var mesh;
 
@@ -571,7 +572,10 @@ WebGLRenderer.prototype.drawMeshes = function drawMeshes() {
         if (!buffers) continue;
 
         var j = mesh.textures.length;
-        while (j--) this.textureManager.bindTexture(mesh.textures[j]);
+
+        while (j--) loading = loading || this.textureManager.bindTexture(mesh.textures[j]);
+
+        if (loading) continue;
 
         if (mesh.options) this.handleOptions(mesh.options, mesh);
 

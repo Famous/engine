@@ -97,7 +97,10 @@ TextureManager.prototype.register = function register(input, slot) {
     if (!texture) {
 
         texture = new Texture(this.gl, options);
-        texture.setImage(this._checkerboard);
+
+        if (options.debug) {
+            texture.setImage(this._checkerboard);
+        }
 
         // Add texture to registry
 
@@ -108,26 +111,27 @@ TextureManager.prototype.register = function register(input, slot) {
             texture: texture,
             source: source,
             id: textureId,
-            slot: slot
+            slot: slot,
+            debug: options.debug
         };
 
         // Handle array
 
         if (Array.isArray(source) || source instanceof Uint8Array || source instanceof Float32Array) {
+            spec.isLoaded = true;
             this.bindTexture(textureId);
             texture.setArray(source);
-            spec.isLoaded = true;
         }
 
         // Handle video
 
         else if (source instanceof HTMLVideoElement) {
             source.addEventListener('loadeddata', function() {
-                _this.bindTexture(textureId);
-                texture.setImage(source);
-
                 spec.isLoaded = true;
                 spec.source = source;
+
+                _this.bindTexture(textureId);
+                texture.setImage(source);
             });
         }
 
@@ -135,11 +139,11 @@ TextureManager.prototype.register = function register(input, slot) {
 
         else if (typeof source === 'string') {
             loadImage(source, function (img) {
-                _this.bindTexture(textureId);
-                texture.setImage(img);
-
                 spec.isLoaded = true;
                 spec.source = img;
+
+                _this.bindTexture(textureId);
+                texture.setImage(img);
             });
         }
     }
@@ -187,6 +191,8 @@ function loadImage (input, callback) {
  */
 TextureManager.prototype.bindTexture = function bindTexture(id) {
     var spec = this.registry[id];
+
+    if (! spec.isLoaded && ! spec.debug) return true;
 
     if (this._activeTexture !== spec.slot) {
         this.gl.activeTexture(this.gl.TEXTURE0 + spec.slot);
