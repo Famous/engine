@@ -220,8 +220,8 @@ Context.prototype._initWebGLRenderer = function _initWebGLRenderer() {
  */
 Context.prototype.getRootSize = function getRootSize() {
     return [
-        this._rootEl.offsetWidth,
-        this._rootEl.offsetHeight
+        this._domRendererRootEl.offsetWidth,
+        this._domRendererRootEl.offsetHeight
     ];
 };
 
