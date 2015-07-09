@@ -79,10 +79,10 @@ test('FamousEngine', function(t) {
 
     t.test('setup onmessage mock', function(t) {
         FamousEngine.getChannel().onmessage = function() {};
-        t.comment(
-            'The Channel#onmessage method is being shared across tests. It ' +
-            'is being set to a noop in this setup.'
-        );
+
+        // The Channel#onmessage method is being shared across tests. It is
+        // being set to a noop in this setup.
+
         t.end();
     });
 
