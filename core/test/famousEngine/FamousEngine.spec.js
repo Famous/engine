@@ -25,10 +25,11 @@
 'use strict';
 
 var test = require('tape');
-var FamousEngine = require('../FamousEngine');
-var Clock = require('../Clock');
-var Scene = require('../Scene');
-var Commands = require('../Commands');
+var FamousEngine = require('../../FamousEngine');
+var Clock = require('../../Clock');
+var Scene = require('../../Scene');
+var Commands = require('../../Commands');
+var api = require('./FamousEngine.api');
 
 function onUpdateWrap(fn) {
     return {
@@ -37,14 +38,21 @@ function onUpdateWrap(fn) {
 }
 
 test('FamousEngine', function(t) {
-    t.test('should be a singleton', function(t) {
-        t.plan(1);
-        t.equal(typeof FamousEngine, 'object', 'FamousEngine should be a singleton');
+    t.test('should conform to its public api', function (t) {
+
+        api.forEach(function (method) {
+            t.ok(FamousEngine[method], 'FamousEngine should have a ' +
+                                    method + ' method');
+
+            t.equal(FamousEngine[method].constructor, Function, 'FamousEngine.'
+                                                 + method + ' should be a function');
+        });
+
+        t.end();
     });
 
     t.test('requestUpdate method (basic)', function(t) {
-        t.plan(4);
-        t.equal(typeof FamousEngine.requestUpdate, 'function', 'FamousEngine.requestUpdate should be a function');
+        t.plan(3);
 
         FamousEngine.getChannel().onmessage = function(commands) {
             t.deepEqual(
@@ -115,7 +123,6 @@ test('FamousEngine', function(t) {
     });
 
     t.test('requestUpdateOnNextTick method', function(t) {
-        t.equal(typeof FamousEngine.requestUpdateOnNextTick, 'function', 'FamousEngine.requestUpdateOnNextTick should be a function');
         var executionOrder = [];
         FamousEngine.requestUpdateOnNextTick(onUpdateWrap(function() {
             executionOrder.push(0);
@@ -138,7 +145,6 @@ test('FamousEngine', function(t) {
     });
 
     t.test('postMessage method (FRAME command)', function(t) {
-        t.equal(typeof FamousEngine.getChannel().postMessage, 'function', 'FamousEngine.getChannel().postMessage should be a function');
         FamousEngine.getChannel().postMessage([Commands.FRAME, 123]);
         t.equal(FamousEngine.getClock().now(), 123);
         FamousEngine.getChannel().postMessage([Commands.FRAME, 124, Commands.FRAME, 125]);
@@ -150,7 +156,6 @@ test('FamousEngine', function(t) {
     });
 
     t.test('createScene method', function(t) {
-        t.equal(typeof FamousEngine.createScene, 'function', 'FamousEngine.createScene should be a function');
         var scene0 = FamousEngine.createScene('.div-0');
         var scene1 = FamousEngine.createScene('.div-1');
 
@@ -165,14 +170,7 @@ test('FamousEngine', function(t) {
         t.end();
     });
 
-    t.test('addScene method', function(t) {
-        t.equal(typeof FamousEngine.addScene, 'function', 'FamousEngine.addScene should be a function');
-        t.end();
-    });
-
     t.test('removeScene method', function(t) {
-        t.equal(typeof FamousEngine.removeScene, 'function', 'FamousEngine.removeScene should be a function');
-
         var scene0 = FamousEngine.createScene('.div-0');
 
         FamousEngine.removeScene(scene0);
@@ -186,15 +184,15 @@ test('FamousEngine', function(t) {
     });
 
     t.test('getClock method', function(t) {
-        t.plan(3);
-        t.equal(typeof FamousEngine.getClock, 'function', 'FamousEngine.getClock should be a function');
+        t.plan(2);
+
         t.equal(FamousEngine.getClock().constructor, Clock, 'FamousEngine.getClock should return clock instance');
         t.equal(FamousEngine.getClock(), FamousEngine.getClock(), 'FamousEngine.getClock should return clock singleton');
     });
 
     t.test('step method', function(t) {
-        t.plan(3);
-        t.equal(typeof FamousEngine.step, 'function', 'FamousEngine.step should be a function');
+        t.plan(2);
+
         FamousEngine.message('m');
         FamousEngine.message('and');
         FamousEngine.message('ms');
@@ -214,10 +212,8 @@ test('FamousEngine', function(t) {
     });
 
     t.test('handleFrame method', function(t) {
-        t.plan(2);
-        t.equal(typeof FamousEngine.handleFrame, 'function', 'FamousEngine.handleFrame should be a function');
+        t.plan(1);
 
-        // complete received command would be ['FRAME', 10]
         FamousEngine.handleFrame([10]);
         t.equal(FamousEngine.getClock().getTime(), 10, 'FamousEngine.handleFrame should update internal clock');
     });

@@ -1,0 +1,22 @@
+module.exports = [
+    'init',
+    'setChannel',
+    'getChannel',
+    '_update',
+    'requestUpdate',
+    'requestUpdateOnNextTick',
+    'handleMessage',
+    'handleWith',
+    'handleFrame',
+    'step',
+    'getContext',
+    'getClock',
+    'message',
+    'createScene',
+    'addScene',
+    'removeScene',
+    'startRenderLoop',
+    'stopRenderLoop',
+    'startEngine',
+    'stopEngine'
+];
