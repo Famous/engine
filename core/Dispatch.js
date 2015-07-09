@@ -249,6 +249,12 @@ Dispatch.prototype.show = function show (path) {
 
     if (node.onShow) node.onShow();
 
+    var components = node.getComponents();
+    for (var i = 0, len = components.length ; i < len ; i++)
+        if (components[i] && components[i].onShow)
+            components[i].onShow();
+
+
     this.addChildrenToQueue(node);
     var child;
 
@@ -276,6 +282,12 @@ Dispatch.prototype.hide = function hide (path) {
         );
 
     if (node.onHide) node.onHide();
+
+    var components = node.getComponents();
+    for (var i = 0, len = components.length ; i < len ; i++)
+        if (components[i] && components[i].onHide)
+            components[i].onHide();
+
 
     this.addChildrenToQueue(node);
     var child;
