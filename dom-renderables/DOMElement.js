@@ -72,8 +72,8 @@ function DOMElement(node, options) {
     this._tagName = options && options.tagName ? options.tagName : 'div';
     this._renderSize = [0, 0, 0];
 
-    this._id = node ? node.addComponent(this) : null;
     this._node = node;
+    this._id = node ? node.addComponent(this) : null;
 
     this._callbacks = new CallbackStore();
 
@@ -449,7 +449,7 @@ DOMElement.prototype.getRenderSize = function getRenderSize() {
  * @return {undefined} undefined
  */
 DOMElement.prototype._requestUpdate = function _requestUpdate() {
-    if (!this._requestingUpdate) {
+    if (!this._requestingUpdate && this._id) {
         this._node.requestUpdate(this._id);
         this._requestingUpdate = true;
     }
