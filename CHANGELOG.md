@@ -1,5 +1,60 @@
 # Famous Rendering Engine Changelog
 
+## 0.7.0
+
+### Breaking Changes
+
+- Make names of update methods of systems consistent d530a5ca612c1db30cfaa9df7800dffe35e2b674
+
+### Bug Fixes
+
+- No longer rely on id returned by Node#addComponent f345c5c0faa1dfef5e7d0023f7431ee4f47c2046
+- Set DOMElement#_node before _requestUpdate e1eaec2128153aa1ca0fbf658250917de55fe3c7
+- rename time material uniform ae4bf986b59119492ddd34e5229399f9d7d2cb73
+- move traverse to material 73256911df5ee9bb7a8818ba468229e4d0b7baf0
+- #151, materials now update meshes on uniform setting. [#95480122] 4648641e47f068b04fd7f2b48b949823a330e7f2
+- Show nodes by default a158d08b31c00cf431a831eb91766d7980e129f9
+- fix render size bug that was caused by the frist frame being display none to get rid of the bad frame dd29c7009f29d345b43dbe1c5bb6f5c90d28f0e3
+- 361 ed1cd18cee4259295934d6819c84f940cf5cb413
+- Remove duplicate Debug d3e970ad5eca2ba833ea2b8dc5c5cdadbbb90b81
+- Fix onReceive bug when removing child while receiving event fdb3b1b7cbfee9506dbbba08ad3240862997d73d
+- No longer throw error in Node#removeChild e21c094f4080eb3d9071216bcb741bd0b6bdd01c
+- undefined i 4fe6dfc38bece5727ecfe6c29080dc118fa24b2f
+- typo 7f06479d83c57042f5bfecc6b55d9251fc57fba2
+- update breaking reference to the node's sizeMode c4580714da1d5a142a428dfc215dc1094d26a4bf
+- Make Node#getChildren() return array without holes [#96509964] 9525278b0a7cc804a7f26de31c888a9e1e705a31
+- Remove redundant DOMRenderer#unsubscribe function 5c85025ac8ef00ca9a1317f439bcdac73f2b22c3
+- Fix UNSUBSCRIBE in DOMElement aa994fa6ba85a92adf7fed89312f1b8e0d4b7afe
+- no default components on scene 352933f60ba27e03ffd5284b204c98ee905b48ab
+- dom-element checks for sizeMode onMount 6b2a575678a2c3dcf2ac45500c594c91b7730fb6
+- opt-out of default components rather than opt-in 3b63e3bb2f378ac2fa728b041d0077a91ed2c013
+- multiple updates in node 3129bb427e465d1e44e68e6373ce688336ac8090
+- can calculate world matrix without setting breakpoint f6b1dde0ce34d0e952b6c36d77ee30d6387bcbc9
+- no default components on Scene 6e732fcecb8c6d2344019a6f2d15802883918d62
+- dom element checks for sizemode on mount 5c7bdc6dcbb68c9a42eb3c831f479b211d881172
+- opt-out of default components 8dc6a4e8c130679c28c55e5c282000d166839c97
+- multiple updates in Node e4476319688ccd7b2ec99e0b35b7b2d4c0885fab
+- add contextmenu to eventmap #290 076d913a43a3642c11bca118a10a87a10de482b0
+
+### Features
+
+- Add ElementCache lifecycle events 7f62062057db688d604aa9ecd5ca21581170e516
+- added more commands to pretty printer 66168c82bfc94209c4d89005c91b186917920a60
+- added more commands to the pretty printer 462ea1276773ca5340478be32b6bc07b293e72dc
+- started adding commands to the command printer 1f2757ab05162c4997f9359a729219f57dbf1195
+
+### Testing and Tooling
+
+- Remove t.comment f3779b182cbf0b00bcd8c6c5819da8ffef4b8083
+- Run FamousEngine tests 471886ae08590c63bc1b8e46e5459ef3ca9f636c
+- Run Event tests 08d7dd21e3a0b0860e15850cd3449a5b0481a844
+- Test Channel 5fd46760ff35636f2acadb503d7b9979af2e32bb
+- Test Clock ba20fd65ae097d63f2894d5f52f98f5ac0ba508f
+- Add test-case for man in the middle insertion cf631efa299f073571d01a85c8d75e874450ddc0
+- Fix Node.api f732d50238a1fdcdbf6c12cb689d05ae89df4a47
+- Test Node, Node#getChildren, Node#getRawChildren 007a93255ec70a669c44f76412400b3e0797ca9d
+
+
 ## 0.6.2
 
 ### Bug Fixes
