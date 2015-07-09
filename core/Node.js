@@ -829,7 +829,7 @@ Node.prototype.removeUIEvent = function removeUIEvent (eventName) {
  *
  * @param {String} eventName the name of the event
  *
- * @return {undefined} undefined
+ * @return {Node} this
  */
 Node.prototype.addUIEvent = function addUIEvent (eventName) {
     var UIEvents = this.getUIEvents();
@@ -844,6 +844,8 @@ Node.prototype.addUIEvent = function addUIEvent (eventName) {
             if (component && component.onAddUIEvent) component.onAddUIEvent(eventName);
         }
     }
+    
+    return this;
 };
 
 /**
