@@ -73,7 +73,7 @@ function DOMElement(node, options) {
     this._renderSize = [0, 0, 0];
 
     this._node = node;
-    this._id = node ? node.addComponent(this) : null;
+    if (node) node.addComponent(this);
 
     this._callbacks = new CallbackStore();
 
