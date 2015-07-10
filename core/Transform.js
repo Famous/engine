@@ -24,6 +24,9 @@
 
 'use strict';
 
+var glMatrix = require('gl-matrix');
+var mat44 = glMatrix.mat4;
+
 var QUAT = [0, 0, 0, 1];
 var ONES = [1, 1, 1];
 
@@ -464,7 +467,7 @@ Transform.prototype.calculateWorldMatrix = function calculateWorldMatrix () {
     while (nearestBreakPoint && !nearestBreakPoint.isBreakPoint())
         nearestBreakPoint = nearestBreakPoint.parent;
 
-    if (nearestBreakPoint) return multiply(this.global, nearestBreakPoint.getWorldTransform(), this.local);
+    if (nearestBreakPoint) return mat44.multiply(this.global, nearestBreakPoint.getWorldTransform(), this.local);
     else {
         for (var i = 0; i < 16 ; i++) this.global[i] = this.local[i];
         return false;
@@ -690,94 +693,6 @@ function fromNodeWithParent (node, transform) {
         t30 !== target[12] ||
         t31 !== target[13] ||
         t32 !== target[14]) changed |= Transform.LOCAL_CHANGED;
-
-    return changed;
-}
-
-/**
- * private method to multiply two transforms.
- *
- * @method
- *
- * @param {Array} out The array to write the result to
- * @param {Array} a the left hand transform
- * @param {Array} b the right hand transform
- *
- * @return {undefined} undefined
- */
-function multiply (out, a, b) {
-    var a00 = a[0], a01 = a[1], a02 = a[2],
-        a10 = a[4], a11 = a[5], a12 = a[6],
-        a20 = a[8], a21 = a[9], a22 = a[10],
-        a30 = a[12], a31 = a[13], a32 = a[14];
-
-    var changed = false;
-    var res;
-
-    // Cache only the current line of the second matrix
-    var b0  = b[0], b1 = b[1], b2 = b[2], b3 = b[3];
-
-    res = b0*a00 + b1*a10 + b2*a20 + b3*a30;
-    changed = changed ? changed : out[0] === res;
-    out[0] = res;
-
-    res = b0*a01 + b1*a11 + b2*a21 + b3*a31;
-    changed = changed ? changed : out[1] === res;
-    out[1] = res;
-
-    res = b0*a02 + b1*a12 + b2*a22 + b3*a32;
-    changed = changed ? changed : out[2] === res;
-    out[2] = res;
-
-    out[3] = 0;
-
-    b0 = b[4]; b1 = b[5]; b2 = b[6]; b3 = b[7];
-
-    res = b0*a00 + b1*a10 + b2*a20 + b3*a30;
-    changed = changed ? changed : out[4] === res;
-    out[4] = res;
-
-    res = b0*a01 + b1*a11 + b2*a21 + b3*a31;
-    changed = changed ? changed : out[5] === res;
-    out[5] = res;
-
-    res = b0*a02 + b1*a12 + b2*a22 + b3*a32;
-    changed = changed ? changed : out[6] === res;
-    out[6] = res;
-
-    out[7] = 0;
-
-    b0 = b[8]; b1 = b[9]; b2 = b[10]; b3 = b[11];
-
-    res = b0*a00 + b1*a10 + b2*a20 + b3*a30;
-    changed = changed ? changed : out[8] === res;
-    out[8] = res;
-
-    res = b0*a01 + b1*a11 + b2*a21 + b3*a31;
-    changed = changed ? changed : out[9] === res;
-    out[9] = res;
-
-    res = b0*a02 + b1*a12 + b2*a22 + b3*a32;
-    changed = changed ? changed : out[10] === res;
-    out[10] = res;
-
-    out[11] = 0;
-
-    b0 = b[12]; b1 = b[13]; b2 = b[14]; b3 = b[15];
-
-    res = b0*a00 + b1*a10 + b2*a20 + b3*a30;
-    changed = changed ? changed : out[12] === res;
-    out[12] = res;
-
-    res = b0*a01 + b1*a11 + b2*a21 + b3*a31;
-    changed = changed ? changed : out[13] === res;
-    out[13] = res;
-
-    res = b0*a02 + b1*a12 + b2*a22 + b3*a32;
-    changed = changed ? changed : out[14] === res;
-    out[14] = res;
-
-    out[15] = 1;
 
     return changed;
 }

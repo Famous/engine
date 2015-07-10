@@ -43,12 +43,13 @@ var TYPES = {
     2: 'vec2 ',
     3: 'vec3 ',
     4: 'vec4 ',
+    9: 'mat3 ',
     16: 'mat4 '
 };
 
 var inputTypes = {
     u_baseColor: 'vec4',
-    u_normals: 'vert',
+    u_normals: 'vec3',
     u_glossiness: 'vec4',
     u_positionOffset: 'vert'
 };
@@ -65,9 +66,9 @@ var masks =  {
  */
 var uniforms = keyValueToArrays({
     u_perspective: identityMatrix,
-    u_view: identityMatrix,
+    u_mvMatrix: identityMatrix,
     u_resolution: [0, 0, 0],
-    u_transform: identityMatrix,
+    u_normalMatrix: [0, 0, 0, 0, 0, 0, 0, 0, 0],
     u_size: [1, 1, 1],
     u_time: 0,
     u_opacity: 1,
@@ -89,7 +90,8 @@ var uniforms = keyValueToArrays({
 var attributes = keyValueToArrays({
     a_pos: [0, 0, 0],
     a_texCoord: [0, 0],
-    a_normals: [0, 0, 0]
+    a_normals: [0, 0, 0],
+    a_tangent: [0, 0, 0]
 });
 
 /**
@@ -99,7 +101,8 @@ var varyings = keyValueToArrays({
     v_textureCoordinate: [0, 0],
     v_normal: [0, 0, 0],
     v_position: [0, 0, 0],
-    v_eyeVector: [0, 0, 0]
+    v_eyeVector: [0, 0, 0],
+    v_tangent: [0, 0, 0]
 });
 
 /**

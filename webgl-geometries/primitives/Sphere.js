@@ -52,13 +52,26 @@ function ParametricSphere (options) {
         true
     );
 
+    var vertices = buffers.vertices,
+        indices = buffers.indices,
+        textureCoords = GeometryHelper.getSpheroidUV(buffers.vertices),
+        normals = GeometryHelper.getSpheroidNormals(buffers.vertices);
+        
+    var buffers = [
+        { name: 'a_pos', data: buffers.vertices },
+        { name: 'a_texCoord', data: textureCoords, size: 2 },
+        { name: 'a_normals', data: normals },
+        { name: 'indices', data: buffers.indices, size: 1 }
+    ];
+
+    buffers.push({
+        name: 'a_tangent',
+        data: GeometryHelper.computeTangents(vertices, indices, normals, textureCoords),
+        size: 3
+    });
+
     return new Geometry({
-        buffers: [
-            { name: 'a_pos', data: buffers.vertices },
-            { name: 'a_texCoord', data: GeometryHelper.getSpheroidUV(buffers.vertices), size: 2 },
-            { name: 'a_normals', data: GeometryHelper.getSpheroidNormals(buffers.vertices) },
-            { name: 'indices', data: buffers.indices, size: 1 }
-        ]
+        buffers: buffers
     });
 }
 

@@ -49,6 +49,7 @@
     "uglify-js": "^2.4.17"
   },
   "dependencies": {
+    "gl-matrix": "^2.3.1",
     "glslify": "^2.0.0"
   },
   "browserify": {
