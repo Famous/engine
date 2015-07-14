@@ -125,6 +125,7 @@ Mesh.prototype.setGeometry = function setGeometry (geometry, options) {
     if (this._initialized) {
         if (this._node) {
             var i = this.value.geometry.spec.invalidations.length;
+            if (i) this._requestUpdate();
             while (i--) {
                 this.value.geometry.spec.invalidations.pop();
                 this._changeQueue.push(Commands.GL_BUFFER_DATA);
@@ -134,7 +135,6 @@ Mesh.prototype.setGeometry = function setGeometry (geometry, options) {
                 this._changeQueue.push(this.value.geometry.spec.bufferSpacings[i]);
                 this._changeQueue.push(this.value.geometry.spec.dynamic);
             }
-            if (i) this._requestUpdate();
         }
     }
     return this;
@@ -680,20 +680,19 @@ function addMeshToMaterial(mesh, material, name) {
     var shouldRemove = true;
     var len = material.inputs;
 
-    while(len--) 
+    while(len--)
         addMeshToMaterial(mesh, material.inputs[len], name);
 
     len = INPUTS.length;
-    
-    while (len--) 
+
+    while (len--)
         shouldRemove |= (name !== INPUTS[len] && previous !== expressions[INPUTS[len]]);
 
     if (shouldRemove)
         material.meshes.splice(material.meshes.indexOf(previous), 1);
-         
+
     if (material.meshes.indexOf(mesh) === -1)
         material.meshes.push(mesh);
 }
 
 module.exports = Mesh;
-
