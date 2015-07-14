@@ -38,7 +38,7 @@ var Transform = require('./Transform');
  *
  * A Node is either mounted or unmounted. Unmounted nodes are detached from the
  * scene graph. Unmounted nodes have no parent node, while each mounted node has
- * exactly one parent. Nodes have an arbitary number of children, which can be
+ * exactly one parent. Nodes have an arbitrary number of children, which can be
  * dynamically added using {@link Node#addChild}.
  *
  * Each Node has an arbitrary number of `components`. Those components can
@@ -844,7 +844,7 @@ Node.prototype.addUIEvent = function addUIEvent (eventName) {
             if (component && component.onAddUIEvent) component.onAddUIEvent(eventName);
         }
     }
-    
+
     return this;
 };
 
