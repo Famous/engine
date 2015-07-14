@@ -48,7 +48,7 @@ test('Primitives', function(t) {
         t.ok(primitive instanceof Geometry, 'should be an instance of a static geometry');
 
         t.notEquals(primitive.spec.bufferNames.indexOf('a_texCoord'), -1, 'should contain a texCoord buffer');
-        t.notEquals(primitive.spec.bufferNames.indexOf('a_normals'), -1, 'should contain a normal buffer');
+        t.notEquals(primitive.spec.bufferNames.indexOf('a_normal'), -1, 'should contain a normal buffer');
         t.notEquals(primitive.spec.bufferNames.indexOf('a_pos'), -1, 'should contain a pos buffer');
 
         if (name !== 'Circle') {

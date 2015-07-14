@@ -151,13 +151,13 @@ test('DynamicGeometry', function(t) {
         geometry.setNormals(vertexNormals);
 
         t.deepEquals(
-            geometry.spec.bufferValues[geometry.spec.bufferNames.indexOf('a_normals')],
+            geometry.spec.bufferValues[geometry.spec.bufferNames.indexOf('a_normal')],
             vertexNormals,
             'Should set vertex data to the "normal" attribute of the geometry'
         );
 
         t.equals(
-            geometry.spec.bufferSpacings[geometry.spec.bufferNames.indexOf('a_normals')],
+            geometry.spec.bufferSpacings[geometry.spec.bufferNames.indexOf('a_normal')],
             3,
             'Should set buffer spacing to 3 for normal attribute'
         );
