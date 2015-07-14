@@ -95,6 +95,21 @@ OpacitySystem.prototype.makeBreakPointAt = function makeBreakPointAt (path) {
 };
 
 /**
+ * Method that will make the opacity at this location calculate a world opacity.
+ *
+ * @method
+ *
+ * @param {String} path The path at which to make the opacity calculate a world matrix
+ *
+ * @return {undefined} undefined
+ */
+OpacitySystem.prototype.makeCalculateWorldOpacityAt = function makeCalculateWorldOpacityAt (path) {
+        var opacity = this.pathStore.get(path);
+        if (!opacity) throw new Error('No opacity opacity at path: ' + path);
+        opacity.setCalculateWorldOpacity();
+};
+
+/**
  * Returns the instance of the opacity class associated with the given path,
  * or undefined if no opacity is associated.
  *

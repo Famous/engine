@@ -509,7 +509,7 @@ Mesh.prototype.onMount = function onMount (node, id) {
     this._id = id;
 
     TransformSystem.makeCalculateWorldMatrixAt(node.getLocation());
-    OpacitySystem.makeBreakPointAt(node.getLocation());
+    OpacitySystem.makeCalculateWorldOpacityAt(node.getLocation());
 
     this.draw();
 };
