@@ -121,7 +121,7 @@ function Program(gl, options) {
     this.options = options || {};
 
     this.registeredMaterials = {};
-    this.cachedUniforms  = {};
+    this.cachedUniforms = {};
     this.uniformTypes = [];
 
     this.definitionVec4 = [];
@@ -400,12 +400,10 @@ Program.prototype.setUniforms = function (uniformNames, uniformValue) {
 
         // Check if the value is already set for the
         // given uniform.
-
         if (this.uniformIsCached(name, value)) continue;
 
         // Determine the correct function and pass the uniform
         // value to WebGL.
-
         if (!this.uniformTypes[name]) {
             this.uniformTypes[name] = this.getUniformTypeFromValue(value);
         }
@@ -413,11 +411,11 @@ Program.prototype.setUniforms = function (uniformNames, uniformValue) {
         // Call uniform setter function on WebGL context with correct value
 
         switch (this.uniformTypes[name]) {
-            case 'uniform4fv':  gl.uniform4fv(location, value); break;
-            case 'uniform3fv':  gl.uniform3fv(location, value); break;
-            case 'uniform2fv':  gl.uniform2fv(location, value); break;
-            case 'uniform1fv':  gl.uniform1fv(location, value); break;
-            case 'uniform1f' :  gl.uniform1f(location, value); break;
+            case 'uniform4fv': gl.uniform4fv(location, value); break;
+            case 'uniform3fv': gl.uniform3fv(location, value); break;
+            case 'uniform2fv': gl.uniform2fv(location, value); break;
+            case 'uniform1fv': gl.uniform1fv(location, value); break;
+            case 'uniform1f' : gl.uniform1f(location, value); break;
             case 'uniformMatrix3fv': gl.uniformMatrix3fv(location, false, value); break;
             case 'uniformMatrix4fv': gl.uniformMatrix4fv(location, false, value); break;
         }
