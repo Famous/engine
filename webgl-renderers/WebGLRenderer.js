@@ -343,8 +343,8 @@ WebGLRenderer.prototype.setCutoutUniform = function setCutoutUniform(path, unifo
  * @param {String} path Path used as id of target mesh
  * @param {Object} options Map of draw options for mesh
  *
- * @return {undefined} undefined
-**/
+ * @return {WebGLRenderer} this
+ */
 WebGLRenderer.prototype.setMeshOptions = function(path, options) {
     var mesh = this.meshRegistry[path] || this.createMesh(path);
 
@@ -362,8 +362,8 @@ WebGLRenderer.prototype.setMeshOptions = function(path, options) {
  * @param {Number} g green channel
  * @param {Number} b blue channel
  *
- * @return {undefined} undefined
-**/
+ * @return {WebGLRenderer} this
+ */
 WebGLRenderer.prototype.setAmbientLightColor = function setAmbientLightColor(path, r, g, b) {
     this.ambientLightColor[0] = r;
     this.ambientLightColor[1] = g;
@@ -381,8 +381,8 @@ WebGLRenderer.prototype.setAmbientLightColor = function setAmbientLightColor(pat
  * @param {Number} y y position
  * @param {Number} z z position
  *
- * @return {undefined} undefined
-**/
+ * @return {WebGLRenderer} this
+ */
 WebGLRenderer.prototype.setLightPosition = function setLightPosition(path, x, y, z) {
     var light = this.lightRegistry[path] || this.createLight(path);
 
@@ -402,8 +402,8 @@ WebGLRenderer.prototype.setLightPosition = function setLightPosition(path, x, y,
  * @param {Number} g green channel
  * @param {Number} b blue channel
  *
- * @return {undefined} undefined
-**/
+ * @return {WebGLRenderer} this
+ */
 WebGLRenderer.prototype.setLightColor = function setLightColor(path, r, g, b) {
     var light = this.lightRegistry[path] || this.createLight(path);
 
@@ -422,8 +422,8 @@ WebGLRenderer.prototype.setLightColor = function setLightColor(path, r, g, b) {
  * @param {String} name Name that the rendering input the material is bound to
  * @param {Object} material Material spec
  *
- * @return {undefined} undefined
-**/
+ * @return {WebGLRenderer} this
+ */
 WebGLRenderer.prototype.handleMaterialInput = function handleMaterialInput(path, name, material) {
     var mesh = this.meshRegistry[path] || this.createMesh(path);
     material = compileMaterial(material, mesh.textures.length);
@@ -459,7 +459,7 @@ WebGLRenderer.prototype.handleMaterialInput = function handleMaterialInput(path,
  * @param {Boolean} dynamic Whether geometry is dynamic
  *
  * @return {undefined} undefined
-**/
+ */
 WebGLRenderer.prototype.setGeometry = function setGeometry(path, geometry, drawType, dynamic) {
     var mesh = this.meshRegistry[path] || this.createMesh(path);
 
@@ -480,7 +480,7 @@ WebGLRenderer.prototype.setGeometry = function setGeometry(path, geometry, drawT
  * @param {Array} uniformValue Value of uniform data
  *
  * @return {undefined} undefined
-**/
+ */
 WebGLRenderer.prototype.setMeshUniform = function setMeshUniform(path, uniformName, uniformValue) {
     var mesh = this.meshRegistry[path] || this.createMesh(path);
 
