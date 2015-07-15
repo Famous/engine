@@ -174,6 +174,8 @@ DOMRenderer.prototype.allowDefault = function allowDefault(type) {
 DOMRenderer.prototype._listen = function _listen(type) {
     this._assertTargetLoaded();
 
+    var capture;
+
     if (!this._target.listeners[type] && !this._root.listeners[type]) {
         var container;
 
@@ -182,9 +184,10 @@ DOMRenderer.prototype._listen = function _listen(type) {
         }
         else {
             container = this._target.content ? this._target.content : this._target.element;
+            capture = true;
         }
         this._target.listeners[type] = this._boundTriggerEvent;
-        container.addEventListener(type, this._boundTriggerEvent);
+        container.addEventListener(type, this._boundTriggerEvent, capture);
     }
 };
 
@@ -628,7 +631,7 @@ DOMRenderer.prototype._initContent = function _initContent () {
         if (!target.listeners[type])
             continue;
         target.element.removeEventListener(type, this._boundTriggerEvent);
-        target.content.addEventListener(type, this._boundTriggerEvent);
+        target.content.addEventListener(type, this._boundTriggerEvent, true);
     }
 };
 
