@@ -63,7 +63,7 @@ function WebGLRenderer(canvas, compositor) {
     this.canvas = canvas;
     this.compositor = compositor;
 
-    var gl = this.gl = this.getWebGLContext(this.canvas);
+    var gl = this.getWebGLContext(this.canvas);
 
     gl.clearColor(0.0, 0.0, 0.0, 0.0);
     gl.polygonOffset(0.1, 0.1);
@@ -154,24 +154,17 @@ function WebGLRenderer(canvas, compositor) {
  * @return {Object} WebGLContext WebGL context
  */
 WebGLRenderer.prototype.getWebGLContext = function getWebGLContext(canvas) {
+    if (this.gl) return this.gl;
+
     var names = ['webgl', 'experimental-webgl', 'webkit-3d', 'moz-webgl'];
-    var context;
 
-    for (var i = 0, len = names.length; i < len; i++) {
-        try {
-            context = canvas.getContext(names[i]);
-        }
-        catch (error) {
-            console.error('Error creating WebGL context: ' + error.toString());
-        }
-        if (context) return context;
-    }
+    for (var i = 0, len = names.length; i < len && !this.gl; i++)
+        this.gl = canvas.getContext(names[i]);
 
-    if (!context) {
-        console.error('Could not retrieve WebGL context. Please refer to https://www.khronos.org/webgl/ for requirements');
-        return false;
-    }
+    if (!this.gl)
+        throw new Error('Could not retrieve WebGL context. Please refer to https://www.khronos.org/webgl/ for requirements');
 
+    return this.gl;
 };
 
 /**
