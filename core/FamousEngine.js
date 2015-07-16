@@ -387,7 +387,7 @@ FamousEngine.prototype.addScene = function addScene (scene) {
 
     var current = this._scenes[selector];
     if (current && current !== scene) current.dismount();
-    if (!scene.isMounted()) scene.mount();
+    if (!scene.isMounted()) scene.mount(scene.getSelector());
     this._scenes[selector] = scene;
     return this;
 };
