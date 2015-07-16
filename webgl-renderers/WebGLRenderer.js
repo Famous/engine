@@ -825,9 +825,9 @@ WebGLRenderer.prototype.handleOptions = function handleOptions(options, mesh) {
 
     switch (options.side) {
         case 'double':
-            this.gl.cullFace(this.gl.FRONT);
+            gl.cullFace(gl.FRONT);
             this.drawBuffers(this.bufferRegistry.registry[mesh.geometry], mesh.drawType, mesh.geometry);
-            this.gl.cullFace(this.gl.BACK);
+            gl.cullFace(gl.BACK);
             break;
         case 'back':
             gl.cullFace(gl.FRONT);

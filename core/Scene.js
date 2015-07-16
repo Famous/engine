@@ -65,10 +65,6 @@ function Scene (selector, updater) {
     this.mount(selector); // Mount the context to itself
                           // (it is its own parent)
 
-    this._globalUpdater                  // message a request for the dom
-        .message(Commands.NEED_SIZE_FOR)  // size of the context so that
-        .message(selector);               // the scene graph has a total size
-
     this.show(); // the context begins shown (it's already present in the dom)
 }
 
@@ -142,6 +138,11 @@ Scene.prototype.onReceive = function onReceive (event, payload) {
 Scene.prototype.mount = function mount (path) {
     if (this.isMounted())
         throw new Error('Scene is already mounted at: ' + this.getLocation());
+
+    this._globalUpdater                   // message a request for the dom
+        .message(Commands.NEED_SIZE_FOR)  // size of the context so that
+        .message(this._selector);         // the scene graph has a total size
+
     Dispatch.mount(path, this);
     this._id = path;
     this._mounted = true;

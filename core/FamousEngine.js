@@ -387,7 +387,7 @@ FamousEngine.prototype.addScene = function addScene (scene) {
 
     var current = this._scenes[selector];
     if (current && current !== scene) current.dismount();
-    if (!scene.isMounted()) scene.mount(scene.getSelector());
+    if (!scene.isMounted()) scene.mount(scene._selector);
     this._scenes[selector] = scene;
     return this;
 };
@@ -406,6 +406,7 @@ FamousEngine.prototype.removeScene = function removeScene (scene) {
 
     var current = this._scenes[selector];
     if (current && current === scene) {
+        this._messages.push(Commands.WITH, selector, Commands.REMOVE_SCENE);
         if (scene.isMounted()) scene.dismount();
         delete this._scenes[selector];
     }

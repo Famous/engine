@@ -159,6 +159,21 @@ Compositor.prototype.getOrSetContext = function getOrSetContext(selector) {
 };
 
 /**
+ * Removes the context from the internal registry.
+ *
+ * @method
+ *
+ * @param  {String} selector    Selector used for accessing the regisered
+ *                              context.
+ * @return {undefined}          undefined
+ */
+Compositor.prototype.removeContext = function removeContext (selector) {
+    var context = this._contexts[selector];
+    delete this._contexts[selector];
+    context.cleanup();
+};
+
+/**
  * Retrieves a context object registered under the passed in selector.
  *
  * @method
