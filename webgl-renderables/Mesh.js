@@ -444,7 +444,7 @@ Mesh.prototype.onUpdate = function onUpdate() {
     var node = this._node;
     var queue = this._changeQueue;
 
-    if (node) {
+    if (node && node.isMounted()) {
         node.sendDrawCommand(Commands.WITH);
         node.sendDrawCommand(node.getLocation());
 
@@ -680,20 +680,19 @@ function addMeshToMaterial(mesh, material, name) {
     var shouldRemove = true;
     var len = material.inputs;
 
-    while(len--) 
+    while(len--)
         addMeshToMaterial(mesh, material.inputs[len], name);
 
     len = INPUTS.length;
-    
-    while (len--) 
+
+    while (len--)
         shouldRemove |= (name !== INPUTS[len] && previous !== expressions[INPUTS[len]]);
 
     if (shouldRemove)
         material.meshes.splice(material.meshes.indexOf(previous), 1);
-         
+
     if (material.meshes.indexOf(mesh) === -1)
         material.meshes.push(mesh);
 }
 
 module.exports = Mesh;
-
