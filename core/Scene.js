@@ -74,15 +74,6 @@ Scene.prototype.constructor = Scene;
 Scene.NO_DEFAULT_COMPONENTS = true;
 
 /**
- * Scene getUpdater function returns the passed in updater
- *
- * @return {Famous} the updater for this Scene
- */
-Scene.prototype.getUpdater = function getUpdater () {
-    return this._updater;
-};
-
-/**
  * Returns the selector that the context was instantiated with
  *
  * @return {String} dom selector
