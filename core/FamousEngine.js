@@ -369,8 +369,11 @@ FamousEngine.prototype.createScene = function createScene (selector) {
     selector = selector || 'body';
 
     if (this._scenes[selector]) this._scenes[selector].dismount();
-    this._scenes[selector] = new Scene(selector, this);
-    return this._scenes[selector];
+
+    var scene = new Scene();
+    this._scenes[selector] = scene;
+    scene.mount(selector);
+    return scene;
 };
 
 /**

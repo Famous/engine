@@ -39,33 +39,9 @@ var SizeSystem = require('./SizeSystem');
  * @class Scene
  * @constructor
  * @extends Node
- *
- * @param {String} selector a string which is a dom selector
- *                 signifying which dom element the context
- *                 should be set upon
- * @param {Famous} updater a class which conforms to Famous' interface
- *                 it needs to be able to send methods to
- *                 the renderers and update nodes in the scene graph
  */
-function Scene (selector, updater) {
-    if (!selector) throw new Error('Scene needs to be created with a DOM selector');
-    if (!updater) throw new Error('Scene needs to be created with a class like Famous');
-
-    Node.call(this);         // Scene inherits from node
-
-    this._globalUpdater = updater; // The updater that will both
-                                   // send messages to the renderers
-                                   // and update dirty nodes
-
-    this._selector = selector; // reference to the DOM selector
-                               // that represents the element
-                               // in the dom that this context
-                               // inhabits
-
-    this.mount(selector); // Mount the context to itself
-                          // (it is its own parent)
-
-    this.show(); // the context begins shown (it's already present in the dom)
+function Scene () {
+    Node.call(this);
 }
 
 // Scene inherits from node
@@ -79,7 +55,8 @@ Scene.NO_DEFAULT_COMPONENTS = true;
  * @return {String} dom selector
  */
 Scene.prototype.getSelector = function getSelector () {
-    return this._selector;
+    console.warn('Scene#getSelector is deprecated, use Scene#getLocation or Scene#getId instead');
+    return this._id;
 };
 
 /**
@@ -121,7 +98,7 @@ Scene.prototype.onReceive = function onReceive (event, payload) {
                              payload[1],
                              payload[2] ? payload[2] : 0);
 
-        this._updater.message(Commands.WITH).message(this._selector).message(Commands.READY);
+        this._updater.message(Commands.WITH).message(this._id).message(Commands.READY);
     }
 };
 
@@ -130,16 +107,20 @@ Scene.prototype.mount = function mount (path) {
     if (this.isMounted())
         throw new Error('Scene is already mounted at: ' + this.getLocation());
 
-    this._globalUpdater                   // message a request for the dom
-        .message(Commands.NEED_SIZE_FOR)  // size of the context so that
-        .message(this._selector);         // the scene graph has a total size
-
     Dispatch.mount(path, this);
+
+    this._updater                   // message a request for the dom
+        .message(Commands.NEED_SIZE_FOR)  // size of the context so that
+        .message(path);         // the scene graph has a total size
+
     this._id = path;
     this._mounted = true;
     this._parent = this;
     TransformSystem.registerTransformAtPath(path);
     SizeSystem.registerSizeAtPath(path);
+
+    // the context begins shown (it's already present in the dom)
+    this.show();
 };
 
 module.exports = Scene;
