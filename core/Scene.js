@@ -53,6 +53,7 @@ Scene.NO_DEFAULT_COMPONENTS = true;
  * Returns the selector that the context was instantiated with
  *
  * @return {String} dom selector
+ * @deprecated
  */
 Scene.prototype.getSelector = function getSelector () {
     console.warn('Scene#getSelector is deprecated, use Scene#getLocation or Scene#getId instead');

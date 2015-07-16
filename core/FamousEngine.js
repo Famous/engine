@@ -405,7 +405,7 @@ FamousEngine.prototype.addScene = function addScene (scene) {
  * @return {FamousEngine} this
  */
 FamousEngine.prototype.removeScene = function removeScene (scene) {
-    var selector = scene._selector;
+    var selector = scene._id;
 
     var current = this._scenes[selector];
     if (current && current === scene) {
