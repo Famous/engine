@@ -409,9 +409,9 @@ FamousEngine.prototype.removeScene = function removeScene (scene) {
 
     var current = this._scenes[selector];
     if (current && current === scene) {
-        this._messages.push(Commands.WITH, selector, Commands.REMOVE_SCENE);
         if (scene.isMounted()) scene.dismount();
         delete this._scenes[selector];
+        this._messages.push(Commands.WITH, selector, Commands.REMOVE_SCENE);
     }
     return this;
 };
