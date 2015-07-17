@@ -496,12 +496,10 @@ WebGLRenderer.prototype.setMeshUniform = function setMeshUniform(path, uniformNa
 };
 
 /**
- * Triggers the 'draw' phase of the WebGLRenderer. Iterates through registries
- * to set uniforms, set attributes and issue draw commands for renderables.
+ * Allocates a new buffer using the internal BufferRegistry.
  *
  * @method
  *
- * @param {String} path Path used as id of mesh in mesh registry
  * @param {Number} geometryId Id of geometry in geometry registry
  * @param {String} bufferName Attribute location name
  * @param {Array} bufferValue Vertex data
@@ -510,10 +508,8 @@ WebGLRenderer.prototype.setMeshUniform = function setMeshUniform(path, uniformNa
  *
  * @return {undefined} undefined
  */
-WebGLRenderer.prototype.bufferData = function bufferData(path, geometryId, bufferName, bufferValue, bufferSpacing, isDynamic) {
+WebGLRenderer.prototype.bufferData = function bufferData(geometryId, bufferName, bufferValue, bufferSpacing, isDynamic) {
     this.bufferRegistry.allocate(geometryId, bufferName, bufferValue, bufferSpacing, isDynamic);
-
-    return this;
 };
 
 /**
