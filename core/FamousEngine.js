@@ -94,6 +94,12 @@ function FamousEngine() {
  * @return {FamousEngine} this
  */
 FamousEngine.prototype.init = function init(options) {
+    if (typeof window === 'undefined') {
+        throw new Error(
+            'FamousEngine#init needs to have access to the global window object. ' +
+            'Instantiate Compositor and UIManager manually in the UI thread.'
+        );
+    }
     this.compositor = options && options.compositor || new Compositor();
     this.renderLoop = options && options.renderLoop || new RequestAnimationFrameLoop();
     this.uiManager = new UIManager(this.getChannel(), this.compositor, this.renderLoop);
