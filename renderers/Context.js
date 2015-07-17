@@ -474,7 +474,6 @@ function glUniforms (context, path, commands, iterator) {
 function glBufferData (context, path, commands, iterator) {
     if (!context._webGLRenderer) context._initWebGLRenderer();
     context._webGLRenderer.bufferData(
-        path,
         commands[++iterator],
         commands[++iterator],
         commands[++iterator],
