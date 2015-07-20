@@ -46,7 +46,8 @@ var defaultGeometry = new Geometry.Plane();
 var INPUTS = ['baseColor', 'normals', 'glossiness', 'positionOffset'];
 
 function Mesh (node, options) {
-    this._node = node;
+    this._node = null;
+    this._id = null;
     this._changeQueue = [];
     this._initialized = false;
     this._requestingUpdate = false;
@@ -61,9 +62,8 @@ function Mesh (node, options) {
         positionOffset: null,
         normals: null
     };
-
+    if (node) node.addComponent(this);
     if (options) this.setDrawOptions(options);
-    this._id = node.addComponent(this);
 }
 /**
  * Pass custom options to Mesh, such as a 3 element map
@@ -508,8 +508,14 @@ Mesh.prototype.onMount = function onMount (node, id) {
  * @return {undefined} undefined
  */
 Mesh.prototype.onDismount = function onDismount () {
+    this._node = null;
+    this._id = null;
+
     this._initialized = false;
-    this._changeQueue.push(Commands.GL_REMOVE_MESH);
+
+    if (this._inDraw) {
+        this._changeQueue.push(Commands.GL_REMOVE_MESH);
+    }
 
     this._requestUpdate();
 };
@@ -623,7 +629,7 @@ Mesh.prototype.onAddUIEvent = function onAddUIEvent (UIEvent) {
  * @return {undefined} undefined
  */
 Mesh.prototype._requestUpdate = function _requestUpdate () {
-    if (!this._requestingUpdate) {
+    if (!this._requestingUpdate && this._node) {
         this._node.requestUpdate(this._id);
         this._requestingUpdate = true;
     }
@@ -680,20 +686,19 @@ function addMeshToMaterial(mesh, material, name) {
     var shouldRemove = true;
     var len = material.inputs;
 
-    while(len--) 
+    while(len--)
         addMeshToMaterial(mesh, material.inputs[len], name);
 
     len = INPUTS.length;
-    
-    while (len--) 
+
+    while (len--)
         shouldRemove |= (name !== INPUTS[len] && previous !== expressions[INPUTS[len]]);
 
     if (shouldRemove)
         material.meshes.splice(material.meshes.indexOf(previous), 1);
-         
+
     if (material.meshes.indexOf(mesh) === -1)
         material.meshes.push(mesh);
 }
 
 module.exports = Mesh;
-

@@ -115,10 +115,6 @@ test('Mesh', function(t) {
         t.equal(typeof Mesh, 'function',
             'should be a function');
 
-        t.throws(function() {
-            mesh = new Mesh();
-        }, 'should throw an error if a node is not provided');
-
         mesh = createMesh().mesh;
         t.equal(typeof mesh.setBaseColor, 'function',
             'mesh should be instantiated without errors');
