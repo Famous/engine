@@ -375,6 +375,7 @@ DOMRenderer.prototype.findParent = function findParent () {
         path = path.substring(0, path.lastIndexOf('/'));
         parent = this._elements[path];
     }
+
     this._parent = parent;
     return parent;
 };
@@ -449,36 +450,29 @@ DOMRenderer.prototype.resolveChildren = function resolveChildren (element, paren
  * @return {undefined} undefined
  */
 DOMRenderer.prototype.insertEl = function insertEl (tagName) {
-    if (!this._target ||
-        this._target.element.tagName.toLowerCase() !== tagName.toLowerCase()) {
 
-        this.findParent();
+    this.findParent();
 
-        this._assertParentLoaded();
+    this._assertParentLoaded();
 
-        if (this._parent.void)
-            throw new Error(
-                this._parent.path + ' is a void element. ' +
-                'Void elements are not allowed to have children.'
-            );
+    if (this._parent.void)
+        throw new Error(
+            this._parent.path + ' is a void element. ' +
+            'Void elements are not allowed to have children.'
+        );
 
-        if (this._target) {
-            this._parent.element.removeChild(this._target.element);
-            this._removeElCallbackStore.trigger(this._path, this._target);
-        }
+    if (!this._target) this._target = new ElementCache(document.createElement(tagName), this._path);
 
-        this._target = new ElementCache(document.createElement(tagName), this._path);
+    var el = this._target.element;
+    var parent = this._parent.element;
 
-        var el = this._target.element;
-        var parent = this._parent.element;
+    this.resolveChildren(el, parent);
 
-        this.resolveChildren(el, parent);
+    parent.appendChild(el);
+    this._elements[this._path] = this._target;
 
-        this._parent.element.appendChild(this._target.element);
-        this._elements[this._path] = this._target;
+    this._insertElCallbackStore.trigger(this._path, this._target);
 
-        this._insertElCallbackStore.trigger(this._path, this._target);
-    }
 };
 
 
