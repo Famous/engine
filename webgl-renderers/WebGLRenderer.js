@@ -542,6 +542,9 @@ WebGLRenderer.prototype.drawMeshes = function drawMeshes() {
 
     for(var i = 0; i < meshes.length; i++) {
         mesh = meshes[i];
+
+        if (!mesh) continue;
+
         buffers = this.bufferRegistry.registry[mesh.geometry];
 
         if (!mesh.visible) continue;
@@ -583,14 +586,15 @@ WebGLRenderer.prototype.drawCutouts = function drawCutouts() {
     var cutouts = this.cutoutRegistry.getValues();
     var len = cutouts.length;
 
-    if (!len) return;
-
     this.gl.disable(this.gl.CULL_FACE);
     this.gl.enable(this.gl.BLEND);
     this.gl.depthMask(true);
 
     for (var i = 0; i < len; i++) {
         cutout = cutouts[i];
+
+        if (!cutout) continue;
+
         buffers = this.bufferRegistry.registry[cutout.geometry];
 
         if (!cutout.visible) continue;
@@ -619,6 +623,9 @@ WebGLRenderer.prototype.setGlobalUniforms = function setGlobalUniforms(renderSta
 
     for (var i = 0; i < len; i++) {
         light = lights[i];
+
+        if (!light) continue;
+
         stride = i * 4;
 
         // Build the light positions' 4x4 matrix
