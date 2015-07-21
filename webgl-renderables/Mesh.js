@@ -508,16 +508,15 @@ Mesh.prototype.onMount = function onMount (node, id) {
  * @return {undefined} undefined
  */
 Mesh.prototype.onDismount = function onDismount () {
+    this._initialized = false;
+    this._inDraw = false;
+
+    this._node.sendDrawCommand(Commands.WITH);
+    this._node.sendDrawCommand(this._node.getLocation());
+    this._node.sendDrawCommand(Commands.GL_REMOVE_MESH);
+
     this._node = null;
     this._id = null;
-
-    this._initialized = false;
-
-    if (this._inDraw) {
-        this._changeQueue.push(Commands.GL_REMOVE_MESH);
-    }
-
-    this._requestUpdate();
 };
 
 /**
