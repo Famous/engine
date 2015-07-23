@@ -22,8 +22,6 @@
  * THE SOFTWARE.
  */
 
-/*jshint -W079 */
-
 'use strict';
 
 var Node = require('./Node');
@@ -44,10 +42,8 @@ function Scene () {
     Node.call(this);
 }
 
-// Scene inherits from node
 Scene.prototype = Object.create(Node.prototype);
 Scene.prototype.constructor = Scene;
-Scene.NO_DEFAULT_COMPONENTS = true;
 
 /**
  * Returns the selector that the context was instantiated with
