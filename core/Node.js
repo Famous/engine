@@ -1,4 +1,4 @@
-/**
+/*
  * The MIT License (MIT)
  *
  * Copyright (c) 2015 Famous Industries Inc.
@@ -372,13 +372,18 @@ Node.prototype.getParent = function getParent () {
  * next frame (if no update during this frame has been scheduled already).
  * If the node is currently being updated (which means one of the requesters
  * invoked requestsUpdate while being updated itself), an update will be
- * scheduled on the next frame.
+ * scheduled on the next frame by falling back to the `requestUpdateOnNextTick`
+ * function.
+ *
+ * Components request their `onUpdate` method to be called during the next
+ * frame using this method.
  *
  * @method requestUpdate
  *
- * @param  {Object} requester   If the requester has an `onUpdate` method, it
- *                              will be invoked during the next update phase of
- *                              the node.
+ * @param  {Number} requester   Id of the component (as returned by
+ *                              {@link Node#addComponent}) to be updated. The
+ *                              component's `onUpdate` method will be invoked
+ *                              during the next update cycle.
  *
  * @return {Node} this
  */
@@ -393,16 +398,25 @@ Node.prototype.requestUpdate = function requestUpdate (requester) {
 };
 
 /**
- * Schedules an update on the next tick. Similarily to
- * {@link Node#requestUpdate}, `requestUpdateOnNextTick` schedules the node's
- * `onUpdate` function to be invoked on the frame after the next invocation on
+ * Schedules an update on the next tick.
+ *
+ * This method is similar to {@link Node#requestUpdate}, but schedules an
+ * update on the **next** frame. It schedules the node's `onUpdate` function
+ * to be invoked on the frame after the next invocation on
  * the node's onUpdate function.
+ *
+ * The primary use-case for this method is to request an update while being in
+ * an update phase (e.g. because an animation is still active). Most of the
+ * time, {@link Node#requestUpdate} is sufficient, since it automatically
+ * falls back to {@link Node#requestUpdateOnNextTick} when being invoked during
+ * the update phase.
  *
  * @method requestUpdateOnNextTick
  *
- * @param  {Object} requester   If the requester has an `onUpdate` method, it
- *                              will be invoked during the next update phase of
- *                              the node.
+ * @param  {Number} requester   Id of the component (as returned by
+ *                              {@link Node#addComponent}) to be updated. The
+ *                              component's `onUpdate` method will be invoked
+ *                              during the next update cycle.
  *
  * @return {Node} this
  */
