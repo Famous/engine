@@ -107,7 +107,7 @@ function radixSort(list, registry) {
             div = floatToInt(comp(list, registry, i));
             out[++buckets[div & radixMask]] = mutator(list, registry, i, div ^= div >> 31 | 0x80000000);
         }
-        
+
         swap = out;
         out = list;
         list = swap;
