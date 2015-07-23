@@ -1,10 +1,14 @@
 'use strict';
 
 var api = require('./Dispatch.api');
-var Dispatch = require('../../../core/Dispatch');
+var rewire = require('rewire');
+var Dispatch = rewire('../../../core/Dispatch');
 var NodeStub = require('../node/Node.stub');
+var PathUtilsStub = require('../path/Path.stub');
 var Node = require('../../../core/Node');
 var test = require('tape');
+
+Dispatch.__set__('PathUtils', PathUtilsStub);
 
 test('Dispatch singleton', function (t) {
 
@@ -14,7 +18,7 @@ test('Dispatch singleton', function (t) {
             t.equal(typeof Dispatch, 'object', 'Dispatch should be an object');
             t.end();
         });
-        
+
         t.test('Dispatch should conform to its public api', function (t) {
 
             api.forEach(function (method) {
@@ -34,7 +38,7 @@ test('Dispatch singleton', function (t) {
     t.test('._setUpdater method', function (t) {
 
         var testUpdater = 'a';
-        
+
         t.doesNotThrow(
             Dispatch._setUpdater.bind(Dispatch, testUpdater),
             '._setUpdater should be callable'
@@ -96,9 +100,9 @@ test('Dispatch singleton', function (t) {
     });
 
     t.test('.dispatch method', function (t) {
-        
+
         var nodes;
-        
+
         t.test('setup', function (t) {
             nodes = {
                 'path': new Node(),
@@ -108,7 +112,7 @@ test('Dispatch singleton', function (t) {
                 'path/1/2/3': new Node(),
                 'path/1/2/4': new Node()
             };
-            
+
             nodes.path.addChild(nodes['path/1']);
             nodes['path/1'].addChild(nodes['path/1/2']);
             nodes['path/1'].addChild(nodes['path/1/1']);
@@ -119,16 +123,16 @@ test('Dispatch singleton', function (t) {
                 nodes[path].__path__ = path;
                 Dispatch.mount(path, nodes[path]);
             }
-            
+
             t.end();
         });
-        
+
         t.test('basic', function (t) {
-            
+
             var received;
             var expectedEvent;
             var expectedPayload;
-            
+
             t.test('setup', function (t) {
                 received = [];
 
@@ -138,17 +142,17 @@ test('Dispatch singleton', function (t) {
                 function onReceive(actualEvent, actualPayload) {
                     t.equal(actualEvent, expectedEvent, 'Node should receive expected event');
                     t.equal(actualPayload, expectedPayload, 'Node should receive expected payload');
-                    
+
                     received.push(this.__path__);
                 }
 
                 for (var path in nodes) {
                     nodes[path].onReceive = onReceive;
                 }
-                
+
                 t.end();
             });
-            
+
             t.test('exec', function (t) {
                 Dispatch.dispatch('path/1', expectedEvent, expectedPayload);
 
@@ -156,27 +160,27 @@ test('Dispatch singleton', function (t) {
                     received.indexOf('path/1'), -1,
                     'path/1 should not receive event dispatched via Dispatch.dispatch("path/1")'
                 );
-                
+
                 t.deepEqual(
                     received, ['path/1/2', 'path/1/1', 'path/1/2/3', 'path/1/2/4'],
                     'Dispatch.dispatch should trigger event first on parent, then on children'
                 );
-                
+
                 t.end();
             });
-            
+
             t.test('teardown', function (t) {
                 for (var path in nodes) {
                     nodes[path].onReceive = null;
                 }
-                
+
                 t.end();
             });
         });
-        
+
         t.test('conflicting events', function (t) {
             var received;
-            
+
             t.test('setup', function (t) {
                 received = [];
 
@@ -187,23 +191,23 @@ test('Dispatch singleton', function (t) {
                 for (var path in nodes) {
                     nodes[path].onReceive = onReceive;
                 }
-                
+
                 nodes['path/1/1'].onReceive = function (event, payload) {
                     received.push([this.__path__, event, payload]);
                     Dispatch.dispatch('path/1/2', 'event2', {payload: 2});
                 };
-                
+
                 t.end();
             });
-            
+
             t.test('exec', function (t) {
                 Dispatch.dispatch('path', 'event1', {payload: 1});
-                
+
                 t.equal(
                     received.length, 7,
                     'Dispatching an event while processing a previous event should result into the correct number of events being received by the nodes'
                 );
-                
+
                 t.deepEqual(
                     received,
                     [
@@ -217,15 +221,15 @@ test('Dispatch singleton', function (t) {
                     ],
                     'Dispatching the second event should traverse the scene graph in the correctly'
                 );
-                
+
                 t.end();
             });
-            
+
             t.test('teardown', function (t) {
                 for (var path in nodes) {
                     nodes[path].onReceive = null;
                 }
-                
+
                 t.end();
             });
         });
