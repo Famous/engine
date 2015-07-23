@@ -87,6 +87,7 @@ function radixSort(list, registry) {
     for (i = 0, n = maxRadix * passCount; i < n; i++) buckets[i] = 0;
 
     for (i = 0, n = list.length; i < n; i++) {
+        if (!list[i]) continue;
         div = floatToInt(comp(list, registry, i));
         div ^= div >> 31 | 0x80000000;
         for (j = 0, k = 0; j < maxOffset; j += maxRadix, k += radixBits) {
@@ -104,15 +105,17 @@ function radixSort(list, registry) {
     }
     if (--passCount) {
         for (i = 0, n = list.length; i < n; i++) {
+            if (!list[i]) continue;
             div = floatToInt(comp(list, registry, i));
             out[++buckets[div & radixMask]] = mutator(list, registry, i, div ^= div >> 31 | 0x80000000);
         }
-        
+
         swap = out;
         out = list;
         list = swap;
         while (++pass < passCount) {
             for (i = 0, n = list.length, offset = pass * maxRadix, size = pass * radixBits; i < n; i++) {
+                if (!list[i]) continue;
                 div = floatToInt(comp(list, registry, i));
                 out[++buckets[offset + (div >>> size & radixMask)]] = list[i];
             }
@@ -124,6 +127,7 @@ function radixSort(list, registry) {
     }
 
     for (i = 0, n = list.length, offset = pass * maxRadix, size = pass * radixBits; i < n; i++) {
+        if (!list[i]) continue;
         div = floatToInt(comp(list, registry, i));
         out[++buckets[offset + (div >>> size & lastMask)]] = mutator(list, registry, i, div ^ (~div >> 31 | 0x80000000));
         clean(list, registry, i);
