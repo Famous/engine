@@ -36,7 +36,7 @@ var Size = require('../core/Size');
  *
  * @class DOMElement
  *
- * @param {Node} node                   The Node to which the `DOMElement`
+ * @param {Node} [node]                 The Node to which the `DOMElement`
  *                                      renderable should be attached to.
  * @param {Object} options              Initial options used for instantiating
  *                                      the Node.
@@ -53,7 +53,12 @@ var Size = require('../core/Size');
  *                                      for DOM and WebGL layering.  On by default.
  */
 function DOMElement(node, options) {
-    if (!node) throw new Error('DOMElement must be instantiated on a node');
+    if (node && node.constructor === Object) {
+        options = node;
+        node = null;
+    }
+
+    options = options || {};
 
     this._changeQueue = [];
 
@@ -61,46 +66,28 @@ function DOMElement(node, options) {
     this._renderSized = false;
     this._requestRenderSize = false;
 
-    this._UIEvents = node.getUIEvents().slice(0);
-    this._classes = ['famous-dom-element'];
+    this._UIEvents = [];
+    this._classes = ['famous-dom-element'].concat(options.classes);
     this._requestingEventListeners = [];
-    this._styles = {};
 
-    this._attributes = {};
-    this._content = '';
+    this._properties = options.properties || {};
+    this._attributes = options.attributes || {};
 
-    this._tagName = options && options.tagName ? options.tagName : 'div';
+    if (options.id != null)
+        this._attributes.id = options.id;
+
+    this._content = options.content || '';
+    this._tagName = options.tagName || 'div';
     this._renderSize = [0, 0, 0];
 
-    this._node = node;
+    this._cutout = options.cutout != null ? options.cutout : true;
 
-    if (node) node.addComponent(this);
+    this._node = null;
+    this._id = null;
 
     this._callbacks = new CallbackStore();
 
-    this.setProperty('display', node.isShown() ? 'block' : 'none');
-    this.onOpacityChange(node.getOpacity());
-
-    if (!options) return;
-
-    var i;
-    var key;
-
-    if (options.classes)
-        for (i = 0; i < options.classes.length; i++)
-            this.addClass(options.classes[i]);
-
-    if (options.attributes)
-        for (key in options.attributes)
-            this.setAttribute(key, options.attributes[key]);
-
-    if (options.properties)
-        for (key in options.properties)
-            this.setProperty(key, options.properties[key]);
-
-    if (options.id) this.setId(options.id);
-    if (options.content) this.setContent(options.content);
-    if (options.cutout === false) this.setCutoutState(options.cutout);
+    if (node) node.addComponent(this);
 }
 
 /**
@@ -113,11 +100,12 @@ function DOMElement(node, options) {
 DOMElement.prototype.getValue = function getValue() {
     return {
         classes: this._classes,
-        styles: this._styles,
+        styles: this._properties,
         attributes: this._attributes,
         content: this._content,
         id: this._attributes.id,
-        tagName: this._tagName
+        tagName: this._tagName,
+        cutout: this._cutout
     };
 };
 
@@ -169,11 +157,16 @@ DOMElement.prototype.onUpdate = function onUpdate () {
 DOMElement.prototype.onMount = function onMount(node, id) {
     this._node = node;
     this._id = id;
+
     this._UIEvents = node.getUIEvents().slice(0);
+
     TransformSystem.makeBreakPointAt(node.getLocation());
+
     this.onSizeModeChange.apply(this, node.getSizeMode());
-    this.draw();
     this.setAttribute('data-fa-path', node.getLocation());
+    this.onOpacityChange(node.getOpacity());
+
+    this._draw();
 };
 
 /**
@@ -217,24 +210,6 @@ DOMElement.prototype.onShow = function onShow() {
  */
 DOMElement.prototype.onHide = function onHide() {
     this.setProperty('display', 'none');
-};
-
-/**
- * Enables or disables WebGL 'cutout' for this element, which affects
- * how the element is layered with WebGL objects in the scene.
- *
- * @method
- *
- * @param {Boolean} usesCutout  The presence of a WebGL 'cutout' for this element.
- *
- * @return {DOMElement} this
- */
-DOMElement.prototype.setCutoutState = function setCutoutState (usesCutout) {
-    if (this._initialized)
-        this._changeQueue.push(Commands.GL_CUTOUT_STATE, usesCutout);
-
-    if (!this._requestingUpdate) this._requestUpdate();
-    return this;
 };
 
 /**
@@ -461,10 +436,11 @@ DOMElement.prototype._requestUpdate = function _requestUpdate() {
  * or reallocates a new Element in the actual DOM hierarchy.
  *
  * @method
+ * @private
  *
  * @return {undefined} undefined
  */
-DOMElement.prototype.init = function init () {
+DOMElement.prototype._init = function _init () {
     this._changeQueue.push(Commands.INIT_DOM, this._tagName);
     this._initialized = true;
     this.onTransformChange(TransformSystem.get(this._node.getLocation()));
@@ -570,7 +546,7 @@ DOMElement.prototype.setAttribute = function setAttribute (name, value) {
 };
 
 /**
- * Sets a CSS property
+ * Sets a CSS property.
  *
  * @chainable
  *
@@ -580,11 +556,31 @@ DOMElement.prototype.setAttribute = function setAttribute (name, value) {
  * @return {DOMElement} this
  */
 DOMElement.prototype.setProperty = function setProperty (name, value) {
-    if (this._styles[name] !== value || this._inDraw) {
-        this._styles[name] = value;
+    if (this._properties[name] !== value || this._inDraw) {
+        this._properties[name] = value;
         if (this._initialized) this._changeQueue.push(Commands.CHANGE_PROPERTY, name, value);
         if (!this._requestingUpdate) this._requestUpdate();
         if (this._renderSized) this._requestRenderSize = true;
+    }
+
+    return this;
+};
+
+/**
+ * Enables or disables WebGL 'cutout' for this element, which affects
+ * how the element is layered with WebGL objects in the scene.
+ *
+ * @method
+ *
+ * @param {Boolean} usesCutout  The presence of a WebGL 'cutout' for this element.
+ *
+ * @return {DOMElement} this
+ */
+DOMElement.prototype.setCutoutState = function setCutoutState (usesCutout) {
+    if (this._cutout !== usesCutout || this._inDraw) {
+        this._cutout = usesCutout;
+        if (this._initialized) this._changeQueue.push(Commands.GL_CUTOUT_STATE, usesCutout);
+        if (!this._requestingUpdate) this._requestUpdate();
     }
 
     return this;
@@ -660,27 +656,26 @@ DOMElement.prototype.onReceive = function onReceive (event, payload) {
  *
  * @return {undefined} undefined
  */
-DOMElement.prototype.draw = function draw() {
-    var key;
-    var i;
-    var len;
-
+DOMElement.prototype._draw = function _draw() {
     this._inDraw = true;
 
-    this.init();
+    this._init();
 
-    for (i = 0, len = this._classes.length ; i < len ; i++)
+    var i;
+    var len;
+    var key;
+
+    for (i = 0, len = this._classes.length; i < len; i++)
         this.addClass(this._classes[i]);
 
-    if (this._content) this.setContent(this._content);
-
-    for (key in this._styles)
-        if (this._styles[key] != null)
-            this.setProperty(key, this._styles[key]);
-
     for (key in this._attributes)
-        if (this._attributes[key] != null)
-            this.setAttribute(key, this._attributes[key]);
+        this.setAttribute(key, this._attributes[key]);
+
+    for (key in this._properties)
+        this.setProperty(key, this._properties[key]);
+
+    this.setContent(this._content);
+    this.setCutoutState(this._cutout);
 
     for (i = 0, len = this._UIEvents.length ; i < len ; i++)
         this.onAddUIEvent(this._UIEvents[i]);
