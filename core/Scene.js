@@ -29,8 +29,6 @@
 var Node = require('./Node');
 var Dispatch = require('./Dispatch');
 var Commands = require('./Commands');
-var TransformSystem = require('./TransformSystem');
-var SizeSystem = require('./SizeSystem');
 
 /**
  * Scene is the bottom of the scene graph. It is its own
@@ -50,6 +48,8 @@ var SizeSystem = require('./SizeSystem');
 function Scene (selector, updater) {
     if (!selector) throw new Error('Scene needs to be created with a DOM selector');
     if (!updater) throw new Error('Scene needs to be created with a class like Famous');
+
+    this._setUpdater(updater);
 
     Node.call(this);         // Scene inherits from node
 
@@ -142,12 +142,12 @@ Scene.prototype.onReceive = function onReceive (event, payload) {
 Scene.prototype.mount = function mount (path) {
     if (this.isMounted())
         throw new Error('Scene is already mounted at: ' + this.getLocation());
-    Dispatch.mount(path, this);
+    this._dispatch.mount(path, this);
     this._id = path;
     this._mounted = true;
     this._parent = this;
-    TransformSystem.registerTransformAtPath(path);
-    SizeSystem.registerSizeAtPath(path);
+    this._transformSystem.registerTransformAtPath(path);
+    this._sizeSystem.registerSizeAtPath(path);
 };
 
 module.exports = Scene;

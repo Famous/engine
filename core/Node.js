@@ -26,9 +26,6 @@
 
 'use strict';
 
-var SizeSystem = require('./SizeSystem');
-var Dispatch = require('./Dispatch');
-var TransformSystem = require('./TransformSystem');
 var Size = require('./Size');
 var Transform = require('./Transform');
 
@@ -48,7 +45,7 @@ var Transform = require('./Transform');
  * no distinction between nodes that send draw commands and nodes that define
  * behavior.
  *
- * Because of the fact that Nodes themself are very unopinioted (they don't
+ * Because of the fact that Nodes themself are very unopinionated (they don't
  * "render" to anything), they are often being subclassed in order to add e.g.
  * components at initialization to them. Because of this flexibility, they might
  * as well have been called `Entities`.
@@ -176,6 +173,9 @@ Node.prototype._setShown = function _setShown (shown) {
  */
 Node.prototype._setUpdater = function _setUpdater (updater) {
     this._updater = updater;
+    this._sizeSystem = updater._sizeSystem;
+    this._transformSystem = updater._transformSystem;
+    this._dispatch = updater._dispatch;
     if (this._requestingUpdate) this._updater.requestUpdate(this);
 };
 
@@ -203,7 +203,7 @@ Node.prototype.getLocation = function getLocation () {
 Node.prototype.getId = Node.prototype.getLocation;
 
 /**
- * Dispatches the event using the Dispatch. All descendent nodes will
+ * Dispatches the event using the this._dispatch. All descendent nodes will
  * receive the dispatched event.
  *
  * @method emit
@@ -214,7 +214,7 @@ Node.prototype.getId = Node.prototype.getLocation;
  * @return {Node} this
  */
 Node.prototype.emit = function emit (event, payload) {
-    Dispatch.dispatch(this.getLocation(), event, payload);
+    this._dispatch.dispatch(this.getLocation(), event, payload);
     return this;
 };
 
@@ -270,8 +270,8 @@ Node.prototype.getValue = function getValue () {
     };
 
     if (value.location) {
-        var transform = TransformSystem.get(this.getId());
-        var size = SizeSystem.get(this.getId());
+        var transform = this._transformSystem.get(this.getId());
+        var size = this._sizeSystem.get(this.getId());
 
         for (i = 0 ; i < 3 ; i++) {
             value.spec.offsets.mountPoint[i] = transform.offsets.mountPoint[i];
@@ -318,8 +318,8 @@ Node.prototype.getComputedValue = function getComputedValue () {
     var value = {
         location: this.getId(),
         computedValues: {
-            transform: this.isMounted() ? TransformSystem.get(this.getLocation()).getLocalTransform() : null,
-            size: this.isMounted() ? SizeSystem.get(this.getLocation()).get() : null
+            transform: this.isMounted() ? this._transformSystem.get(this.getLocation()).getLocalTransform() : null,
+            size: this.isMounted() ? this._sizeSystem.get(this.getLocation()).get() : null
         },
         children: []
     };
@@ -473,7 +473,7 @@ Node.prototype.getMountPoint = function getMountPoint () {
     if (!this.constructor.NO_DEFAULT_COMPONENTS)
         return this.getComponent(this._transformID).getMountPoint();
     else if (this.isMounted())
-        return TransformSystem.get(this.getLocation()).getMountPoint();
+        return this._transformSystem.get(this.getLocation()).getMountPoint();
     else throw new Error('This node does not have access to a transform component');
 };
 
@@ -488,7 +488,7 @@ Node.prototype.getAlign = function getAlign () {
     if (!this.constructor.NO_DEFAULT_COMPONENTS)
         return this.getComponent(this._transformID).getAlign();
     else if (this.isMounted())
-        return TransformSystem.get(this.getLocation()).getAlign();
+        return this._transformSystem.get(this.getLocation()).getAlign();
     else throw new Error('This node does not have access to a transform component');
 };
 
@@ -503,7 +503,7 @@ Node.prototype.getOrigin = function getOrigin () {
     if (!this.constructor.NO_DEFAULT_COMPONENTS)
         return this.getComponent(this._transformID).getOrigin();
     else if (this.isMounted())
-        return TransformSystem.get(this.getLocation()).getOrigin();
+        return this._transformSystem.get(this.getLocation()).getOrigin();
     else throw new Error('This node does not have access to a transform component');
 };
 
@@ -518,7 +518,7 @@ Node.prototype.getPosition = function getPosition () {
     if (!this.constructor.NO_DEFAULT_COMPONENTS)
         return this.getComponent(this._transformID).getPosition();
     else if (this.isMounted())
-        return TransformSystem.get(this.getLocation()).getPosition();
+        return this._transformSystem.get(this.getLocation()).getPosition();
     else throw new Error('This node does not have access to a transform component');
 };
 
@@ -533,7 +533,7 @@ Node.prototype.getRotation = function getRotation () {
     if (!this.constructor.NO_DEFAULT_COMPONENTS)
         return this.getComponent(this._transformID).getRotation();
     else if (this.isMounted())
-        return TransformSystem.get(this.getLocation()).getRotation();
+        return this._transformSystem.get(this.getLocation()).getRotation();
     else throw new Error('This node does not have access to a transform component');
 };
 
@@ -548,7 +548,7 @@ Node.prototype.getScale = function getScale () {
     if (!this.constructor.NO_DEFAULT_COMPONENTS)
         return this.getComponent(this._transformID).getScale();
     else if (this.isMounted())
-        return TransformSystem.get(this.getLocation()).getScale();
+        return this._transformSystem.get(this.getLocation()).getScale();
     else throw new Error('This node does not have access to a transform component');
 };
 
@@ -563,7 +563,7 @@ Node.prototype.getSizeMode = function getSizeMode () {
     if (!this.constructor.NO_DEFAULT_COMPONENTS)
         return this.getComponent(this._sizeID).getSizeMode();
     else if (this.isMounted())
-        return SizeSystem.get(this.getLocation()).getSizeMode();
+        return this._sizeSystem.get(this.getLocation()).getSizeMode();
     else throw new Error('This node does not have access to a size component');
 };
 
@@ -578,7 +578,7 @@ Node.prototype.getProportionalSize = function getProportionalSize () {
     if (!this.constructor.NO_DEFAULT_COMPONENTS)
         return this.getComponent(this._sizeID).getProportional();
     else if (this.isMounted())
-        return SizeSystem.get(this.getLocation()).getProportional();
+        return this._sizeSystem.get(this.getLocation()).getProportional();
     else throw new Error('This node does not have access to a size component');
 };
 
@@ -593,7 +593,7 @@ Node.prototype.getDifferentialSize = function getDifferentialSize () {
     if (!this.constructor.NO_DEFAULT_COMPONENTS)
         return this.getComponent(this._sizeID).getDifferential();
     else if (this.isMounted())
-        return SizeSystem.get(this.getLocation()).getDifferential();
+        return this._sizeSystem.get(this.getLocation()).getDifferential();
     else throw new Error('This node does not have access to a size component');
 };
 
@@ -608,7 +608,7 @@ Node.prototype.getAbsoluteSize = function getAbsoluteSize () {
     if (!this.constructor.NO_DEFAULT_COMPONENTS)
         return this.getComponent(this._sizeID).getAbsolute();
     else if (this.isMounted())
-        return SizeSystem.get(this.getLocation()).getAbsolute();
+        return this._sizeSystem.get(this.getLocation()).getAbsolute();
     else throw new Error('This node does not have access to a size component');
 };
 
@@ -625,7 +625,7 @@ Node.prototype.getRenderSize = function getRenderSize () {
     if (!this.constructor.NO_DEFAULT_COMPONENTS)
         return this.getComponent(this._sizeID).getRender();
     else if (this.isMounted())
-        return SizeSystem.get(this.getLocation()).getRender();
+        return this._sizeSystem.get(this.getLocation()).getRender();
     else throw new Error('This node does not have access to a size component');
 };
 
@@ -640,7 +640,7 @@ Node.prototype.getSize = function getSize () {
     if (!this.constructor.NO_DEFAULT_COMPONENTS)
         return this.getComponent(this._sizeID).get();
     else if (this.isMounted())
-        return SizeSystem.get(this.getLocation()).get();
+        return this._sizeSystem.get(this.getLocation()).get();
     else throw new Error('This node does not have access to a size component');
 };
 
@@ -652,7 +652,7 @@ Node.prototype.getSize = function getSize () {
  * @return {Float32Array} a 16 value transform
  */
 Node.prototype.getTransform = function getTransform () {
-    return TransformSystem.get(this.getLocation());
+    return this._transformSystem.get(this.getLocation());
 };
 
 /**
@@ -689,8 +689,10 @@ Node.prototype.addChild = function addChild (child) {
         this._fullChildren.push(child);
     }
 
-    if (this.isMounted())
+    if (this.isMounted()) {
+        child._setUpdater(this._updater);
         child.mount(this.getLocation() + '/' + index);
+    }
 
     return child;
 };
@@ -897,7 +899,7 @@ Node.prototype._vecOptionalSet = function _vecOptionalSet (vec, index, val) {
  * @return {Node} this
  */
 Node.prototype.show = function show () {
-    Dispatch.show(this.getLocation());
+    this._dispatch.show(this.getLocation());
     this._shown = true;
     return this;
 };
@@ -912,7 +914,7 @@ Node.prototype.show = function show () {
  * @return {Node} this
  */
 Node.prototype.hide = function hide () {
-    Dispatch.hide(this.getLocation());
+    this._dispatch.hide(this.getLocation());
     this._shown = false;
     return this;
 };
@@ -933,7 +935,7 @@ Node.prototype.setAlign = function setAlign (x, y, z) {
     if (!this.constructor.NO_DEFAULT_COMPONENTS)
         this.getComponent(this._transformID).setAlign(x, y, z);
     else if (this.isMounted())
-        TransformSystem.get(this.getLocation()).setAlign(x, y, z);
+        this._transformSystem.get(this.getLocation()).setAlign(x, y, z);
     else throw new Error('This node does not have access to a transform component');
     return this;
 };
@@ -954,7 +956,7 @@ Node.prototype.setMountPoint = function setMountPoint (x, y, z) {
     if (!this.constructor.NO_DEFAULT_COMPONENTS)
         this.getComponent(this._transformID).setMountPoint(x, y, z);
     else if (this.isMounted())
-        TransformSystem.get(this.getLocation()).setMountPoint(x, y, z);
+        this._transformSystem.get(this.getLocation()).setMountPoint(x, y, z);
     else throw new Error('This node does not have access to a transform component');
     return this;
 };
@@ -975,7 +977,7 @@ Node.prototype.setOrigin = function setOrigin (x, y, z) {
     if (!this.constructor.NO_DEFAULT_COMPONENTS)
         this.getComponent(this._transformID).setOrigin(x, y, z);
     else if (this.isMounted())
-        TransformSystem.get(this.getLocation()).setOrigin(x, y, z);
+        this._transformSystem.get(this.getLocation()).setOrigin(x, y, z);
     else throw new Error('This node does not have access to a transform component');
     return this;
 };
@@ -996,7 +998,7 @@ Node.prototype.setPosition = function setPosition (x, y, z) {
     if (!this.constructor.NO_DEFAULT_COMPONENTS)
         this.getComponent(this._transformID).setPosition(x, y, z);
     else if (this.isMounted())
-        TransformSystem.get(this.getLocation()).setPosition(x, y, z);
+        this._transformSystem.get(this.getLocation()).setPosition(x, y, z);
     else throw new Error('This node does not have access to a transform component');
     return this;
 };
@@ -1020,7 +1022,7 @@ Node.prototype.setRotation = function setRotation (x, y, z, w) {
     if (!this.constructor.NO_DEFAULT_COMPONENTS)
         this.getComponent(this._transformID).setRotation(x, y, z, w);
     else if (this.isMounted())
-        TransformSystem.get(this.getLocation()).setRotation(x, y, z, w);
+        this._transformSystem.get(this.getLocation()).setRotation(x, y, z, w);
     else throw new Error('This node does not have access to a transform component');
     return this;
 };
@@ -1041,7 +1043,7 @@ Node.prototype.setScale = function setScale (x, y, z) {
     if (!this.constructor.NO_DEFAULT_COMPONENTS)
         this.getComponent(this._transformID).setScale(x, y, z);
     else if (this.isMounted())
-        TransformSystem.get(this.getLocation()).setScale(x, y, z);
+        this._transformSystem.get(this.getLocation()).setScale(x, y, z);
     else throw new Error('This node does not have access to a transform component');
     return this;
 };
@@ -1102,7 +1104,7 @@ Node.prototype.setSizeMode = function setSizeMode (x, y, z) {
     if (!this.constructor.NO_DEFAULT_COMPONENTS)
         this.getComponent(this._sizeID).setSizeMode(x, y, z);
     else if (this.isMounted())
-        SizeSystem.get(this.getLocation()).setSizeMode(x, y, z);
+        this._sizeSystem.get(this.getLocation()).setSizeMode(x, y, z);
     else throw new Error('This node does not have access to a size component');
     return this;
 };
@@ -1124,7 +1126,7 @@ Node.prototype.setProportionalSize = function setProportionalSize (x, y, z) {
     if (!this.constructor.NO_DEFAULT_COMPONENTS)
         this.getComponent(this._sizeID).setProportional(x, y, z);
     else if (this.isMounted())
-        SizeSystem.get(this.getLocation()).setProportional(x, y, z);
+        this._sizeSystem.get(this.getLocation()).setProportional(x, y, z);
     else throw new Error('This node does not have access to a size component');
     return this;
 };
@@ -1151,7 +1153,7 @@ Node.prototype.setDifferentialSize = function setDifferentialSize (x, y, z) {
     if (!this.constructor.NO_DEFAULT_COMPONENTS)
         this.getComponent(this._sizeID).setDifferential(x, y, z);
     else if (this.isMounted())
-        SizeSystem.get(this.getLocation()).setDifferential(x, y, z);
+        this._sizeSystem.get(this.getLocation()).setDifferential(x, y, z);
     else throw new Error('This node does not have access to a size component');
     return this;
 };
@@ -1171,7 +1173,7 @@ Node.prototype.setAbsoluteSize = function setAbsoluteSize (x, y, z) {
     if (!this.constructor.NO_DEFAULT_COMPONENTS)
         this.getComponent(this._sizeID).setAbsolute(x, y, z);
     else if (this.isMounted())
-        SizeSystem.get(this.getLocation()).setAbsolute(x, y, z);
+        this._sizeSystem.get(this.getLocation()).setAbsolute(x, y, z);
     else throw new Error('This node does not have access to a size component');
     return this;
 };
@@ -1252,14 +1254,14 @@ Node.prototype.mount = function mount (path) {
         throw new Error('Node is already mounted at: ' + this.getLocation());
 
     if (!this.constructor.NO_DEFAULT_COMPONENTS){
-        TransformSystem.registerTransformAtPath(path, this.getComponent(this._transformID));
-        SizeSystem.registerSizeAtPath(path, this.getComponent(this._sizeID));
+        this._transformSystem.registerTransformAtPath(path, this.getComponent(this._transformID));
+        this._sizeSystem.registerSizeAtPath(path, this.getComponent(this._sizeID));
     }
     else {
-        TransformSystem.registerTransformAtPath(path);
-        SizeSystem.registerSizeAtPath(path);
+        this._transformSystem.registerTransformAtPath(path);
+        this._sizeSystem.registerSizeAtPath(path);
     }
-    Dispatch.mount(path, this);
+    this._dispatch.mount(path, this);
 
     if (!this._requestingUpdate) this._requestUpdate();
     return this;
@@ -1280,9 +1282,9 @@ Node.prototype.dismount = function dismount () {
 
     var path = this.getLocation();
 
-    TransformSystem.deregisterTransformAtPath(path);
-    SizeSystem.deregisterSizeAtPath(path);
-    Dispatch.dismount(path);
+    this._transformSystem.deregisterTransformAtPath(path);
+    this._sizeSystem.deregisterSizeAtPath(path);
+    this._dispatch.dismount(path);
 
     if (!this._requestingUpdate) this._requestUpdate();
 };

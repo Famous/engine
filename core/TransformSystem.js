@@ -1,18 +1,18 @@
 /**
  * The MIT License (MIT)
- * 
+ *
  * Copyright (c) 2015 Famous Industries Inc.
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -26,18 +26,23 @@
 
 var PathUtils = require('./Path');
 var Transform = require('./Transform');
-var Dispatch = require('./Dispatch');
 var PathStore = require('./PathStore');
 
 /**
  * The transform class is responsible for calculating the transform of a particular
  * node from the data on the node and its parent
  *
- * @constructor {TransformSystem}
- */
-function TransformSystem () {
-    this.pathStore = new PathStore();
+ * @constructor
+ * @param {Dispatch} dispatch The dispatch object to be used for accessing
+ *                            nodes.
+  */
+function TransformSystem (dispatch) {
+    PathStore.call(this);
+    this._dispatch = dispatch;
 }
+
+TransformSystem.prototype = Object.create(PathStore.prototype);
+TransformSystem.prototype.constructor = TransformSystem;
 
 /**
  * registers a new Transform for the given path. This transform will be updated
@@ -51,9 +56,9 @@ function TransformSystem () {
  */
 TransformSystem.prototype.registerTransformAtPath = function registerTransformAtPath (path, transform) {
     if (!PathUtils.depth(path))
-        return this.pathStore.insert(path, transform ? transform : new Transform());
+        return this.insert(path, transform ? transform : new Transform());
 
-    var parent = this.pathStore.get(PathUtils.parent(path));
+    var parent = this.get(PathUtils.parent(path));
 
     if (!parent) throw new Error(
             'No parent transform registered at expected path: ' + PathUtils.parent(path)
@@ -61,7 +66,7 @@ TransformSystem.prototype.registerTransformAtPath = function registerTransformAt
 
     if (transform) transform.setParent(parent);
 
-    this.pathStore.insert(path, transform ? transform : new Transform(parent));
+    this.insert(path, transform ? transform : new Transform(parent));
 };
 
 /**
@@ -69,12 +74,11 @@ TransformSystem.prototype.registerTransformAtPath = function registerTransformAt
  *
  * @method deregisterTransformAtPath
  * @return {void}
+ * @alias remove
  *
  * @param {String} path at which to register the transform
  */
-TransformSystem.prototype.deregisterTransformAtPath = function deregisterTransformAtPath (path) {
-    this.pathStore.remove(path);
-};
+TransformSystem.prototype.deregisterTransformAtPath = TransformSystem.prototype.remove;
 
 /**
  * Method which will make the transform currently stored at the given path a breakpoint.
@@ -90,7 +94,7 @@ TransformSystem.prototype.deregisterTransformAtPath = function deregisterTransfo
  * @return {undefined} undefined
  */
 TransformSystem.prototype.makeBreakPointAt = function makeBreakPointAt (path) {
-    var transform = this.pathStore.get(path);
+    var transform = this.get(path);
     if (!transform) throw new Error('No transform Registered at path: ' + path);
     transform.setBreakPoint();
 };
@@ -105,7 +109,7 @@ TransformSystem.prototype.makeBreakPointAt = function makeBreakPointAt (path) {
  * @return {undefined} undefined
  */
 TransformSystem.prototype.makeCalculateWorldMatrixAt = function makeCalculateWorldMatrixAt (path) {
-        var transform = this.pathStore.get(path);
+        var transform = this.get(path);
         if (!transform) throw new Error('No transform Registered at path: ' + path);
         transform.setCalculateWorldMatrix();
 };
@@ -114,15 +118,12 @@ TransformSystem.prototype.makeCalculateWorldMatrixAt = function makeCalculateWor
  * Returns the instance of the transform class associated with the given path,
  * or undefined if no transform is associated.
  *
- * @method
- * 
+ * @method get
+ *
  * @param {String} path The path to lookup
  *
  * @return {Transform | undefined} the transform at that path is available, else undefined.
  */
-TransformSystem.prototype.get = function get (path) {
-    return this.pathStore.get(path);
-};
 
 /**
  * update is called when the transform system requires an update.
@@ -135,8 +136,8 @@ TransformSystem.prototype.get = function get (path) {
  * @return {undefined} undefined
  */
 TransformSystem.prototype.update = function update () {
-    var transforms = this.pathStore.getItems();
-    var paths = this.pathStore.getPaths();
+    var transforms = this.getItems();
+    var paths = this.getPaths();
     var transform;
     var changed;
     var node;
@@ -145,7 +146,7 @@ TransformSystem.prototype.update = function update () {
     var components;
 
     for (var i = 0, len = transforms.length ; i < len ; i++) {
-        node = Dispatch.getNode(paths[i]);
+        node = this._dispatch.getNode(paths[i]);
         if (!node) continue;
         components = node.getComponents();
         transform = transforms[i];
@@ -164,8 +165,6 @@ TransformSystem.prototype.update = function update () {
         }
     }
 };
-
-// private methods
 
 /**
  * Private method to call when align changes. Triggers 'onAlignChange' methods
@@ -372,4 +371,4 @@ function worldTransformChanged (node, components, transform) {
             components[i].onWorldTransformChange(transform);
 }
 
-module.exports = new TransformSystem();
+module.exports = TransformSystem;

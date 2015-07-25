@@ -25,7 +25,6 @@
 'use strict';
 var Geometry = require('../webgl-geometries');
 var Commands = require('../core/Commands');
-var TransformSystem = require('../core/TransformSystem');
 var defaultGeometry = new Geometry.Plane();
 
 /**
@@ -495,7 +494,7 @@ Mesh.prototype.onMount = function onMount (node, id) {
     this._node = node;
     this._id = id;
 
-    TransformSystem.makeCalculateWorldMatrixAt(node.getLocation());
+    this._node._transformSystem.makeCalculateWorldMatrixAt(node.getLocation());
 
     this.draw();
 };
@@ -643,7 +642,7 @@ Mesh.prototype._requestUpdate = function _requestUpdate () {
  */
 Mesh.prototype.init = function init () {
     this._initialized = true;
-    this.onTransformChange(TransformSystem.get(this._node.getLocation()));
+    this.onTransformChange(this._node._transformSystem.get(this._node.getLocation()));
     var size = this._node.getSize();
     this.onSizeChange(size[0], size[1], size[2]);
     this.onOpacityChange(this._node.getOpacity());

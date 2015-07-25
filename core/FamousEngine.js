@@ -49,8 +49,12 @@ var TIME_UPDATE = [Commands.TIME, null];
  */
 function FamousEngine() {
     var _this = this;
+    
+    this._dispatch = new Dispatch(this);
 
-    Dispatch._setUpdater(this);
+    this._sizeSystem = new SizeSystem(this._dispatch);
+
+    this._transformSystem = new TransformSystem(this._dispatch);
 
     this._updateQueue = []; // The updateQueue is a place where nodes
                             // can place themselves in order to be
@@ -75,13 +79,11 @@ function FamousEngine() {
     this._clock = new Clock(); // a clock to keep track of time for the scene
                                // graph.
 
-
     this._channel = new Channel();
     this._channel.onMessage = function (message) {
         _this.handleMessage(message);
     };
 }
-
 
 /**
  * An init script that initializes the FamousEngine with options
@@ -156,8 +158,8 @@ FamousEngine.prototype._update = function _update () {
 
     this._messages[1] = time;
 
-    SizeSystem.update();
-    TransformSystem.update();
+    this._sizeSystem.update();
+    this._transformSystem.update();
 
     while (nextQueue.length) queue.unshift(nextQueue.pop());
 
@@ -261,7 +263,7 @@ FamousEngine.prototype.handleWith = function handleWith (messages) {
         case Commands.TRIGGER: // the TRIGGER command sends a UIEvent to the specified path
             var type = messages.shift();
             var ev = messages.shift();
-            Dispatch.dispatchUIEvent(path, type, ev);
+            this._dispatch.dispatchUIEvent(path, type, ev);
             break;
         default:
             throw new Error('received unknown command: ' + command);
