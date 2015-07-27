@@ -23,10 +23,14 @@
  */
 
 'use strict';
+
+// TODO This will be removed once `Mesh#setGeometry` no longer accepts
+// geometries defined by name.
 var Geometry = require('../webgl-geometries');
+
 var Commands = require('../core/Commands');
 var TransformSystem = require('../core/TransformSystem');
-var defaultGeometry = new Geometry.Plane();
+var Plane = require('../webgl-geometries/primitives/Plane');
 
 /**
  * The Mesh class is responsible for providing the API for how
@@ -53,7 +57,7 @@ function Mesh (node, options) {
     this._requestingUpdate = false;
     this._inDraw = false;
     this.value = {
-        geometry: defaultGeometry,
+        geometry: Plane(),
         drawOptions: null,
         color: null,
         expressions: {},
@@ -108,7 +112,15 @@ Mesh.prototype.getDrawOptions = function getDrawOptions () {
 Mesh.prototype.setGeometry = function setGeometry (geometry, options) {
     if (typeof geometry === 'string') {
         if (!Geometry[geometry]) throw 'Invalid geometry: "' + geometry + '".';
-        else geometry = new Geometry[geometry](options);
+        else {
+            console.warn(
+                'Mesh#setGeometry using the geometry registry is deprecated!\n' +
+                'Instantiate the geometry directly via `new ' + geometry +
+                '(options)` instead!'
+            );
+
+            geometry = new Geometry[geometry](options);
+        }
     }
 
     if (this.value.geometry !== geometry || this._inDraw) {
