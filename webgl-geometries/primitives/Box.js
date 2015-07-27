@@ -52,6 +52,8 @@ var boxData = [
  * @return {Object} constructed geometry
  */
 function BoxGeometry(options) {
+    if (!(this instanceof BoxGeometry)) return new BoxGeometry(options);
+
     options = options || {};
 
     var vertices      = [];
@@ -87,7 +89,10 @@ function BoxGeometry(options) {
         { name: 'indices', data: indices, size: 1 }
     ];
 
-    return new Geometry(options);
+    Geometry.call(this, options);
 }
+
+BoxGeometry.prototype = Object.create(Geometry.prototype);
+BoxGeometry.prototype.constructor = BoxGeometry;
 
 module.exports = BoxGeometry;
