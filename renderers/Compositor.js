@@ -270,7 +270,8 @@ Compositor.prototype.giveSizeFor = function giveSizeFor(iterator, commands) {
     if (context) {
         var size = context.getRootSize();
         this.sendResize(selector, size);
-    } else {
+    }
+    else {
         this.getOrSetContext(selector);
     }
 };
