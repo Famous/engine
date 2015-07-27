@@ -31,8 +31,6 @@ var vertexWrapper = require('../webgl-shaders').vertex;
 var fragmentWrapper = require('../webgl-shaders').fragment;
 var Debug = require('./Debug');
 
-var VERTEX_SHADER = 35633;
-var FRAGMENT_SHADER = 35632;
 var identityMatrix = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
 
 var header = 'precision mediump float;\n';
@@ -183,28 +181,27 @@ Program.prototype.registerMaterial = function registerMaterial(name, material) {
 
     this.registeredMaterials[material._id] |= mask;
 
-    if (type === 'float') {
-        this.definitionFloat.push(material.defines);
-        this.definitionFloat.push('float fa_' + material._id + '() {\n '  + compiled.glsl + ' \n}');
-        this.applicationFloat.push('if (int(abs(ID)) == ' + material._id + ') return fa_' + material._id  + '();');
-    }
-
-    if (type === 'vec3') {
-        this.definitionVec3.push(material.defines);
-        this.definitionVec3.push('vec3 fa_' + material._id + '() {\n '  + compiled.glsl + ' \n}');
-        this.applicationVec3.push('if (int(abs(ID.x)) == ' + material._id + ') return fa_' + material._id + '();');
-    }
-
-    if (type === 'vec4') {
-        this.definitionVec4.push(material.defines);
-        this.definitionVec4.push('vec4 fa_' + material._id + '() {\n '  + compiled.glsl + ' \n}');
-        this.applicationVec4.push('if (int(abs(ID.x)) == ' + material._id + ') return fa_' + material._id + '();');
-    }
-
-    if (type === 'vert') {
-        this.definitionVert.push(material.defines);
-        this.definitionVert.push('vec3 fa_' + material._id + '() {\n '  + compiled.glsl + ' \n}');
-        this.applicationVert.push('if (int(abs(ID.x)) == ' + material._id + ') return fa_' + material._id + '();');
+    switch (type) {
+        case 'float':
+            this.definitionFloat.push(material.defines);
+            this.definitionFloat.push('float fa_' + material._id + '() {\n '  + compiled.glsl + ' \n}');
+            this.applicationFloat.push('if (int(abs(ID)) == ' + material._id + ') return fa_' + material._id  + '();');
+            break;
+        case 'vec3':
+            this.definitionVec3.push(material.defines);
+            this.definitionVec3.push('vec3 fa_' + material._id + '() {\n '  + compiled.glsl + ' \n}');
+            this.applicationVec3.push('if (int(abs(ID.x)) == ' + material._id + ') return fa_' + material._id + '();');
+            break;
+        case 'vec4':
+            this.definitionVec4.push(material.defines);
+            this.definitionVec4.push('vec4 fa_' + material._id + '() {\n '  + compiled.glsl + ' \n}');
+            this.applicationVec4.push('if (int(abs(ID.x)) == ' + material._id + ') return fa_' + material._id + '();');
+            break;
+        case 'vert':
+            this.definitionVert.push(material.defines);
+            this.definitionVert.push('vec3 fa_' + material._id + '() {\n '  + compiled.glsl + ' \n}');
+            this.applicationVert.push('if (int(abs(ID.x)) == ' + material._id + ') return fa_' + material._id + '();');
+            break;
     }
 
     return this.resetProgram();
@@ -250,9 +247,8 @@ Program.prototype.resetProgram = function resetProgram() {
 
     fragmentHeader.push('uniform sampler2D u_textures[7];\n');
 
-    if (this.applicationVert.length) {
+    if (this.applicationVert.length)
         vertexHeader.push('uniform sampler2D u_textures[7];\n');
-    }
 
     for(i = 0; i < this.uniformNames.length; i++) {
         name = this.uniformNames[i];
@@ -290,12 +286,12 @@ Program.prototype.resetProgram = function resetProgram() {
 
     this.gl.attachShader(
         program,
-        this.compileShader(this.gl.createShader(VERTEX_SHADER), vertexSource)
+        this.compileShader(this.gl.createShader(this.gl.VERTEX_SHADER), vertexSource)
     );
 
     this.gl.attachShader(
         program,
-        this.compileShader(this.gl.createShader(FRAGMENT_SHADER), fragmentSource)
+        this.compileShader(this.gl.createShader(this.gl.FRAGMENT_SHADER), fragmentSource)
     );
 
     this.gl.linkProgram(program);
@@ -386,7 +382,7 @@ Program.prototype.setUniforms = function (uniformNames, uniformValue) {
         name = uniformNames[i];
         value = uniformValue[i];
 
-        // Retreive the cached location of the uniform,
+        // Retrieve the cached location of the uniform,
         // requesting a new location from the WebGL context
         // if it does not yet exist.
 
