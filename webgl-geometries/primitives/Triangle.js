@@ -59,9 +59,8 @@ function Triangle (options) {
 
     while(--detail) GeometryHelper.subdivide(indices, vertices, textureCoords);
 
-    if (options.backface !== false) {
-        GeometryHelper.addBackfaceTriangles(vertices, indices);
-    }
+    if (options.backface !== false)
+        GeometryHelper.addBackfaceTriangles(indices);
 
     normals = GeometryHelper.computeNormals(vertices, indices);
 

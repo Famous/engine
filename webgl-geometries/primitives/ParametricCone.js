@@ -50,9 +50,8 @@ function ParametricCone (options) {
         ParametricCone.generator.bind(null, radius)
     );
 
-    if (options.backface !== false) {
-        GeometryHelper.addBackfaceTriangles(buffers.vertices, buffers.indices);
-    }
+    if (options.backface !== false)
+        GeometryHelper.addBackfaceTriangles(buffers.indices);
 
     options.buffers = [
         { name: 'a_pos', data: buffers.vertices },

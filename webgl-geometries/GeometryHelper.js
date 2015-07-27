@@ -528,39 +528,18 @@ GeometryHelper.trianglesToLines = function triangleToLines(indices, out) {
 };
 
 /**
- * Adds a reverse order triangle for every triangle in the mesh. Adds extra vertices
- * and indices to input arrays.
+ * Adds a reverse order triangle for every triangle in the mesh. Adds extra
+ * indices to input array.
  *
  * @static
  * @method
  *
- * @param {Array} vertices X, Y, Z positions of all vertices in the geometry
  * @param {Array} indices Indices of all faces on the geometry
  * @return {undefined} undefined
  */
-GeometryHelper.addBackfaceTriangles = function addBackfaceTriangles(vertices, indices) {
-    var nFaces = indices.length / 3;
-
-    var maxIndex = 0;
-    var i = indices.length;
-    while (i--) if (indices[i] > maxIndex) maxIndex = indices[i];
-
-    maxIndex++;
-
-    for (i = 0; i < nFaces; i++) {
-        var indexOne = indices[i * 3],
-            indexTwo = indices[i * 3 + 1],
-            indexThree = indices[i * 3 + 2];
-
-        indices.push(indexOne + maxIndex, indexThree + maxIndex, indexTwo + maxIndex);
-    }
-
-    // Iterating instead of .slice() here to avoid max call stack issue.
-
-    var nVerts = vertices.length;
-    for (i = 0; i < nVerts; i++) {
-        vertices.push(vertices[i]);
-    }
+GeometryHelper.addBackfaceTriangles = function addBackfaceTriangles(indices) {
+    for (var face = 0, len = indices.length; face < len; face += 3)
+        indices.push(indices[face], indices[face + 2], indices[face + 1]);
 };
 
 module.exports = GeometryHelper;
