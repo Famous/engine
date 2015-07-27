@@ -44,9 +44,8 @@ function Circle (options) {
     var detail   = options.detail || 30;
     var buffers  = getCircleBuffers(detail, true);
 
-    if (options.backface !== false) {
-        GeometryHelper.addBackfaceTriangles(buffers.vertices, buffers.indices);
-    }
+    if (options.backface !== false)
+        GeometryHelper.addBackfaceTriangles(buffers.indices);
 
     var textureCoords = getCircleTexCoords(buffers.vertices);
     var normals = GeometryHelper.computeNormals(buffers.vertices, buffers.indices);
