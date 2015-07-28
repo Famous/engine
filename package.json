@@ -26,7 +26,9 @@
     "lint": "eslint --ignore-path .gitignore .",
     "build": "npm run build-debug && npm run build-min",
     "build-debug": "browserify index.js -d --standalone famous > dist/famous.js",
-    "build-min": "browserify index.js --standalone famous | uglifyjs --screw-ie8 -m -c dead_code,sequences,conditionals,booleans,unused,if_return,join_vars,drop_debugger > dist/famous.min.js"
+    "build-min": "browserify index.js --standalone famous | uglifyjs --screw-ie8 -m -c dead_code,sequences,conditionals,booleans,unused,if_return,join_vars,drop_debugger > dist/famous.min.js",
+    "build-umd": "babel ./ --source-maps --out-dir ./build --ignore node_modules --modules umd",
+    "build-amd": "babel ./ --source-maps --out-dir ./build --ignore node_modules --modules amd"
   },
   "repository": {
     "type": "git",
@@ -35,6 +37,7 @@
   "author": "Famous",
   "license": "MIT",
   "devDependencies": {
+    "babel": "^5.8.21",
     "browserify": "^11.0.0",
     "colors": "^1.1.0",
     "eslint": "^0.24.1",
