@@ -1,6 +1,6 @@
 {
-  "name": "famous",
-  "version": "0.7.1",
+  "name": "infamous-engine",
+  "version": "0.7.1-webpack.0",
   "description": "",
   "main": "index.js",
   "scripts": {

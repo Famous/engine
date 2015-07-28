@@ -24,11 +24,12 @@
 
 'use strict';
 
-var glslify = require('glslify');
+var VertexShader = require('./VertexShader.glsl')
+var FragmentShader = require('./FragmentShader.glsl')
 
 var shaders = {
-    vertex: glslify('./VertexShader.glsl'),
-    fragment: glslify('./FragmentShader.glsl')
+    vertex: VertexShader,
+    fragment: FragmentShader
 };
 
 module.exports = shaders;
