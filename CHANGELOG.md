@@ -1,5 +1,26 @@
 # Famous Rendering Engine Changelog
 
+## 0.7.1
+
+### Bug Fixes
+
+- Account for empty registry values a5d7fd552505c0f2d40c4a86aa0a61950736ff16
+- Send draw command upon dismount 884f082df8453f372ff97fba53e518c91850b18e
+- Correctly mount and dismount mesh 85060e458e4bbbbe515f9ac9dc0620fc43ea38fd
+- showing child components on hide in Node [#97865428] 3ccd502b91dd4ba54feb82d54558a9ce9612e65e
+- #396 6f8336f94eef456c87893c2387d63625ba51df9c
+- dom-element checks for sizeMode onMount 28a9bbdcfb9e9d7db87a8f69f45dcfe113d1448f
+- Correctly request Mesh update 46ea658aab939794ab9cb51095554c6a60a9f7fe
+- Only update mesh when node is mounted 6718be9445a326030acdb7064a04d3a6571a7199
+- Fix FamousEngine#addScene 3e34f91a56f5b595a5430d8a09af7453236f6141
+- mounting bug 3c0004063eb08add7b01f2c93db9d61a8454cd23
+
+### Testing and Tooling
+
+- Add test-case for man in the middle insertion 216ed5f444717c301661d92d9b41099600b68b64
+- Add naive test cases for WebGLRenderer 45c9b2c3cb8a53ea3fbfd391e364660a9139d41f
+
+
 ## 0.7.0
 
 ### Breaking Changes
