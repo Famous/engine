@@ -46,6 +46,10 @@
     "tap-closer": "^1.0.0",
     "tape": "^4.0.0",
     "tap-spec": "^4.0.0",
+    "escodegen": "^1.6.1",
+    "esprima": "^2.2.0",
+    "replace-method": "0.0.0",
+    "through": "^2.3.7",
     "uglify-js": "^2.4.17"
   },
   "dependencies": {
@@ -53,6 +57,7 @@
   },
   "browserify": {
     "transform": [
+      ["./scripts/optimize-assertions", { "stripErrors": false, "preCheck": true }],
       "glslify"
     ]
   }

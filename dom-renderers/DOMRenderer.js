@@ -30,6 +30,7 @@ var PathUtils = require('../core/Path');
 var vendorPrefix = require('../utilities/vendorPrefix');
 var CallbackStore = require('../utilities/CallbackStore');
 var eventMap = require('./events/EventMap');
+var assert = require('../utilities/assert');
 
 var TRANSFORM = null;
 
@@ -93,7 +94,6 @@ function DOMRenderer (element, selector, compositor) {
     this._lastEv = null;
 }
 
-
 /**
  * Attaches an EventListener to the element associated with the passed in path.
  * Prevents the default browser action on all subsequent events if
@@ -110,9 +110,24 @@ function DOMRenderer (element, selector, compositor) {
  * @return {undefined} undefined
  */
 DOMRenderer.prototype.subscribe = function subscribe(type) {
-    this._assertTargetLoaded();
+    assert(this._target, 'No target loaded');
     this._listen(type);
     this._target.subscribe[type] = true;
+};
+
+/**
+ * Unsubscribes from all events that are of the specified type.
+ *
+ * @method
+ *
+ * @param  {String} type    Event type to unsubscribe from.
+ * @return {undefined}      undefined
+ */
+DOMRenderer.prototype.unsubscribe = function unsubscribe(type) {
+    assert(this._target, 'No target loaded');
+
+    this._listen(type);
+    this._target.subscribe[type] = false;
 };
 
 /**
@@ -125,7 +140,8 @@ DOMRenderer.prototype.subscribe = function subscribe(type) {
  * @return {undefined}      undefined
  */
 DOMRenderer.prototype.preventDefault = function preventDefault(type) {
-    this._assertTargetLoaded();
+    assert(this._target, 'No target loaded');
+
     this._listen(type);
     this._target.preventDefault[type] = true;
 };
@@ -142,7 +158,8 @@ DOMRenderer.prototype.preventDefault = function preventDefault(type) {
  * @return {undefined}      undefined
  */
 DOMRenderer.prototype.allowDefault = function allowDefault(type) {
-    this._assertTargetLoaded();
+    assert(this._target, 'No target loaded');
+
     this._listen(type);
     this._target.preventDefault[type] = false;
 };
@@ -163,7 +180,7 @@ DOMRenderer.prototype.allowDefault = function allowDefault(type) {
  * @return {undefined}      undefined
  */
 DOMRenderer.prototype._listen = function _listen(type) {
-    this._assertTargetLoaded();
+    assert(this._target, 'No target loaded');
 
     if (
         !this._target.listeners[type] && !this._root.listeners[type]
@@ -173,19 +190,6 @@ DOMRenderer.prototype._listen = function _listen(type) {
         target.listeners[type] = this._boundTriggerEvent;
         target.element.addEventListener(type, this._boundTriggerEvent);
     }
-};
-
-/**
- * Unsubscribes from all events that are of the specified type.
- *
- * @method
- *
- * @param {String} type DOM event type (e.g. click, mouseover).
- * @return {undefined} undefined
- */
-DOMRenderer.prototype.unsubscribe = function unsubscribe(type) {
-    this._assertTargetLoaded();
-    this._target.subscribe[type] = false;
 };
 
 /**
@@ -235,7 +239,6 @@ DOMRenderer.prototype._triggerEvent = function _triggerEvent(ev) {
         }
     }
 };
-
 
 /**
  * getSizeOf gets the dom size of a particular DOM element.  This is
@@ -308,55 +311,6 @@ DOMRenderer.prototype.draw = function draw(renderState) {
     }
 };
 
-
-/**
- * Internal helper function used for ensuring that a path is currently loaded.
- *
- * @method
- * @private
- *
- * @return {undefined} undefined
- */
-DOMRenderer.prototype._assertPathLoaded = function _asserPathLoaded() {
-    if (!this._path) throw new Error('path not loaded');
-};
-
-/**
- * Internal helper function used for ensuring that a parent is currently loaded.
- *
- * @method
- * @private
- *
- * @return {undefined} undefined
- */
-DOMRenderer.prototype._assertParentLoaded = function _assertParentLoaded() {
-    if (!this._parent) throw new Error('parent not loaded');
-};
-
-/**
- * Internal helper function used for ensuring that children are currently
- * loaded.
- *
- * @method
- * @private
- *
- * @return {undefined} undefined
- */
-DOMRenderer.prototype._assertChildrenLoaded = function _assertChildrenLoaded() {
-    if (!this._children) throw new Error('children not loaded');
-};
-
-/**
- * Internal helper function used for ensuring that a target is currently loaded.
- *
- * @method  _assertTargetLoaded
- *
- * @return {undefined} undefined
- */
-DOMRenderer.prototype._assertTargetLoaded = function _assertTargetLoaded() {
-    if (!this._target) throw new Error('No target loaded');
-};
-
 /**
  * Finds and sets the parent of the currently loaded element (path).
  *
@@ -366,7 +320,7 @@ DOMRenderer.prototype._assertTargetLoaded = function _assertTargetLoaded() {
  * @return {ElementCache} Parent element.
  */
 DOMRenderer.prototype.findParent = function findParent () {
-    this._assertPathLoaded();
+    assert(this._path, 'No path loaded');
 
     var path = this._path;
     var parent;
@@ -453,7 +407,7 @@ DOMRenderer.prototype.insertEl = function insertEl (tagName) {
 
     this.findParent();
 
-    this._assertParentLoaded();
+    assert(this._parent, 'No parent loaded');
 
     if (this._parent.void)
         throw new Error(
@@ -475,7 +429,6 @@ DOMRenderer.prototype.insertEl = function insertEl (tagName) {
 
 };
 
-
 /**
  * Sets a property on the currently loaded target.
  *
@@ -487,10 +440,9 @@ DOMRenderer.prototype.insertEl = function insertEl (tagName) {
  * @return {undefined} undefined
  */
 DOMRenderer.prototype.setProperty = function setProperty (name, value) {
-    this._assertTargetLoaded();
+    assert(this._target, 'No target loaded');
     this._target.element.style[name] = value;
 };
-
 
 /**
  * Sets the size of the currently loaded target.
@@ -508,7 +460,7 @@ DOMRenderer.prototype.setProperty = function setProperty (name, value) {
  * @return {undefined} undefined
  */
 DOMRenderer.prototype.setSize = function setSize (width, height) {
-    this._assertTargetLoaded();
+    assert(this._target, 'No target loaded');
 
     this.setWidth(width);
     this.setHeight(height);
@@ -528,7 +480,7 @@ DOMRenderer.prototype.setSize = function setSize (width, height) {
  * @return {undefined} undefined
  */
 DOMRenderer.prototype.setWidth = function setWidth(width) {
-    this._assertTargetLoaded();
+    assert(this._target, 'No target loaded');
 
     var contentWrapper = this._target.content;
 
@@ -561,7 +513,7 @@ DOMRenderer.prototype.setWidth = function setWidth(width) {
  * @return {undefined} undefined
  */
 DOMRenderer.prototype.setHeight = function setHeight(height) {
-    this._assertTargetLoaded();
+    assert(this._target, 'No target loaded');
 
     var contentWrapper = this._target.content;
 
@@ -591,7 +543,7 @@ DOMRenderer.prototype.setHeight = function setHeight(height) {
  * @return {undefined} undefined
  */
 DOMRenderer.prototype.setAttribute = function setAttribute(name, value) {
-    this._assertTargetLoaded();
+    assert(this._target, 'No target loaded');
     this._target.element.setAttribute(name, value);
 };
 
@@ -605,7 +557,7 @@ DOMRenderer.prototype.setAttribute = function setAttribute(name, value) {
  * @return {undefined} undefined
  */
 DOMRenderer.prototype.setContent = function setContent(content) {
-    this._assertTargetLoaded();
+    assert(this._target, 'No target loaded');
 
     if (this._target.formElement) {
         this._target.element.value = content;
@@ -629,7 +581,6 @@ DOMRenderer.prototype.setContent = function setContent(content) {
     );
 };
 
-
 /**
  * Sets the passed in transform matrix (world space). Inverts the parent's world
  * transform.
@@ -641,10 +592,9 @@ DOMRenderer.prototype.setContent = function setContent(content) {
  * @return {undefined} undefined
  */
 DOMRenderer.prototype.setMatrix = function setMatrix (transform) {
-    this._assertTargetLoaded();
+    assert(this._target, 'No target loaded');
     this._target.element.style[TRANSFORM] = this._stringifyMatrix(transform);
 };
-
 
 /**
  * Adds a class to the classList associated with the currently loaded target.
@@ -656,10 +606,9 @@ DOMRenderer.prototype.setMatrix = function setMatrix (transform) {
  * @return {undefined} undefined
  */
 DOMRenderer.prototype.addClass = function addClass(domClass) {
-    this._assertTargetLoaded();
+    assert(this._target, 'No target loaded');
     this._target.element.classList.add(domClass);
 };
-
 
 /**
  * Removes a class from the classList associated with the currently loaded
@@ -672,10 +621,9 @@ DOMRenderer.prototype.addClass = function addClass(domClass) {
  * @return {undefined} undefined
  */
 DOMRenderer.prototype.removeClass = function removeClass(domClass) {
-    this._assertTargetLoaded();
+    assert(this._target, 'No target loaded');
     this._target.element.classList.remove(domClass);
 };
-
 
 /**
  * Stringifies the passed in matrix for setting the `transform` property.
