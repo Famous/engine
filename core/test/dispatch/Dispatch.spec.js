@@ -157,12 +157,12 @@ test('Dispatch singleton', function (t) {
                 Dispatch.dispatch('path/1', expectedEvent, expectedPayload);
 
                 t.equal(
-                    received.indexOf('path/1'), -1,
-                    'path/1 should not receive event dispatched via Dispatch.dispatch("path/1")'
+                    received.indexOf('path/1'), 0,
+                    'path/1 should receive event dispatched via Dispatch.dispatch("path/1")'
                 );
 
                 t.deepEqual(
-                    received, ['path/1/2', 'path/1/1', 'path/1/2/3', 'path/1/2/4'],
+                    received, ['path/1', 'path/1/2', 'path/1/1', 'path/1/2/3', 'path/1/2/4'],
                     'Dispatch.dispatch should trigger event first on parent, then on children'
                 );
 
@@ -204,16 +204,22 @@ test('Dispatch singleton', function (t) {
                 Dispatch.dispatch('path', 'event1', {payload: 1});
 
                 t.equal(
-                    received.length, 7,
+                    received.length, 9,
                     'Dispatching an event while processing a previous event should result into the correct number of events being received by the nodes'
                 );
+
+                received.forEach(function (node) {
+                    delete node[2].node;
+                });
 
                 t.deepEqual(
                     received,
                     [
+                        [ 'path', 'event1', { payload: 1 } ],
                         [ 'path/1', 'event1', { payload: 1 } ],
                         [ 'path/1/2', 'event1', { payload: 1 } ],
                         [ 'path/1/1', 'event1', { payload: 1 } ],
+                        [ 'path/1/2', 'event2', { payload: 2 } ],
                         [ 'path/1/2/3', 'event2', { payload: 2 } ],
                         [ 'path/1/2/4', 'event2', { payload: 2 } ],
                         [ 'path/1/2/3', 'event1', { payload: 1 } ],
