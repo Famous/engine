@@ -183,6 +183,15 @@ Node.prototype._setUpdater = function _setUpdater (updater) {
 };
 
 /**
+ * Scene getUpdater function returns the previously set updater.
+ *
+ * @return {Object} the updater of this Node
+ */
+Node.prototype.getUpdater = function getUpdater () {
+    return this._updater;
+};
+
+/**
  * Determine the node's location in the scene graph hierarchy.
  * A location of `body/0/1` can be interpreted as the following scene graph
  * hierarchy (ignoring siblings of ancestors and additional child nodes):

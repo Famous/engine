@@ -371,8 +371,11 @@ FamousEngine.prototype.createScene = function createScene (selector) {
     selector = selector || 'body';
 
     if (this._scenes[selector]) this._scenes[selector].dismount();
-    this._scenes[selector] = new Scene(selector, this);
-    return this._scenes[selector];
+
+    var scene = new Scene();
+    this._scenes[selector] = scene;
+    scene.mount(selector);
+    return scene;
 };
 
 /**
@@ -385,11 +388,11 @@ FamousEngine.prototype.createScene = function createScene (selector) {
  * @return {FamousEngine} this
  */
 FamousEngine.prototype.addScene = function addScene (scene) {
-    var selector = scene._selector;
+    var selector = scene._id;
 
     var current = this._scenes[selector];
     if (current && current !== scene) current.dismount();
-    if (!scene.isMounted()) scene.mount(scene.getSelector());
+    if (!scene.isMounted()) scene.mount(scene._id);
     this._scenes[selector] = scene;
     return this;
 };
@@ -404,12 +407,13 @@ FamousEngine.prototype.addScene = function addScene (scene) {
  * @return {FamousEngine} this
  */
 FamousEngine.prototype.removeScene = function removeScene (scene) {
-    var selector = scene._selector;
+    var selector = scene._id;
 
     var current = this._scenes[selector];
     if (current && current === scene) {
         if (scene.isMounted()) scene.dismount();
         delete this._scenes[selector];
+        this._messages.push(Commands.WITH, selector, Commands.REMOVE_SCENE);
     }
     return this;
 };

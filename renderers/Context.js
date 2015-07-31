@@ -153,6 +153,12 @@ Context.prototype._initDOMRenderer = function _initDOMRenderer() {
     );
 };
 
+Context.prototype.cleanup = function cleanup () {
+    this._rootEl.removeChild(this._domRendererRootEl);
+    if (this._webGLRendererRootEl)
+        this._rootEl.removeChild(this._webGLRendererRootEl);
+};
+
 Context.prototype.initCommandCallbacks = function initCommandCallbacks () {
     this._commandCallbacks[Commands.INIT_DOM] = initDOM;
     this._commandCallbacks[Commands.DOM_RENDER_SIZE] = domRenderSize;
@@ -182,6 +188,7 @@ Context.prototype.initCommandCallbacks = function initCommandCallbacks () {
     this._commandCallbacks[Commands.PREVENT_DEFAULT] = preventDefault;
     this._commandCallbacks[Commands.ALLOW_DEFAULT] = allowDefault;
     this._commandCallbacks[Commands.READY] = ready;
+    this._commandCallbacks[Commands.REMOVE_SCENE] = removeScene;
 };
 
 /**
@@ -538,6 +545,11 @@ function changeViewTransform (context, path, commands, iterator) {
 
     context._renderState.viewDirty = true;
     return iterator;
+}
+
+function removeScene (context, path, commands, iterator) {
+    context._compositor.removeContext(path);
+    return commands.length - 1;
 }
 
 module.exports = Context;
