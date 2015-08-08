@@ -567,7 +567,7 @@ DOMElement.prototype.setAttribute = function setAttribute (name, value) {
     if (this._attributes[name] !== value || this._inDraw) {
         this._attributes[name] = value;
         if (this._initialized) this._changeQueue.push(Commands.CHANGE_ATTRIBUTE, name, value);
-        if (!this._requestUpdate) this._requestUpdate();
+        if (!this._requestingUpdate) this._requestUpdate();
     }
 
     return this;
