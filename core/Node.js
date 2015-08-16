@@ -922,8 +922,8 @@ Node.prototype._vecOptionalSet = function _vecOptionalSet (vec, index, val) {
  * @return {Node} this
  */
 Node.prototype.show = function show () {
-    Dispatch.show(this.getLocation());
     this._shown = true;
+    Dispatch.show(this.getLocation());
     return this;
 };
 
@@ -937,8 +937,8 @@ Node.prototype.show = function show () {
  * @return {Node} this
  */
 Node.prototype.hide = function hide () {
-    Dispatch.hide(this.getLocation());
     this._shown = false;
+    Dispatch.hide(this.getLocation());
     return this;
 };
 

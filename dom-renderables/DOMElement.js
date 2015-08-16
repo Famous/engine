@@ -204,7 +204,7 @@ DOMElement.prototype.onDismount = function onDismount() {
  * @return {undefined} undefined
  */
 DOMElement.prototype.onShow = function onShow() {
-    this.setProperty('display', 'block');
+    if (this._node.isShown()) this.setProperty('display', 'block');
 };
 
 /**
