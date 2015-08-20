@@ -158,8 +158,8 @@ Position.prototype._checkUpdate = function _checkUpdate() {
  * @return {undefined} undefined
  */
 Position.prototype.update = function update () {
-    this._node.setPosition(this._x.get(), this._y.get(), this._z.get());
     this._checkUpdate();
+    this._node.setPosition(this._x.get(), this._y.get(), this._z.get());
 };
 
 Position.prototype.onUpdate = Position.prototype.update;
