@@ -23,10 +23,15 @@
  */
 
 'use strict';
+
+// TODO This will be removed once `Mesh#setGeometry` no longer accepts
+// geometries defined by name.
 var Geometry = require('../webgl-geometries');
+
 var Commands = require('../core/Commands');
 var TransformSystem = require('../core/TransformSystem');
-var defaultGeometry = new Geometry.Plane();
+var Plane = require('../webgl-geometries/primitives/Plane');
+var OpacitySystem = require('../core/OpacitySystem');
 
 /**
  * The Mesh class is responsible for providing the API for how
@@ -53,7 +58,7 @@ function Mesh (node, options) {
     this._requestingUpdate = false;
     this._inDraw = false;
     this.value = {
-        geometry: defaultGeometry,
+        geometry: Plane(),
         drawOptions: null,
         color: null,
         expressions: {},
@@ -108,7 +113,15 @@ Mesh.prototype.getDrawOptions = function getDrawOptions () {
 Mesh.prototype.setGeometry = function setGeometry (geometry, options) {
     if (typeof geometry === 'string') {
         if (!Geometry[geometry]) throw 'Invalid geometry: "' + geometry + '".';
-        else geometry = new Geometry[geometry](options);
+        else {
+            console.warn(
+                'Mesh#setGeometry using the geometry registry is deprecated!\n' +
+                'Instantiate the geometry directly via `new ' + geometry +
+                '(options)` instead!'
+            );
+
+            geometry = new Geometry[geometry](options);
+        }
     }
 
     if (this.value.geometry !== geometry || this._inDraw) {
@@ -496,6 +509,7 @@ Mesh.prototype.onMount = function onMount (node, id) {
     this._id = id;
 
     TransformSystem.makeCalculateWorldMatrixAt(node.getLocation());
+    OpacitySystem.makeCalculateWorldOpacityAt(node.getLocation());
 
     this.draw();
 };
@@ -601,7 +615,7 @@ Mesh.prototype.onOpacityChange = function onOpacityChange (opacity) {
     if (this._initialized) {
         this._changeQueue.push(Commands.GL_UNIFORMS);
         this._changeQueue.push('u_opacity');
-        this._changeQueue.push(opacity);
+        this._changeQueue.push(opacity.getWorldOpacity());
     }
 
     this._requestUpdate();
@@ -644,9 +658,9 @@ Mesh.prototype._requestUpdate = function _requestUpdate () {
 Mesh.prototype.init = function init () {
     this._initialized = true;
     this.onTransformChange(TransformSystem.get(this._node.getLocation()));
+    this.onOpacityChange(OpacitySystem.get(this._node.getLocation()));
     var size = this._node.getSize();
     this.onSizeChange(size[0], size[1], size[2]);
-    this.onOpacityChange(this._node.getOpacity());
     this._requestUpdate();
 };
 

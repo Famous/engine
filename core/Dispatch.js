@@ -38,7 +38,7 @@ var PathUtils = require('./Path');
 function Dispatch () {
     this._nodes = {}; // a container for constant time lookup of nodes
 
-    this._queue = []; // The queue is used for two purposes
+                      // The queue is used for two purposes
                       // 1. It is used to list indicies in the
                       //    Nodes path which are then used to lookup
                       //    a node in the scene graph.
@@ -62,49 +62,6 @@ Dispatch.prototype._setUpdater = function _setUpdater (updater) {
     this._updater = updater;
 
     for (var key in this._nodes) this._nodes[key]._setUpdater(updater);
-};
-
-/**
- * Enque the children of a node within the dispatcher. Does not clear
- * the dispatchers queue first.
- *
- * @method addChildrenToQueue
- * @return {void}
- *
- * @param {Node} node from which to add children to the queue
- */
-Dispatch.prototype.addChildrenToQueue = function addChildrenToQueue (node) {
-    var children = node.getChildren();
-    var child;
-    for (var i = 0, len = children.length ; i < len ; i++) {
-        child = children[i];
-        if (child) this._queue.push(child);
-    }
-};
-
-/**
- * Returns the next item in the Dispatch's queue.
- *
- * @method next
- * @return {Node} next node in the queue
- */
-Dispatch.prototype.next = function next () {
-    return this._queue.shift();
-};
-
-/**
- * Returns the next node in the queue, but also adds its children to
- * the end of the queue. Continually calling this method will result
- * in a breadth first traversal of the render tree.
- *
- * @method breadthFirstNext
- * @return {Node | undefined} the next node in the traversal if one exists
- */
-Dispatch.prototype.breadthFirstNext = function breadthFirstNext () {
-    var child = this._queue.shift();
-    if (!child) return void 0;
-    this.addChildrenToQueue(child);
-    return child;
 };
 
 /**
@@ -254,13 +211,15 @@ Dispatch.prototype.show = function show (path) {
         if (components[i] && components[i].onShow)
             components[i].onShow();
 
+    var queue = allocQueue();
 
-    this.addChildrenToQueue(node);
+    addChildrenToQueue(node, queue);
     var child;
 
-    while ((child = this.breadthFirstNext()))
+    while ((child = breadthFirstNext(queue)))
         this.show(child.getLocation());
 
+    deallocQueue(queue);
 };
 
 /**
@@ -288,13 +247,15 @@ Dispatch.prototype.hide = function hide (path) {
         if (components[i] && components[i].onHide)
             components[i].onHide();
 
+    var queue = allocQueue();
 
-    this.addChildrenToQueue(node);
+    addChildrenToQueue(node, queue);
     var child;
 
-    while ((child = this.breadthFirstNext()))
+    while ((child = breadthFirstNext(queue)))
         this.hide(child.getLocation());
 
+    deallocQueue(queue);
 };
 
 /**
@@ -308,13 +269,15 @@ Dispatch.prototype.hide = function hide (path) {
 Dispatch.prototype.lookupNode = function lookupNode (location) {
     if (!location) throw new Error('lookupNode must be called with a path');
 
-    this._queue.length = 0;
-    var path = this._queue;
+    var path = allocQueue();
 
     _splitTo(location, path);
 
     for (var i = 0, len = path.length ; i < len ; i++)
         path[i] = this._nodes[path[i]];
+
+    path.length = 0;
+    deallocQueue(path);
 
     return path[path.length - 1];
 };
@@ -336,16 +299,31 @@ Dispatch.prototype.dispatch = function dispatch (path, event, payload) {
     if (!event) throw new Error('dispatch requires an event name as it\'s second argument');
 
     var node = this._nodes[path];
-    
+
     if (!node) return;
 
-    this.addChildrenToQueue(node);
-    var child;
+    payload.node = node;
 
-    while ((child = this.breadthFirstNext()))
+    var queue = allocQueue();
+    queue.push(node);
+
+    var child;
+    var components;
+    var i;
+    var len;
+
+    while ((child = breadthFirstNext(queue))) {
         if (child && child.onReceive)
             child.onReceive(event, payload);
 
+        components = child.getComponents();
+
+        for (i = 0, len = components.length ; i < len ; i++)
+            if (components[i] && components[i].onReceive)
+                components[i].onReceive(event, payload);
+    }
+
+    deallocQueue(queue);
 };
 
 /**
@@ -391,6 +369,32 @@ Dispatch.prototype.dispatchUIEvent = function dispatchUIEvent (path, event, payl
     }
 };
 
+var queues = [];
+
+/**
+ * Helper method used for allocating a new queue or reusing a previously freed
+ * one if possible.
+ *
+ * @private
+ *
+ * @return {Array} allocated queue.
+ */
+function allocQueue() {
+    return queues.pop() || [];
+}
+
+/**
+ * Helper method used for freeing a previously allocated queue.
+ *
+ * @private
+ *
+ * @param  {Array} queue    the queue to be relased to the pool.
+ * @return {undefined}      undefined
+ */
+function deallocQueue(queue) {
+    queues.push(queue);
+}
+
 /**
  * _splitTo is a private method which takes a path and splits it at every '/'
  * pushing the result into the supplied array. This is a destructive change.
@@ -418,5 +422,42 @@ function _splitTo (string, target) {
 
     return target;
 }
+
+/**
+ * Enque the children of a node within the dispatcher. Does not clear
+ * the dispatchers queue first.
+ *
+ * @method addChildrenToQueue
+ *
+ * @param {Node} node from which to add children to the queue
+ * @param {Array} queue the queue used for retrieving the new child from
+ *
+ * @return {void}
+ */
+function addChildrenToQueue (node, queue) {
+    var children = node.getChildren();
+    var child;
+    for (var i = 0, len = children.length ; i < len ; i++) {
+        child = children[i];
+        if (child) queue.push(child);
+    }
+}
+
+/**
+ * Returns the next node in the queue, but also adds its children to
+ * the end of the queue. Continually calling this method will result
+ * in a breadth first traversal of the render tree.
+ *
+ * @method breadthFirstNext
+ * @param {Array} queue the queue used for retrieving the new child from
+ * @return {Node | undefined} the next node in the traversal if one exists
+ */
+function breadthFirstNext (queue) {
+    var child = queue.shift();
+    if (!child) return void 0;
+    addChildrenToQueue(child, queue);
+    return child;
+}
+
 
 module.exports = new Dispatch();

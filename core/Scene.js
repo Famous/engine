@@ -30,6 +30,7 @@ var Node = require('./Node');
 var Dispatch = require('./Dispatch');
 var Commands = require('./Commands');
 var TransformSystem = require('./TransformSystem');
+var OpacitySystem = require('./OpacitySystem');
 var SizeSystem = require('./SizeSystem');
 
 /**
@@ -147,6 +148,7 @@ Scene.prototype.mount = function mount (path) {
     this._mounted = true;
     this._parent = this;
     TransformSystem.registerTransformAtPath(path);
+    OpacitySystem.registerOpacityAtPath(path);
     SizeSystem.registerSizeAtPath(path);
 };
 

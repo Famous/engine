@@ -40,6 +40,8 @@ var GeometryHelper = require('../GeometryHelper');
  * @return {Object} constructed geometry
  */
 function Tetrahedron(options) {
+    if (!(this instanceof Tetrahedron)) return new Tetrahedron(options);
+
     var textureCoords = [];
     var normals = [];
     var detail;
@@ -95,7 +97,10 @@ function Tetrahedron(options) {
         { name: 'indices', data: indices, size: 1 }
     ];
 
-    return new Geometry(options);
+    Geometry.call(this, options);
 }
+
+Tetrahedron.prototype = Object.create(Geometry.prototype);
+Tetrahedron.prototype.constructor = Tetrahedron;
 
 module.exports = Tetrahedron;

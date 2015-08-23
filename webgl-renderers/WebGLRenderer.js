@@ -64,7 +64,7 @@ function WebGLRenderer(canvas, compositor) {
     this.canvas = canvas;
     this.compositor = compositor;
 
-    var gl = this.gl = this.getWebGLContext(this.canvas);
+    var gl = this.getWebGLContext(this.canvas);
 
     gl.clearColor(0.0, 0.0, 0.0, 0.0);
     gl.polygonOffset(0.1, 0.1);
@@ -76,7 +76,9 @@ function WebGLRenderer(canvas, compositor) {
     gl.enable(gl.CULL_FACE);
     gl.cullFace(gl.BACK);
 
-    this.meshRegistry = new Registry();
+    this.meshRegistry = {};
+    this.meshRegistryKeys = [];
+
     this.cutoutRegistry = new Registry();
     this.lightRegistry = new Registry();
 
@@ -147,24 +149,17 @@ function WebGLRenderer(canvas, compositor) {
  * @return {Object} WebGLContext WebGL context
  */
 WebGLRenderer.prototype.getWebGLContext = function getWebGLContext(canvas) {
+    if (this.gl) return this.gl;
+
     var names = ['webgl', 'experimental-webgl', 'webkit-3d', 'moz-webgl'];
-    var context;
 
-    for (var i = 0, len = names.length; i < len; i++) {
-        try {
-            context = canvas.getContext(names[i]);
-        }
-        catch (error) {
-            console.error('Error creating WebGL context: ' + error.toString());
-        }
-        if (context) return context;
-    }
+    for (var i = 0, len = names.length; i < len && !this.gl; i++)
+        this.gl = canvas.getContext(names[i]);
 
-    if (!context) {
-        console.error('Could not retrieve WebGL context. Please refer to https://www.khronos.org/webgl/ for requirements');
-        return false;
-    }
+    if (!this.gl)
+        throw new Error('Could not retrieve WebGL context. Please refer to https://www.khronos.org/webgl/ for requirements');
 
+    return this.gl;
 };
 
 /**
@@ -217,7 +212,8 @@ WebGLRenderer.prototype.createMesh = function createMesh(path) {
         visible: true
     };
 
-    this.meshRegistry.register(path, mesh);
+    this.meshRegistry[path] = mesh;
+    this.meshRegistryKeys.push(path);
     return mesh;
 };
 
@@ -284,7 +280,7 @@ WebGLRenderer.prototype.getOrSetCutout = function getOrSetCutout(path) {
  * @return {undefined} undefined
  */
 WebGLRenderer.prototype.setMeshVisibility = function setMeshVisibility(path, visibility) {
-    var mesh = this.meshRegistry.get(path) || this.createMesh(path);
+    var mesh = this.meshRegistry[path] || this.createMesh(path);
 
     mesh.visible = visibility;
 };
@@ -298,7 +294,10 @@ WebGLRenderer.prototype.setMeshVisibility = function setMeshVisibility(path, vis
  * @return {undefined} undefined
  */
 WebGLRenderer.prototype.removeMesh = function removeMesh(path) {
-    this.meshRegistry.unregister(path);
+    delete this.meshRegistry[path];
+    var index = this.meshRegistryKeys.indexOf(path);
+
+    if (index !== -1) this.meshRegistryKeys.splice(index, 1);
 };
 
 /**
@@ -336,7 +335,7 @@ WebGLRenderer.prototype.setCutoutUniform = function setCutoutUniform(path, unifo
  * @return {WebGLRenderer} this
  */
 WebGLRenderer.prototype.setMeshOptions = function(path, options) {
-    var mesh = this.meshRegistry.get(path) || this.createMesh(path);
+    var mesh = this.meshRegistry[path] || this.createMesh(path);
 
     mesh.options = options;
     return this;
@@ -414,7 +413,7 @@ WebGLRenderer.prototype.setLightColor = function setLightColor(path, r, g, b) {
  * @return {WebGLRenderer} this
  */
 WebGLRenderer.prototype.handleMaterialInput = function handleMaterialInput(path, name, material) {
-    var mesh = this.meshRegistry.get(path) || this.createMesh(path);
+    var mesh = this.meshRegistry[path] || this.createMesh(path);
     material = compileMaterial(material, mesh.textures.length);
 
     // Set uniforms to enable texture!
@@ -450,7 +449,7 @@ WebGLRenderer.prototype.handleMaterialInput = function handleMaterialInput(path,
  * @return {undefined} undefined
  */
 WebGLRenderer.prototype.setGeometry = function setGeometry(path, geometry, drawType, dynamic) {
-    var mesh = this.meshRegistry.get(path) || this.createMesh(path);
+    var mesh = this.meshRegistry[path] || this.createMesh(path);
 
     mesh.geometry = geometry;
     mesh.drawType = drawType;
@@ -471,7 +470,7 @@ WebGLRenderer.prototype.setGeometry = function setGeometry(path, geometry, drawT
  * @return {undefined} undefined
  */
 WebGLRenderer.prototype.setMeshUniform = function setMeshUniform(path, uniformName, uniformValue) {
-    var mesh = this.meshRegistry.get(path) || this.createMesh(path);
+    var mesh = this.meshRegistry[path] || this.createMesh(path);
 
     var index = mesh.uniformKeys.indexOf(uniformName);
 
@@ -517,7 +516,7 @@ WebGLRenderer.prototype.draw = function draw(renderState) {
     this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
     this.textureManager.update(time);
 
-    this.meshRegistryKeys = sorter(this.meshRegistry.getKeys(), this.meshRegistry.getKeyToValue());
+    this.meshRegistryKeys = sorter(this.meshRegistryKeys, this.meshRegistry);
 
     this.setGlobalUniforms(renderState);
     this.drawCutouts();
@@ -538,10 +537,10 @@ WebGLRenderer.prototype.drawMeshes = function drawMeshes() {
     var buffers;
     var mesh;
 
-    var meshes = this.meshRegistry.getValues();
+    var paths = this.meshRegistryKeys;
 
-    for(var i = 0; i < meshes.length; i++) {
-        mesh = meshes[i];
+    for(var i = 0; i < paths.length; i++) {
+        mesh = this.meshRegistry[paths[i]];
 
         if (!mesh) continue;
 
