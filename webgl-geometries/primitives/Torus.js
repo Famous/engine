@@ -41,8 +41,10 @@ var GeometryHelper = require('../GeometryHelper');
  */
 
 function Torus(options) {
-    options  = options || {};
-    var detail   = options.detail || 30;
+    if (!(this instanceof Torus)) return new Torus(options);
+
+    options = options || {};
+    var detail = options.detail || 30;
     var holeRadius = options.holeRadius || 0.80;
     var tubeRadius = options.tubeRadius || 0.20;
 
@@ -59,8 +61,11 @@ function Torus(options) {
         { name: 'indices', data: buffers.indices, size: 1 }
     ];
 
-    return new Geometry(options);
+    Geometry.call(this, options);
 }
+
+Torus.prototype = Object.create(Geometry.prototype);
+Torus.prototype.constructor = Torus;
 
 /**
  * function used in iterative construction of parametric primitive.

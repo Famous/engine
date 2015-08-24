@@ -40,6 +40,8 @@ var GeometryHelper = require('../GeometryHelper');
  * @return {Object} constructed geometry
  */
 function Plane(options) {
+    if (!(this instanceof Plane)) return new Plane(options);
+
     options = options || {};
     var detailX = options.detailX || options.detail || 1;
     var detailY = options.detailY || options.detail || 1;
@@ -83,7 +85,10 @@ function Plane(options) {
         { name: 'indices', data: indices, size: 1 }
     ];
 
-    return new Geometry(options);
+    Geometry.call(this, options);
 }
+
+Plane.prototype = Object.create(Geometry.prototype);
+Plane.prototype.constructor = Plane;
 
 module.exports = Plane;

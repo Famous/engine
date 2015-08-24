@@ -40,7 +40,9 @@ var GeometryHelper = require('../GeometryHelper');
  * @return {Object} constructed geometry
  */
 function ParametricCone (options) {
-    options  = options || {};
+    if (!(this instanceof ParametricCone)) return new ParametricCone(options);
+
+    options = options || {};
     var detail   = options.detail || 15;
     var radius   = options.radius || 1 / Math.PI;
 
@@ -61,8 +63,11 @@ function ParametricCone (options) {
         { name: 'indices', data: buffers.indices, size: 1 }
     ];
 
-    return new Geometry(options);
+    Geometry.call(this, options);
 }
+
+ParametricCone.prototype = Object.create(Geometry.prototype);
+ParametricCone.prototype.constructor = ParametricCone;
 
 /**
  * function used in iterative construction of parametric primitive.

@@ -1,4 +1,4 @@
-/**
+/*
  * The MIT License (MIT)
  *
  * Copyright (c) 2015 Famous Industries Inc.
@@ -29,7 +29,9 @@
 var SizeSystem = require('./SizeSystem');
 var Dispatch = require('./Dispatch');
 var TransformSystem = require('./TransformSystem');
+var OpacitySystem = require('./OpacitySystem');
 var Size = require('./Size');
+var Opacity = require('./Opacity');
 var Transform = require('./Transform');
 
 /**
@@ -76,7 +78,6 @@ function Node () {
     this._mounted = false;
     this._shown = true;
     this._updater = null;
-    this._opacity = 1;
     this._UIEvents = [];
 
     this._updateQueue = [];
@@ -96,6 +97,7 @@ function Node () {
 
     this._transformID = null;
     this._sizeID = null;
+    this._opacityID = null;
 
     if (!this.constructor.NO_DEFAULT_COMPONENTS) this._init();
 }
@@ -117,6 +119,7 @@ Node.NO_DEFAULT_COMPONENTS = false;
 Node.prototype._init = function _init () {
     this._transformID = this.addComponent(new Transform());
     this._sizeID = this.addComponent(new Size());
+    this._opacityID = this.addComponent(new Opacity());
 };
 
 /**
@@ -244,7 +247,7 @@ Node.prototype.getValue = function getValue () {
             showState: {
                 mounted: this.isMounted(),
                 shown: this.isShown(),
-                opacity: this.getOpacity() || null
+                opacity: 1
             },
             offsets: {
                 mountPoint: [0, 0, 0],
@@ -272,6 +275,9 @@ Node.prototype.getValue = function getValue () {
     if (value.location) {
         var transform = TransformSystem.get(this.getId());
         var size = SizeSystem.get(this.getId());
+        var opacity = OpacitySystem.get(this.getId());
+
+        value.spec.showState.opacity = opacity.getOpacity();
 
         for (i = 0 ; i < 3 ; i++) {
             value.spec.offsets.mountPoint[i] = transform.offsets.mountPoint[i];
@@ -319,7 +325,8 @@ Node.prototype.getComputedValue = function getComputedValue () {
         location: this.getId(),
         computedValues: {
             transform: this.isMounted() ? TransformSystem.get(this.getLocation()).getLocalTransform() : null,
-            size: this.isMounted() ? SizeSystem.get(this.getLocation()).get() : null
+            size: this.isMounted() ? SizeSystem.get(this.getLocation()).get() : null,
+            opacity: this.isMounted() ? OpacitySystem.get(this.getLocation()).get() : null
         },
         children: []
     };
@@ -372,13 +379,18 @@ Node.prototype.getParent = function getParent () {
  * next frame (if no update during this frame has been scheduled already).
  * If the node is currently being updated (which means one of the requesters
  * invoked requestsUpdate while being updated itself), an update will be
- * scheduled on the next frame.
+ * scheduled on the next frame by falling back to the `requestUpdateOnNextTick`
+ * function.
+ *
+ * Components request their `onUpdate` method to be called during the next
+ * frame using this method.
  *
  * @method requestUpdate
  *
- * @param  {Object} requester   If the requester has an `onUpdate` method, it
- *                              will be invoked during the next update phase of
- *                              the node.
+ * @param  {Number} requester   Id of the component (as returned by
+ *                              {@link Node#addComponent}) to be updated. The
+ *                              component's `onUpdate` method will be invoked
+ *                              during the next update cycle.
  *
  * @return {Node} this
  */
@@ -393,16 +405,25 @@ Node.prototype.requestUpdate = function requestUpdate (requester) {
 };
 
 /**
- * Schedules an update on the next tick. Similarily to
- * {@link Node#requestUpdate}, `requestUpdateOnNextTick` schedules the node's
- * `onUpdate` function to be invoked on the frame after the next invocation on
+ * Schedules an update on the next tick.
+ *
+ * This method is similar to {@link Node#requestUpdate}, but schedules an
+ * update on the **next** frame. It schedules the node's `onUpdate` function
+ * to be invoked on the frame after the next invocation on
  * the node's onUpdate function.
+ *
+ * The primary use-case for this method is to request an update while being in
+ * an update phase (e.g. because an animation is still active). Most of the
+ * time, {@link Node#requestUpdate} is sufficient, since it automatically
+ * falls back to {@link Node#requestUpdateOnNextTick} when being invoked during
+ * the update phase.
  *
  * @method requestUpdateOnNextTick
  *
- * @param  {Object} requester   If the requester has an `onUpdate` method, it
- *                              will be invoked during the next update phase of
- *                              the node.
+ * @param  {Number} requester   Id of the component (as returned by
+ *                              {@link Node#addComponent}) to be updated. The
+ *                              component's `onUpdate` method will be invoked
+ *                              during the next update cycle.
  *
  * @return {Node} this
  */
@@ -459,7 +480,11 @@ Node.prototype.isShown = function isShown () {
  * @return {Number}         Relative opacity of the node.
  */
 Node.prototype.getOpacity = function getOpacity () {
-    return this._opacity;
+    if (!this.constructor.NO_DEFAULT_COMPONENTS)
+        return this.getComponent(this._opacityID).getOpacity();
+    else if (this.isMounted())
+        return OpacitySystem.get(this.getLocation()).getOpacity();
+    else throw new Error('This node does not have access to an opacity component');
 };
 
 /**
@@ -1048,28 +1073,20 @@ Node.prototype.setScale = function setScale (x, y, z) {
 
 /**
  * Sets the value of the opacity of this node. All of the node's
- * components will have onOpacityChange called on them/
+ * components will have onOpacityChange called on them.
  *
  * @method
  *
- * @param {Number} val Value of the opacity. 1 is the default.
+ * @param {Number} val=1 Value of the opacity. 1 is the default.
  *
  * @return {Node} this
  */
 Node.prototype.setOpacity = function setOpacity (val) {
-    if (val !== this._opacity) {
-        this._opacity = val;
-        if (!this._requestingUpdate) this._requestUpdate();
-
-        var i = 0;
-        var list = this._components;
-        var len = list.length;
-        var item;
-        for (; i < len ; i++) {
-            item = list[i];
-            if (item && item.onOpacityChange) item.onOpacityChange(val);
-        }
-    }
+    if (!this.constructor.NO_DEFAULT_COMPONENTS)
+        this.getComponent(this._opacityID).setOpacity(val);
+    else if (this.isMounted())
+        OpacitySystem.get(this.getLocation()).setOpacity(val);
+    else throw new Error('This node does not have access to an opacity component');
     return this;
 };
 
@@ -1253,10 +1270,12 @@ Node.prototype.mount = function mount (path) {
 
     if (!this.constructor.NO_DEFAULT_COMPONENTS){
         TransformSystem.registerTransformAtPath(path, this.getComponent(this._transformID));
+        OpacitySystem.registerOpacityAtPath(path, this.getComponent(this._opacityID));
         SizeSystem.registerSizeAtPath(path, this.getComponent(this._sizeID));
     }
     else {
         TransformSystem.registerTransformAtPath(path);
+        OpacitySystem.registerOpacityAtPath(path);
         SizeSystem.registerSizeAtPath(path);
     }
     Dispatch.mount(path, this);
@@ -1282,6 +1301,7 @@ Node.prototype.dismount = function dismount () {
 
     TransformSystem.deregisterTransformAtPath(path);
     SizeSystem.deregisterSizeAtPath(path);
+    OpacitySystem.deregisterOpacityAtPath(path);
     Dispatch.dismount(path);
 
     if (!this._requestingUpdate) this._requestUpdate();

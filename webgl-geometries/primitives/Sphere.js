@@ -40,6 +40,8 @@ var GeometryHelper = require('../GeometryHelper');
  * @return {Object} constructed geometry
  */
 function ParametricSphere (options) {
+    if (!(this instanceof ParametricSphere)) return new ParametricSphere(options);
+
     options = options || {};
     var detail = options.detail || 10;
     var detailX = options.detailX || detail;
@@ -59,8 +61,11 @@ function ParametricSphere (options) {
         { name: 'indices', data: buffers.indices, size: 1 }
     ];
 
-    return new Geometry(options);
+    Geometry.call(this, options);
 }
+
+ParametricSphere.prototype = Object.create(Geometry.prototype);
+ParametricSphere.prototype.constructor = ParametricSphere;
 
 /**
  * Function used in iterative construction of parametric primitive.

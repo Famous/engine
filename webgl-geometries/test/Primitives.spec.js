@@ -58,17 +58,18 @@ test('Primitives', function(t) {
         }
 		t.end();
     });
-    
+
     t.test('Primitives.optionsParameter', function(t) {
         for (var name in primitives) {
             var primitive = new primitives[name]({type:'POINTS'});
 
             t.ok(primitive instanceof Geometry, 'should be an instance of a static geometry');
+            t.ok(primitive instanceof primitives[name], 'should be an instance of its constructor function');
 
             t.notEquals(primitive.spec.bufferNames.indexOf('a_texCoord'), -1, 'should contain a texCoord buffer');
             t.notEquals(primitive.spec.bufferNames.indexOf('a_normals'), -1, 'should contain a normal buffer');
             t.notEquals(primitive.spec.bufferNames.indexOf('a_pos'), -1, 'should contain a pos buffer');
-            
+
             t.equals(primitive.spec.type, 'POINTS', 'draw type should be passed through');
 
             if (name !== 'Circle') {
@@ -77,8 +78,7 @@ test('Primitives', function(t) {
         }
 		t.end();
     });
-    
+
 
     t.end();
 });
-

@@ -40,6 +40,8 @@ var GeometryHelper = require('../GeometryHelper');
  * @return {Object} constructed geometry
  */
 function Triangle (options) {
+    if (!(this instanceof Triangle)) return new Triangle(options);
+
     options  = options || {};
     var detail   = options.detail || 1;
     var normals  = [];
@@ -57,11 +59,10 @@ function Triangle (options) {
          1, -1, 0
     ];
 
-    while(--detail) GeometryHelper.subdivide(indices, vertices, textureCoords);
+    while (--detail) GeometryHelper.subdivide(indices, vertices, textureCoords);
 
-    if (options.backface !== false) {
+    if (options.backface !== false)
         GeometryHelper.addBackfaceTriangles(vertices, indices);
-    }
 
     normals = GeometryHelper.computeNormals(vertices, indices);
 
@@ -72,7 +73,10 @@ function Triangle (options) {
             { name: 'indices', data: indices, size: 1 }
     ];
 
-    return new Geometry(options);
+    Geometry.call(this, options);
 }
+
+Triangle.prototype = Object.create(Geometry.prototype);
+Triangle.prototype.constructor = Triangle;
 
 module.exports = Triangle;
