@@ -30,7 +30,7 @@ define([
     'famous/core/Dispatch',
     'famous/core/TransformSystem',
     'famous/core/Size',
-    'famsous/core/Transform'
+    'famous/core/Transform'
     ], function( SizeSystem, Dispatch, TransformSystem, Size, Transform) {
 /**
  * Nodes define hierarchy and geometrical transformations. They can be moved

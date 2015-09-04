@@ -23,7 +23,7 @@
  */
 
 'use strict';
-
+define([], function ( ) {
 var css = '.famous-dom-renderer {' +
     'width:100%;' +
     'height:100%;' +
@@ -86,4 +86,5 @@ function injectCSS() {
     }
 }
 
-module.exports = injectCSS;
+return injectCSS;
+});

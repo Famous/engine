@@ -23,7 +23,7 @@
  */
 
 'use strict';
-
+define([], function () {
 /**
  * Channels are being used for interacting with the UI Thread when running in
  * a Web Worker or with the UIManager/ Compositor when running in single
@@ -112,4 +112,5 @@ Channel.prototype.postMessage = function postMessage(message) {
     return this.onMessage(message);
 };
 
-module.exports = Channel;
+return Channel;
+});

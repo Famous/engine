@@ -23,11 +23,12 @@
  */
 
 'use strict';
-
-var WebGLRenderer = require('../webgl-renderers/WebGLRenderer');
-var Camera = require('../components/Camera');
-var DOMRenderer = require('../dom-renderers/DOMRenderer');
-var Commands = require('../core/Commands');
+define([
+    'famous/webgl-renderers/WebGLRenderer',
+    'famous/components/Camera',
+    'famous/dom-renderers/DOMRenderer',
+    'famous/core/Commands'
+    ], function ( WebGLRenderer, Camera, DOMRenderer, Commands ) {
 
 /**
  * Context is a render layer with its own WebGLRenderer and DOMRenderer.
@@ -540,4 +541,5 @@ function changeViewTransform (context, path, commands, iterator) {
     return iterator;
 }
 
-module.exports = Context;
+return Context;
+});
