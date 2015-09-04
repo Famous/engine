@@ -5,6 +5,8 @@
 
 'use strict';
 
+define( [], function () {
+
 var lastTime = 0;
 var vendors = ['ms', 'moz', 'webkit', 'o'];
 
@@ -80,4 +82,5 @@ var animationFrame = {
     cancelAnimationFrame: cAF
 };
 
-module.exports = animationFrame;
+return animationFrame;
+});
