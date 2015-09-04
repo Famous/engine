@@ -24,6 +24,7 @@
 
 'use strict';
 
+define([], function() {
 /**
  * A collection of utilities for handling paths.
  *
@@ -169,4 +170,5 @@ var Path = {
 
 };
 
-module.exports = Path;
+return Path;
+});

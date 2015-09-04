@@ -23,9 +23,7 @@
  */
 
 'use strict';
-
-var Event = require('./Event');
-var PathUtils = require('./Path');
+define( ['famous/core/Event', 'famous/core/Path'], function (Event, Path) {
 
 /**
  * The Dispatch class is used to propogate events down the
@@ -336,7 +334,7 @@ Dispatch.prototype.dispatch = function dispatch (path, event, payload) {
     if (!event) throw new Error('dispatch requires an event name as it\'s second argument');
 
     var node = this._nodes[path];
-    
+
     if (!node) return;
 
     this.addChildrenToQueue(node);
@@ -419,4 +417,5 @@ function _splitTo (string, target) {
     return target;
 }
 
-module.exports = new Dispatch();
+return new Dispatch();
+});

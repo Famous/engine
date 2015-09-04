@@ -23,17 +23,18 @@
  */
 
 'use strict';
-
-var Clock = require('./Clock');
-var Scene = require('./Scene');
-var Channel = require('./Channel');
-var Dispatch = require('./Dispatch');
-var UIManager = require('../renderers/UIManager');
-var Compositor = require('../renderers/Compositor');
-var RequestAnimationFrameLoop = require('../render-loops/RequestAnimationFrameLoop');
-var TransformSystem = require('./TransformSystem');
-var SizeSystem = require('./SizeSystem');
-var Commands = require('./Commands');
+define([
+    'famous/core/Clock',
+    'famous/core/Scene',
+    'famous/core/Channel',
+    'famous/core/Dispatch',
+    'famous/renderers/UIManager',
+    'famous/renderers/Compositor',
+    'famous/render-loops/RequestAnimationFrameLoop',
+    'famous/core/TransformSystem',
+    'famous/core/SizeSystem',
+    'famous/core/Commands'
+    ], function ( Clock, Scene, Channel, Dispatch, UIManager, Compositor, RequestAnimationFrameLoop, TransformSystem, SizeSystem, Commands ) {
 
 var ENGINE_START = [Commands.ENGINE, Commands.START];
 var ENGINE_STOP = [Commands.ENGINE, Commands.STOP];
@@ -466,4 +467,5 @@ FamousEngine.prototype.stopEngine = function stopEngine() {
     return this.stopRenderLoop();
 };
 
-module.exports = new FamousEngine();
+return new FamousEngine();
+});

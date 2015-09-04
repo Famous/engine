@@ -24,30 +24,59 @@
 
 'use strict';
 
-module.exports = {
-    Particle: require('./bodies/Particle'),
-    convexBodyFactory: require('./bodies/convexBodyFactory'),
-    Box: require('./bodies/Box'),
-    Sphere: require('./bodies/Sphere'),
-    Wall: require('./bodies/Wall'),
+define( [
+    'famous/physics/bodies/Particle',
+    'famous/physics/bodies/convexBodyFactory',
+    'famous/physics/bodies/Box',
+    'famous/physics/bodies/Sphere',
+    'famous/physics/bodies/Wall',
 
-    Constraint: require('./constraints/Constraint'),
-    Angle: require('./constraints/Angle'),
-    Collision: require('./constraints/Collision'),
-    Direction: require('./constraints/Direction'),
-    Distance: require('./constraints/Distance'),
-    Curve: require('./constraints/Curve'),
-    Hinge: require('./constraints/Hinge'),
-    BallAndSocket: require('./constraints/BallAndSocket'),
+    'famous/physics/constraints/Constraint',
+    'famous/physics/constraints/Angle',
+    'famous/physics/constraints/Collision',
+    'famous/physics/constraints/Direction',
+    'famous/physics/constraints/Distance',
+    'famous/physics/constraints/Curve',
+    'famous/physics/constraints/Hinge',
+    'famous/physics/constraints/BallAndSocket',
 
-    Force: require('./forces/Force'),
-    Drag: require('./forces/Drag'),
-    RotationalDrag: require('./forces/RotationalDrag'),
-    Gravity1D: require('./forces/Gravity1D'),
-    Gravity3D: require('./forces/Gravity3D'),
-    Spring: require('./forces/Spring'),
-    RotationalSpring: require('./forces/RotationalSpring'),
+    'famous/physics/forces/Force',
+    'famous/physics/forces/Drag',
+    'famous/physics/forces/RotationalDrag',
+    'famous/physics/forces/Gravity1D',
+    'famous/physics/forces/Gravity3D',
+    'famous/physics/forces/Spring',
+    'famous/physics/forces/RotationalSpring',
 
-    PhysicsEngine: require('./PhysicsEngine'),
-    Geometry: require('./Geometry')
+    'famous/physics/PhysicsEngine',
+    'famous/physics/Geometry'
+    ], function ( Particle, convexBodyFactory, Box, Sphere, Wall, Constraint, Angle, Collision, Direction, Distance, Curve, Hinge, BallAndSocket, Force, Drag, RotationalDrag, Gravity1D, Gravity3D, Spring, RotationalSpring, PhysicsEngine, Geometry ) {
+
+return {
+    Particle: Particle,
+    convexBodyFactory: convexBodyFactory,
+    Box: Box,
+    Sphere: Sphere,
+    Wall: Wall,
+
+    Constraint: Constraint,
+    Angle: Angle,
+    Collision: Collision,
+    Direction: Direction,
+    Distance: Distance,
+    Curve: Curve,
+    Hinge: Hinge,
+    BallAndSocket: BallAndSocket,
+
+    Force: Force,
+    Drag: Drag,
+    RotationalDrag: RotationalDrag,
+    Gravity1D: Gravity1D,
+    Gravity3D: Gravity3D,
+    Spring: Spring,
+    RotationalSpring: RotationalSpring,
+
+    PhysicsEngine: PhysicsEngine,
+    Geometry: Geometry
 };
+});

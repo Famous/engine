@@ -25,13 +25,13 @@
 /*jshint -W079 */
 
 'use strict';
-
-var SizeSystem = require('./SizeSystem');
-var Dispatch = require('./Dispatch');
-var TransformSystem = require('./TransformSystem');
-var Size = require('./Size');
-var Transform = require('./Transform');
-
+define([
+    'famous/core/SizeSystem',
+    'famous/core/Dispatch',
+    'famous/core/TransformSystem',
+    'famous/core/Size',
+    'famsous/core/Transform'
+    ], function( SizeSystem, Dispatch, TransformSystem, Size, Transform) {
 /**
  * Nodes define hierarchy and geometrical transformations. They can be moved
  * (translated), scaled and rotated.
@@ -1287,4 +1287,5 @@ Node.prototype.dismount = function dismount () {
     if (!this._requestingUpdate) this._requestUpdate();
 };
 
-module.exports = Node;
+return Node;
+});
