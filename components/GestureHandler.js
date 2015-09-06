@@ -23,9 +23,10 @@
  */
 
 'use strict';
-
-var CallbackStore = require('../utilities/CallbackStore');
-var Vec2 = require('../math/Vec2');
+define([
+    'famous/utilities/CallbackStore',
+    'famous/math/Vec2'
+    ], function (CallbackStore, Vec2) {
 
 var VEC_REGISTER = new Vec2();
 
@@ -501,4 +502,5 @@ function _processMouseLeave() {
     }
 }
 
-module.exports = GestureHandler;
+return GestureHandler;
+});
