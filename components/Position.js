@@ -23,8 +23,9 @@
  */
 
 'use strict';
-
-var Transitionable = require('../transitions/Transitionable');
+define([
+    'famous/transitions/Transitionable'
+    ], function (Transitionable) {
 
 /**
  * The Position component serves as a way to tween to translation of a Node.
@@ -282,4 +283,5 @@ Position.prototype.halt = function halt() {
     return this;
 };
 
-module.exports = Position;
+return Position;
+});

@@ -23,9 +23,10 @@
  */
 
 'use strict';
-
-var Transitionable = require('../transitions/Transitionable');
-var SizeSystem = require('../core/SizeSystem');
+define([
+    'famous/transitions/Transitionable',
+    'famous/core/SizeSystem'
+    ], function (Transitionable, SizeSystem) {
 
 /**
  * Size component used for managing the size of the Node it is attached to.
@@ -406,4 +407,5 @@ Size.prototype.halt = function halt () {
     return this;
 };
 
-module.exports = Size;
+return Size;
+});

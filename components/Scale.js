@@ -23,8 +23,9 @@
  */
 
 'use strict';
-
-var Position = require('./Position');
+define([
+  'famous/components/Position'
+  ], function (Position) {
 
 /**
  * Scale is a component that allows the tweening of a Node's scale. Scale
@@ -72,4 +73,5 @@ Scale.prototype.update = function update() {
 
 Scale.prototype.onUpdate = Scale.prototype.update;
 
-module.exports = Scale;
+return Scale;
+});

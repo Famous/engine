@@ -23,9 +23,10 @@
  */
 
 'use strict';
-
-var Transitionable = require('../transitions/Transitionable');
-var Quaternion = require('../math/Quaternion');
+define([
+    'famous/transitions/Transitionable',
+    'famous/math/Quaternion'
+    ], function (Transitionable, Quaternion) {
 
 var Q_REGISTER = new Quaternion();
 var Q2_REGISTER = new Quaternion();
@@ -338,4 +339,5 @@ Transform.prototype.clean = function clean() {
 
 Transform.prototype.onUpdate = Transform.prototype.clean;
 
-module.exports = Transform;
+return Transform;
+});

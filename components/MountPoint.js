@@ -23,8 +23,9 @@
  */
 
 'use strict';
-
-var Position = require('./Position');
+define([
+  'famous/components/Position'
+  ], function ( Position ) {
 
 /**
  * MountPoint is a component designed to allow for smooth tweening
@@ -74,4 +75,5 @@ MountPoint.prototype.update = function update() {
 
 MountPoint.prototype.onUpdate = MountPoint.prototype.update;
 
-module.exports = MountPoint;
+return MountPoint;
+});
