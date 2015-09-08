@@ -89,5 +89,5 @@ ObjectManager.disposeOf = function(type) {
     while (i--) pool.pop();
 };
 
-return = ObjectManager;
+return  ObjectManager;
 });
