@@ -23,6 +23,7 @@
  */
 
 'use strict';
+define([], function (){
 
 /**
  * Deep clone an object.
@@ -59,4 +60,5 @@ var clone = function clone(b) {
     return a;
 };
 
-module.exports = clone;
+return clone;
+});
