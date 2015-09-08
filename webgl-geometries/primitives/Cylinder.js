@@ -23,9 +23,10 @@
  */
 
 'use strict';
-
-var Geometry = require('../Geometry');
-var GeometryHelper = require('../GeometryHelper');
+define([
+    'famous/webgl-geometries/Geometry',
+    'famous/webgl-geometries/GeometryHelper'
+    ], function ( Geometry, GeometryHelper ) {
 
 /**
  * This class creates a new geometry instance and sets
@@ -84,4 +85,5 @@ Cylinder.generator = function generator(r, u, v, pos) {
     pos[2] = r * (-1 + u / Math.PI * 2);
 };
 
-module.exports = Cylinder;
+return Cylinder;
+});

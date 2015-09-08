@@ -23,6 +23,7 @@
  */
 
 'use strict';
+define([], function (){
 
 var GeometryIds = 0;
 
@@ -61,4 +62,5 @@ function Geometry(options) {
     }
 }
 
-module.exports = Geometry;
+return Geometry;
+});
