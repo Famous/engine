@@ -23,12 +23,14 @@
  */
 
 'use strict';
+define([
+  'text!famous/webgl-shaders/VertexShaderOutput.glsl',
+  'text!famous/webgl-shaders/FragmentShaderOutput.glsl'
+  ], function ( vertex, fragment ) {
 
-var glslify = require('glslify');
-
-var shaders = {
-    vertex: glslify('./VertexShader.glsl'),
-    fragment: glslify('./FragmentShader.glsl')
+return {
+    vertex: vertex,
+    fragment: fragment
 };
 
-module.exports = shaders;
+});

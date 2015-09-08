@@ -29,11 +29,12 @@ define([
     'famous/webgl-renderers/compileMaterial',
     'famous/webgl-renderers/createCheckerboard',
     'famous/webgl-renderers/Debug',
+    'famous/webgl-renderers/Program',
     'famous/webgl-renderers/radixSort',
     'famous/webgl-renderers/Texture',
     'famous/webgl-renderers/TextureManager',
     'famous/webgl-renderers/WebGLRenderer'
-    ], function ( Buffer, BufferRegistry, compileMaterial, createCheckerboard, Debug, radixSort, Texture, TextureManager, WebGLRenderer ) {
+    ], function ( Buffer, BufferRegistry, compileMaterial, createCheckerboard, Debug, Program, radixSort, Texture, TextureManager, WebGLRenderer ) {
 
 return {
     Buffer: Buffer,
@@ -41,6 +42,7 @@ return {
     compileMaterial: compileMaterial,
     createCheckerboard: createCheckerboard,
     Debug: Debug,
+    Program: Program,
     radixSort: radixSort,
     Texture: Texture,
     TextureManager: TextureManager,
