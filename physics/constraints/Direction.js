@@ -23,9 +23,10 @@
  */
 
 'use strict';
-
-var Constraint = require('./Constraint');
-var Vec3 = require('../../math/Vec3');
+define([
+    'famous/physics/constraints/Constraint',
+    'famous/math/Vec3'
+    ], function ( Constraint, Vec3 ) {
 
 var NORMAL_REGISTER = new Vec3();
 var IMPULSE_REGISTER = new Vec3();
@@ -175,4 +176,5 @@ Direction.prototype.resolve = function update() {
     this.impulse += lambda;
 };
 
-module.exports = Direction;
+return Direction;
+});

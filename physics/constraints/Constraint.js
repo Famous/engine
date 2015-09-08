@@ -24,6 +24,7 @@
 
 'use strict';
 
+define([], function (){
 var _ID = 0;
 /**
  * Base Constraint class to be used in the Physics
@@ -81,4 +82,5 @@ Constraint.prototype.update = function update(time, dt) {};
  */
 Constraint.prototype.resolve = function resolve(time, dt) {};
 
-module.exports = Constraint;
+return Constraint;
+});
