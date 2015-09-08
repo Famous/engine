@@ -24,7 +24,9 @@
 
 'use strict';
 
-var VoidElements = require('./VoidElements');
+define([
+    'famous/dom-renderers/VoidElements'
+    ], function ( VoidElements ) {
 
 /**
  * ElementCache is being used for keeping track of an element's DOM Element,
@@ -60,4 +62,5 @@ function ElementCache (element, path) {
     this.subscribe = {};
 }
 
-module.exports = ElementCache;
+return ElementCache;
+});

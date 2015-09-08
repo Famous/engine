@@ -23,9 +23,10 @@
  */
 
 'use strict';
-
-var Vec3 = require('../../../math/Vec3');
-var ObjectManager = require('../../../utilities/ObjectManager');
+define([
+    'famous/math/Vec3',
+    'famous/utilities/ObjectManager'
+    ], function ( Vec3, ObjectManager ) {
 
 ObjectManager.register('GJK_EPASupportPoint', GJK_EPASupportPoint);
 var oMRequestGJK_EPASupportPoint = ObjectManager.requestGJK_EPASupportPoint;
@@ -220,5 +221,8 @@ function epa(body1, body2, polytope) {
     throw new Error('EPA failed to terminate in allotted iterations.');
 }
 
-module.exports.gjk = gjk;
-module.exports.epa = epa;
+return {
+    gjk: gjk,
+    epa: epa
+};
+});

@@ -23,6 +23,7 @@
  */
 
 'use strict';
+define([], function (){
 
 /**
  * Load a URL and return its contents in a callback.
@@ -35,7 +36,7 @@
  *
  * @return {undefined} undefined
  */
-var loadURL = function loadURL(url, callback) {
+return function loadURL(url, callback) {
     var xhr = new XMLHttpRequest();
     xhr.onreadystatechange = function onreadystatechange() {
         if (this.readyState === 4) {
@@ -46,4 +47,4 @@ var loadURL = function loadURL(url, callback) {
     xhr.send();
 };
 
-module.exports = loadURL;
+});

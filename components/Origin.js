@@ -23,8 +23,9 @@
  */
 
 'use strict';
-
-var Position = require('./Position');
+define([
+  'famous/components/Position'
+  ], function (Position) {
 
 /**
  * Origin is a component designed to allow for smooth tweening
@@ -74,4 +75,5 @@ Origin.prototype.update = function update() {
 
 Origin.prototype.onUpdate = Origin.prototype.update;
 
-module.exports = Origin;
+return Origin;
+});

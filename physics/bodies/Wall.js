@@ -24,8 +24,10 @@
 
 'use strict';
 
-var Particle = require('./Particle');
-var Vec3 = require('../../math/Vec3');
+define([
+    'famous/physics/bodies/Particle',
+    'famous/math/Vec3'
+    ], function ( Particle, Vec3 ) {
 
 /**
  * @enum directions
@@ -84,4 +86,5 @@ function Wall(options) {
 Wall.prototype = Object.create(Particle.prototype);
 Wall.prototype.constructor = Wall;
 
-module.exports = Wall;
+return Wall;
+});

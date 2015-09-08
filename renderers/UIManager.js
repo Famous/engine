@@ -23,8 +23,7 @@
  */
 
 'use strict';
-
-var Commands = require('../core/Commands');
+define( [ 'famous/core/Commands' ], function ( Commands ) {
 
 /**
  * The UIManager is being updated by an Engine by consecutively calling its
@@ -154,4 +153,5 @@ UIManager.prototype.update = function update (time) {
     this._compositor.clearCommands();
 };
 
-module.exports = UIManager;
+return UIManager;
+});

@@ -23,10 +23,16 @@
  */
 
 'use strict';
-
-module.exports = {
+define( [
+  'famous/renderers/Compositor',
+  'famous/renderers/Context',
+  'famous/renderers/UIManager',
+  'famous/renderers/inject-css'
+  ], function ( Compositor, Context, UIManager, injectCSS) {
+return {
     Compositor: require('./Compositor'),
     Context: require('./Context'),
     UIManager: require('./UIManager'),
     injectCSS: require('./inject-css')
 };
+});

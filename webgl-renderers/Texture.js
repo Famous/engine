@@ -23,6 +23,7 @@
  */
 
 'use strict';
+define([], function (){
 
 /**
  * Texture is a private class that stores image data
@@ -136,4 +137,5 @@ Texture.prototype.readBack = function readBack(x, y, width, height) {
     return pixels;
 };
 
-module.exports = Texture;
+return Texture;
+});

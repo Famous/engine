@@ -23,9 +23,10 @@
  */
 
 'use strict';
-
-var Force = require('./Force');
-var Vec3 = require('../../math/Vec3');
+define([
+    'famous/physics/forces/Force',
+    'famous/math/Vec3'
+    ], function ( Force, Vec3 ) {
 
 var FORCE_REGISTER = new Vec3();
 
@@ -118,4 +119,5 @@ Gravity1D.prototype.update = function() {
     }
 };
 
-module.exports = Gravity1D;
+return Gravity1D;
+});

@@ -23,6 +23,7 @@
  */
 
 'use strict';
+define([], function (){
 
 /**
  * Removes all non-primitive values from a (nested) object.
@@ -61,4 +62,5 @@ function strip(obj) {
     }
 }
 
-module.exports = strip;
+return strip;
+});

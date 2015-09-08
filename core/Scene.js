@@ -25,12 +25,13 @@
 /*jshint -W079 */
 
 'use strict';
-
-var Node = require('./Node');
-var Dispatch = require('./Dispatch');
-var Commands = require('./Commands');
-var TransformSystem = require('./TransformSystem');
-var SizeSystem = require('./SizeSystem');
+define([
+    'famous/core/Node',
+    'famous/core/Dispatch',
+    'famous/core/Commands',
+    'famous/core/TransformSystem',
+    'famous/core/SizeSystem'
+    ], function ( Node, Dispatch, Commands, TransformSystem, SizeSystem ) {
 
 /**
  * Scene is the bottom of the scene graph. It is its own
@@ -150,4 +151,5 @@ Scene.prototype.mount = function mount (path) {
     SizeSystem.registerSizeAtPath(path);
 };
 
-module.exports = Scene;
+return Scene;
+});

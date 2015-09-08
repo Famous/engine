@@ -23,6 +23,7 @@
  */
 
 'use strict';
+define([], function (){
 
 var _ID = 0;
 /**
@@ -101,4 +102,5 @@ Force.prototype.init = function init(options) {};
  */
 Force.prototype.update = function update(time, dt) {};
 
-module.exports = Force;
+return Force;
+});

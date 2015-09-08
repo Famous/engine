@@ -24,7 +24,10 @@
 
 'use strict';
 
-var UIEvent = require('./UIEvent');
+define([
+    'famous/dom-renderers/events/UIEvent'
+    ], function (UIEvent) {
+
 
 var EMPTY_ARRAY = [];
 
@@ -193,4 +196,5 @@ TouchEvent.prototype.toString = function toString () {
     return 'TouchEvent';
 };
 
-module.exports = TouchEvent;
+return TouchEvent;
+});

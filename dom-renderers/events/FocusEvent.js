@@ -24,7 +24,9 @@
 
 'use strict';
 
-var UIEvent = require('./UIEvent');
+define([
+  'famous/dom-renderers/events/UIEvent'
+  ], function (UIEvent) {
 
 /**
  * See [UI Events (formerly DOM Level 3 Events)](http://www.w3.org/TR/2015/WD-uievents-20150428/#events-focusevent).
@@ -57,4 +59,5 @@ FocusEvent.prototype.toString = function toString () {
     return 'FocusEvent';
 };
 
-module.exports = FocusEvent;
+return FocusEvent;
+});

@@ -23,6 +23,7 @@
  */
 
 'use strict';
+define([], function () {
 
 /**
  * Singleton object to manage recycling of objects with typically short
@@ -88,4 +89,5 @@ ObjectManager.disposeOf = function(type) {
     while (i--) pool.pop();
 };
 
-module.exports = ObjectManager;
+return  ObjectManager;
+});

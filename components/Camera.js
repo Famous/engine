@@ -23,8 +23,7 @@
  */
 
 'use strict';
-
-var Commands = require('../core/Commands');
+define(['famous/core/Commands'], function ( Commands ) {
 
 /**
  * Camera is a component that is responsible for sending information to the renderer about where
@@ -310,4 +309,5 @@ Camera.prototype.onTransformChange = function onTransformChange(transform) {
     this._viewTransform[15] = (a20 * b03 - a21 * b01 + a22 * b00) * det;
 };
 
-module.exports = Camera;
+return Camera;
+});

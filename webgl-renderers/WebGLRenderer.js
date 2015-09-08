@@ -23,14 +23,14 @@
  */
 
 'use strict';
-
-var Program = require('./Program');
-var BufferRegistry = require('./BufferRegistry');
-var sorter = require('./radixSort');
-var keyValueToArrays = require('../utilities/keyValueToArrays');
-var TextureManager = require('./TextureManager');
-var compileMaterial = require('./compileMaterial');
-var Registry = require('../utilities/Registry');
+define([
+    'famous/webgl-renderers/Program',
+    'famous/webgl-renderers/BufferRegistry',
+    'famous/webgl-renderers/radixSort',
+    'famous/utilities/keyValueToArrays',
+    'famous/webgl-renderers/TextureManager',
+    'famous/utilities/Registry'
+    ], function ( Program, BufferRegistry, sorter, keyValueToArrays, TextureManager, compileMaterial, Registry ) {
 
 var identity = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
 
@@ -851,4 +851,5 @@ WebGLRenderer.prototype.resetOptions = function resetOptions(options) {
     if (options.side === 'back') gl.cullFace(gl.BACK);
 };
 
-module.exports = WebGLRenderer;
+return WebGLRenderer;
+});

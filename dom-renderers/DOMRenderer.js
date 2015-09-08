@@ -24,12 +24,14 @@
 
 'use strict';
 
-var ElementCache = require('./ElementCache');
-var math = require('./Math');
-var PathUtils = require('../core/Path');
-var vendorPrefix = require('../utilities/vendorPrefix');
-var CallbackStore = require('../utilities/CallbackStore');
-var eventMap = require('./events/EventMap');
+define([
+    'famous/dom-renderers/ElementCache',
+    'famous/dom-renderers/Math',
+    'famous/core/Path',
+    'famous/utilities/vendorPrefix',
+    'famous/utilities/CallbackStore',
+    'famous/dom-renderers/events/eventMap'
+    ], function ( ElementCache, math, PathUtils, vendorPrefix, CallbackStore, eventMap ) {
 
 var TRANSFORM = null;
 
@@ -774,4 +776,5 @@ DOMRenderer.prototype.offRemoveEl = function offRemoveEl(path, callback) {
     return this;
 };
 
-module.exports = DOMRenderer;
+return DOMRenderer;
+});

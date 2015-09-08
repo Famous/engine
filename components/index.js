@@ -23,17 +23,30 @@
  */
 
 'use strict';
-
-module.exports = {
-    Align: require('./Align'),
-    Camera: require('./Camera'),
-    GestureHandler: require('./GestureHandler'),
-    MountPoint: require('./MountPoint'),
-    Opacity: require('./Opacity'),
-    Origin: require('./Origin'),
-    Position: require('./Position'),
-    Rotation: require('./Rotation'),
-    Scale: require('./Scale'),
-    Size: require('./Size'),
-    Transform: require('./Transform')
+define([
+    'famous/components/Align',
+    'famous/components/Camera',
+    'famous/components/GestureHandler',
+    'famous/components/MountPoint',
+    'famous/components/Opacity',
+    'famous/components/Origin',
+    'famous/components/Position',
+    'famous/components/Rotation',
+    'famous/components/Scale',
+    'famous/components/Size',
+    'famous/components/Transform'
+    ], function ( Align, Camera, GestureHandler, MountPoint, Opacity, Origin, Position, Rotation, Scale, Size, Transform ) {
+return {
+    Align: Align,
+    Camera: Camera,
+    GestureHandler: GestureHandler,
+    MountPoint: MountPoint,
+    Opacity: Opacity,
+    Origin: Origin,
+    Position: Position,
+    Rotation: Rotation,
+    Scale: Scale,
+    Size: Size,
+    Transform: Transform
 };
+});

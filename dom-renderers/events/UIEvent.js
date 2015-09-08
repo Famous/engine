@@ -24,7 +24,9 @@
 
 'use strict';
 
-var Event = require('./Event');
+define([
+    'famous/dom-renderers/events/Event'
+    ], function (Event) {
 
 /**
  * See [UI Events (formerly DOM Level 3 Events)](http://www.w3.org/TR/2015/WD-uievents-20150428).
@@ -63,4 +65,5 @@ UIEvent.prototype.toString = function toString () {
     return 'UIEvent';
 };
 
-module.exports = UIEvent;
+return UIEvent;
+});

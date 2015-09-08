@@ -23,6 +23,7 @@
  */
 
 'use strict';
+define([], function (){
 
 /*
  * A singleton object that holds texture instances in a registry which
@@ -80,4 +81,5 @@ TextureRegistry.get = function get(accessor) {
     }
 };
 
-module.exports = TextureRegistry;
+return TextureRegistry;
+});

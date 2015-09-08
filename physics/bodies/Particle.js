@@ -24,11 +24,12 @@
 
 'use strict';
 
-var Vec3 = require('../../math/Vec3');
-var Quaternion = require('../../math/Quaternion');
-var Mat33 = require('../../math/Mat33');
-
-var CallbackStore = require('../../utilities/CallbackStore');
+define([
+    'famous/math/Vec3',
+    'famous/math/Quaternion',
+    'famous/math/Mat33',
+    'famous/utilities/CallbackStore'
+    ], function ( Vec3, Quaternion, Mat33, CallbackStore ) {
 
 var ZERO_VECTOR = new Vec3();
 
@@ -499,4 +500,5 @@ Particle.prototype.support = function support() {
  */
 Particle.prototype.updateShape = function updateShape() {};
 
-module.exports = Particle;
+return Particle;
+});

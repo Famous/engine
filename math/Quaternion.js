@@ -23,6 +23,7 @@
  */
 
 'use strict';
+define([], function (){
 
 var sin = Math.sin;
 var cos = Math.cos;
@@ -545,4 +546,5 @@ Quaternion.dot = function dot(q1, q2) {
     return q1.w * q2.w + q1.x * q2.x + q1.y * q2.y + q1.z * q2.z;
 };
 
-module.exports = Quaternion;
+return Quaternion;
+});

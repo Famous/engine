@@ -23,11 +23,12 @@
  */
 
 'use strict';
-
-var CallbackStore = require('../utilities/CallbackStore');
-var TransformSystem = require('../core/TransformSystem');
-var Commands = require('../core/Commands');
-var Size = require('../core/Size');
+define( [
+    'famous/utilities/CallbackStore',
+    'famous/core/TransformSystem',
+    'famous/core/Commands',
+    'famous/core/Size'
+    ], function (CallbackStore, TransformSystem, Commands, Size) {
 
 /**
  * A DOMElement is a component that can be added to a Node with the
@@ -688,4 +689,5 @@ DOMElement.prototype.draw = function draw() {
     this._inDraw = false;
 };
 
-module.exports = DOMElement;
+return  DOMElement;
+});

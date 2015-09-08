@@ -23,9 +23,10 @@
  */
 
 'use strict';
-
-var Light = require('./Light');
-var TransformSystem = require('../../core/TransformSystem');
+define([
+    'famous/webgl-renderables/lights/Light',
+    'famous/core/TransformSystem'
+    ], function ( Light, TransformSystem ) {
 
 /**
  * PointLight extends the functionality of Light. PointLight is a light source
@@ -88,4 +89,5 @@ PointLight.prototype.onTransformChange = function onTransformChange (transform) 
     this.queue.push(transform[14]);
 };
 
-module.exports = PointLight;
+return PointLight;
+});

@@ -23,9 +23,10 @@
  */
 
 'use strict';
-
-var loadURL        = require('../utilities/loadURL');
-var GeometryHelper = require('./GeometryHelper');
+define([
+    'famous/utilities/loadURL',
+    'famous/webgl-geometries/GeometryHelper'
+    ], function ( loadURL, GeometryHelper ) {
 
 /*
  * A singleton object that takes that makes requests
@@ -489,4 +490,5 @@ function flatten(arr) {
     return out;
 }
 
-module.exports = OBJLoader;
+return OBJLoader;
+});

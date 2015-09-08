@@ -23,6 +23,7 @@
  */
 
 'use strict';
+define([], function (){
 
 var PREFIXES = ['', '-ms-', '-webkit-', '-moz-', '-o-'];
 
@@ -55,4 +56,5 @@ function vendorPrefix(property) {
     return property;
 }
 
-module.exports = vendorPrefix;
+return vendorPrefix;
+});

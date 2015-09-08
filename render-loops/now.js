@@ -22,10 +22,11 @@
  * THE SOFTWARE.
  */
 'use strict';
-
+define([], function (){
 // Polyfill for performance.now()
 var now = (window.performance && window.performance.now) ? function() {
     return window.performance.now();
 } : Date.now;
 
-module.exports = now;
+return now;
+});

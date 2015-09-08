@@ -23,8 +23,9 @@
  */
 
 'use strict';
-
-var Transitionable = require('../transitions/Transitionable');
+define([
+    'famous/transitions/Transitionable'
+    ], function (Transitionable) {
 
 
 /**
@@ -162,4 +163,5 @@ Opacity.prototype.update = function update () {
 
 Opacity.prototype.onUpdate = Opacity.prototype.update;
 
-module.exports = Opacity;
+return Opacity;
+});

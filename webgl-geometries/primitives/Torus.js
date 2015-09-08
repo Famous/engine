@@ -23,9 +23,10 @@
  */
 
 'use strict';
-
-var Geometry = require('../Geometry');
-var GeometryHelper = require('../GeometryHelper');
+define([
+    'famous/webgl-geometries/Geometry',
+    'famous/webgl-geometries/GeometryHelper'
+    ], function ( Geometry, GeometryHelper ) {
 
 /**
  * This function returns a new static geometry, which is passed
@@ -81,4 +82,5 @@ Torus.generator = function generator(c, a, u, v, pos) {
     pos[2] = a * Math.sin(2 * v);
 };
 
-module.exports = Torus;
+return Torus;
+});

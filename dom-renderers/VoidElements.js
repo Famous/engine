@@ -24,6 +24,7 @@
 
 'use strict';
 
+define([], function ( ){
 /**
  * Map of void elements as defined by the
  * [HTML5 spec](http://www.w3.org/TR/html5/syntax.html#elements-0).
@@ -48,4 +49,5 @@ var VoidElements = {
     wbr   : true
 };
 
-module.exports = VoidElements;
+return VoidElements;
+});

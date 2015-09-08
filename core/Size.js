@@ -23,7 +23,7 @@
  */
 
 'use strict';
-
+define([], function () {
 var ONES = [1, 1, 1];
 var ZEROS = [0, 0, 0];
 
@@ -328,5 +328,6 @@ Size.prototype.fromComponents = function fromComponents (components) {
     return changed;
 };
 
-module.exports = Size;
+return Size;
 
+});

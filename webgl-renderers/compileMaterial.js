@@ -22,6 +22,7 @@
  * THE SOFTWARE.
  */
 'use strict';
+define([], function (){
 
 var types = {
     1: 'float ',
@@ -128,4 +129,5 @@ function _arrayToVec(array) {
     return 'vec' + len + '(' + array.join(',')  + ')';
 }
 
-module.exports = compileMaterial;
+return compileMaterial;
+});
