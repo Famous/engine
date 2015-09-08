@@ -24,6 +24,7 @@
 
 'use strict';
 
+define([], function (){
 /**
  * Axis-aligned bounding box. Used in collision broadphases.
  *
@@ -167,4 +168,5 @@ AABB.checkOverlap = function(aabb1, aabb2) {
 
 AABB.vertexThreshold = 100;
 
-module.exports = AABB;
+return AABB;
+});

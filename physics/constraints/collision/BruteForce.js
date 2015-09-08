@@ -23,8 +23,10 @@
  */
 
 'use strict';
+define([
+    'famous/physics/contraints/collision/AABB'
+    ], function (AABB) {
 
-var AABB = require('./AABB');
 
 /**
  * O(n^2) comparisons with an AABB check for a midphase. Likely to be more performant
@@ -112,5 +114,8 @@ BruteForce.prototype.update = function update() {
     return [this.targets];
 };
 
-module.exports.BruteForceAABB = BruteForceAABB;
-module.exports.BruteForce = BruteForce;
+return {
+    BruteForceAABB: BruteForceAABB,
+    BruteForce: BruteForce
+}
+});

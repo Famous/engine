@@ -24,10 +24,13 @@
 
 'use strict';
 
-var Particle = require('./Particle');
-var Mat33 = require('../../math/Mat33');
-var Vec3 = require('../../math/Vec3');
-var Geometry = require('../Geometry');
+define([
+    'famous/physics/bodies/Particle',
+    'famous/math/Mat33',
+    'famous/math/Vec3',
+    'famous/physics/Geometry'
+    ], function ( Particle, Mat33, Vec3, Geometry ) {
+
 var ConvexHull = Geometry.ConvexHull;
 
 var TEMP_REGISTER = new Vec3();
@@ -250,4 +253,5 @@ function _computeInertiaProperties(T) {
     Mat33.inverse(this.localInertia, this.localInverseInertia);
 }
 
-module.exports = convexBodyFactory;
+return convexBodyFactory;
+});

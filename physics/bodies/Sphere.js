@@ -24,8 +24,10 @@
 
 'use strict';
 
-var Particle = require('./Particle');
-var Vec3 = require('../../math/Vec3');
+define([
+    'famous/physics/bodies/Particle',
+    'famous/math/Vec3'
+    ], function ( Particlem, Vec3 ) {
 
 var SUPPORT_REGISTER = new Vec3();
 
@@ -117,4 +119,5 @@ Sphere.prototype.support = function support(direction) {
  * @exports Sphere
  * @module Sphere
  */
-module.exports = Sphere;
+return Sphere;
+});

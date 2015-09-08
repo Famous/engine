@@ -23,12 +23,12 @@
  */
 
 'use strict';
-
-var Constraint = require('./Constraint');
-var Vec3 = require('../../math/Vec3');
-var Mat33 = require('../../math/Mat33');
-var Quaternion = require('../../math/Quaternion');
-
+define([
+    'famous/physics/constraints/Constraint',
+    'famous/math/Vec3',
+    'famous/math/Mat33',
+    'famous/math/Quaternion'
+    ], function ( Constraint, Vec3, Mat33, Quaternion ) {
 var VEC1_REGISTER = new Vec3();
 var VEC2_REGISTER = new Vec3();
 var VB1_REGISTER = new Vec3();
@@ -166,4 +166,5 @@ BallAndSocket.prototype.resolve = function resolve() {
     this.angImpulseB.add(angImpulseB);
 };
 
-module.exports = BallAndSocket;
+return BallAndSocket;
+});

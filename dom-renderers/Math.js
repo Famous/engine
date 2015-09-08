@@ -24,6 +24,7 @@
 
 'use strict';
 
+define([], function () {
 /**
  * A method for inverting a transform matrix
  *
@@ -178,7 +179,8 @@ function multiply (out, a, b) {
     return out;
 }
 
-module.exports = {
+return {
     multiply: multiply,
     invert: invert
 };
+});

@@ -23,9 +23,10 @@
  */
 
 'use strict';
-
-var Vec3 = require('../../math/Vec3');
-var convexBodyFactory = require('./convexBodyFactory');
+define([
+    'famous/math/Vec3',
+    'famous/physics/bodies/convexBodyFactory'
+    ], function ( Vec3, convexBodyFactory ) {
 
 var _Box = convexBodyFactory([
             // Order: back-left, back-right, front-left, front-right
@@ -61,4 +62,5 @@ function Box(options) {
 Box.prototype = Object.create(_Box.prototype);
 Box.prototype.constructor = Box;
 
-module.exports = Box;
+return Box;
+});

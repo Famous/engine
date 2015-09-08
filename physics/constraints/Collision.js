@@ -23,18 +23,16 @@
  */
 
 'use strict';
+define([
+    'famous/math/Vec3',
+    'famous/physics/constraints/Constraint',
+    'famous/physics/constraints/collision/SweepAndPrune',
+    'famous/physics/constraints/collision/BruteForce',
+    'famous/physics/constraints/collision/ConvexCollisionDetection',
+    'famous/physics/constraints/collision/ContactManifold',
+    'famous/utilities/ObjectManager'
+    ], function ( Vec3, Constraint, SweepAndPrune, BruteForce, ConvexCollision, ContactManifoldTable, ObjectManager ) {
 
-var Vec3 = require('../../math/Vec3');
-var Constraint = require('./Constraint');
-
-var SweepAndPrune = require('./collision/SweepAndPrune');
-var BruteForce = require('./collision/BruteForce');
-var ConvexCollision = require('./collision/ConvexCollisionDetection');
-var gjk = ConvexCollision.gjk;
-var epa = ConvexCollision.epa;
-var ContactManifoldTable = require('./collision/ContactManifold');
-
-var ObjectManager = require('../../utilities/ObjectManager');
 ObjectManager.register('CollisionData', CollisionData);
 var oMRequestCollisionData = ObjectManager.requestCollisionData;
 
@@ -405,4 +403,5 @@ Collision.SweepAndPrune = SweepAndPrune;
 Collision.BruteForce = BruteForce.BruteForce;
 Collision.BruteForceAABB = BruteForce.BruteForceAABB;
 
-module.exports = Collision;
+return Collision;
+});

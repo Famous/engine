@@ -23,6 +23,7 @@
  */
 
 'use strict';
+define([], function () {
 
 /**
  * A three-dimensional vector.
@@ -583,7 +584,7 @@ Vec3.cross = function cross(v1, v2, output) {
  * @param {Vec3} v2 The right Vec3.
  * @param {Vec3} output Vec3 in which to place the result.
  *
- * @return {Object} the object the result of the cross product was placed into 
+ * @return {Object} the object the result of the cross product was placed into
  */
 Vec3.project = function project(v1, v2, output) {
     var x1 = v1.x;
@@ -603,4 +604,5 @@ Vec3.project = function project(v1, v2, output) {
     return output;
 };
 
-module.exports = Vec3;
+return Vec3;
+});
