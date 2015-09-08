@@ -689,9 +689,9 @@ Node.prototype.addChild = function addChild (child) {
         this._fullChildren.push(child);
     }
 
-    if (this.isMounted())
+    if (this.isMounted()) {
         child.mount(this.getLocation() + '/' + index);
-
+    }
     return child;
 };
 
