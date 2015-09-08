@@ -27,7 +27,7 @@
 define([
     'famous/physics/bodies/Particle',
     'famous/math/Vec3'
-    ], function ( Particlem, Vec3 ) {
+    ], function ( Particle, Vec3 ) {
 
 var SUPPORT_REGISTER = new Vec3();
 
