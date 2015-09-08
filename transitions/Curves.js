@@ -25,6 +25,7 @@
 /*jshint -W008 */
 
 'use strict';
+define([], function () {
 
 /**
  * A library of curves which map an animation explicitly as a function of time.
@@ -251,4 +252,5 @@ var Curves = {
     }
 };
 
-module.exports = Curves;
+return Curves;
+});
