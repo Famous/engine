@@ -1248,9 +1248,9 @@ Node.prototype.update = function update (time){
  * @return {Node} this
  */
 Node.prototype.mount = function mount (path) {
-    if (this.isMounted())
+    if (this.isMounted()) {
         throw new Error('Node is already mounted at: ' + this.getLocation());
-
+    }
     if (!this.constructor.NO_DEFAULT_COMPONENTS){
         TransformSystem.registerTransformAtPath(path, this.getComponent(this._transformID));
         SizeSystem.registerSizeAtPath(path, this.getComponent(this._sizeID));
@@ -1261,7 +1261,9 @@ Node.prototype.mount = function mount (path) {
     }
     Dispatch.mount(path, this);
 
-    if (!this._requestingUpdate) this._requestUpdate();
+    if (!this._requestingUpdate) {
+        this._requestUpdate();
+    }
     return this;
 
 };
@@ -1275,8 +1277,9 @@ Node.prototype.mount = function mount (path) {
  * @return {Node} this
  */
 Node.prototype.dismount = function dismount () {
-    if (!this.isMounted())
+    if (!this.isMounted()) {
         throw new Error('Node is not mounted');
+    }
 
     var path = this.getLocation();
 
@@ -1284,7 +1287,9 @@ Node.prototype.dismount = function dismount () {
     SizeSystem.deregisterSizeAtPath(path);
     Dispatch.dismount(path);
 
-    if (!this._requestingUpdate) this._requestUpdate();
+    if (!this._requestingUpdate) {
+        this._requestUpdate();
+    }
 };
 
 return Node;
