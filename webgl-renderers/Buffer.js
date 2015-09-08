@@ -23,6 +23,7 @@
  */
 
 'use strict';
+define([], function (){
 
 /**
  * Buffer is a private class that wraps the vertex data that defines
@@ -67,4 +68,5 @@ Buffer.prototype.subData = function subData() {
     gl.bufferData(this.target, new this.type(data), gl.STATIC_DRAW);
 };
 
-module.exports = Buffer;
+return Buffer;
+});

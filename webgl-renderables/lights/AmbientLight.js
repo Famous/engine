@@ -23,9 +23,10 @@
  */
 
 'use strict';
-
-var Light = require('./Light');
-var Commands = require('../../core/Commands');
+define([
+  'famous/webgl-renderables/lights/Light',
+  'famous/core/Commands'
+  ], function ( Light, Commands ) {
 
 /**
  * AmbientLight extends the functionality of Light. It sets the ambience in
@@ -55,4 +56,5 @@ AmbientLight.prototype = Object.create(Light.prototype);
  */
 AmbientLight.prototype.constructor = AmbientLight;
 
-module.exports = AmbientLight;
+return AmbientLight;
+});

@@ -33,6 +33,7 @@
  *
  * @returns {Function} Augmented function
  */
+ define([], function (){
 function Debug() {
     return _augmentFunction(
         this.gl.compileShader,
@@ -92,4 +93,5 @@ function _processErrors(errors, source) {
     }
 }
 
-module.exports = Debug;
+return Debug;
+});

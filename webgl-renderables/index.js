@@ -23,9 +23,15 @@
  */
 
 'use strict';
+define([
+  'famous/webgl-renderables/Mesh',
+  'famous/webgl-renderables/lights/PointLight',
+  'famous/webgl-renderables/lights/AmbientLight'
+  ], function ( Mesh, PointLight, AmbientLight ) {
 
-module.exports = {
-    Mesh: require('./Mesh'),
-    PointLight: require('./lights/PointLight'),
-    AmbientLight: require('./lights/AmbientLight')
+return {
+    Mesh: Mesh,
+    PointLight: PointLight,
+    AmbientLight: AmbientLight
 };
+});

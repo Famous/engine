@@ -23,9 +23,11 @@
  */
 
 'use strict';
-var Geometry = require('../webgl-geometries');
-var Commands = require('../core/Commands');
-var TransformSystem = require('../core/TransformSystem');
+define([
+    'famous/webgl-geometries/Geometry',
+    'famous/core/Commands',
+    'famous/core/TransformSystem'
+    ], function ( Geometry, Commands, TransformSystem ) {
 var defaultGeometry = new Geometry.Plane();
 
 /**
@@ -700,4 +702,5 @@ function addMeshToMaterial(mesh, material, name) {
         material.meshes.push(mesh);
 }
 
-module.exports = Mesh;
+return Mesh;
+});
