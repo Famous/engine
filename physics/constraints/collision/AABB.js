@@ -31,7 +31,7 @@ define([], function (){
  * @class AABB
  * @param {Particle} body The body around which to track a bounding box.
  */
-function AABB(body) {
+var AABB = function AABB(body) {
     this._body = body;
     this._ID = body._ID;
     this.position = null;
