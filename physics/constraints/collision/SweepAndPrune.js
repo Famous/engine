@@ -23,8 +23,10 @@
  */
 
 'use strict';
+define([
+    'famous/physics/constraints/collision/AABB'
+    ], function ( AABB ) {
 
-var AABB = require('./AABB');
 
 /**
  * @const {String[]} AXES x, y, and z axes
@@ -239,4 +241,5 @@ SweepVolume.prototype.update = function() {
     }
 };
 
-module.exports = SweepAndPrune;
+return SweepAndPrune;
+});

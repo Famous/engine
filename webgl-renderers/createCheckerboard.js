@@ -23,6 +23,7 @@
  */
 
 'use strict';
+define([], function (){
 
 /**
  * Generates a checkerboard pattern to be used as a placeholder texture while
@@ -46,4 +47,5 @@ function createCheckerBoard() {
     return context.canvas;
 }
 
-module.exports = createCheckerBoard;
+return createCheckerBoard;
+});

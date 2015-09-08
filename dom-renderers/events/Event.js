@@ -23,6 +23,7 @@
  */
 
 'use strict';
+define([], function () {
 
 /**
  * The Event class is being used in order to normalize native DOM events.
@@ -115,4 +116,5 @@ Event.prototype.toString = function toString () {
     return 'Event';
 };
 
-module.exports = Event;
+return Event;
+});

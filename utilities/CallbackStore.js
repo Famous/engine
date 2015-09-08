@@ -24,6 +24,7 @@
 
 'use strict';
 
+define( [], function () {
 /**
  * A lightweight, featureless EventEmitter.
  *
@@ -93,4 +94,5 @@ CallbackStore.prototype.trigger = function trigger (key, payload) {
     return this;
 };
 
-module.exports = CallbackStore;
+return CallbackStore;
+});

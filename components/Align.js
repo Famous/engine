@@ -23,8 +23,9 @@
  */
 
 'use strict';
-
-var Position = require('./Position');
+defin([
+  'famous/components/Position'
+  ], function (Position) {
 
 /**
  * Align is a component designed to allow for smooth tweening
@@ -74,4 +75,5 @@ Align.prototype.update = function update() {
 
 Align.prototype.onUpdate = Align.prototype.update;
 
-module.exports = Align;
+return Align;
+});

@@ -23,8 +23,13 @@
  */
 
 'use strict';
+define([
+  'famous/webgl-materials/Material',
+  'famous/webgl-materials/TextureRegistry'
+  ], function ( Material, TextureRegistry ) {
 
-module.exports = {
-    Material: require('./Material'),
-    TextureRegistry: require('./TextureRegistry')
+return {
+    Material: Material,
+    TextureRegistry: TextureRegistry
 };
+});

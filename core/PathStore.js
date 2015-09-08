@@ -25,8 +25,7 @@
 /*jshint -W079 */
 
 'use strict';
-
-var PathUtils = require('./Path');
+define(['famous/core/Path'], function (PathUtils) {
 
 /**
  * A class that can be used to associate any item with a path.
@@ -164,4 +163,5 @@ PathStore.prototype.getPaths = function getPaths () {
     return this.paths;
 };
 
-module.exports = PathStore;
+return PathStore;
+});

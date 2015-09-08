@@ -24,7 +24,9 @@
 
 'use strict';
 
-var MouseEvent = require('./MouseEvent');
+define([
+    'famous/dom-renderers/events/MouseEvent'
+    ], function (MouseEvent) {
 
 /**
  * See [UI Events (formerly DOM Level 3 Events)](http://www.w3.org/TR/2015/WD-uievents-20150428/#events-wheelevents).
@@ -106,4 +108,5 @@ WheelEvent.prototype.toString = function toString () {
     return 'WheelEvent';
 };
 
-module.exports = WheelEvent;
+return WheelEvent;
+});

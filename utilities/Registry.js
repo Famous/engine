@@ -1,4 +1,5 @@
 'use strict';
+define([], function (){
 
 function Registry () {
     this._keyToValue = {};
@@ -54,4 +55,5 @@ Registry.prototype.getKeyToValue = function getKeyToValue () {
     return this._keyToValue;
 };
 
-module.exports = Registry;
+return Registry;
+});

@@ -23,9 +23,10 @@
  */
 
 'use strict';
-
-var Vec3 = require('../../../math/Vec3');
-var ObjectManager = require('../../../utilities/ObjectManager');
+define([
+    'famous/math/Vec3',
+    'famous/utilities/ObjectManager'
+    ], function ( Vec3, ObjectManager ) {
 
 ObjectManager.register('Manifold', Manifold);
 ObjectManager.register('Contact', Contact);
@@ -594,4 +595,5 @@ Contact.prototype.resolve = function resolve() {
     this.angImpulseB.add(angImpulseB);
 };
 
-module.exports = ContactManifoldTable;
+return ContactManifoldTable;
+});

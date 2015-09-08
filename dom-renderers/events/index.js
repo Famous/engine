@@ -24,16 +24,28 @@
 
 'use strict';
 
-module.exports = {
-    CompositionEvent: require('./CompositionEvent'),
-    Event: require('./Event'),
-    EventMap: require('./EventMap'),
-    FocusEvent: require('./FocusEvent'),
-    InputEvent: require('./InputEvent'),
-    KeyboardEvent: require('./KeyboardEvent'),
-    MouseEvent: require('./MouseEvent'),
-    TouchEvent: require('./TouchEvent'),
-    UIEvent: require('./UIEvent'),
-    WheelEvent: require('./WheelEvent')
+define([
+    'famous/dom-renderers/events/CompositionEvent',
+    'famous/dom-renderers/events/Event',
+    'famous/dom-renderers/events/EventMap',
+    'famous/dom-renderers/events/FocusEvent',
+    'famous/dom-renderers/events/InputEvent',
+    'famous/dom-renderers/events/KeyboardEvent',
+    'famous/dom-renderers/events/MouseEvent',
+    'famous/dom-renderers/events/TouchEvent',
+    'famous/dom-renderers/events/UIEvent',
+    'famous/dom-renderers/events/WheelEvent'
+    ], function ( CompositionEvent, Event, EventMap, FocusEvent, InputEvent, KeyboardEvent, MouseEvent, TouchEvent, UIEvent, WheelEvent ) {
+return {
+    CompositionEvent: CompositionEvent,
+    Event: Event,
+    EventMap: EventMap,
+    FocusEvent: FocusEvent,
+    InputEvent: InputEvent,
+    KeyboardEvent: KeyboardEvent,
+    MouseEvent: MouseEvent,
+    TouchEvent: TouchEvent,
+    UIEvent: UIEvent,
+    WheelEvent: WheelEvent
 };
-
+});

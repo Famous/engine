@@ -23,7 +23,7 @@
  */
 
 'use strict';
-
+define([], function () {
 /**
  * Equivalent of an Engine in the Worker Thread. Used to synchronize and manage
  * time across different Threads.
@@ -204,5 +204,5 @@ Clock.prototype.clearTimer = function (timer) {
     return this;
 };
 
-module.exports = Clock;
-
+return Clock;
+});

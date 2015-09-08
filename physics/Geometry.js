@@ -23,11 +23,12 @@
  */
 
 'use strict';
+define([
+    'famous/math/Vec3',
+    'famous/math/Mat33',
+    'famous/utilities/ObjectManager'
+    ], function ( Vec3, Mat33, ObjectManager ) {
 
-var Vec3 = require('../math/Vec3');
-var Mat33 = require('../math/Mat33');
-
-var ObjectManager = require('../utilities/ObjectManager');
 ObjectManager.register('DynamicGeometry', DynamicGeometry);
 ObjectManager.register('DynamicGeometryFeature', DynamicGeometryFeature);
 var oMRequestDynamicGeometryFeature = ObjectManager.requestDynamicGeometryFeature;
@@ -793,7 +794,8 @@ function _computePolyhedralProperties(vertices, indices) {
     };
 }
 
-module.exports = {
+return {
     DynamicGeometry: DynamicGeometry,
     ConvexHull: ConvexHull
 };
+});

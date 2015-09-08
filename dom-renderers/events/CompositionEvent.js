@@ -24,7 +24,9 @@
 
 'use strict';
 
-var UIEvent = require('./UIEvent');
+define([
+    'famous/dom-renderers/events/UIEvent'
+    ], function (UIEvent) {
 
 /**
  * See [UI Events (formerly DOM Level 3 Events)](http://www.w3.org/TR/2015/WD-uievents-20150428/#events-compositionevents).
@@ -63,4 +65,5 @@ CompositionEvent.prototype.toString = function toString () {
     return 'CompositionEvent';
 };
 
-module.exports = CompositionEvent;
+return CompositionEvent;
+});

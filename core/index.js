@@ -23,20 +23,36 @@
  */
 
 'use strict';
-
-module.exports = {
-    Channel: require('./Channel'),
-    Clock: require('./Clock'),
-    Commands: require('./Commands'),
-    Dispatch: require('./Dispatch'),
-    Event: require('./Event'),
-    FamousEngine: require('./FamousEngine'),
-    Node: require('./Node'),
-    Path: require('./Path'),
-    PathStore: require('./PathStore'),
-    Scene: require('./Scene'),
-    Size: require('./Size'),
-    SizeSystem: require('./SizeSystem'),
-    Transform: require('./Transform'),
-    TransformSystem: require('./TransformSystem')
+define([
+    'famous/core/Channel',
+    'famous/core/Clock',
+    'famous/core/Commans',
+    'famous/core/Dispatch',
+    'famous/core/Event',
+    'famous/core/FamousEngine',
+    'famous/core/Node',
+    'famous/core/Path',
+    'famous/core/PathStore',
+    'famous/core/Scene',
+    'famous/core/Size',
+    'famous/core/SizeSystem',
+    'famous/core/Transform',
+    'famous/core/TransformSystem'
+    ], function ( Channel, Clock, Commands, Dispatch, Event, FamousEngine, Node, Path, PathStore, Scene, Size, SizeSystem, Transform, TransformSystem) {
+return {
+    Channel: Channel,
+    Clock: Clock,
+    Commands: Commands,
+    Dispatch: Dispatch,
+    Event: Event,
+    FamousEngine: FamousEngine,
+    Node: Node,
+    Path: Path,
+    PathStore: PathStore,
+    Scene: Scene,
+    Size: Size,
+    SizeSystem: SizeSystem,
+    Transform: Transform,
+    TransformSystem: TransformSystem
 };
+});

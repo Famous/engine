@@ -23,8 +23,9 @@
  */
 
 'use strict';
-
-var Position = require('./Position');
+define([
+    'famous/components/Position'
+    ], function (Position) {
 
 /**
  * Rotation is a component that allows the tweening of a Node's rotation. Rotation
@@ -90,4 +91,5 @@ Rotation.prototype.update = function update() {
 
 Rotation.prototype.onUpdate = Rotation.prototype.update;
 
-module.exports = Rotation;
+return Rotation;
+});

@@ -23,10 +23,11 @@
  */
 
 'use strict';
+define([
+    'famous/webgl-renderers/Buffer'
+    ], function ( Buffer ) {
 
 var INDICES = 'indices';
-
-var Buffer = require('./Buffer');
 
 /**
  * BufferRegistry is a class that manages allocation of buffers to
@@ -142,4 +143,5 @@ BufferRegistry.prototype.allocate = function allocate(geometryId, name, value, s
     vertexBuffers.values[j].subData();
 };
 
-module.exports = BufferRegistry;
+return BufferRegistry;
+});

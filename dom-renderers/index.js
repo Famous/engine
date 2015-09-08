@@ -24,10 +24,19 @@
 
 'use strict';
 
-module.exports = {
-    DOMRenderer: require('./DOMRenderer'),
-    ElementCache: require('./ElementCache'),
-    Events: require('./events'),
-    Math: require('./Math'),
-    VoidElements: require('./VoidElements')
+define([
+  'famous/dom-renderers/DOMRenderer',
+  'famous/dom-renderers/ElementCache',
+  'famous/dom-renderers/events/index',
+  'famous/dom-renderers/Math',
+  'famous/dom-renderers/VoidElements'
+  ], function ( DOMRenderer, ElementCache, Events, Math, VoidElements ) {
+
+return {
+    DOMRenderer: DOMRenderer,
+    ElementCache: ElementCache,
+    Events: Events,
+    Math: Math,
+    VoidElements: VoidElements
 };
+});

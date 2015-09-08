@@ -23,8 +23,9 @@
  */
 
 'use strict';
-
-var Geometry = require('./Geometry');
+define([
+    'famous/webgl-geometries/Geometry'
+    ], function ( Geometry ) {
 
 /**
  * DynamicGeometry is a component that defines and manages data
@@ -202,4 +203,5 @@ DynamicGeometry.prototype.getTextureCoords = function () {
     return this.getVertexBuffer('a_texCoord');
 };
 
-module.exports = DynamicGeometry;
+return DynamicGeometry;
+});

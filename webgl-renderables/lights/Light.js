@@ -23,8 +23,9 @@
  */
 
 'use strict';
-
-var Commands = require('../../core/Commands');
+define([
+    'famous/core/Commands'
+    ], function ( Commands ) {
 
 /**
  * The blueprint for all light components.
@@ -117,4 +118,5 @@ Light.prototype.onUpdate = function onUpdate() {
     }
 };
 
-module.exports = Light;
+return Light;
+});

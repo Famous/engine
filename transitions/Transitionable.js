@@ -23,9 +23,10 @@
  */
 
 'use strict';
-
-var Curves = require('./Curves');
-var FamousEngine = require('../core/FamousEngine');
+define([
+    'famous/transitions/Curves',
+    'famous/core/FamousEngine'
+    ], function ( Curves, FamousEngine ) {
 
 /**
  * A state maintainer for a smooth transition between
@@ -453,4 +454,5 @@ Transitionable.prototype.set = function(state, transition, callback) {
     return this;
 };
 
-module.exports = Transitionable;
+return Transitionable;
+});

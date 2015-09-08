@@ -22,9 +22,10 @@
  * THE SOFTWARE.
  */
 'use strict';
-
-var Texture = require('./Texture');
-var createCheckerboard = require('./createCheckerboard');
+define([
+    'famous/webgl-renderers/Texture',
+    'famous/webgl-renderers/createCheckerboard'
+    ], function ( Texture, createCheckerboard ) {
 
 /**
  * Handles loading, binding, and resampling of textures for WebGLRenderer.
@@ -207,4 +208,5 @@ TextureManager.prototype.bindTexture = function bindTexture(id) {
     }
 };
 
-module.exports = TextureManager;
+return TextureManager;
+});

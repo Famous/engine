@@ -1,18 +1,18 @@
 /**
  * The MIT License (MIT)
- * 
+ *
  * Copyright (c) 2015 Famous Industries Inc.
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -24,10 +24,13 @@
 
 'use strict';
 
-var PathUtils = require('./Path');
-var Transform = require('./Transform');
-var Dispatch = require('./Dispatch');
-var PathStore = require('./PathStore');
+
+define( [
+    'famous/core/Path',
+    'famous/core/Transform',
+    'famous/core/Dispatch',
+    'famous/core/PathStore',
+    ], function (PathUtils, Transform, Dispatch, PathStore) {
 
 /**
  * The transform class is responsible for calculating the transform of a particular
@@ -115,7 +118,7 @@ TransformSystem.prototype.makeCalculateWorldMatrixAt = function makeCalculateWor
  * or undefined if no transform is associated.
  *
  * @method
- * 
+ *
  * @param {String} path The path to lookup
  *
  * @return {Transform | undefined} the transform at that path is available, else undefined.
@@ -372,4 +375,5 @@ function worldTransformChanged (node, components, transform) {
             components[i].onWorldTransformChange(transform);
 }
 
-module.exports = new TransformSystem();
+return new TransformSystem();
+});

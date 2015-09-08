@@ -24,6 +24,8 @@
 
 'use strict';
 
+
+define( [], function () {
 /**
  * An enumeration of the commands in our command queue.
  */
@@ -85,7 +87,7 @@ var commandPrinters = [];
 
 commandPrinters[Commands.INIT_DOM] = function init_dom (buffer, data) {
     data.result += data.i + '. INIT_DOM\n    tagName: ' + buffer[++data.i] + '\n\n';
-}; 
+};
 
 commandPrinters[Commands.DOM_RENDER_SIZE] = function dom_render_size (buffer, data) {
     data.result += data.i + '. DOM_RENDER_SIZE\n    selector: ' + buffer[++data.i] + '\n\n';
@@ -209,5 +211,6 @@ commandPrinters[Commands.NEED_SIZE_FOR] = function need_size_for (buffer, data) 
     data.result += data.i + '. NEED_SIZE_FOR\n    selector: ' + buffer[++data.i] + '\n\n';
 };
 
-module.exports = Commands;
+return Commands;
 
+});

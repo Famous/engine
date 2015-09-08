@@ -24,7 +24,9 @@
 
 'use strict';
 
-var UIEvent = require('./UIEvent');
+define([
+    'famous/dom-renderers/events/UIEvent'
+    ], function (UIEvent) {
 
 /**
  * See [Input Events](http://w3c.github.io/editing-explainer/input-events.html#idl-def-InputEvent).
@@ -86,4 +88,5 @@ InputEvent.prototype.toString = function toString () {
     return 'InputEvent';
 };
 
-module.exports = InputEvent;
+return InputEvent;
+});

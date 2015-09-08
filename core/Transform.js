@@ -23,7 +23,7 @@
  */
 
 'use strict';
-
+define([], function() {
 var QUAT = [0, 0, 0, 1];
 var ONES = [1, 1, 1];
 
@@ -782,4 +782,5 @@ function multiply (out, a, b) {
     return changed;
 }
 
-module.exports = Transform;
+return Transform;
+})

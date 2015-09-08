@@ -23,13 +23,15 @@
  */
 
 'use strict';
+define([
+    'famous/utilities/clone',
+    'famous/utilities/keyValueToArrays',
+    'famous/webgl-shaders/index',
+    'famous/webgl-renderers/Debug'
+    ], function ( clone, keyValueToArrays, Shaders, Debug ) {
 
-var clone = require('../utilities/clone');
-var keyValueToArrays = require('../utilities/keyValueToArrays');
-
-var vertexWrapper = require('../webgl-shaders').vertex;
-var fragmentWrapper = require('../webgl-shaders').fragment;
-var Debug = require('./Debug');
+var vertexWrapper = Shaders.vertex;
+var fragmentWrapper = Shaders.fragment;
 
 var VERTEX_SHADER = 35633;
 var FRAGMENT_SHADER = 35632;
@@ -478,4 +480,6 @@ Program.prototype.compileShader = function compileShader(shader, source) {
     return shader;
 };
 
-module.exports = Program;
+
+return Program;
+});

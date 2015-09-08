@@ -23,10 +23,12 @@
  */
 
 'use strict';
+define([
+    'famous/physics/constraints/Constraint',
+    'famous/math/Vec3',
+    'famous/math/Mat33'
+    ], function ( Constraint, Vec3, Mat33 ) {
 
-var Constraint = require('./Constraint');
-var Vec3 = require('../../math/Vec3');
-var Mat33 = require('../../math/Mat33');
 
 var DELTA_REGISTER = new Vec3();
 
@@ -119,4 +121,5 @@ Angle.prototype.resolve = function update() {
     this.angularImpulse.add(angularImpulse);
 };
 
-module.exports = Angle;
+return Angle;
+});

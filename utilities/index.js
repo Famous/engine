@@ -23,17 +23,31 @@
  */
 
 'use strict';
+define([
+    'famous/utilities/CallbackStore',
+    'famous/utilities/clamp',
+    'famous/utilities/clone',
+    'famous/utilities/Color',
+    'famous/utilities/KeyCodes',
+    'famous/utilities/keyValueToArrays',
+    'famous/utilities/loadURL',
+    'famous/utilities/ObjectManager',
+    'famous/utilities/Registry',
+    'famous/utilities/strip',
+    'famous/utilities/vendorPrefix'
+    ], function ( CallbackStore, clamp, clone, Color, KeyCodes, keyValueToArrays, loadURL, ObjectManager, Registry, strip, vendorPrefix ){
 
-module.exports = {
-    CallbackStore: require('./CallbackStore'),
-    clamp: require('./clamp'),
-    clone: require('./clone'),
-    Color: require('./Color'),
-    KeyCodes: require('./KeyCodes'),
-    keyValueToArrays: require('./keyValueToArrays'),
-    loadURL: require('./loadURL'),
-    ObjectManager: require('./ObjectManager'),
-    Registry: require('./Registry'),
-    strip: require('./strip'),
-    vendorPrefix: require('./vendorPrefix')
+return {
+    CallbackStore: CallbackStore,
+    clamp: clamp,
+    clone: clone,
+    Color: Color,
+    KeyCodes: KeyCodes,
+    keyValueToArrays: keyValueToArrays,
+    loadURL: loadURL,
+    ObjectManager: ObjectManager,
+    Registry: Registry,
+    strip: strip,
+    vendorPrefix: vendorPrefix
 };
+});

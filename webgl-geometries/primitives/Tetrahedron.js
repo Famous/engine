@@ -23,9 +23,10 @@
  */
 
 'use strict';
-
-var Geometry = require('../Geometry');
-var GeometryHelper = require('../GeometryHelper');
+define([
+    'famous/webgl-geometries/Geometry',
+    'famous/webgl-geometries/GeometryHelper'
+    ], function ( Geometry, GeometryHelper ) {
 
 /**
  * This function generates custom buffers and passes them to
@@ -98,4 +99,5 @@ function Tetrahedron(options) {
     return new Geometry(options);
 }
 
-module.exports = Tetrahedron;
+return Tetrahedron;
+});

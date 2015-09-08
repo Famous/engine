@@ -23,10 +23,11 @@
  */
 
 'use strict';
-
-var Context = require('./Context');
-var injectCSS = require('./inject-css');
-var Commands = require('../core/Commands');
+define([
+    'famous/renderers/Context',
+    'famous/renderers/inject-css',
+    'famous/core/Commands'
+    ], function ( Context, injectCSS, Commands) {
 
 /**
  * Instantiates a new Compositor.
@@ -289,4 +290,5 @@ Compositor.prototype.clearCommands = function clearCommands() {
     this._resized = false;
 };
 
-module.exports = Compositor;
+return Compositor;
+});

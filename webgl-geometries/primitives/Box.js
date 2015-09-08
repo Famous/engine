@@ -23,8 +23,9 @@
  */
 
 'use strict';
-
-var Geometry = require('../Geometry');
+define([
+    'famous/webgl-geometries/Geometry'
+    ], function ( Geometry ) {
 
 function pickOctant(i) {
     return [(i & 1) * 2 - 1, (i & 2) - 1, (i & 4) / 2 - 1];
@@ -90,4 +91,5 @@ function BoxGeometry(options) {
     return new Geometry(options);
 }
 
-module.exports = BoxGeometry;
+return BoxGeometry;
+});

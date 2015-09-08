@@ -23,21 +23,38 @@
  */
 
 'use strict';
-
-module.exports = {
-    Box: require('./primitives/Box'),
-    Circle: require('./primitives/Circle'),
-    Cylinder: require('./primitives/Cylinder'),
-    GeodesicSphere: require('./primitives/GeodesicSphere'),
-    Icosahedron: require('./primitives/Icosahedron'),
-    ParametricCone: require('./primitives/ParametricCone'),
-    Plane: require('./primitives/Plane'),
-    Sphere: require('./primitives/Sphere'),
-    Tetrahedron: require('./primitives/Tetrahedron'),
-    Torus: require('./primitives/Torus'),
-    Triangle: require('./primitives/Triangle'),
-    GeometryHelper: require('./GeometryHelper'),
-    DynamicGeometry: require('./DynamicGeometry'),
-    Geometry: require('./Geometry'),
-    OBJLoader: require('./OBJLoader')
+define([
+    'famous/webgl-geometries/primitives/Box',
+    'famous/webgl-geometries/primitives/Circle',
+    'famous/webgl-geometries/primitives/Cylinder',
+    'famous/webgl-geometries/primitives/GeodesicSphere',
+    'famous/webgl-geometries/primitives/Icosahedron',
+    'famous/webgl-geometries/primitives/ParametricCone',
+    'famous/webgl-geometries/primitives/Plane',
+    'famous/webgl-geometries/primitives/Sphere',
+    'famous/webgl-geometries/primitives/Tetrahedron',
+    'famous/webgl-geometries/primitives/Torus',
+    'famous/webgl-geometries/primitives/Triangle',
+    'famous/webgl-geometries/GeometryHelper',
+    'famous/webgl-geometries/DynamicGeometry',
+    'famous/webgl-geometries/Geometry',
+    'famous/webgl-geometries/OBJLoader'
+    ], function ( Box, Circle, Cylinder, GeodesicSphere, Icosahedron, ParametricCone, Plane, Sphere, Tetrahedron, Torus, Triangle, GeometryHelper, DynamicGeometry, Geometry, OBJLoader ) {
+return {
+    Box: Box,
+    Circle: Circle,
+    Cylinder: Cylinder,
+    GeodesicSphere: GeodesicSphere,
+    Icosahedron: Icosahedron,
+    ParametricCone: ParametricCone,
+    Plane: Plane,
+    Sphere: Sphere,
+    Tetrahedron: Tetrahedron,
+    Torus: Torus,
+    Triangle: Triangle,
+    GeometryHelper: GeometryHelper,
+    DynamicGeometry: DynamicGeometry,
+    Geometry: Geometry,
+    OBJLoader: OBJLoader
 };
+});

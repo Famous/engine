@@ -23,8 +23,7 @@
  */
 
 'use strict';
-
-var polyfills = require('../polyfills');
+define(['famous/polyfills/index'], function (polyfills) {
 var rAF = polyfills.requestAnimationFrame;
 var cAF = polyfills.cancelAnimationFrame;
 
@@ -307,4 +306,5 @@ RequestAnimationFrameLoop.prototype.noLongerUpdate = function noLongerUpdate(upd
     return this;
 };
 
-module.exports = RequestAnimationFrameLoop;
+return RequestAnimationFrameLoop;
+});

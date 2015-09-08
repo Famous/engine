@@ -23,9 +23,10 @@
  */
 
 'use strict';
-
-var Geometry = require('../Geometry');
-var GeometryHelper = require('../GeometryHelper');
+define([
+    'famous/webgl-geometries/Geometry',
+    'famous/webgl-geometries/GeometryHelper'
+    ], function ( Geometry, GeometryHelper ) {
 
 /**
  * This function returns a new static geometry, which is passed
@@ -83,4 +84,5 @@ ParametricSphere.generator = function generator(u, v, pos) {
     pos[2] = z;
 };
 
-module.exports = ParametricSphere;
+return ParametricSphere;
+});

@@ -24,6 +24,7 @@
 
 'use strict';
 
+define([], function () {
 /**
  * A two-dimensional vector.
  *
@@ -366,4 +367,5 @@ Vec2.cross = function(v1,v2) {
     return v1.x * v2.y - v1.y * v2.x;
 };
 
-module.exports = Vec2;
+return Vec2;
+});
