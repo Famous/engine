@@ -24,7 +24,7 @@
 
 'use strict';
 define([
-    'famous/physics/contraints/collision/AABB'
+    'famous/physics/constraints/collision/AABB'
     ], function (AABB) {
 
 
