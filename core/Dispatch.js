@@ -23,7 +23,7 @@
  */
 
 'use strict';
-define( ['famous/core/Event', 'famous/core/Path'], function (Event, Path) {
+define( ['famous/core/Event', 'famous/core/Path'], function (Event, PathUtils) {
 
 /**
  * The Dispatch class is used to propogate events down the
