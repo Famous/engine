@@ -23,10 +23,10 @@
  */
 
 'use strict';
-
-var Force = require('./Force');
-var Vec3 = require('../../math/Vec3');
-
+define([
+    'famous/physics/forces/Force',
+    'famous/math/Vec3'
+    ], function ( Force, Vec3 ) {
 var TORQUE_REGISTER = new Vec3();
 
 /**
@@ -100,4 +100,5 @@ RotationalDrag.prototype.update = function update() {
     }
 };
 
-module.exports = RotationalDrag;
+return RotationalDrag;
+});

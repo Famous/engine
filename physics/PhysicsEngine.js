@@ -23,15 +23,14 @@
  */
 
 'use strict';
-
-var Particle = require('./bodies/Particle');
-var Constraint = require('./constraints/Constraint');
-var Force = require('./forces/Force');
-
-var CallbackStore = require('../utilities/CallbackStore');
-
-var Vec3 = require('../math/Vec3');
-var Quaternion = require('../math/Quaternion');
+define([
+    'famous/physics/bodies/Particle',
+    'famous/physics/constraints/Constraint',
+    'famous/physics/forces/Force',
+    'famous/utilities/CallbackStore',
+    'famous/math/Vec3',
+    'famous/math/Quaternion'
+    ], function ( Particle, Constraint, Force, CallbackStore, Vec3, Quaternion ) {
 
 var VEC_REGISTER = new Vec3();
 var QUAT_REGISTER = new Quaternion();
@@ -495,4 +494,5 @@ function _integratePose(body, dt) {
     body.updateInertia();
 }
 
-module.exports = PhysicsEngine;
+return PhysicsEngine;
+});

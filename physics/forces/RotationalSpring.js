@@ -23,11 +23,12 @@
  */
 
 'use strict';
-
-var Force = require('./Force');
-var Vec3 = require('../../math/Vec3');
-var Mat33 = require('../../math/Mat33');
-var Quaternion = require('../../math/Quaternion');
+define([
+    'famous/physics/forces/Force',
+    'famous/math/Vec3',
+    'famous/math/Mat33',
+    'famous/math/Quaternion'
+    ], function ( Force, Vec3, Mat33, Quaternion ) {
 
 var Q_REGISTER = new Quaternion();
 var DAMPING_REGISTER = new Vec3();
@@ -139,4 +140,5 @@ RotationalSpring.prototype.update = function update() {
     }
 };
 
-module.exports = RotationalSpring;
+return RotationalSpring;
+});
