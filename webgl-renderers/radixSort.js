@@ -133,4 +133,5 @@ function radixSort(list, registry) {
     return out;
 }
 
-module.exports = radixSort;
+return radixSort;
+});
