@@ -41,6 +41,8 @@ var GeometryHelper = require('../GeometryHelper');
  * @return {Object} constructed geometry
  */
 function Cylinder (options) {
+    if (!(this instanceof Cylinder)) return new Cylinder(options);
+
     options  = options || {};
     var radius   = options.radius || 1;
     var detail   = options.detail || 15;
@@ -63,8 +65,11 @@ function Cylinder (options) {
         { name: 'indices', data: buffers.indices, size: 1 }
     ];
 
-    return new Geometry(options);
+    Geometry.call(this, options);
 }
+
+Cylinder.prototype = Object.create(Geometry.prototype);
+Cylinder.prototype.constructor = Cylinder;
 
 /**
  * Function used in iterative construction of parametric primitive.

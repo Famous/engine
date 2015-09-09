@@ -56,15 +56,9 @@ function Buffer(target, type, gl) {
  */
 Buffer.prototype.subData = function subData() {
     var gl = this.gl;
-    var data = [];
-
-    // to prevent against maximum call-stack issue.
-    for (var i = 0, chunk = 10000; i < this.data.length; i += chunk)
-        data = Array.prototype.concat.apply(data, this.data.slice(i, i + chunk));
-
     this.buffer = this.buffer || gl.createBuffer();
     gl.bindBuffer(this.target, this.buffer);
-    gl.bufferData(this.target, new this.type(data), gl.STATIC_DRAW);
+    gl.bufferData(this.target, new this.type(this.data), gl.STATIC_DRAW);
 };
 
 module.exports = Buffer;

@@ -40,6 +40,8 @@ var GeometryHelper = require('../GeometryHelper');
  * @return {Object} constructed geometry
  */
 function Circle (options) {
+    if (!(this instanceof Circle)) return new Circle(options);
+
     options  = options || {};
     var detail   = options.detail || 30;
     var buffers  = getCircleBuffers(detail, true);
@@ -58,8 +60,11 @@ function Circle (options) {
         { name: 'indices', data: buffers.indices, size: 1 }
     ];
 
-    return new Geometry(options);
+    Geometry.call(this, options);
 }
+
+Circle.prototype = Object.create(Geometry.prototype);
+Circle.prototype.constructor = Circle;
 
 function getCircleTexCoords (vertices) {
     var textureCoords = [];
