@@ -27,6 +27,7 @@
 var PathStore = require('./PathStore');
 var Size = require('./Size');
 var Dispatch = require('./Dispatch');
+var TransformSystem = require('./TransformSystem');
 var PathUtils = require('./Path');
 
 /**
@@ -118,11 +119,9 @@ SizeSystem.prototype.update = function update () {
         if (size.proportionalSizeChanged) proportionalSizeChanged(node, components, size);
         if (size.differentialSizeChanged) differentialSizeChanged(node, components, size);
         if (size.renderSizeChanged) renderSizeChanged(node, components, size);
-        if (size.fromComponents(components)) sizeChanged(node, components, size);
+        if (size.fromComponents(components)) sizeChanged(node, components, size, paths[i]);
     }
 };
-
-// private methods
 
 /**
  * Private method to alert the node and components that size mode changed.
@@ -233,7 +232,7 @@ function differentialSizeChanged (node, components, size) {
  * @return {undefined} undefined
  */
 function renderSizeChanged (node, components, size) {
-    var renderSize = size.getRenderSize();
+    var renderSize = size.getRender();
     var x = renderSize[0];
     var y = renderSize[1];
     var z = renderSize[2];
@@ -253,10 +252,11 @@ function renderSizeChanged (node, components, size) {
  * @param {Node} node Node to potentially call onSizeChange on
  * @param {Array} components a list of the nodes' components
  * @param {Size} size the size class for the Node
+ * @params {String} path the size path
  *
  * @return {undefined} undefined
  */
-function sizeChanged (node, components, size) {
+function sizeChanged (node, components, size, path) {
     var finalSize = size.get();
     var x = finalSize[0];
     var y = finalSize[1];
@@ -266,6 +266,9 @@ function sizeChanged (node, components, size) {
         if (components[i] && components[i].onSizeChange)
             components[i].onSizeChange(x, y, z);
     size.sizeChanged = false;
+
+    var transform = TransformSystem.get(path);
+    transform._dirtyFromSizeChange = true;
 }
 
 module.exports = new SizeSystem();

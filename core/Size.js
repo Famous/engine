@@ -34,7 +34,6 @@ var ZEROS = [0, 0, 0];
  * @param {Size} parent the parent size
  */
 function Size (parent) {
-
     this.finalSize = new Float32Array(3);
     this.sizeChanged = false;
 
@@ -267,6 +266,25 @@ Size.prototype.getDifferential = function getDifferential () {
 };
 
 /**
+ * Gets the render size of this size representation
+ *
+ * @method
+ *
+ * @return {array} array of render size
+ */
+Size.prototype.getRender = function getRender () {
+    return this.renderSize;
+};
+
+/**
+ * Preserved for backwards compatibility.
+ * 
+ * @deprecated
+ * @alias {Size#getRender}
+ */
+Size.prototype.getRenderSize = Size.prototype.getRender;
+
+/**
  * Sets the size of this size representation.
  *
  * @method
@@ -301,6 +319,7 @@ Size.prototype.fromComponents = function fromComponents (components) {
     var changed = false;
     var len = components.length;
     var j;
+    var candidate;
     for (var i = 0 ; i < 3 ; i++) {
         prev = target[i];
         switch (mode[i]) {
@@ -311,13 +330,18 @@ Size.prototype.fromComponents = function fromComponents (components) {
                 target[i] = this.absoluteSize[i];
                 break;
             case Size.RENDER:
-                var candidate;
                 var component;
                 for (j = 0; j < len ; j++) {
                     component = components[j];
                     if (component && component.getRenderSize) {
                         candidate = component.getRenderSize()[i];
-                        target[i] = target[i] < candidate || target[i] === 0 ? candidate : target[i];
+
+                        if (this.renderSize[i] !== candidate) {
+                            this.renderSize[i] = candidate;
+                            this.renderSizeChanged = true;
+                        }
+
+                        target[i] = candidate;
                     }
                 }
                 break;
@@ -329,4 +353,3 @@ Size.prototype.fromComponents = function fromComponents (components) {
 };
 
 module.exports = Size;
-

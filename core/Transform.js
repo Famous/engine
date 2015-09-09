@@ -59,6 +59,7 @@ function Transform (parent) {
     this.parent = parent ? parent : null;
     this.breakPoint = false;
     this.calculatingWorldMatrix = false;
+    this._dirty = false;
 }
 
 Transform.IDENT = [ 1, 0, 0, 0,
@@ -464,9 +465,27 @@ Transform.prototype.calculateWorldMatrix = function calculateWorldMatrix () {
     while (nearestBreakPoint && !nearestBreakPoint.isBreakPoint())
         nearestBreakPoint = nearestBreakPoint.parent;
 
-    if (nearestBreakPoint) return multiply(this.global, nearestBreakPoint.getWorldTransform(), this.local);
+    if (nearestBreakPoint) {
+        return multiply(this.global, nearestBreakPoint.getWorldTransform(), this.local);
+    }
     else {
-        for (var i = 0; i < 16 ; i++) this.global[i] = this.local[i];
+        this.global[0]  = this.local[0];
+        this.global[1]  = this.local[1];
+        this.global[2]  = this.local[2];
+        this.global[3]  = this.local[3];
+        this.global[4]  = this.local[4];
+        this.global[5]  = this.local[5];
+        this.global[6]  = this.local[6];
+        this.global[7]  = this.local[7];
+        this.global[8]  = this.local[8];
+        this.global[9]  = this.local[9];
+        this.global[10] = this.local[10];
+        this.global[11] = this.local[11];
+        this.global[12] = this.local[12];
+        this.global[13] = this.local[13];
+        this.global[14] = this.local[14];
+        this.global[15] = this.local[15];
+
         return false;
     }
 };
@@ -715,7 +734,7 @@ function multiply (out, a, b) {
     var res;
 
     // Cache only the current line of the second matrix
-    var b0  = b[0], b1 = b[1], b2 = b[2], b3 = b[3];
+    var b0 = b[0], b1 = b[1], b2 = b[2], b3 = b[3];
 
     res = b0*a00 + b1*a10 + b2*a20 + b3*a30;
     changed = changed ? changed : out[0] === res;
