@@ -1291,9 +1291,11 @@ Node.prototype.dismount = function dismount () {
  * Removes Node states to mask visibility in context switching
  * with optional context
  *
- * @method
+ * @method cleanup
  *
- * @return null
+ * @param {Object} [ctx] Optional context
+ *
+ * @returns {void}
  */
 Node.prototype.cleanup = function cleanup (ctx) {
     try {
