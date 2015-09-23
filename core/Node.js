@@ -1288,8 +1288,8 @@ Node.prototype.dismount = function dismount () {
 };
 
 /**
- * Removes Node states to mask visibility in context switching
- * with optional context
+ * Removes selected Node visual states during context switching
+ * of parents creating new nodes, with optional context
  *
  * @method cleanup
  *
