@@ -1287,4 +1287,34 @@ Node.prototype.dismount = function dismount () {
     if (!this._requestingUpdate) this._requestUpdate();
 };
 
-module.exports = Node;
+/**
+ * Removes selected Node visual states during context switching
+ * of parents creating new nodes, with optional context
+ *
+ * @method cleanup
+ *
+ * @param {Object} [ctx] Optional context
+ *
+ * @returns {void}
+ */
+Node.prototype.cleanup = function cleanup (ctx) {
+    try {
+        var was = this;
+        was._UIEvents.forEach(function(e) {
+            was.removeUIEvent(e);
+        });
+        was._components.forEach(function(c) {
+            c.setProperty('background-color', 'transparent')
+                .setContent('');
+            was.removeComponent(c);
+        });
+        was.setSizeMode('absolute', 'absolute')
+            .setAbsoluteSize(0, 0);
+        if (ctx) ctx.removeChild(was);
+    } 
+    catch (e) {
+        throw e;
+    }
+};
+
+ module.exports = Node;
