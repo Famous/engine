@@ -1309,9 +1309,10 @@ Node.prototype.cleanup = function cleanup (ctx) {
         was.setSizeMode('absolute', 'absolute')
             .setAbsoluteSize(0, 0);
         if (ctx) ctx.removeChild(was);
-    } catch(e) {
-        throw e
-    };
+    } 
+    catch (e) {
+        throw e;
+    }
 };
 
  module.exports = Node;
