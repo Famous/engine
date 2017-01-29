@@ -51,20 +51,31 @@ var Commands = require('../core/Commands');
  * property and sending updates using `postMessage`.
  * @param {Compositor} compositor an instance of Compositor used to extract
  * enqueued draw commands from to be sent to the thread.
- * @param {RenderLoop} renderLoop an instance of Engine used for executing
- * the `ENGINE` commands on.
+ * @param {RenderLoop} [renderLoop] an instance of RenderLoop used for updating
+ * the UIManager when not running in container mode. Target for the ENGINE
+ * commands. Optional when running exclusively in container mode.
  */
 function UIManager (thread, compositor, renderLoop) {
+    var _this = this;
+
     this._thread = thread;
     this._compositor = compositor;
     this._renderLoop = renderLoop;
 
-    this._renderLoop.update(this);
+    if (renderLoop) {
+        this._renderLoop.update(this);
+    }
 
-    var _this = this;
     this._thread.onmessage = function (ev) {
         var message = ev.data ? ev.data : ev;
         if (message[0] === Commands.ENGINE) {
+            if (!_this._renderLoop) {
+                console.error(
+                    'Can not process ENGINE commands since no render loop' +
+                    'is available.'
+                );
+                return;
+            }
             switch (message[1]) {
                 case Commands.START:
                     _this._engine.start();
@@ -86,6 +97,11 @@ function UIManager (thread, compositor, renderLoop) {
     this._thread.onerror = function (error) {
         console.error(error);
     };
+
+    this._containerMode = false;
+    window.addEventListener('message', function (message) {
+        _this._handleWindowMessage(message);
+    });
 }
 
 /**
@@ -149,9 +165,119 @@ UIManager.prototype.getRenderLoop = function getRenderLoop() {
  */
 UIManager.prototype.update = function update (time) {
     this._thread.postMessage([Commands.FRAME, time]);
+    this._sendDrawCommands();
+};
+
+
+/**
+ * Method used for sending the compositor's draw commands to the managed thread
+ * (Worker or Channel). Clears the compositor.
+ *
+ * @method  _sendDrawCommands
+ * @private
+ *
+ * @return {undefined}      undefined
+ */
+UIManager.prototype._sendDrawCommands = function _sendDrawCommands () {
     var threadMessages = this._compositor.drawCommands();
     this._thread.postMessage(threadMessages);
     this._compositor.clearCommands();
+};
+
+
+/**
+ * Container mode will automatically be entered after receving the initial
+ * window commands from the container manager.
+ *
+ * Entering container mode results into the currently active render loop to be
+ * stopped, assuming it is available.
+ *
+ * @method
+ * @param {MessageEvent} [message] Message received from container used for
+ *                                 establishing two way messaging between
+ *                                 container and UIManager.
+ * @return {undefined}          undefined
+ */
+UIManager.prototype.enterContainerMode = function enterContainerMode (message) {
+    if (!this._containerMode) {
+        this._containerMode = true;
+        if (message) {
+            this._container = message.source;
+            this.requestContainerSize();
+        }
+        if (this._renderLoop) this._renderLoop.stop();
+    }
+};
+
+/**
+ * Requests the container size by posting a REQUEST_SIZE message to the parent
+ * container.
+ *
+ * @method
+ *
+ * @return {undefined} undefined
+ */
+UIManager.prototype.requestContainerSize = function requestContainerSize() {
+    if (!this._containerMode) {
+        throw new Error('Not in container mode');
+    }
+    if (!this._container) {
+        throw new Error('No access to parent container');
+    }
+
+    this._container.postMessage([Commands.CONTAINER, Commands.REQUEST_SIZE], '*');
+};
+
+/**
+ * Exits from container mode. Starts the render loop if possible, but won't
+ * prevent the UIManager from receiveing further messages.
+ *
+ * @method
+ * @return {undefined}          undefined
+ */
+UIManager.prototype.exitContainerMode = function exitContainerMode () {
+    if (!this._containerMode) {
+        this._containerMode = false;
+        if (this._renderLoop) this._renderLoop.start();
+    }
+};
+
+
+/**
+ * Listener function used for receiveing window messages.
+ *
+ * @method
+ * @private
+ *
+ * @param  {Object} message     Received window message.
+ * @return {undefined}          undefined
+ */
+UIManager.prototype._handleWindowMessage = function _handleWindowMessage (message) {
+    var windowCommands = message.data;
+
+    if (windowCommands && windowCommands.constructor === Array && windowCommands[0] === Commands.FAMOUS) {
+        this.enterContainerMode(message);
+
+        // Remove FAMOUS prefix command
+        windowCommands.shift();
+
+        this._thread.postMessage(windowCommands);
+        this._sendDrawCommands();
+    }
+};
+
+
+/**
+ * Method used for determining whether the UIManger is currently running in
+ * container mode.
+ *
+ * @method
+ *
+ * @return {Boolean}    Boolean value indicating whether the UIManager is
+ * currently running in container mode.
+ */
+UIManager.prototype.isContainerMode = function isContainerMode () {
+    return this._containerMode;
 };
 
 module.exports = UIManager;

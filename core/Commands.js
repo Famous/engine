@@ -64,7 +64,15 @@ var Commands = {
     READY: 33,
     ALLOW_DEFAULT: 34,
     PREVENT_DEFAULT: 35,
-    UNSUBSCRIBE: 36,
+
+    FAMOUS: 36,
+    CONTAINER_EVENT: 37,
+    CONTAINER: 38,
+    REQUEST_SIZE: 39,
+    SEND_SIZE: 40,
+
+    UNSUBSCRIBE: 41,
+
     prettyPrint: function (buffer, start, count) {
         var callback;
         start = start ? start : 0;
@@ -85,7 +93,7 @@ var commandPrinters = [];
 
 commandPrinters[Commands.INIT_DOM] = function init_dom (buffer, data) {
     data.result += data.i + '. INIT_DOM\n    tagName: ' + buffer[++data.i] + '\n\n';
-}; 
+};
 
 commandPrinters[Commands.DOM_RENDER_SIZE] = function dom_render_size (buffer, data) {
     data.result += data.i + '. DOM_RENDER_SIZE\n    selector: ' + buffer[++data.i] + '\n\n';
@@ -210,4 +218,3 @@ commandPrinters[Commands.NEED_SIZE_FOR] = function need_size_for (buffer, data) 
 };
 
 module.exports = Commands;
-

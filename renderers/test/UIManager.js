@@ -165,4 +165,8 @@ test('UIManager', function(t) {
 
         t.equal(clearedCommands, true);
     });
+
+    t.test('Container Mode', function(t) {
+        t.end();
+    });
 });

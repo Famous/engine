@@ -238,6 +238,13 @@ FamousEngine.prototype.handleMessage = function handleMessage (messages) {
             case Commands.FRAME:
                 this.handleFrame(messages);
                 break;
+            case Commands.SEND_SIZE:
+                // var containerWidth = messages.shift();
+                // var containerHeight = messages.shift();
+                messages.shift();
+                messages.shift();
+                // TODO
+                break;
             default:
                 throw new Error('received unknown command: ' + command);
         }
