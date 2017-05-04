@@ -23,6 +23,7 @@ module.exports = [
     'getAlign',
     'getOrigin',
     'getPosition',
+    'getPositionFrom',
     'getRotation',
     'getScale',
     'getSizeMode',

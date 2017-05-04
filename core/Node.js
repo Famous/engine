@@ -33,6 +33,7 @@ var OpacitySystem = require('./OpacitySystem');
 var Size = require('./Size');
 var Opacity = require('./Opacity');
 var Transform = require('./Transform');
+var Scene = require('./Scene');
 
 /**
  * Nodes define hierarchy and geometrical transformations. They can be moved
@@ -546,6 +547,49 @@ Node.prototype.getPosition = function getPosition () {
         return TransformSystem.get(this.getLocation()).getPosition();
     else throw new Error('This node does not have access to a transform component');
 };
+
+/**
+ * Determines the node's position relative to an ancestor node.
+ *
+ * @method getPositionFrom
+ *
+ * @param {Node} ancestor An ancestor `Node` of the current `Node`.
+ *
+ * @return {Float32Array} An array representing the position.
+ */
+Node.prototype.getPositionFrom = function getPositionFrom (ancestor) {
+    var position = new Float32Array(Array.prototype.slice.call(this.getPosition()));
+    var currentParent = this.getParent();
+    var parentPosition;
+
+    if (!(ancestor instanceof Node))
+        throw new Error(''+ancestor+' is not an instance of Node.');
+
+    // Go through all the nodes up through the ancestor.
+    while (currentParent && currentParent !== ancestor
+        // stop at the scene node.
+        && !(currentParent instanceof Scene)) {
+
+        parentPosition = currentParent.getPosition();
+
+        position[0] += parentPosition[0];
+        position[1] += parentPosition[1];
+        position[2] += parentPosition[2];
+
+        currentParent = currentParent.getParent();
+    }
+
+    // if we reached a null _parent and didn't find the target ancestor.
+    if (!currentParent)
+        throw new Error('Null parent reached, but '+ancestor+' is not an ancestor of this Node.');
+
+    // or if we reached the scene node and didn't find the target ancestor.
+    if (currentParent !== ancestor)
+        throw new Error('Scene node reached, but '+ancestor+' is not an ancestor of this Node.');
+
+    return position;
+};
+
 
 /**
  * Returns the node's current rotation
