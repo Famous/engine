@@ -50,11 +50,12 @@ Gravity3D.prototype.constructor = Gravity3D;
  * Initialize the Force. Sets defaults if a property was not already set.
  *
  * @method
+ * @param {Object} options The options hash.
  * @return {undefined} undefined
  */
-Gravity3D.prototype.init = function() {
-    this.max = this.max || Infinity;
-    this.strength = this.strength || 200;
+Gravity3D.prototype.init = function(options) {
+    this.max = options.max || Infinity;
+    this.strength = options.strength || 200;
 };
 
 /**

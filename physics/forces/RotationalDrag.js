@@ -69,12 +69,13 @@ RotationalDrag.LINEAR = function LINEAR() {
  * Initialize the Force. Sets defaults if a property was not already set.
  *
  * @method
+ * @param {Object} options The options hash.
  * @return {undefined} undefined
  */
-RotationalDrag.prototype.init = function init() {
-    this.max = this.max || Infinity;
-    this.strength = this.strength || 1;
-    this.type = this.type || RotationalDrag.LINEAR;
+RotationalDrag.prototype.init = function init(options) {
+    this.max = options.max || Infinity;
+    this.strength = options.strength || 1;
+    this.type = options.type || RotationalDrag.LINEAR;
 };
 
 /**
