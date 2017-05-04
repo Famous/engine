@@ -600,14 +600,16 @@ DOMRenderer.prototype.setAttribute = function setAttribute(name, value) {
  *
  * @method
  *
- * @param {String} content Content to be set as `innerHTML`
+ * @param {String|HTMLElement} content A string to be set as `innerHTML` or an
+ *                                     instance of HTMLElement to be set as the
+ *                                     child element.
  *
  * @return {undefined} undefined
  */
 DOMRenderer.prototype.setContent = function setContent(content) {
     this._assertTargetLoaded();
 
-    if (this._target.formElement) {
+    if (this._target.isInputElement || this._target.isTextAreaElement) {
         this._target.element.value = content;
     }
     else {
@@ -619,7 +621,13 @@ DOMRenderer.prototype.setContent = function setContent(content) {
                 this._target.element.firstChild
             );
         }
-        this._target.content.innerHTML = content;
+        if (content instanceof HTMLElement) {
+            this._target.content.innerHTML = '';
+            this._target.content.appendChild(content);
+        }
+        else {
+            this._target.content.innerHTML = content;
+        }
     }
 
 
