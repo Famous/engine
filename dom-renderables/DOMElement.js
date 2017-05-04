@@ -74,6 +74,7 @@ function DOMElement(node, options) {
     this._renderSize = [0, 0, 0];
 
     this._node = node;
+    if (node) node.addComponent(this);
 
     if (node) node.addComponent(this);
 
