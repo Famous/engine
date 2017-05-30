@@ -25,6 +25,7 @@
 'use strict';
 
 module.exports = {
+    Mike: 'Test',
     Particle: require('./bodies/Particle'),
     convexBodyFactory: require('./bodies/convexBodyFactory'),
     Box: require('./bodies/Box'),
