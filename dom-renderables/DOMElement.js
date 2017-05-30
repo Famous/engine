@@ -303,7 +303,7 @@ DOMElement.prototype.onOpacityChange = function onOpacityChange(opacity) {
  *
  * @param {String} uiEvent uiEvent to be subscribed to (e.g. `click`)
  *
- * @return {undefined} undefined
+ * @return {DOMElement} this
  */
 DOMElement.prototype.onAddUIEvent = function onAddUIEvent(uiEvent) {
     if (this._UIEvents.indexOf(uiEvent) === -1) {
