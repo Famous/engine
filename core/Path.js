@@ -97,9 +97,9 @@ var Path = {
         var len = path.length;
         var index = 0;
         for (; i < len ; i++) {
-            if (path[i] === '/') index++;
-            if (index === depth) {
-                path = path.substring(i ? i + 1 : i);
+            if (path[i] == '/') index++;
+            if (index == depth) {
+                path = path.substring(!i ? i : 1 + i);
                 index = path.indexOf('/');
                 path = index === -1 ? path : path.substring(0, index);
                 index = parseInt(path);
